@@ -1,0 +1,2060 @@
+{
+  "columns": [
+    {
+      "ai_artifact": {
+        "artifact_id": "ai_1",
+        "sha256": "302a883a750b2cacd5fedc08f9b8aadc5944c8e69513a61e70af2bc9e191798b"
+      },
+      "ai_duration_ms": 70913.3,
+      "ai_error": null,
+      "ai_status": "OK",
+      "backend": "openai_responses",
+      "centerline_views": false,
+      "decision": "SUPPORTED_AUTO",
+      "deployment": "gpt-5.6-sol",
+      "draft_generated": true,
+      "eligibility": {
+        "decision": "SUPPORTED_AUTO",
+        "reason_codes": []
+      },
+      "estimated_cost_usd": null,
+      "evidence_mode": "single",
+      "fusion": {
+        "conflicts": 0,
+        "inputs_complete": true,
+        "site_model_id": "SITE-688FEDC874AFE565"
+      },
+      "grounding": null,
+      "image_quality": "GOOD",
+      "label": "gpt-5.6-sol - single-resolution, baseline",
+      "metrics": {
+        "below_threshold": [],
+        "low_confidence": 0,
+        "resolved": 13,
+        "unresolved": 0
+      },
+      "model": "gpt-5.6-sol",
+      "new_external_calls": [
+        {
+          "duration_ms": 13928.5,
+          "external": true,
+          "provider": "azure_maps",
+          "requests": 4,
+          "service": "map",
+          "span": "tcp.sheet.render"
+        }
+      ],
+      "observation": {
+        "attribute_confidence": {
+          "divided_road": 0.98,
+          "intersection_conflict": 0.82,
+          "lane_count_total": 0.96,
+          "outside_traveled_way": 0.82,
+          "pedestrian_impact": 0.86,
+          "road_edges": 0.78,
+          "two_way_visible": 0.93,
+          "work_side": 0.93
+        },
+        "divided_road_visible": false,
+        "features": {
+          "crosswalks": [],
+          "driveways": [
+            {
+              "confidence": 0.66,
+              "description": "Residential or property access joining the left side of the selected road.",
+              "image_x": 124,
+              "image_y": 718,
+              "side": "LEFT"
+            },
+            {
+              "confidence": 0.72,
+              "description": "Property access joining the left side of the road.",
+              "image_x": 337,
+              "image_y": 607,
+              "side": "LEFT"
+            },
+            {
+              "confidence": 0.9,
+              "description": "Paved access connecting the road to the visible parking area.",
+              "image_x": 584,
+              "image_y": 493,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.72,
+              "description": "Residential access joining the left side of the road.",
+              "image_x": 702,
+              "image_y": 433,
+              "side": "LEFT"
+            },
+            {
+              "confidence": 0.82,
+              "description": "Curving residential access joining the right side of the road.",
+              "image_x": 815,
+              "image_y": 376,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.68,
+              "description": "Property access joining the left side of the road.",
+              "image_x": 881,
+              "image_y": 342,
+              "side": "LEFT"
+            }
+          ],
+          "intersections": [
+            {
+              "confidence": 0.68,
+              "description": "Paved side-road or broad access junction; exact classification is visually uncertain.",
+              "image_x": 78,
+              "image_y": 750,
+              "side": "RIGHT"
+            }
+          ],
+          "obstructions": [],
+          "ramps": [],
+          "roundabouts": []
+        },
+        "image_quality": "GOOD",
+        "lane_count_total": 2,
+        "lane_markings_visible": true,
+        "notes": "A visible two-lane undivided road runs southwest\u2013northeast. The image-centre reference appears on the northwest/LEFT roadside beyond the narrow visible shoulder, rather than within the edge-line-to-edge-line traveled way. Width is approximate because of aerial-image resolution.",
+        "osm_conflicts": [],
+        "road_edges": {
+          "left_visible": true,
+          "right_visible": true,
+          "traveled_way_width_px": 16
+        },
+        "shoulders": {
+          "left_present": true,
+          "right_present": true
+        },
+        "sidewalks": {
+          "left_present": false,
+          "right_present": false
+        },
+        "two_way_visible": true,
+        "work_reference": {
+          "appears_outside_traveled_way": true,
+          "appears_roadside": true,
+          "relative_position": "BEYOND_SHOULDER",
+          "side": "LEFT"
+        }
+      },
+      "osm_claims": false,
+      "plan_id": "TCP-1B2261E3C58315E2",
+      "profile": "gpt-5.6-sol",
+      "raw_response": "{\"lane_count_total\":2,\"two_way_visible\":\"YES\",\"divided_road_visible\":\"NO\",\"lane_markings_visible\":\"YES\",\"road_edges\":{\"left_visible\":true,\"right_visible\":true,\"traveled_way_width_px\":16},\"shoulders\":{\"left_present\":\"YES\",\"right_present\":\"YES\"},\"sidewalks\":{\"left_present\":\"NO\",\"right_present\":\"NO\"},\"work_reference\":{\"appears_roadside\":\"YES\",\"side\":\"LEFT\",\"appears_outside_traveled_way\":\"YES\",\"relative_position\":\"BEYOND_SHOULDER\"},\"features\":{\"intersections\":[{\"description\":\"Paved side-road or broad access junction; exact classification is visually uncertain.\",\"image_x\":78,\"image_y\":750,\"side\":\"RIGHT\",\"confidence\":0.68}],\"driveways\":[{\"description\":\"Residential or property access joining the left side of the selected road.\",\"image_x\":124,\"image_y\":718,\"side\":\"LEFT\",\"confidence\":0.66},{\"description\":\"Property access joining the left side of the road.\",\"image_x\":337,\"image_y\":607,\"side\":\"LEFT\",\"confidence\":0.72},{\"description\":\"Paved access connecting the road to the visible parking area.\",\"image_x\":584,\"image_y\":493,\"side\":\"RIGHT\",\"confidence\":0.9},{\"description\":\"Residential access joining the left side of the road.\",\"image_x\":702,\"image_y\":433,\"side\":\"LEFT\",\"confidence\":0.72},{\"description\":\"Curving residential access joining the right side of the road.\",\"image_x\":815,\"image_y\":376,\"side\":\"RIGHT\",\"confidence\":0.82},{\"description\":\"Property access joining the left side of the road.\",\"image_x\":881,\"image_y\":342,\"side\":\"LEFT\",\"confidence\":0.68}],\"crosswalks\":[],\"roundabouts\":[],\"ramps\":[],\"obstructions\":[]},\"image_quality\":\"GOOD\",\"attribute_confidence\":{\"lane_count_total\":0.96,\"two_way_visible\":0.93,\"divided_road\":0.98,\"road_edges\":0.78,\"work_side\":0.93,\"outside_traveled_way\":0.82,\"intersection_conflict\":0.82,\"pedestrian_impact\":0.86},\"osm_conflicts\":[],\"notes\":\"A visible two-lane undivided road runs southwest\u2013northeast. The image-centre reference appears on the northwest/LEFT roadside beyond the narrow visible shoulder, rather than within the edge-line-to-edge-line traveled way. Width is approximate because of aerial-image resolution.\"}",
+      "reason_codes": [],
+      "reused": [
+        {
+          "api_call": false,
+          "artifact_id": "map_1",
+          "kind": "map",
+          "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1",
+          "source_run": "20261016-213622-483ff4"
+        },
+        {
+          "api_call": false,
+          "artifact_id": "osm_1",
+          "kind": "osm",
+          "sha256": "2ac7bc19a24d850cc61a5438a11838b8c91e9cf33ffbd8e0d529517a8a5164bc",
+          "source_run": "20261016-213622-483ff4"
+        }
+      ],
+      "run_id": "20261016-221807-a49f7b",
+      "schema_errors": null,
+      "state": "FINISHED",
+      "usage": {
+        "cache_creation_input_tokens": 1750,
+        "cache_read_input_tokens": 0,
+        "input_tokens": 1753,
+        "output_tokens": 5016,
+        "reasoning_tokens": 4487
+      },
+      "views": [],
+      "vision_mode": "baseline"
+    },
+    {
+      "ai_artifact": {
+        "artifact_id": "ai_1",
+        "sha256": "82ef9140b3b31c21a567bef14f87f380c21e1bac9a0210e9f295f34e21e07cd9"
+      },
+      "ai_duration_ms": 17572.9,
+      "ai_error": null,
+      "ai_status": "OK",
+      "backend": "anthropic_messages",
+      "centerline_views": false,
+      "decision": "REVIEW_REQUIRED",
+      "deployment": "claude-opus-5-5",
+      "draft_generated": false,
+      "eligibility": {
+        "decision": "REVIEW_REQUIRED",
+        "reason_codes": [
+          "ALTERNATING_TRAFFIC_UNRESOLVED",
+          "INTERSECTION_CONFLICT_LOW_CONFIDENCE",
+          "LANE_CLOSURE_UNRESOLVED",
+          "LANE_COUNT_LOW_CONFIDENCE",
+          "PEDESTRIAN_IMPACT_LOW_CONFIDENCE",
+          "ROAD_EDGES_LOW_CONFIDENCE",
+          "TRAVELED_WAY_ENCROACHMENT_UNRESOLVED",
+          "TWO_WAY_STATUS_UNRESOLVED",
+          "WORK_LOCATION_UNRESOLVED",
+          "WORK_SIDE_LOW_CONFIDENCE"
+        ]
+      },
+      "estimated_cost_usd": null,
+      "evidence_mode": "single",
+      "fusion": {
+        "conflicts": 0,
+        "inputs_complete": false,
+        "site_model_id": "SITE-0FA605891190AF12"
+      },
+      "grounding": null,
+      "image_quality": "FAIR",
+      "label": "claude-opus-5-5 - single-resolution, baseline",
+      "metrics": {
+        "below_threshold": [
+          "intersection_conflict",
+          "lane_count_total",
+          "outside_traveled_way",
+          "pedestrian_impact",
+          "road_edges",
+          "two_way_visible",
+          "work_side"
+        ],
+        "low_confidence": 4,
+        "resolved": 4,
+        "unresolved": 5
+      },
+      "model": "claude-opus-5-5",
+      "new_external_calls": [],
+      "observation": {
+        "attribute_confidence": {
+          "divided_road": 0.8,
+          "intersection_conflict": 0.4,
+          "lane_count_total": 0.6,
+          "outside_traveled_way": 0.55,
+          "pedestrian_impact": 0.5,
+          "road_edges": 0.55,
+          "two_way_visible": 0.3,
+          "work_side": 0.55
+        },
+        "divided_road_visible": false,
+        "features": {
+          "crosswalks": [],
+          "driveways": [
+            {
+              "confidence": 0.6,
+              "description": "Driveway/entrance to parking lot of large building south-east of road",
+              "image_x": 590,
+              "image_y": 512,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.45,
+              "description": "Driveway to residence south of road",
+              "image_x": 385,
+              "image_y": 622,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.45,
+              "description": "Driveway to residences north of road",
+              "image_x": 705,
+              "image_y": 405,
+              "side": "LEFT"
+            },
+            {
+              "confidence": 0.5,
+              "description": "Long driveway/lane north to houses",
+              "image_x": 838,
+              "image_y": 350,
+              "side": "LEFT"
+            },
+            {
+              "confidence": 0.45,
+              "description": "Curved driveway south of road to residence",
+              "image_x": 848,
+              "image_y": 395,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.4,
+              "description": "Access lane south toward farm fields and houses",
+              "image_x": 90,
+              "image_y": 775,
+              "side": "RIGHT"
+            }
+          ],
+          "intersections": [],
+          "obstructions": [
+            {
+              "confidence": 0.35,
+              "description": "Trees and vegetation close to the left (north-west) road edge near the work reference",
+              "image_x": 505,
+              "image_y": 505,
+              "side": "LEFT"
+            }
+          ],
+          "ramps": [],
+          "roundabouts": []
+        },
+        "image_quality": "FAIR",
+        "lane_count_total": 2,
+        "lane_markings_visible": null,
+        "notes": "Undivided rural road running SW-NE across image; road centreline at image x=512 is roughly y=537, so the centre point lies about 20-25 px (~12-14 m) north-west of the centreline, on the left side outside the traveled way. Lane markings and shoulders are not clearly resolvable at this resolution; traveled way width estimated ~14 px (~8 m). Vehicles visible in both directions are hard to confirm. No sidewalks visible. A parking lot entrance is just right-side opposite and slightly ahead of the reference.",
+        "osm_conflicts": [],
+        "road_edges": {
+          "left_visible": true,
+          "right_visible": true,
+          "traveled_way_width_px": 14
+        },
+        "shoulders": {
+          "left_present": null,
+          "right_present": null
+        },
+        "sidewalks": {
+          "left_present": false,
+          "right_present": false
+        },
+        "two_way_visible": null,
+        "work_reference": {
+          "appears_outside_traveled_way": true,
+          "appears_roadside": true,
+          "relative_position": "BEYOND_SHOULDER",
+          "side": "LEFT"
+        }
+      },
+      "osm_claims": false,
+      "plan_id": null,
+      "profile": "claude-opus-5-5",
+      "raw_response": "{\"lane_count_total\":2,\"two_way_visible\":\"UNKNOWN\",\"divided_road_visible\":\"NO\",\"lane_markings_visible\":\"UNKNOWN\",\"road_edges\":{\"left_visible\":true,\"right_visible\":true,\"traveled_way_width_px\":14},\"shoulders\":{\"left_present\":\"UNKNOWN\",\"right_present\":\"UNKNOWN\"},\"sidewalks\":{\"left_present\":\"NO\",\"right_present\":\"NO\"},\"work_reference\":{\"appears_roadside\":\"YES\",\"side\":\"LEFT\",\"appears_outside_traveled_way\":\"YES\",\"relative_position\":\"BEYOND_SHOULDER\"},\"features\":{\"intersections\":[],\"driveways\":[{\"description\":\"Driveway/entrance to parking lot of large building south-east of road\",\"image_x\":590,\"image_y\":512,\"side\":\"RIGHT\",\"confidence\":0.6},{\"description\":\"Driveway to residence south of road\",\"image_x\":385,\"image_y\":622,\"side\":\"RIGHT\",\"confidence\":0.45},{\"description\":\"Driveway to residences north of road\",\"image_x\":705,\"image_y\":405,\"side\":\"LEFT\",\"confidence\":0.45},{\"description\":\"Long driveway/lane north to houses\",\"image_x\":838,\"image_y\":350,\"side\":\"LEFT\",\"confidence\":0.5},{\"description\":\"Curved driveway south of road to residence\",\"image_x\":848,\"image_y\":395,\"side\":\"RIGHT\",\"confidence\":0.45},{\"description\":\"Access lane south toward farm fields and houses\",\"image_x\":90,\"image_y\":775,\"side\":\"RIGHT\",\"confidence\":0.4}],\"crosswalks\":[],\"roundabouts\":[],\"ramps\":[],\"obstructions\":[{\"description\":\"Trees and vegetation close to the left (north-west) road edge near the work reference\",\"image_x\":505,\"image_y\":505,\"side\":\"LEFT\",\"confidence\":0.35}]},\"image_quality\":\"FAIR\",\"attribute_confidence\":{\"lane_count_total\":0.6,\"two_way_visible\":0.3,\"divided_road\":0.8,\"road_edges\":0.55,\"work_side\":0.55,\"outside_traveled_way\":0.55,\"intersection_conflict\":0.4,\"pedestrian_impact\":0.5},\"osm_conflicts\":[],\"notes\":\"Undivided rural road running SW-NE across image; road centreline at image x=512 is roughly y=537, so the centre point lies about 20-25 px (~12-14 m) north-west of the centreline, on the left side outside the traveled way. Lane markings and shoulders are not clearly resolvable at this resolution; traveled way width estimated ~14 px (~8 m). Vehicles visible in both directions are hard to confirm. No sidewalks visible. A parking lot entrance is just right-side opposite and slightly ahead of the reference.\"}",
+      "reason_codes": [
+        "ALTERNATING_TRAFFIC_UNRESOLVED",
+        "INTERSECTION_CONFLICT_LOW_CONFIDENCE",
+        "LANE_CLOSURE_UNRESOLVED",
+        "LANE_COUNT_LOW_CONFIDENCE",
+        "PEDESTRIAN_IMPACT_LOW_CONFIDENCE",
+        "ROAD_EDGES_LOW_CONFIDENCE",
+        "TRAVELED_WAY_ENCROACHMENT_UNRESOLVED",
+        "TWO_WAY_STATUS_UNRESOLVED",
+        "WORK_LOCATION_UNRESOLVED",
+        "WORK_SIDE_LOW_CONFIDENCE"
+      ],
+      "reused": [
+        {
+          "api_call": false,
+          "artifact_id": "map_1",
+          "kind": "map",
+          "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1",
+          "source_run": "20261016-213622-483ff4"
+        },
+        {
+          "api_call": false,
+          "artifact_id": "osm_1",
+          "kind": "osm",
+          "sha256": "2ac7bc19a24d850cc61a5438a11838b8c91e9cf33ffbd8e0d529517a8a5164bc",
+          "source_run": "20261016-213622-483ff4"
+        }
+      ],
+      "run_id": "20261016-221807-0728cd",
+      "schema_errors": null,
+      "state": "FINISHED",
+      "usage": {
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "input_tokens": 4494,
+        "output_tokens": 1520
+      },
+      "views": [],
+      "vision_mode": "baseline"
+    },
+    {
+      "ai_artifact": {
+        "artifact_id": "ai_1",
+        "sha256": "e9504be3fb8e67b7665e84979f40a04e50eda6a58b46986cf84db6cd841397e2"
+      },
+      "ai_duration_ms": 9203.0,
+      "ai_error": null,
+      "ai_status": "OK",
+      "backend": "anthropic_messages",
+      "centerline_views": false,
+      "decision": "REVIEW_REQUIRED",
+      "deployment": "claude-opus-5-5-fast",
+      "draft_generated": false,
+      "eligibility": {
+        "decision": "REVIEW_REQUIRED",
+        "reason_codes": [
+          "ALTERNATING_TRAFFIC_UNRESOLVED",
+          "INTERSECTION_CONFLICT_LOW_CONFIDENCE",
+          "LANE_CLOSURE_UNRESOLVED",
+          "LANE_COUNT_LOW_CONFIDENCE",
+          "PEDESTRIAN_IMPACT_LOW_CONFIDENCE",
+          "ROAD_EDGES_LOW_CONFIDENCE",
+          "TRAVELED_WAY_ENCROACHMENT_UNRESOLVED",
+          "TWO_WAY_STATUS_LOW_CONFIDENCE",
+          "WORK_LOCATION_UNRESOLVED",
+          "WORK_SIDE_LOW_CONFIDENCE"
+        ]
+      },
+      "estimated_cost_usd": null,
+      "evidence_mode": "single",
+      "fusion": {
+        "conflicts": 0,
+        "inputs_complete": false,
+        "site_model_id": "SITE-F09BFEED20A1CD6F"
+      },
+      "grounding": null,
+      "image_quality": "FAIR",
+      "label": "claude-opus-5-5-fast - single-resolution, baseline",
+      "metrics": {
+        "below_threshold": [
+          "intersection_conflict",
+          "lane_count_total",
+          "outside_traveled_way",
+          "pedestrian_impact",
+          "road_edges",
+          "two_way_visible",
+          "work_side"
+        ],
+        "low_confidence": 5,
+        "resolved": 4,
+        "unresolved": 4
+      },
+      "model": "claude-opus-5-5",
+      "new_external_calls": [],
+      "observation": {
+        "attribute_confidence": {
+          "divided_road": 0.8,
+          "intersection_conflict": 0.4,
+          "lane_count_total": 0.6,
+          "outside_traveled_way": 0.65,
+          "pedestrian_impact": 0.5,
+          "road_edges": 0.5,
+          "two_way_visible": 0.55,
+          "work_side": 0.65
+        },
+        "divided_road_visible": false,
+        "features": {
+          "crosswalks": [],
+          "driveways": [
+            {
+              "confidence": 0.7,
+              "description": "Paved driveway to parking lot of large building southeast of the road, close to the work reference",
+              "image_x": 588,
+              "image_y": 510,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.5,
+              "description": "Driveway to houses south of the road",
+              "image_x": 385,
+              "image_y": 625,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.45,
+              "description": "Driveway to residence north of the road",
+              "image_x": 668,
+              "image_y": 420,
+              "side": "LEFT"
+            },
+            {
+              "confidence": 0.5,
+              "description": "Driveway to residence north of the road",
+              "image_x": 712,
+              "image_y": 385,
+              "side": "LEFT"
+            },
+            {
+              "confidence": 0.5,
+              "description": "Driveway heading north to residences",
+              "image_x": 828,
+              "image_y": 330,
+              "side": "LEFT"
+            },
+            {
+              "confidence": 0.3,
+              "description": "Driveway/access to house north of road near work reference",
+              "image_x": 470,
+              "image_y": 540,
+              "side": "LEFT"
+            }
+          ],
+          "intersections": [
+            {
+              "confidence": 0.5,
+              "description": "Side road/driveway branching south from the main road near bottom-left of image",
+              "image_x": 90,
+              "image_y": 772,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.4,
+              "description": "Paved access road branching southeast toward houses near upper right",
+              "image_x": 835,
+              "image_y": 372,
+              "side": "RIGHT"
+            }
+          ],
+          "obstructions": [
+            {
+              "confidence": 0.4,
+              "description": "Trees and vegetation along the north side of the road near the work reference",
+              "image_x": 520,
+              "image_y": 500,
+              "side": "LEFT"
+            }
+          ],
+          "ramps": [],
+          "roundabouts": []
+        },
+        "image_quality": "FAIR",
+        "lane_count_total": 2,
+        "lane_markings_visible": null,
+        "notes": "Road runs SW-NE through the image; at x=512 the road centreline is near y~538, so the image centre lies roughly 20-25 px (~12-14 m) northwest of the road centreline, i.e. on the LEFT side for travel at 63 deg, in a grassy/treed area near a house. Paved width appears ~13-18 px; edge lines and centreline are not clearly resolvable at this resolution, so traveled way width and shoulder presence are approximate. No sidewalks visible. A driveway to a parking lot on the right side is about 75 px east of the reference point.",
+        "osm_conflicts": [],
+        "road_edges": {
+          "left_visible": true,
+          "right_visible": true,
+          "traveled_way_width_px": 13
+        },
+        "shoulders": {
+          "left_present": null,
+          "right_present": null
+        },
+        "sidewalks": {
+          "left_present": false,
+          "right_present": false
+        },
+        "two_way_visible": true,
+        "work_reference": {
+          "appears_outside_traveled_way": true,
+          "appears_roadside": true,
+          "relative_position": "BEYOND_SHOULDER",
+          "side": "LEFT"
+        }
+      },
+      "osm_claims": false,
+      "plan_id": null,
+      "profile": "claude-opus-5-5-fast",
+      "raw_response": "{\"lane_count_total\":2,\"two_way_visible\":\"YES\",\"divided_road_visible\":\"NO\",\"lane_markings_visible\":\"UNKNOWN\",\"road_edges\":{\"left_visible\":true,\"right_visible\":true,\"traveled_way_width_px\":13},\"shoulders\":{\"left_present\":\"UNKNOWN\",\"right_present\":\"UNKNOWN\"},\"sidewalks\":{\"left_present\":\"NO\",\"right_present\":\"NO\"},\"work_reference\":{\"appears_roadside\":\"YES\",\"side\":\"LEFT\",\"appears_outside_traveled_way\":\"YES\",\"relative_position\":\"BEYOND_SHOULDER\"},\"features\":{\"intersections\":[{\"description\":\"Side road/driveway branching south from the main road near bottom-left of image\",\"image_x\":90,\"image_y\":772,\"side\":\"RIGHT\",\"confidence\":0.5},{\"description\":\"Paved access road branching southeast toward houses near upper right\",\"image_x\":835,\"image_y\":372,\"side\":\"RIGHT\",\"confidence\":0.4}],\"driveways\":[{\"description\":\"Paved driveway to parking lot of large building southeast of the road, close to the work reference\",\"image_x\":588,\"image_y\":510,\"side\":\"RIGHT\",\"confidence\":0.7},{\"description\":\"Driveway to houses south of the road\",\"image_x\":385,\"image_y\":625,\"side\":\"RIGHT\",\"confidence\":0.5},{\"description\":\"Driveway to residence north of the road\",\"image_x\":668,\"image_y\":420,\"side\":\"LEFT\",\"confidence\":0.45},{\"description\":\"Driveway to residence north of the road\",\"image_x\":712,\"image_y\":385,\"side\":\"LEFT\",\"confidence\":0.5},{\"description\":\"Driveway heading north to residences\",\"image_x\":828,\"image_y\":330,\"side\":\"LEFT\",\"confidence\":0.5},{\"description\":\"Driveway/access to house north of road near work reference\",\"image_x\":470,\"image_y\":540,\"side\":\"LEFT\",\"confidence\":0.3}],\"crosswalks\":[],\"roundabouts\":[],\"ramps\":[],\"obstructions\":[{\"description\":\"Trees and vegetation along the north side of the road near the work reference\",\"image_x\":520,\"image_y\":500,\"side\":\"LEFT\",\"confidence\":0.4}]},\"image_quality\":\"FAIR\",\"attribute_confidence\":{\"lane_count_total\":0.6,\"two_way_visible\":0.55,\"divided_road\":0.8,\"road_edges\":0.5,\"work_side\":0.65,\"outside_traveled_way\":0.65,\"intersection_conflict\":0.4,\"pedestrian_impact\":0.5},\"osm_conflicts\":[],\"notes\":\"Road runs SW-NE through the image; at x=512 the road centreline is near y~538, so the image centre lies roughly 20-25 px (~12-14 m) northwest of the road centreline, i.e. on the LEFT side for travel at 63 deg, in a grassy/treed area near a house. Paved width appears ~13-18 px; edge lines and centreline are not clearly resolvable at this resolution, so traveled way width and shoulder presence are approximate. No sidewalks visible. A driveway to a parking lot on the right side is about 75 px east of the reference point.\"}",
+      "reason_codes": [
+        "ALTERNATING_TRAFFIC_UNRESOLVED",
+        "INTERSECTION_CONFLICT_LOW_CONFIDENCE",
+        "LANE_CLOSURE_UNRESOLVED",
+        "LANE_COUNT_LOW_CONFIDENCE",
+        "PEDESTRIAN_IMPACT_LOW_CONFIDENCE",
+        "ROAD_EDGES_LOW_CONFIDENCE",
+        "TRAVELED_WAY_ENCROACHMENT_UNRESOLVED",
+        "TWO_WAY_STATUS_LOW_CONFIDENCE",
+        "WORK_LOCATION_UNRESOLVED",
+        "WORK_SIDE_LOW_CONFIDENCE"
+      ],
+      "reused": [
+        {
+          "api_call": false,
+          "artifact_id": "map_1",
+          "kind": "map",
+          "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1",
+          "source_run": "20261016-213622-483ff4"
+        },
+        {
+          "api_call": false,
+          "artifact_id": "osm_1",
+          "kind": "osm",
+          "sha256": "2ac7bc19a24d850cc61a5438a11838b8c91e9cf33ffbd8e0d529517a8a5164bc",
+          "source_run": "20261016-213622-483ff4"
+        }
+      ],
+      "run_id": "20261016-221807-c5fa64",
+      "schema_errors": null,
+      "state": "FINISHED",
+      "usage": {
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "input_tokens": 4494,
+        "output_tokens": 1522
+      },
+      "views": [],
+      "vision_mode": "baseline"
+    },
+    {
+      "ai_artifact": {
+        "artifact_id": "ai_1",
+        "sha256": "a56115589a4e59142005850cf0fb06d7a9b4d85164ade3eca5c1fb86394c6d2d"
+      },
+      "ai_duration_ms": 117435.5,
+      "ai_error": null,
+      "ai_status": "OK",
+      "backend": "openai_responses",
+      "centerline_views": false,
+      "decision": "REVIEW_REQUIRED",
+      "deployment": "gpt-5.6-sol",
+      "draft_generated": false,
+      "eligibility": {
+        "decision": "REVIEW_REQUIRED",
+        "reason_codes": [
+          "ALTERNATING_TRAFFIC_UNRESOLVED",
+          "ENCROACHES_TRAVELED_WAY_CONFLICT",
+          "LANE_CLOSURE_UNRESOLVED",
+          "TRAVELED_WAY_ENCROACHMENT_CONFLICT",
+          "WORK_LOCATION_CONFLICT",
+          "WORK_SIDE_UNRESOLVED"
+        ]
+      },
+      "estimated_cost_usd": null,
+      "evidence_mode": "multi",
+      "fusion": {
+        "conflicts": 1,
+        "inputs_complete": false,
+        "site_model_id": "SITE-C76E1E82CA22084A"
+      },
+      "grounding": null,
+      "image_quality": "GOOD",
+      "label": "gpt-5.6-sol - multi-resolution, baseline",
+      "metrics": {
+        "below_threshold": [
+          "work_side"
+        ],
+        "low_confidence": 0,
+        "resolved": 8,
+        "unresolved": 5
+      },
+      "model": "gpt-5.6-sol",
+      "new_external_calls": [],
+      "observation": {
+        "attribute_confidence": {
+          "divided_road": 0.99,
+          "intersection_conflict": 0.76,
+          "lane_count_total": 0.98,
+          "outside_traveled_way": 0.96,
+          "pedestrian_impact": 0.91,
+          "road_edges": 0.9,
+          "two_way_visible": 0.97,
+          "work_side": 0.3
+        },
+        "divided_road_visible": false,
+        "features": {
+          "crosswalks": [],
+          "driveways": [
+            {
+              "confidence": 0.72,
+              "description": "Narrow property or farm access meeting the southeast side of the road",
+              "image_x": 84,
+              "image_y": 729,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.68,
+              "description": "Residential property access on the southeast side",
+              "image_x": 151,
+              "image_y": 695,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.76,
+              "description": "Residential driveway on the southeast side",
+              "image_x": 378,
+              "image_y": 580,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.72,
+              "description": "Residential driveway on the southeast side",
+              "image_x": 430,
+              "image_y": 554,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.94,
+              "description": "Paved access to the parking area southeast of the road",
+              "image_x": 580,
+              "image_y": 478,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.82,
+              "description": "Residential driveway northwest of the road",
+              "image_x": 668,
+              "image_y": 433,
+              "side": "LEFT"
+            },
+            {
+              "confidence": 0.82,
+              "description": "Property driveway northwest of the road",
+              "image_x": 706,
+              "image_y": 414,
+              "side": "LEFT"
+            },
+            {
+              "confidence": 0.88,
+              "description": "Branching property access southeast of the road",
+              "image_x": 833,
+              "image_y": 349,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.82,
+              "description": "Residential driveway northwest of the road",
+              "image_x": 901,
+              "image_y": 315,
+              "side": "LEFT"
+            }
+          ],
+          "intersections": [],
+          "obstructions": [],
+          "ramps": [],
+          "roundabouts": []
+        },
+        "image_quality": "GOOD",
+        "lane_count_total": 2,
+        "lane_markings_visible": true,
+        "notes": "Visible two-lane undivided road with double-yellow center markings, white edge lines, and narrow paved shoulders. The work reference appears on or very near the centerline within the traveled way; no distinct left/right side is assigned.",
+        "osm_conflicts": [],
+        "road_edges": {
+          "left_visible": true,
+          "right_visible": true,
+          "traveled_way_width_px": 12.5
+        },
+        "shoulders": {
+          "left_present": true,
+          "right_present": true
+        },
+        "sidewalks": {
+          "left_present": false,
+          "right_present": false
+        },
+        "two_way_visible": true,
+        "work_reference": {
+          "appears_outside_traveled_way": false,
+          "appears_roadside": false,
+          "relative_position": "TRAVELED_WAY",
+          "side": "UNKNOWN"
+        }
+      },
+      "osm_claims": false,
+      "plan_id": null,
+      "profile": "gpt-5.6-sol",
+      "raw_response": "{\"lane_count_total\":2,\"two_way_visible\":\"YES\",\"divided_road_visible\":\"NO\",\"lane_markings_visible\":\"YES\",\"road_edges\":{\"left_visible\":true,\"right_visible\":true,\"traveled_way_width_px\":12.5},\"shoulders\":{\"left_present\":\"YES\",\"right_present\":\"YES\"},\"sidewalks\":{\"left_present\":\"NO\",\"right_present\":\"NO\"},\"work_reference\":{\"appears_roadside\":\"NO\",\"side\":\"UNKNOWN\",\"appears_outside_traveled_way\":\"NO\",\"relative_position\":\"TRAVELED_WAY\"},\"features\":{\"intersections\":[],\"driveways\":[{\"description\":\"Narrow property or farm access meeting the southeast side of the road\",\"image_x\":84,\"image_y\":729,\"side\":\"RIGHT\",\"confidence\":0.72},{\"description\":\"Residential property access on the southeast side\",\"image_x\":151,\"image_y\":695,\"side\":\"RIGHT\",\"confidence\":0.68},{\"description\":\"Residential driveway on the southeast side\",\"image_x\":378,\"image_y\":580,\"side\":\"RIGHT\",\"confidence\":0.76},{\"description\":\"Residential driveway on the southeast side\",\"image_x\":430,\"image_y\":554,\"side\":\"RIGHT\",\"confidence\":0.72},{\"description\":\"Paved access to the parking area southeast of the road\",\"image_x\":580,\"image_y\":478,\"side\":\"RIGHT\",\"confidence\":0.94},{\"description\":\"Residential driveway northwest of the road\",\"image_x\":668,\"image_y\":433,\"side\":\"LEFT\",\"confidence\":0.82},{\"description\":\"Property driveway northwest of the road\",\"image_x\":706,\"image_y\":414,\"side\":\"LEFT\",\"confidence\":0.82},{\"description\":\"Branching property access southeast of the road\",\"image_x\":833,\"image_y\":349,\"side\":\"RIGHT\",\"confidence\":0.88},{\"description\":\"Residential driveway northwest of the road\",\"image_x\":901,\"image_y\":315,\"side\":\"LEFT\",\"confidence\":0.82}],\"crosswalks\":[],\"roundabouts\":[],\"ramps\":[],\"obstructions\":[]},\"image_quality\":\"GOOD\",\"attribute_confidence\":{\"lane_count_total\":0.98,\"two_way_visible\":0.97,\"divided_road\":0.99,\"road_edges\":0.9,\"work_side\":0.3,\"outside_traveled_way\":0.96,\"intersection_conflict\":0.76,\"pedestrian_impact\":0.91},\"osm_conflicts\":[],\"notes\":\"Visible two-lane undivided road with double-yellow center markings, white edge lines, and narrow paved shoulders. The work reference appears on or very near the centerline within the traveled way; no distinct left/right side is assigned.\"}",
+      "reason_codes": [
+        "ALTERNATING_TRAFFIC_UNRESOLVED",
+        "ENCROACHES_TRAVELED_WAY_CONFLICT",
+        "LANE_CLOSURE_UNRESOLVED",
+        "TRAVELED_WAY_ENCROACHMENT_CONFLICT",
+        "WORK_LOCATION_CONFLICT",
+        "WORK_SIDE_UNRESOLVED"
+      ],
+      "reused": [
+        {
+          "api_call": false,
+          "artifact_id": "map_1",
+          "kind": "map",
+          "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1",
+          "source_run": "20261016-213622-483ff4"
+        },
+        {
+          "api_call": false,
+          "artifact_id": "osm_1",
+          "kind": "osm",
+          "sha256": "2ac7bc19a24d850cc61a5438a11838b8c91e9cf33ffbd8e0d529517a8a5164bc",
+          "source_run": "20261016-213622-483ff4"
+        },
+        {
+          "api_call": false,
+          "artifact_id": "map_view_1",
+          "kind": "map_view",
+          "sha256": "959768acb820394177caddc81758ec4af20d3660c34a508337ff19645cf6ebe0",
+          "source_run": "20261016-221800-2b4518"
+        },
+        {
+          "api_call": false,
+          "artifact_id": "map_view_2",
+          "kind": "map_view",
+          "sha256": "1c36bfdb37470eaf2ea8d8d59b3f23b2e0ea1f8ef0b58cf2b350951c6d022fe0",
+          "source_run": "20261016-221800-2b4518"
+        },
+        {
+          "api_call": false,
+          "artifact_id": "map_view_3",
+          "kind": "map_view",
+          "sha256": "7668f4aed72814e73f5177894c645c3740f4a2fc82583ae744b87445080158a3",
+          "source_run": "20261016-221800-2b4518"
+        }
+      ],
+      "run_id": "20261016-221807-b41f65",
+      "schema_errors": null,
+      "state": "FINISHED",
+      "usage": {
+        "cache_creation_input_tokens": 4134,
+        "cache_read_input_tokens": 0,
+        "input_tokens": 4137,
+        "output_tokens": 8328,
+        "reasoning_tokens": 7768
+      },
+      "views": [
+        "work_area 539b4c91c3b5",
+        "corridor_ahead 612ff5025558",
+        "corridor_behind 90319e153e13"
+      ],
+      "vision_mode": "baseline"
+    },
+    {
+      "ai_artifact": {
+        "artifact_id": "ai_1",
+        "sha256": "e90a4abd30912afbeb8381c0af88a5b161fd7def5086e849cc31cddc6c96c9c8"
+      },
+      "ai_duration_ms": 30500.3,
+      "ai_error": null,
+      "ai_status": "OK",
+      "backend": "anthropic_messages",
+      "centerline_views": false,
+      "decision": "REVIEW_REQUIRED",
+      "deployment": "claude-opus-5-5",
+      "draft_generated": false,
+      "eligibility": {
+        "decision": "REVIEW_REQUIRED",
+        "reason_codes": [
+          "ALTERNATING_TRAFFIC_UNRESOLVED",
+          "INTERSECTION_CONFLICT_LOW_CONFIDENCE",
+          "LANE_CLOSURE_UNRESOLVED",
+          "PEDESTRIAN_IMPACT_LOW_CONFIDENCE",
+          "ROAD_EDGES_LOW_CONFIDENCE",
+          "TRAVELED_WAY_ENCROACHMENT_UNRESOLVED",
+          "WORK_LOCATION_UNRESOLVED"
+        ]
+      },
+      "estimated_cost_usd": null,
+      "evidence_mode": "multi",
+      "fusion": {
+        "conflicts": 0,
+        "inputs_complete": false,
+        "site_model_id": "SITE-0A894FD00A81FE65"
+      },
+      "grounding": null,
+      "image_quality": "GOOD",
+      "label": "claude-opus-5-5 - multi-resolution, baseline",
+      "metrics": {
+        "below_threshold": [
+          "intersection_conflict",
+          "pedestrian_impact",
+          "road_edges"
+        ],
+        "low_confidence": 2,
+        "resolved": 7,
+        "unresolved": 4
+      },
+      "model": "claude-opus-5-5",
+      "new_external_calls": [],
+      "observation": {
+        "attribute_confidence": {
+          "divided_road": 0.85,
+          "intersection_conflict": 0.5,
+          "lane_count_total": 0.85,
+          "outside_traveled_way": 0.7,
+          "pedestrian_impact": 0.6,
+          "road_edges": 0.6,
+          "two_way_visible": 0.85,
+          "work_side": 0.75
+        },
+        "divided_road_visible": false,
+        "features": {
+          "crosswalks": [],
+          "driveways": [
+            {
+              "confidence": 0.75,
+              "description": "Parking lot entrance to large building (paved lot with striped stalls), just ahead of the work reference",
+              "image_x": 590,
+              "image_y": 515,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.6,
+              "description": "Residential driveways to houses north of road ahead of work reference",
+              "image_x": 680,
+              "image_y": 420,
+              "side": "LEFT"
+            },
+            {
+              "confidence": 0.6,
+              "description": "Long driveway leading north to houses",
+              "image_x": 835,
+              "image_y": 345,
+              "side": "LEFT"
+            },
+            {
+              "confidence": 0.55,
+              "description": "Curved driveway/loop leading south to houses",
+              "image_x": 848,
+              "image_y": 385,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.55,
+              "description": "Residential driveway to houses south of road behind work reference",
+              "image_x": 385,
+              "image_y": 620,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.45,
+              "description": "Paved pull-off/parking area on north side behind work reference",
+              "image_x": 160,
+              "image_y": 695,
+              "side": "LEFT"
+            },
+            {
+              "confidence": 0.45,
+              "description": "Unpaved lane leading south to houses and fields",
+              "image_x": 88,
+              "image_y": 772,
+              "side": "RIGHT"
+            }
+          ],
+          "intersections": [],
+          "obstructions": [
+            {
+              "confidence": 0.5,
+              "description": "Utility poles along south edge of road near the work reference",
+              "image_x": 525,
+              "image_y": 543,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.45,
+              "description": "Hedge row along south edge of road just behind work reference",
+              "image_x": 490,
+              "image_y": 550,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.4,
+              "description": "Trees and house close to north road edge near work reference",
+              "image_x": 475,
+              "image_y": 495,
+              "side": "LEFT"
+            }
+          ],
+          "ramps": [],
+          "roundabouts": []
+        },
+        "image_quality": "GOOD",
+        "lane_count_total": 2,
+        "lane_markings_visible": true,
+        "notes": "Two-lane undivided road running SW-NE (~63 deg) with double yellow centreline, white edge lines and narrow paved shoulders on both sides. No sidewalks visible. The work reference lies about 11-12 m north-west of the road centreline, in the grassy yard beyond the left (north) paved shoulder. Traveled-way width estimated at ~8 m from the close-up (approx. 14 px in Image 1); uncertainty is moderate. Several driveways nearby, notably a parking-lot entrance on the right side roughly 40 m ahead. No public side-road intersections clearly identified; some access points may be minor lanes. OSM lanes value is null, so no lane conflict reported.",
+        "osm_conflicts": [],
+        "road_edges": {
+          "left_visible": true,
+          "right_visible": true,
+          "traveled_way_width_px": 14
+        },
+        "shoulders": {
+          "left_present": true,
+          "right_present": true
+        },
+        "sidewalks": {
+          "left_present": false,
+          "right_present": false
+        },
+        "two_way_visible": true,
+        "work_reference": {
+          "appears_outside_traveled_way": true,
+          "appears_roadside": true,
+          "relative_position": "BEYOND_SHOULDER",
+          "side": "LEFT"
+        }
+      },
+      "osm_claims": false,
+      "plan_id": null,
+      "profile": "claude-opus-5-5",
+      "raw_response": "{\"lane_count_total\":2,\"two_way_visible\":\"YES\",\"divided_road_visible\":\"NO\",\"lane_markings_visible\":\"YES\",\"road_edges\":{\"left_visible\":true,\"right_visible\":true,\"traveled_way_width_px\":14},\"shoulders\":{\"left_present\":\"YES\",\"right_present\":\"YES\"},\"sidewalks\":{\"left_present\":\"NO\",\"right_present\":\"NO\"},\"work_reference\":{\"appears_roadside\":\"YES\",\"side\":\"LEFT\",\"appears_outside_traveled_way\":\"YES\",\"relative_position\":\"BEYOND_SHOULDER\"},\"features\":{\"intersections\":[],\"driveways\":[{\"description\":\"Parking lot entrance to large building (paved lot with striped stalls), just ahead of the work reference\",\"image_x\":590,\"image_y\":515,\"side\":\"RIGHT\",\"confidence\":0.75},{\"description\":\"Residential driveways to houses north of road ahead of work reference\",\"image_x\":680,\"image_y\":420,\"side\":\"LEFT\",\"confidence\":0.6},{\"description\":\"Long driveway leading north to houses\",\"image_x\":835,\"image_y\":345,\"side\":\"LEFT\",\"confidence\":0.6},{\"description\":\"Curved driveway/loop leading south to houses\",\"image_x\":848,\"image_y\":385,\"side\":\"RIGHT\",\"confidence\":0.55},{\"description\":\"Residential driveway to houses south of road behind work reference\",\"image_x\":385,\"image_y\":620,\"side\":\"RIGHT\",\"confidence\":0.55},{\"description\":\"Paved pull-off/parking area on north side behind work reference\",\"image_x\":160,\"image_y\":695,\"side\":\"LEFT\",\"confidence\":0.45},{\"description\":\"Unpaved lane leading south to houses and fields\",\"image_x\":88,\"image_y\":772,\"side\":\"RIGHT\",\"confidence\":0.45}],\"crosswalks\":[],\"roundabouts\":[],\"ramps\":[],\"obstructions\":[{\"description\":\"Utility poles along south edge of road near the work reference\",\"image_x\":525,\"image_y\":543,\"side\":\"RIGHT\",\"confidence\":0.5},{\"description\":\"Hedge row along south edge of road just behind work reference\",\"image_x\":490,\"image_y\":550,\"side\":\"RIGHT\",\"confidence\":0.45},{\"description\":\"Trees and house close to north road edge near work reference\",\"image_x\":475,\"image_y\":495,\"side\":\"LEFT\",\"confidence\":0.4}]},\"image_quality\":\"GOOD\",\"attribute_confidence\":{\"lane_count_total\":0.85,\"two_way_visible\":0.85,\"divided_road\":0.85,\"road_edges\":0.6,\"work_side\":0.75,\"outside_traveled_way\":0.7,\"intersection_conflict\":0.5,\"pedestrian_impact\":0.6},\"osm_conflicts\":[],\"notes\":\"Two-lane undivided road running SW-NE (~63 deg) with double yellow centreline, white edge lines and narrow paved shoulders on both sides. No sidewalks visible. The work reference lies about 11-12 m north-west of the road centreline, in the grassy yard beyond the left (north) paved shoulder. Traveled-way width estimated at ~8 m from the close-up (approx. 14 px in Image 1); uncertainty is moderate. Several driveways nearby, notably a parking-lot entrance on the right side roughly 40 m ahead. No public side-road intersections clearly identified; some access points may be minor lanes. OSM lanes value is null, so no lane conflict reported.\"}",
+      "reason_codes": [
+        "ALTERNATING_TRAFFIC_UNRESOLVED",
+        "INTERSECTION_CONFLICT_LOW_CONFIDENCE",
+        "LANE_CLOSURE_UNRESOLVED",
+        "PEDESTRIAN_IMPACT_LOW_CONFIDENCE",
+        "ROAD_EDGES_LOW_CONFIDENCE",
+        "TRAVELED_WAY_ENCROACHMENT_UNRESOLVED",
+        "WORK_LOCATION_UNRESOLVED"
+      ],
+      "reused": [
+        {
+          "api_call": false,
+          "artifact_id": "map_1",
+          "kind": "map",
+          "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1",
+          "source_run": "20261016-213622-483ff4"
+        },
+        {
+          "api_call": false,
+          "artifact_id": "osm_1",
+          "kind": "osm",
+          "sha256": "2ac7bc19a24d850cc61a5438a11838b8c91e9cf33ffbd8e0d529517a8a5164bc",
+          "source_run": "20261016-213622-483ff4"
+        },
+        {
+          "api_call": false,
+          "artifact_id": "map_view_1",
+          "kind": "map_view",
+          "sha256": "959768acb820394177caddc81758ec4af20d3660c34a508337ff19645cf6ebe0",
+          "source_run": "20261016-221800-2b4518"
+        },
+        {
+          "api_call": false,
+          "artifact_id": "map_view_2",
+          "kind": "map_view",
+          "sha256": "1c36bfdb37470eaf2ea8d8d59b3f23b2e0ea1f8ef0b58cf2b350951c6d022fe0",
+          "source_run": "20261016-221800-2b4518"
+        },
+        {
+          "api_call": false,
+          "artifact_id": "map_view_3",
+          "kind": "map_view",
+          "sha256": "7668f4aed72814e73f5177894c645c3740f4a2fc82583ae744b87445080158a3",
+          "source_run": "20261016-221800-2b4518"
+        }
+      ],
+      "run_id": "20261016-221807-adb34e",
+      "schema_errors": null,
+      "state": "FINISHED",
+      "usage": {
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "input_tokens": 9058,
+        "output_tokens": 2640
+      },
+      "views": [
+        "work_area 539b4c91c3b5",
+        "corridor_ahead 612ff5025558",
+        "corridor_behind 90319e153e13"
+      ],
+      "vision_mode": "baseline"
+    },
+    {
+      "ai_artifact": {
+        "artifact_id": "ai_1",
+        "sha256": "0b61f2ee14c90377e2ee6715513285b1e29d8a81e2edc7e3fb2627167797343c"
+      },
+      "ai_duration_ms": 11361.3,
+      "ai_error": null,
+      "ai_status": "OK",
+      "backend": "anthropic_messages",
+      "centerline_views": false,
+      "decision": "REVIEW_REQUIRED",
+      "deployment": "claude-opus-5-5-fast",
+      "draft_generated": false,
+      "eligibility": {
+        "decision": "REVIEW_REQUIRED",
+        "reason_codes": [
+          "ALTERNATING_TRAFFIC_UNRESOLVED",
+          "INTERSECTION_CONFLICT_LOW_CONFIDENCE",
+          "LANE_CLOSURE_UNRESOLVED",
+          "PEDESTRIAN_IMPACT_LOW_CONFIDENCE",
+          "ROAD_EDGES_LOW_CONFIDENCE",
+          "TRAVELED_WAY_ENCROACHMENT_UNRESOLVED",
+          "WORK_LOCATION_UNRESOLVED"
+        ]
+      },
+      "estimated_cost_usd": null,
+      "evidence_mode": "multi",
+      "fusion": {
+        "conflicts": 0,
+        "inputs_complete": false,
+        "site_model_id": "SITE-F72FE88BA036730B"
+      },
+      "grounding": null,
+      "image_quality": "GOOD",
+      "label": "claude-opus-5-5-fast - multi-resolution, baseline",
+      "metrics": {
+        "below_threshold": [
+          "intersection_conflict",
+          "pedestrian_impact",
+          "road_edges"
+        ],
+        "low_confidence": 2,
+        "resolved": 7,
+        "unresolved": 4
+      },
+      "model": "claude-opus-5-5",
+      "new_external_calls": [],
+      "observation": {
+        "attribute_confidence": {
+          "divided_road": 0.85,
+          "intersection_conflict": 0.6,
+          "lane_count_total": 0.85,
+          "outside_traveled_way": 0.75,
+          "pedestrian_impact": 0.6,
+          "road_edges": 0.6,
+          "two_way_visible": 0.85,
+          "work_side": 0.75
+        },
+        "divided_road_visible": false,
+        "features": {
+          "crosswalks": [],
+          "driveways": [
+            {
+              "confidence": 0.8,
+              "description": "Paved entrance to parking lot of large building on south side of road",
+              "image_x": 590,
+              "image_y": 515,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.6,
+              "description": "Paved driveway to houses on north side",
+              "image_x": 662,
+              "image_y": 418,
+              "side": "LEFT"
+            },
+            {
+              "confidence": 0.6,
+              "description": "Gravel driveway/lot to building on north side",
+              "image_x": 712,
+              "image_y": 400,
+              "side": "LEFT"
+            },
+            {
+              "confidence": 0.65,
+              "description": "Long gravel driveway to house north of road",
+              "image_x": 835,
+              "image_y": 345,
+              "side": "LEFT"
+            },
+            {
+              "confidence": 0.6,
+              "description": "Gravel driveway to houses south of road",
+              "image_x": 845,
+              "image_y": 420,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.5,
+              "description": "Driveway to houses south of road",
+              "image_x": 385,
+              "image_y": 625,
+              "side": "RIGHT"
+            },
+            {
+              "confidence": 0.45,
+              "description": "Paved apron/lot on north side near west end",
+              "image_x": 160,
+              "image_y": 700,
+              "side": "LEFT"
+            },
+            {
+              "confidence": 0.45,
+              "description": "Access lane leading south to houses and fields",
+              "image_x": 88,
+              "image_y": 775,
+              "side": "RIGHT"
+            }
+          ],
+          "intersections": [],
+          "obstructions": [
+            {
+              "confidence": 0.4,
+              "description": "Utility poles along south edge of road",
+              "image_x": 545,
+              "image_y": 548,
+              "side": "RIGHT"
+            }
+          ],
+          "ramps": [],
+          "roundabouts": []
+        },
+        "image_quality": "GOOD",
+        "lane_count_total": 2,
+        "lane_markings_visible": true,
+        "notes": "Two-lane undivided rural secondary road with double yellow centre line and white edge lines; paved shoulders visible beyond edge lines on both sides. Work reference lies in the grass area north-west of the road (left side for travel at 63 deg), roughly 4-5 m beyond the pavement edge, about 8 m from the left edge line. Traveled way estimated ~8 m (~14 px in Image 1); measurement approximate. No sidewalks or crosswalks visible. Several driveways nearby, most notably the parking-lot entrance on the right side just east of the reference. OSM lanes is null; image shows 2 lanes.",
+        "osm_conflicts": [],
+        "road_edges": {
+          "left_visible": true,
+          "right_visible": true,
+          "traveled_way_width_px": 14
+        },
+        "shoulders": {
+          "left_present": true,
+          "right_present": true
+        },
+        "sidewalks": {
+          "left_present": false,
+          "right_present": false
+        },
+        "two_way_visible": true,
+        "work_reference": {
+          "appears_outside_traveled_way": true,
+          "appears_roadside": true,
+          "relative_position": "BEYOND_SHOULDER",
+          "side": "LEFT"
+        }
+      },
+      "osm_claims": false,
+      "plan_id": null,
+      "profile": "claude-opus-5-5-fast",
+      "raw_response": "{\"lane_count_total\":2,\"two_way_visible\":\"YES\",\"divided_road_visible\":\"NO\",\"lane_markings_visible\":\"YES\",\"road_edges\":{\"left_visible\":true,\"right_visible\":true,\"traveled_way_width_px\":14},\"shoulders\":{\"left_present\":\"YES\",\"right_present\":\"YES\"},\"sidewalks\":{\"left_present\":\"NO\",\"right_present\":\"NO\"},\"work_reference\":{\"appears_roadside\":\"YES\",\"side\":\"LEFT\",\"appears_outside_traveled_way\":\"YES\",\"relative_position\":\"BEYOND_SHOULDER\"},\"features\":{\"intersections\":[],\"driveways\":[{\"description\":\"Paved entrance to parking lot of large building on south side of road\",\"image_x\":590,\"image_y\":515,\"side\":\"RIGHT\",\"confidence\":0.8},{\"description\":\"Paved driveway to houses on north side\",\"image_x\":662,\"image_y\":418,\"side\":\"LEFT\",\"confidence\":0.6},{\"description\":\"Gravel driveway/lot to building on north side\",\"image_x\":712,\"image_y\":400,\"side\":\"LEFT\",\"confidence\":0.6},{\"description\":\"Long gravel driveway to house north of road\",\"image_x\":835,\"image_y\":345,\"side\":\"LEFT\",\"confidence\":0.65},{\"description\":\"Gravel driveway to houses south of road\",\"image_x\":845,\"image_y\":420,\"side\":\"RIGHT\",\"confidence\":0.6},{\"description\":\"Driveway to houses south of road\",\"image_x\":385,\"image_y\":625,\"side\":\"RIGHT\",\"confidence\":0.5},{\"description\":\"Paved apron/lot on north side near west end\",\"image_x\":160,\"image_y\":700,\"side\":\"LEFT\",\"confidence\":0.45},{\"description\":\"Access lane leading south to houses and fields\",\"image_x\":88,\"image_y\":775,\"side\":\"RIGHT\",\"confidence\":0.45}],\"crosswalks\":[],\"roundabouts\":[],\"ramps\":[],\"obstructions\":[{\"description\":\"Utility poles along south edge of road\",\"image_x\":545,\"image_y\":548,\"side\":\"RIGHT\",\"confidence\":0.4}]},\"image_quality\":\"GOOD\",\"attribute_confidence\":{\"lane_count_total\":0.85,\"two_way_visible\":0.85,\"divided_road\":0.85,\"road_edges\":0.6,\"work_side\":0.75,\"outside_traveled_way\":0.75,\"intersection_conflict\":0.6,\"pedestrian_impact\":0.6},\"osm_conflicts\":[],\"notes\":\"Two-lane undivided rural secondary road with double yellow centre line and white edge lines; paved shoulders visible beyond edge lines on both sides. Work reference lies in the grass area north-west of the road (left side for travel at 63 deg), roughly 4-5 m beyond the pavement edge, about 8 m from the left edge line. Traveled way estimated ~8 m (~14 px in Image 1); measurement approximate. No sidewalks or crosswalks visible. Several driveways nearby, most notably the parking-lot entrance on the right side just east of the reference. OSM lanes is null; image shows 2 lanes.\"}",
+      "reason_codes": [
+        "ALTERNATING_TRAFFIC_UNRESOLVED",
+        "INTERSECTION_CONFLICT_LOW_CONFIDENCE",
+        "LANE_CLOSURE_UNRESOLVED",
+        "PEDESTRIAN_IMPACT_LOW_CONFIDENCE",
+        "ROAD_EDGES_LOW_CONFIDENCE",
+        "TRAVELED_WAY_ENCROACHMENT_UNRESOLVED",
+        "WORK_LOCATION_UNRESOLVED"
+      ],
+      "reused": [
+        {
+          "api_call": false,
+          "artifact_id": "map_1",
+          "kind": "map",
+          "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1",
+          "source_run": "20261016-213622-483ff4"
+        },
+        {
+          "api_call": false,
+          "artifact_id": "osm_1",
+          "kind": "osm",
+          "sha256": "2ac7bc19a24d850cc61a5438a11838b8c91e9cf33ffbd8e0d529517a8a5164bc",
+          "source_run": "20261016-213622-483ff4"
+        },
+        {
+          "api_call": false,
+          "artifact_id": "map_view_1",
+          "kind": "map_view",
+          "sha256": "959768acb820394177caddc81758ec4af20d3660c34a508337ff19645cf6ebe0",
+          "source_run": "20261016-221800-2b4518"
+        },
+        {
+          "api_call": false,
+          "artifact_id": "map_view_2",
+          "kind": "map_view",
+          "sha256": "1c36bfdb37470eaf2ea8d8d59b3f23b2e0ea1f8ef0b58cf2b350951c6d022fe0",
+          "source_run": "20261016-221800-2b4518"
+        },
+        {
+          "api_call": false,
+          "artifact_id": "map_view_3",
+          "kind": "map_view",
+          "sha256": "7668f4aed72814e73f5177894c645c3740f4a2fc82583ae744b87445080158a3",
+          "source_run": "20261016-221800-2b4518"
+        }
+      ],
+      "run_id": "20261016-221807-5b4ae3",
+      "schema_errors": null,
+      "state": "FINISHED",
+      "usage": {
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "input_tokens": 9058,
+        "output_tokens": 2233
+      },
+      "views": [
+        "work_area 539b4c91c3b5",
+        "corridor_ahead 612ff5025558",
+        "corridor_behind 90319e153e13"
+      ],
+      "vision_mode": "baseline"
+    }
+  ],
+  "comparison_id": "20261016-221800-2b4518",
+  "complete": true,
+  "confidence_threshold": 0.7,
+  "created_at": "2026-10-16T16:48:00.168+00:00",
+  "modes": [
+    "single",
+    "multi"
+  ],
+  "note": "Factual per-model metrics; no model is ranked or selected.",
+  "phase": "complete",
+  "planned_columns": [
+    {
+      "evidence_mode": "single",
+      "profile": "gpt-5.6-sol"
+    },
+    {
+      "evidence_mode": "single",
+      "profile": "claude-opus-5-5"
+    },
+    {
+      "evidence_mode": "single",
+      "profile": "claude-opus-5-5-fast"
+    },
+    {
+      "evidence_mode": "multi",
+      "profile": "gpt-5.6-sol"
+    },
+    {
+      "evidence_mode": "multi",
+      "profile": "claude-opus-5-5"
+    },
+    {
+      "evidence_mode": "multi",
+      "profile": "claude-opus-5-5-fast"
+    }
+  ],
+  "prep": {
+    "bearing_deg": 63.1,
+    "ended_at": "2026-10-16T16:48:07.505+00:00",
+    "ok": true,
+    "state": "FINISHED",
+    "views": [
+      "work_area",
+      "corridor_ahead",
+      "corridor_behind"
+    ]
+  },
+  "profiles": [
+    "gpt-5.6-sol",
+    "claude-opus-5-5",
+    "claude-opus-5-5-fast"
+  ],
+  "reused": [
+    {
+      "api_call": false,
+      "artifact": "map_1",
+      "file": "map_1.png",
+      "kind": "map",
+      "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1",
+      "source_run": "20261016-213622-483ff4",
+      "stage": "imagery",
+      "title": "Imagery"
+    },
+    {
+      "api_call": false,
+      "artifact": "osm_1",
+      "file": "osm_1.json",
+      "kind": "osm",
+      "sha256": "2ac7bc19a24d850cc61a5438a11838b8c91e9cf33ffbd8e0d529517a8a5164bc",
+      "source_run": "20261016-213622-483ff4",
+      "stage": "osm",
+      "title": "OSM"
+    }
+  ],
+  "rows": [
+    {
+      "differs": true,
+      "field": "final decision",
+      "section": "decision",
+      "unknown_vs_resolved": false,
+      "values": [
+        "SUPPORTED_AUTO",
+        "REVIEW_REQUIRED",
+        "REVIEW_REQUIRED",
+        "REVIEW_REQUIRED",
+        "REVIEW_REQUIRED",
+        "REVIEW_REQUIRED"
+      ]
+    },
+    {
+      "differs": true,
+      "field": "eligibility",
+      "section": "decision",
+      "unknown_vs_resolved": false,
+      "values": [
+        "SUPPORTED_AUTO",
+        "REVIEW_REQUIRED",
+        "REVIEW_REQUIRED",
+        "REVIEW_REQUIRED",
+        "REVIEW_REQUIRED",
+        "REVIEW_REQUIRED"
+      ]
+    },
+    {
+      "differs": false,
+      "field": "AI status",
+      "section": "decision",
+      "unknown_vs_resolved": false,
+      "values": [
+        "OK",
+        "OK",
+        "OK",
+        "OK",
+        "OK",
+        "OK"
+      ]
+    },
+    {
+      "differs": false,
+      "field": "divided_road_visible",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "differs": true,
+      "field": "image_quality",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        "GOOD",
+        "FAIR",
+        "FAIR",
+        "GOOD",
+        "GOOD",
+        "GOOD"
+      ]
+    },
+    {
+      "differs": false,
+      "field": "lane_count_total",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "differs": true,
+      "field": "lane_markings_visible",
+      "section": "observation",
+      "unknown_vs_resolved": true,
+      "values": [
+        true,
+        null,
+        null,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "differs": false,
+      "field": "road_edges.left_visible",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "differs": false,
+      "field": "road_edges.right_visible",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "differs": true,
+      "field": "road_edges.traveled_way_width_px",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        16,
+        14,
+        13,
+        12.5,
+        14,
+        14
+      ]
+    },
+    {
+      "differs": true,
+      "field": "shoulders.left_present",
+      "section": "observation",
+      "unknown_vs_resolved": true,
+      "values": [
+        true,
+        null,
+        null,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "differs": true,
+      "field": "shoulders.right_present",
+      "section": "observation",
+      "unknown_vs_resolved": true,
+      "values": [
+        true,
+        null,
+        null,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "differs": false,
+      "field": "sidewalks.left_present",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "differs": false,
+      "field": "sidewalks.right_present",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "differs": true,
+      "field": "two_way_visible",
+      "section": "observation",
+      "unknown_vs_resolved": true,
+      "values": [
+        true,
+        null,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "differs": true,
+      "field": "work_reference.appears_outside_traveled_way",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        true,
+        true,
+        true,
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "differs": true,
+      "field": "work_reference.appears_roadside",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        true,
+        true,
+        true,
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "differs": true,
+      "field": "work_reference.relative_position",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        "BEYOND_SHOULDER",
+        "BEYOND_SHOULDER",
+        "BEYOND_SHOULDER",
+        "TRAVELED_WAY",
+        "BEYOND_SHOULDER",
+        "BEYOND_SHOULDER"
+      ]
+    },
+    {
+      "differs": true,
+      "field": "work_reference.side",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        "LEFT",
+        "LEFT",
+        "LEFT",
+        "UNKNOWN",
+        "LEFT",
+        "LEFT"
+      ]
+    },
+    {
+      "differs": false,
+      "field": "features.crosswalks (count)",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "differs": true,
+      "field": "features.driveways (count)",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        6,
+        6,
+        6,
+        9,
+        7,
+        8
+      ]
+    },
+    {
+      "differs": true,
+      "field": "features.intersections (count)",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        1,
+        0,
+        2,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "differs": true,
+      "field": "features.obstructions (count)",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        0,
+        1,
+        1,
+        0,
+        3,
+        1
+      ]
+    },
+    {
+      "differs": false,
+      "field": "features.ramps (count)",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "differs": false,
+      "field": "features.roundabouts (count)",
+      "section": "observation",
+      "unknown_vs_resolved": false,
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "below_threshold": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "differs": true,
+      "field": "divided_road",
+      "section": "confidence",
+      "unknown_vs_resolved": false,
+      "values": [
+        0.98,
+        0.8,
+        0.8,
+        0.99,
+        0.85,
+        0.85
+      ]
+    },
+    {
+      "below_threshold": [
+        false,
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "differs": true,
+      "field": "intersection_conflict",
+      "section": "confidence",
+      "unknown_vs_resolved": false,
+      "values": [
+        0.82,
+        0.4,
+        0.4,
+        0.76,
+        0.5,
+        0.6
+      ]
+    },
+    {
+      "below_threshold": [
+        false,
+        true,
+        true,
+        false,
+        false,
+        false
+      ],
+      "differs": true,
+      "field": "lane_count_total",
+      "section": "confidence",
+      "unknown_vs_resolved": false,
+      "values": [
+        0.96,
+        0.6,
+        0.6,
+        0.98,
+        0.85,
+        0.85
+      ]
+    },
+    {
+      "below_threshold": [
+        false,
+        true,
+        true,
+        false,
+        false,
+        false
+      ],
+      "differs": true,
+      "field": "outside_traveled_way",
+      "section": "confidence",
+      "unknown_vs_resolved": false,
+      "values": [
+        0.82,
+        0.55,
+        0.65,
+        0.96,
+        0.7,
+        0.75
+      ]
+    },
+    {
+      "below_threshold": [
+        false,
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "differs": true,
+      "field": "pedestrian_impact",
+      "section": "confidence",
+      "unknown_vs_resolved": false,
+      "values": [
+        0.86,
+        0.5,
+        0.5,
+        0.91,
+        0.6,
+        0.6
+      ]
+    },
+    {
+      "below_threshold": [
+        false,
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "differs": true,
+      "field": "road_edges",
+      "section": "confidence",
+      "unknown_vs_resolved": false,
+      "values": [
+        0.78,
+        0.55,
+        0.5,
+        0.9,
+        0.6,
+        0.6
+      ]
+    },
+    {
+      "below_threshold": [
+        false,
+        true,
+        true,
+        false,
+        false,
+        false
+      ],
+      "differs": true,
+      "field": "two_way_visible",
+      "section": "confidence",
+      "unknown_vs_resolved": false,
+      "values": [
+        0.93,
+        0.3,
+        0.55,
+        0.97,
+        0.85,
+        0.85
+      ]
+    },
+    {
+      "below_threshold": [
+        false,
+        true,
+        true,
+        true,
+        false,
+        false
+      ],
+      "differs": true,
+      "field": "work_side",
+      "section": "confidence",
+      "unknown_vs_resolved": false,
+      "values": [
+        0.93,
+        0.55,
+        0.65,
+        0.3,
+        0.75,
+        0.75
+      ]
+    },
+    {
+      "differs": false,
+      "field": "road.centerline_status",
+      "section": "site_model",
+      "unknown_vs_resolved": false,
+      "values": [
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED"
+      ]
+    },
+    {
+      "differs": false,
+      "field": "road.divided",
+      "section": "site_model",
+      "unknown_vs_resolved": false,
+      "values": [
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED"
+      ]
+    },
+    {
+      "differs": false,
+      "field": "road.facility_type",
+      "section": "site_model",
+      "unknown_vs_resolved": false,
+      "values": [
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED"
+      ]
+    },
+    {
+      "differs": true,
+      "field": "road.lane_count",
+      "section": "site_model",
+      "unknown_vs_resolved": false,
+      "values": [
+        "RESOLVED",
+        "LOW_CONFIDENCE",
+        "LOW_CONFIDENCE",
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED"
+      ]
+    },
+    {
+      "differs": true,
+      "field": "road.road_edges",
+      "section": "site_model",
+      "unknown_vs_resolved": false,
+      "values": [
+        "RESOLVED",
+        "LOW_CONFIDENCE",
+        "LOW_CONFIDENCE",
+        "RESOLVED",
+        "LOW_CONFIDENCE",
+        "LOW_CONFIDENCE"
+      ]
+    },
+    {
+      "differs": false,
+      "field": "road.road_type",
+      "section": "site_model",
+      "unknown_vs_resolved": false,
+      "values": [
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED"
+      ]
+    },
+    {
+      "differs": true,
+      "field": "road.two_way",
+      "section": "site_model",
+      "unknown_vs_resolved": false,
+      "values": [
+        "RESOLVED",
+        "UNRESOLVED",
+        "LOW_CONFIDENCE",
+        "RESOLVED",
+        "RESOLVED",
+        "RESOLVED"
+      ]
+    },
+    {
+      "differs": true,
+      "field": "work.affects_pedestrian_route",
+      "section": "site_model",
+      "unknown_vs_resolved": false,
+      "values": [
+        "RESOLVED",
+        "LOW_CONFIDENCE",
+        "LOW_CONFIDENCE",
+        "RESOLVED",
+        "LOW_CONFIDENCE",
+        "LOW_CONFIDENCE"
+      ]
+    },
+    {
+      "differs": true,
+      "field": "work.encroaches_traveled_way",
+      "section": "site_model",
+      "unknown_vs_resolved": false,
+      "values": [
+        "RESOLVED",
+        "UNRESOLVED",
+        "UNRESOLVED",
+        "CONFLICT",
+        "UNRESOLVED",
+        "UNRESOLVED"
+      ]
+    },
+    {
+      "differs": true,
+      "field": "work.location",
+      "section": "site_model",
+      "unknown_vs_resolved": false,
+      "values": [
+        "RESOLVED",
+        "UNRESOLVED",
+        "UNRESOLVED",
+        "CONFLICT",
+        "UNRESOLVED",
+        "UNRESOLVED"
+      ]
+    },
+    {
+      "differs": true,
+      "field": "work.requires_alternating_one_lane_traffic",
+      "section": "site_model",
+      "unknown_vs_resolved": false,
+      "values": [
+        "RESOLVED",
+        "UNRESOLVED",
+        "UNRESOLVED",
+        "UNRESOLVED",
+        "UNRESOLVED",
+        "UNRESOLVED"
+      ]
+    },
+    {
+      "differs": true,
+      "field": "work.requires_lane_closure",
+      "section": "site_model",
+      "unknown_vs_resolved": false,
+      "values": [
+        "RESOLVED",
+        "UNRESOLVED",
+        "UNRESOLVED",
+        "UNRESOLVED",
+        "UNRESOLVED",
+        "UNRESOLVED"
+      ]
+    },
+    {
+      "differs": true,
+      "field": "work.side",
+      "section": "site_model",
+      "unknown_vs_resolved": false,
+      "values": [
+        "RESOLVED",
+        "LOW_CONFIDENCE",
+        "LOW_CONFIDENCE",
+        "UNRESOLVED",
+        "RESOLVED",
+        "RESOLVED"
+      ]
+    }
+  ],
+  "skipped": [],
+  "source_run_id": "20261016-213622-483ff4",
+  "totals": {
+    "analysis_map_calls_in_children": 0,
+    "cost_note": "Not Available - at least one model's price is not configured or its call failed",
+    "estimated_cost_usd": null,
+    "evidence_prep_map_requests": 3,
+    "new_map_calls": 4,
+    "new_osm_calls": 0,
+    "tokens": {
+      "cache_creation_input_tokens": 5884,
+      "cache_read_input_tokens": 0,
+      "input_tokens": 32994,
+      "output_tokens": 21259,
+      "reasoning_tokens": 12255
+    }
+  }
+}

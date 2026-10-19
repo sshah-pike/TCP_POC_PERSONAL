@@ -1,0 +1,18 @@
+[
+  {
+    "duration_ms": 2164.1,
+    "external": true,
+    "provider": "azure_maps",
+    "requests": 1,
+    "service": "map",
+    "span": "tcp.map.retrieve"
+  },
+  {
+    "duration_ms": 1794.3,
+    "external": true,
+    "provider": "osm_api",
+    "requests": 1,
+    "service": "osm",
+    "span": "tcp.osm.resolve"
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "duration_ms": 2064.9,
+    "external": true,
+    "provider": "azure_maps",
+    "purpose": "view:work_area",
+    "requests": 1,
+    "service": "map",
+    "span": "tcp.prep.views"
+  },
+  {
+    "duration_ms": 1634.2,
+    "external": true,
+    "provider": "azure_maps",
+    "purpose": "view:corridor_ahead",
+    "requests": 1,
+    "service": "map",
+    "span": "tcp.prep.views"
+  },
+  {
+    "duration_ms": 1494.0,
+    "external": true,
+    "provider": "azure_maps",
+    "purpose": "view:corridor_behind",
+    "requests": 1,
+    "service": "map",
+    "span": "tcp.prep.views"
+  }
+]

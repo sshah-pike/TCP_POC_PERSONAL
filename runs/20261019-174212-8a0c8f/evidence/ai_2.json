@@ -1,0 +1,715 @@
+{
+  "backend": "openai_responses",
+  "centerline_views": false,
+  "deployment": "gpt-5.6-sol",
+  "duration_ms": 138190.2,
+  "evidence_mode": "multi",
+  "osm_claims": true,
+  "profile": "gpt-5.6-sol",
+  "provider": "foundry",
+  "request": {
+    "api": "openai_responses",
+    "effort": "high",
+    "images_sha256": "11b95506dc01615a0d2bdb9f82eb05885e99734518f5f9cc80f691167bac4705",
+    "model": "gpt-5.6-sol",
+    "profile": "gpt-5.6-sol",
+    "prompt_sha256": "8aa05c435a589152322bb52f8a275000bba9914a1deb4821a2ddce605a42028c",
+    "schema_sha256": "85645c65480ee4084a3f8d0ba4092636d783106e155dc04024a75278095d60b9"
+  },
+  "result": {
+    "debug_sent": null,
+    "deployment": "gpt-5.6-sol",
+    "evidence_mode": "multi",
+    "foundry_api": "openai_responses",
+    "grounding": {
+      "checks": [
+        {
+          "detail": {
+            "appears_outside": true,
+            "distance_to_nearest_edge_m": 0.6,
+            "relative_position": "BEYOND_SHOULDER"
+          },
+          "id": "C1_WORK_VS_DISTANCE",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "lane_count_total": 4,
+            "reasons": [],
+            "traveled_way_width_m": 13.8
+          },
+          "id": "C2_WIDTH_VS_EDGES",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "action": null,
+            "geometry_side": "LEFT",
+            "model_side": "LEFT"
+          },
+          "id": "C3_SIDE_VS_GEOMETRY",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "claims_not_reported": [],
+            "disagreements": []
+          },
+          "id": "C4_JUNCTIONS_VS_OSM",
+          "result": "PASS"
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "OSM-A1",
+          "field": "lane_count",
+          "mapped_as": "ATTRIBUTE",
+          "tag": "lanes",
+          "text": "number of lanes of the selected road mapped as lanes=4 (OSM way last edited 2026-02-08T17:32:04Z). Report it in osm_claim_checks with classification OTHER: seen YES if the images confirm it, NO if they contradict it, UNKNOWN if they cannot show it.",
+          "value": "4"
+        },
+        {
+          "claim_id": "OSM-1",
+          "highway": "tertiary",
+          "image_1_px": [
+            674.6,
+            821.5
+          ],
+          "mapped_as": "PUBLIC_ROAD",
+          "osm_id": "19380570",
+          "osm_kind": "intersections",
+          "side_hint": "both side of the selected road"
+        },
+        {
+          "claim_id": "OSM-2",
+          "highway": "residential",
+          "image_1_px": [
+            593.8,
+            67.4
+          ],
+          "mapped_as": "PUBLIC_ROAD",
+          "osm_id": "19381478",
+          "osm_kind": "intersections",
+          "side_hint": "right side of the selected road"
+        },
+        {
+          "claim_id": "OSM-3",
+          "highway": "tertiary",
+          "image_1_px": [
+            631.8,
+            357.4
+          ],
+          "mapped_as": "PUBLIC_ROAD",
+          "osm_id": "19386395",
+          "osm_kind": "intersections",
+          "side_hint": "left side of the selected road"
+        },
+        {
+          "claim_id": "OSM-4",
+          "highway": "secondary",
+          "image_1_px": [
+            593.8,
+            67.4
+          ],
+          "mapped_as": "PUBLIC_ROAD",
+          "osm_id": "19387781",
+          "osm_kind": "intersections",
+          "side_hint": "right side of the selected road"
+        },
+        {
+          "claim_id": "OSM-5",
+          "highway": "traffic_signals",
+          "image_1_px": [
+            674.6,
+            821.5
+          ],
+          "mapped_as": "PUBLIC_ROAD",
+          "osm_id": "201445194",
+          "osm_kind": "intersections",
+          "side_hint": "side not mapped"
+        },
+        {
+          "claim_id": "OSM-6",
+          "highway": "traffic_signals",
+          "image_1_px": [
+            593.8,
+            67.4
+          ],
+          "mapped_as": "PUBLIC_ROAD",
+          "osm_id": "201445223",
+          "osm_kind": "intersections",
+          "side_hint": "side not mapped"
+        },
+        {
+          "claim_id": "OSM-7",
+          "highway": "service",
+          "image_1_px": [
+            645.1,
+            488.2
+          ],
+          "mapped_as": "DRIVEWAY_OR_SERVICE",
+          "osm_id": "850426767",
+          "osm_kind": "driveways",
+          "side_hint": "right side of the selected road"
+        },
+        {
+          "claim_id": "OSM-8",
+          "highway": "service",
+          "image_1_px": [
+            639.3,
+            406.6
+          ],
+          "mapped_as": "DRIVEWAY_OR_SERVICE",
+          "osm_id": "855215727",
+          "osm_kind": "driveways",
+          "side_hint": "right side of the selected road"
+        },
+        {
+          "claim_id": "OSM-9",
+          "highway": "service",
+          "image_1_px": [
+            725.7,
+            1130.6
+          ],
+          "mapped_as": "DRIVEWAY_OR_SERVICE",
+          "osm_id": "872064907",
+          "osm_kind": "driveways",
+          "side_hint": "left side of the selected road"
+        },
+        {
+          "claim_id": "OSM-10",
+          "highway": "service",
+          "image_1_px": [
+            727.2,
+            1139.5
+          ],
+          "mapped_as": "DRIVEWAY_OR_SERVICE",
+          "osm_id": "872064908",
+          "osm_kind": "driveways",
+          "side_hint": "right side of the selected road"
+        },
+        {
+          "claim_id": "OSM-11",
+          "highway": "service",
+          "image_1_px": [
+            692.4,
+            931.6
+          ],
+          "mapped_as": "DRIVEWAY_OR_SERVICE",
+          "osm_id": "890932842",
+          "osm_kind": "driveways",
+          "side_hint": "left side of the selected road"
+        },
+        {
+          "claim_id": "OSM-12",
+          "highway": "service",
+          "image_1_px": [
+            710.5,
+            1044.8
+          ],
+          "mapped_as": "DRIVEWAY_OR_SERVICE",
+          "osm_id": "941366763",
+          "osm_kind": "driveways",
+          "side_hint": "left side of the selected road"
+        },
+        {
+          "claim_id": "OSM-13",
+          "highway": "service",
+          "image_1_px": [
+            700.8,
+            986.4
+          ],
+          "mapped_as": "DRIVEWAY_OR_SERVICE",
+          "osm_id": "941366765",
+          "osm_kind": "driveways",
+          "side_hint": "right side of the selected road"
+        },
+        {
+          "claim_id": "OSM-14",
+          "highway": "service",
+          "image_1_px": [
+            659.0,
+            650.0
+          ],
+          "mapped_as": "DRIVEWAY_OR_SERVICE",
+          "osm_id": "1342322703",
+          "osm_kind": "driveways",
+          "side_hint": "right side of the selected road"
+        },
+        {
+          "claim_id": "OSM-15",
+          "highway": "service",
+          "image_1_px": [
+            651.5,
+            562.4
+          ],
+          "mapped_as": "DRIVEWAY_OR_SERVICE",
+          "osm_id": "1342322704",
+          "osm_kind": "driveways",
+          "side_hint": "right side of the selected road"
+        },
+        {
+          "claim_id": "OSM-16",
+          "highway": "crossing",
+          "image_1_px": [
+            563.6,
+            49.7
+          ],
+          "mapped_as": "CROSSWALK",
+          "osm_id": "9491423454",
+          "osm_kind": "crosswalks",
+          "side_hint": "side not mapped"
+        }
+      ],
+      "evidence": {
+        "divided": {
+          "basis": "The opposing lanes share one continuous paved roadway with no physical median or barrier.",
+          "image": "IMAGE_2"
+        },
+        "intersections": {
+          "basis": "Three public-road junctions with roadways continuing beyond adjoining properties are visible along the selected corridor.",
+          "image": "IMAGE_1"
+        },
+        "lane_count": {
+          "basis": "Two marked through lanes are directly visible on each side of the yellow center line.",
+          "image": "IMAGE_2"
+        },
+        "pedestrian": {
+          "basis": "Sidewalks are visible along the corridor and marked crossings of the selected road are visible at the southern intersection.",
+          "image": "IMAGE_6"
+        },
+        "road_edges": {
+          "basis": "Both pavement or curb edges are visible at the work cross-section, measuring about 13.8 m apart.",
+          "image": "IMAGE_2"
+        },
+        "two_way": {
+          "basis": "Yellow center lines and vehicles using opposing sides of one roadway are visible.",
+          "image": "IMAGE_2"
+        },
+        "work_location": {
+          "basis": "The marker center is on the concrete roadside area about 0.6 m beyond the traveled-way edge.",
+          "image": "IMAGE_2"
+        },
+        "work_side": {
+          "basis": "The magenta work marker is visibly beside the west, or left, edge of the northbound reference direction.",
+          "image": "IMAGE_2"
+        }
+      },
+      "format": "agent-call2-v1",
+      "images": [
+        {
+          "annotation": "annot-v1",
+          "image": "IMAGE_1",
+          "model_input_sha256": "ab6a91c2e0f9bd95b5cb8bbb355795d94296416d0001f776db7934a55d09100e",
+          "raw_pixel_sha256": "6d70d80d5eebefa18c8f0292d96dbdfd64054a75d76f0cbcc31cfa1e432da16c",
+          "work_reference_px": [
+            640.0,
+            640.0
+          ]
+        },
+        {
+          "annotation": "annot-v1",
+          "image": "IMAGE_2",
+          "model_input_sha256": "1b1501c15359d63ea2759363a76d2c40970cffa994f105d47bc9d09febd5df1f",
+          "raw_pixel_sha256": "e26aa0742157f02fc571d19141297f05aaf077dff443c8c8223b4e5ba2d01f46",
+          "work_reference_px": [
+            512.0,
+            512.0
+          ]
+        },
+        {
+          "annotation": "annot-v1",
+          "image": "IMAGE_3",
+          "model_input_sha256": "3180001cd85193c6a57e7f72d0cf9fa828b274b819f2f357589684ad8749740f",
+          "raw_pixel_sha256": "45949b5f3e1cd99dbc6561151b8ea098b3bc8e415fb7acded89ac4e6ee9d7c0d",
+          "work_reference_px": [
+            275.4,
+            -831.3
+          ]
+        },
+        {
+          "annotation": "annot-v1",
+          "image": "IMAGE_4",
+          "model_input_sha256": "c830e58839aa2bb5636aef5a93e86f3e3e268d1cb4229f665862b2e63e58ff23",
+          "raw_pixel_sha256": "db6ffb1e015084f80d7a4cd5ec6ef49112a876c378b788b23360dac1f63a48b5",
+          "work_reference_px": [
+            561.2,
+            1872.5
+          ]
+        },
+        {
+          "annotation": "annot-v1",
+          "image": "IMAGE_5",
+          "model_input_sha256": "8f0aff8a33b21874129dd0c271d2234dc0ef91c2acda08d17ed0d6f92b873feb",
+          "raw_pixel_sha256": "8e53f453fb8104ca1233762eb86acd6d128cec65cb50a9cbad8bd49348ac6779",
+          "work_reference_px": [
+            481.8,
+            1028.5
+          ]
+        },
+        {
+          "annotation": "annot-v1",
+          "image": "IMAGE_6",
+          "model_input_sha256": "1ec16e8cb0308d0b22f7c5ed39c7d7a72a2ea11abab5b07580f497fcb8065cfb",
+          "raw_pixel_sha256": "b833f164a2d85791c4dcb29cd1195280109dccedf40accd207e06c2ad1d41e4f",
+          "work_reference_px": [
+            395.8,
+            8.1
+          ]
+        }
+      ],
+      "measurements": {
+        "distance_measured_in": "IMAGE_2",
+        "distance_to_nearest_edge_m": 0.6,
+        "traveled_way_width_m": 13.8,
+        "width_measured_in": "IMAGE_2"
+      },
+      "osm_claim_checks": [
+        {
+          "basis": "IMAGE_2 directly shows four through lanes, two on each side of the center line.",
+          "claim_id": "OSM-A1",
+          "classification": "OTHER",
+          "seen": "YES"
+        },
+        {
+          "basis": "A public road visibly crosses the selected road near IMAGE_1 pixel (675,822).",
+          "claim_id": "OSM-1",
+          "classification": "PUBLIC_ROAD",
+          "seen": "YES"
+        },
+        {
+          "basis": "A roadway continuing beyond adjacent property is visible to the right near the northern junction.",
+          "claim_id": "OSM-2",
+          "classification": "PUBLIC_ROAD",
+          "seen": "YES"
+        },
+        {
+          "basis": "A public side road visibly continues west from the selected road near IMAGE_1 pixel (632,357).",
+          "claim_id": "OSM-3",
+          "classification": "PUBLIC_ROAD",
+          "seen": "YES"
+        },
+        {
+          "basis": "The northern junction visibly includes a public roadway extending to the right.",
+          "claim_id": "OSM-4",
+          "classification": "PUBLIC_ROAD",
+          "seen": "YES"
+        },
+        {
+          "basis": "A public-road intersection is visible near IMAGE_1 pixel (675,822); signal hardware is not separately resolved.",
+          "claim_id": "OSM-5",
+          "classification": "PUBLIC_ROAD",
+          "seen": "YES"
+        },
+        {
+          "basis": "A public-road junction is visible near IMAGE_1 pixel (594,67); signal hardware is not separately resolved.",
+          "claim_id": "OSM-6",
+          "classification": "PUBLIC_ROAD",
+          "seen": "YES"
+        },
+        {
+          "basis": "A parking or business access visibly joins the right side of the selected road near the mapped location.",
+          "claim_id": "OSM-7",
+          "classification": "DRIVEWAY_OR_SERVICE",
+          "seen": "YES"
+        },
+        {
+          "basis": "A gravel or service-property access is visible on the right side near the mapped location.",
+          "claim_id": "OSM-8",
+          "classification": "DRIVEWAY_OR_SERVICE",
+          "seen": "YES"
+        },
+        {
+          "basis": "A service or parking-property access is visible on the left side near the mapped location.",
+          "claim_id": "OSM-9",
+          "classification": "DRIVEWAY_OR_SERVICE",
+          "seen": "YES"
+        },
+        {
+          "basis": "A service or parking-property access is visible on the right side near the mapped location.",
+          "claim_id": "OSM-10",
+          "classification": "DRIVEWAY_OR_SERVICE",
+          "seen": "YES"
+        },
+        {
+          "basis": "A commercial or parking access visibly joins the left side near IMAGE_1 pixel (692,932).",
+          "claim_id": "OSM-11",
+          "classification": "DRIVEWAY_OR_SERVICE",
+          "seen": "YES"
+        },
+        {
+          "basis": "A commercial or parking access visibly joins the left side near IMAGE_1 pixel (710,1045).",
+          "claim_id": "OSM-12",
+          "classification": "DRIVEWAY_OR_SERVICE",
+          "seen": "YES"
+        },
+        {
+          "basis": "A commercial or parking access visibly joins the right side near IMAGE_1 pixel (701,986).",
+          "claim_id": "OSM-13",
+          "classification": "DRIVEWAY_OR_SERVICE",
+          "seen": "YES"
+        },
+        {
+          "basis": "A business access is directly visible on the right side near the work area.",
+          "claim_id": "OSM-14",
+          "classification": "DRIVEWAY_OR_SERVICE",
+          "seen": "YES"
+        },
+        {
+          "basis": "A business parking entrance is visible on the right side north of the work reference.",
+          "claim_id": "OSM-15",
+          "classification": "DRIVEWAY_OR_SERVICE",
+          "seen": "YES"
+        },
+        {
+          "basis": "Painted pedestrian-crossing markings are visible near IMAGE_1 pixel (564,50).",
+          "claim_id": "OSM-16",
+          "classification": "CROSSWALK",
+          "seen": "YES"
+        }
+      ]
+    },
+    "model": "gpt-5.6-sol",
+    "observation": {
+      "attribute_confidence": {
+        "divided_road": 0.97,
+        "intersection_conflict": 0.83,
+        "lane_count_total": 0.98,
+        "outside_traveled_way": 0.93,
+        "pedestrian_impact": 0.88,
+        "road_edges": 0.92,
+        "two_way_visible": 0.97,
+        "work_side": 0.97
+      },
+      "divided_road_visible": false,
+      "features": {
+        "crosswalks": [
+          {
+            "confidence": 0.78,
+            "description": "Marked pedestrian crossing near the northern public-road junction",
+            "image_x": 564.0,
+            "image_y": 50.0,
+            "side": "BOTH"
+          },
+          {
+            "confidence": 0.9,
+            "description": "Marked crossing of the selected road on the north side of the southern intersection",
+            "image_x": 664.3,
+            "image_y": 797.2,
+            "side": "BOTH"
+          },
+          {
+            "confidence": 0.96,
+            "description": "Marked crossing of the selected road on the south side of the southern intersection",
+            "image_x": 666.8,
+            "image_y": 829.0,
+            "side": "BOTH"
+          }
+        ],
+        "driveways": [
+          {
+            "confidence": 0.78,
+            "description": "Gravel or service-property access east of the selected road",
+            "image_x": 639.0,
+            "image_y": 407.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.84,
+            "description": "Parking-lot or business entrance east of the selected road",
+            "image_x": 645.0,
+            "image_y": 488.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.87,
+            "description": "Business parking entrance east of the selected road",
+            "image_x": 652.0,
+            "image_y": 562.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.94,
+            "description": "Business access east of the selected road near the work area",
+            "image_x": 671.3,
+            "image_y": 648.3,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.91,
+            "description": "Residential driveway west of the selected road",
+            "image_x": 640.5,
+            "image_y": 626.5,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.93,
+            "description": "Residential driveway west of the selected road south of the work reference",
+            "image_x": 647.8,
+            "image_y": 764.7,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.9,
+            "description": "Residential access west of the road near the southern intersection",
+            "image_x": 649.3,
+            "image_y": 793.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.82,
+            "description": "Commercial or parking access west of the selected road",
+            "image_x": 692.0,
+            "image_y": 932.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.82,
+            "description": "Commercial or parking access east of the selected road",
+            "image_x": 701.0,
+            "image_y": 986.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.81,
+            "description": "Commercial or parking access west of the selected road",
+            "image_x": 710.0,
+            "image_y": 1045.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.76,
+            "description": "Service or parking access west of the selected road",
+            "image_x": 726.0,
+            "image_y": 1131.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.76,
+            "description": "Service or parking access east of the selected road",
+            "image_x": 727.0,
+            "image_y": 1140.0,
+            "side": "RIGHT"
+          }
+        ],
+        "intersections": [
+          {
+            "confidence": 0.82,
+            "description": "Major public-road junction at the north end of the visible corridor",
+            "image_x": 594.0,
+            "image_y": 67.0,
+            "side": "BOTH"
+          },
+          {
+            "confidence": 0.84,
+            "description": "Public side-road T-junction west of the selected road",
+            "image_x": 632.0,
+            "image_y": 357.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.96,
+            "description": "Public road crossing the selected road south of the work reference",
+            "image_x": 667.1,
+            "image_y": 818.2,
+            "side": "BOTH"
+          }
+        ],
+        "obstructions": [
+          {
+            "confidence": 0.91,
+            "description": "Hedge or dense roadside vegetation immediately west of the sidewalk near the work reference",
+            "image_x": 635.2,
+            "image_y": 621.7,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.84,
+            "description": "Roadside pole near the west traveled-way edge and work reference",
+            "image_x": 639.0,
+            "image_y": 633.5,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.95,
+            "description": "Large tree canopy extending over the road south of the work reference",
+            "image_x": 666.1,
+            "image_y": 745.5,
+            "side": "BOTH"
+          }
+        ],
+        "ramps": [],
+        "roundabouts": []
+      },
+      "image_quality": "GOOD",
+      "lane_count_total": 4,
+      "lane_markings_visible": true,
+      "notes": "The selected road visibly has two through lanes in each direction separated by painted yellow center lines, with no physical median. The work marker is on the west-side sidewalk beyond the pavement edge.",
+      "osm_conflicts": [],
+      "road_edges": {
+        "left_visible": true,
+        "right_visible": true,
+        "traveled_way_width_px": 30.79
+      },
+      "shoulders": {
+        "left_present": false,
+        "right_present": false
+      },
+      "sidewalks": {
+        "left_present": true,
+        "right_present": true
+      },
+      "two_way_visible": true,
+      "work_reference": {
+        "appears_outside_traveled_way": true,
+        "appears_roadside": true,
+        "relative_position": "BEYOND_SHOULDER",
+        "side": "LEFT"
+      }
+    },
+    "profile": "gpt-5.6-sol",
+    "provider": "foundry",
+    "raw_response": "{\"lane_count_total\":4,\"two_way_visible\":\"YES\",\"divided_road_visible\":\"NO\",\"lane_markings_visible\":\"YES\",\"road_edges\":{\"left_visible\":true,\"right_visible\":true,\"traveled_way_width_m\":13.8,\"width_measured_in\":\"IMAGE_2\"},\"shoulders\":{\"left_present\":\"NO\",\"right_present\":\"NO\"},\"sidewalks\":{\"left_present\":\"YES\",\"right_present\":\"YES\"},\"work_reference\":{\"appears_roadside\":\"YES\",\"side\":\"LEFT\",\"appears_outside_traveled_way\":\"YES\",\"relative_position\":\"BEYOND_SHOULDER\",\"distance_to_nearest_edge_m\":0.6,\"distance_measured_in\":\"IMAGE_2\"},\"features\":{\"intersections\":[{\"description\":\"Major public-road junction at the north end of the visible corridor\",\"side\":\"BOTH\",\"confidence\":0.82,\"image\":\"IMAGE_1\",\"x\":594,\"y\":67},{\"description\":\"Public side-road T-junction west of the selected road\",\"side\":\"LEFT\",\"confidence\":0.84,\"image\":\"IMAGE_1\",\"x\":632,\"y\":357},{\"description\":\"Public road crossing the selected road south of the work reference\",\"side\":\"BOTH\",\"confidence\":0.96,\"image\":\"IMAGE_6\",\"x\":504,\"y\":721}],\"driveways\":[{\"description\":\"Gravel or service-property access east of the selected road\",\"side\":\"RIGHT\",\"confidence\":0.78,\"image\":\"IMAGE_1\",\"x\":639,\"y\":407},{\"description\":\"Parking-lot or business entrance east of the selected road\",\"side\":\"RIGHT\",\"confidence\":0.84,\"image\":\"IMAGE_1\",\"x\":645,\"y\":488},{\"description\":\"Business parking entrance east of the selected road\",\"side\":\"RIGHT\",\"confidence\":0.87,\"image\":\"IMAGE_1\",\"x\":652,\"y\":562},{\"description\":\"Business access east of the selected road near the work area\",\"side\":\"RIGHT\",\"confidence\":0.94,\"image\":\"IMAGE_2\",\"x\":637,\"y\":545},{\"description\":\"Residential driveway west of the selected road\",\"side\":\"LEFT\",\"confidence\":0.91,\"image\":\"IMAGE_2\",\"x\":514,\"y\":458},{\"description\":\"Residential driveway west of the selected road south of the work reference\",\"side\":\"LEFT\",\"confidence\":0.93,\"image\":\"IMAGE_6\",\"x\":427,\"y\":507},{\"description\":\"Residential access west of the road near the southern intersection\",\"side\":\"LEFT\",\"confidence\":0.9,\"image\":\"IMAGE_6\",\"x\":433,\"y\":620},{\"description\":\"Commercial or parking access west of the selected road\",\"side\":\"LEFT\",\"confidence\":0.82,\"image\":\"IMAGE_1\",\"x\":692,\"y\":932},{\"description\":\"Commercial or parking access east of the selected road\",\"side\":\"RIGHT\",\"confidence\":0.82,\"image\":\"IMAGE_1\",\"x\":701,\"y\":986},{\"description\":\"Commercial or parking access west of the selected road\",\"side\":\"LEFT\",\"confidence\":0.81,\"image\":\"IMAGE_1\",\"x\":710,\"y\":1045},{\"description\":\"Service or parking access west of the selected road\",\"side\":\"LEFT\",\"confidence\":0.76,\"image\":\"IMAGE_1\",\"x\":726,\"y\":1131},{\"description\":\"Service or parking access east of the selected road\",\"side\":\"RIGHT\",\"confidence\":0.76,\"image\":\"IMAGE_1\",\"x\":727,\"y\":1140}],\"crosswalks\":[{\"description\":\"Marked pedestrian crossing near the northern public-road junction\",\"side\":\"BOTH\",\"confidence\":0.78,\"image\":\"IMAGE_1\",\"x\":564,\"y\":50},{\"description\":\"Marked crossing of the selected road on the north side of the southern intersection\",\"side\":\"BOTH\",\"confidence\":0.9,\"image\":\"IMAGE_6\",\"x\":493,\"y\":637},{\"description\":\"Marked crossing of the selected road on the south side of the southern intersection\",\"side\":\"BOTH\",\"confidence\":0.96,\"image\":\"IMAGE_6\",\"x\":503,\"y\":764}],\"roundabouts\":[],\"ramps\":[],\"obstructions\":[{\"description\":\"Hedge or dense roadside vegetation immediately west of the sidewalk near the work reference\",\"side\":\"LEFT\",\"confidence\":0.91,\"image\":\"IMAGE_2\",\"x\":493,\"y\":439},{\"description\":\"Roadside pole near the west traveled-way edge and work reference\",\"side\":\"LEFT\",\"confidence\":0.84,\"image\":\"IMAGE_2\",\"x\":508,\"y\":486},{\"description\":\"Large tree canopy extending over the road south of the work reference\",\"side\":\"BOTH\",\"confidence\":0.95,\"image\":\"IMAGE_6\",\"x\":500,\"y\":430}]},\"image_quality\":\"GOOD\",\"attribute_confidence\":{\"lane_count_total\":0.98,\"two_way_visible\":0.97,\"divided_road\":0.97,\"road_edges\":0.92,\"work_side\":0.97,\"outside_traveled_way\":0.93,\"intersection_conflict\":0.83,\"pedestrian_impact\":0.88},\"osm_conflicts\":[],\"notes\":\"The selected road visibly has two through lanes in each direction separated by painted yellow center lines, with no physical median. The work marker is on the west-side sidewalk beyond the pavement edge.\",\"evidence\":{\"lane_count\":{\"image\":\"IMAGE_2\",\"basis\":\"Two marked through lanes are directly visible on each side of the yellow center line.\"},\"two_way\":{\"image\":\"IMAGE_2\",\"basis\":\"Yellow center lines and vehicles using opposing sides of one roadway are visible.\"},\"divided\":{\"image\":\"IMAGE_2\",\"basis\":\"The opposing lanes share one continuous paved roadway with no physical median or barrier.\"},\"road_edges\":{\"image\":\"IMAGE_2\",\"basis\":\"Both pavement or curb edges are visible at the work cross-section, measuring about 13.8 m apart.\"},\"work_side\":{\"image\":\"IMAGE_2\",\"basis\":\"The magenta work marker is visibly beside the west, or left, edge of the northbound reference direction.\"},\"work_location\":{\"image\":\"IMAGE_2\",\"basis\":\"The marker center is on the concrete roadside area about 0.6 m beyond the traveled-way edge.\"},\"intersections\":{\"image\":\"IMAGE_1\",\"basis\":\"Three public-road junctions with roadways continuing beyond adjoining properties are visible along the selected corridor.\"},\"pedestrian\":{\"image\":\"IMAGE_6\",\"basis\":\"Sidewalks are visible along the corridor and marked crossings of the selected road are visible at the southern intersection.\"}},\"osm_claim_checks\":[{\"claim_id\":\"OSM-A1\",\"seen\":\"YES\",\"classification\":\"OTHER\",\"basis\":\"IMAGE_2 directly shows four through lanes, two on each side of the center line.\"},{\"claim_id\":\"OSM-1\",\"seen\":\"YES\",\"classification\":\"PUBLIC_ROAD\",\"basis\":\"A public road visibly crosses the selected road near IMAGE_1 pixel (675,822).\"},{\"claim_id\":\"OSM-2\",\"seen\":\"YES\",\"classification\":\"PUBLIC_ROAD\",\"basis\":\"A roadway continuing beyond adjacent property is visible to the right near the northern junction.\"},{\"claim_id\":\"OSM-3\",\"seen\":\"YES\",\"classification\":\"PUBLIC_ROAD\",\"basis\":\"A public side road visibly continues west from the selected road near IMAGE_1 pixel (632,357).\"},{\"claim_id\":\"OSM-4\",\"seen\":\"YES\",\"classification\":\"PUBLIC_ROAD\",\"basis\":\"The northern junction visibly includes a public roadway extending to the right.\"},{\"claim_id\":\"OSM-5\",\"seen\":\"YES\",\"classification\":\"PUBLIC_ROAD\",\"basis\":\"A public-road intersection is visible near IMAGE_1 pixel (675,822); signal hardware is not separately resolved.\"},{\"claim_id\":\"OSM-6\",\"seen\":\"YES\",\"classification\":\"PUBLIC_ROAD\",\"basis\":\"A public-road junction is visible near IMAGE_1 pixel (594,67); signal hardware is not separately resolved.\"},{\"claim_id\":\"OSM-7\",\"seen\":\"YES\",\"classification\":\"DRIVEWAY_OR_SERVICE\",\"basis\":\"A parking or business access visibly joins the right side of the selected road near the mapped location.\"},{\"claim_id\":\"OSM-8\",\"seen\":\"YES\",\"classification\":\"DRIVEWAY_OR_SERVICE\",\"basis\":\"A gravel or service-property access is visible on the right side near the mapped location.\"},{\"claim_id\":\"OSM-9\",\"seen\":\"YES\",\"classification\":\"DRIVEWAY_OR_SERVICE\",\"basis\":\"A service or parking-property access is visible on the left side near the mapped location.\"},{\"claim_id\":\"OSM-10\",\"seen\":\"YES\",\"classification\":\"DRIVEWAY_OR_SERVICE\",\"basis\":\"A service or parking-property access is visible on the right side near the mapped location.\"},{\"claim_id\":\"OSM-11\",\"seen\":\"YES\",\"classification\":\"DRIVEWAY_OR_SERVICE\",\"basis\":\"A commercial or parking access visibly joins the left side near IMAGE_1 pixel (692,932).\"},{\"claim_id\":\"OSM-12\",\"seen\":\"YES\",\"classification\":\"DRIVEWAY_OR_SERVICE\",\"basis\":\"A commercial or parking access visibly joins the left side near IMAGE_1 pixel (710,1045).\"},{\"claim_id\":\"OSM-13\",\"seen\":\"YES\",\"classification\":\"DRIVEWAY_OR_SERVICE\",\"basis\":\"A commercial or parking access visibly joins the right side near IMAGE_1 pixel (701,986).\"},{\"claim_id\":\"OSM-14\",\"seen\":\"YES\",\"classification\":\"DRIVEWAY_OR_SERVICE\",\"basis\":\"A business access is directly visible on the right side near the work area.\"},{\"claim_id\":\"OSM-15\",\"seen\":\"YES\",\"classification\":\"DRIVEWAY_OR_SERVICE\",\"basis\":\"A business parking entrance is visible on the right side north of the work reference.\"},{\"claim_id\":\"OSM-16\",\"seen\":\"YES\",\"classification\":\"CROSSWALK\",\"basis\":\"Painted pedestrian-crossing markings are visible near IMAGE_1 pixel (564,50).\"}]}",
+    "request_id": "resp_05216975fc59d3fe006ad609b221f481908c810f371afafa29",
+    "usage": {
+      "cache_creation_input_tokens": 7987,
+      "cache_read_input_tokens": 0,
+      "input_tokens": 7990,
+      "output_tokens": 11742,
+      "reasoning_tokens": 9690
+    },
+    "views": [
+      "CROP_1",
+      "CROP_2",
+      "CROP_3",
+      "CROP_4",
+      "CROP_5"
+    ],
+    "vision_mode": "agent_call2",
+    "wire_format": "tri-state-v1"
+  },
+  "status": "OK",
+  "views": [
+    {
+      "pixel_sha256": "e26aa0742157f02fc571d19141297f05aaf077dff443c8c8223b4e5ba2d01f46",
+      "role": "CROP_1"
+    },
+    {
+      "pixel_sha256": "45949b5f3e1cd99dbc6561151b8ea098b3bc8e415fb7acded89ac4e6ee9d7c0d",
+      "role": "CROP_2"
+    },
+    {
+      "pixel_sha256": "db6ffb1e015084f80d7a4cd5ec6ef49112a876c378b788b23360dac1f63a48b5",
+      "role": "CROP_3"
+    },
+    {
+      "pixel_sha256": "8e53f453fb8104ca1233762eb86acd6d128cec65cb50a9cbad8bd49348ac6779",
+      "role": "CROP_4"
+    },
+    {
+      "pixel_sha256": "b833f164a2d85791c4dcb29cd1195280109dccedf40accd207e06c2ad1d41e4f",
+      "role": "CROP_5"
+    }
+  ],
+  "vision_mode": "agent_call2"
+}

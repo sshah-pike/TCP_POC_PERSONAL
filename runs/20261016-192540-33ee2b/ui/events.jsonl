@@ -1,0 +1,6 @@
+{"attributes": {"input_type": "KML"}, "event": "span_start", "name": "tcp.input.parse", "t": "2026-10-16T13:55:46.700+00:00"}
+{"attributes": {"features": 1, "input_hash": "sha256:391ef33639ff", "input_type": "KML"}, "duration_ms": 2.9, "event": "span_end", "name": "tcp.input.parse", "status": "OK", "t": "2026-10-16T13:55:46.704+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.rulepack.load", "t": "2026-10-16T13:55:46.705+00:00"}
+{"attributes": {"rule_pack_hash": "9402591080b1b03c", "rule_pack_id": "APPROVED_TWO_LANE_POC_RULE_PACK", "rule_pack_version": "1.0.0"}, "duration_ms": 58.6, "event": "span_end", "name": "tcp.rulepack.load", "status": "OK", "t": "2026-10-16T13:55:46.764+00:00"}
+{"attributes": {"provider": "usgs_naip"}, "event": "span_start", "name": "tcp.map.retrieve", "t": "2026-10-16T13:55:46.765+00:00"}
+{"attributes": {"error_code": "MAP_REQUEST_FAILED", "provider": "usgs_naip"}, "duration_ms": 91251.3, "event": "span_end", "name": "tcp.map.retrieve", "status": "OK", "t": "2026-10-16T13:57:18.022+00:00"}

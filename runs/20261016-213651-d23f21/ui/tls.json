@@ -1,0 +1,4 @@
+{
+  "ssl_context": "truststore._api.SSLContext",
+  "trust_store": "WINDOWS_SYSTEM_STORE (truststore)"
+}

@@ -1,0 +1,24 @@
+{
+  "decision": "REVIEW_REQUIRED",
+  "eligibility": {
+    "decision": "REVIEW_REQUIRED",
+    "details": {},
+    "generate_draft": false,
+    "message": "Automatic generation stopped: one or more safety-critical site facts are missing, low-confidence or conflicting. A person must resolve them before a draft can be generated.",
+    "reason_codes": [
+      "MAP_CONTEXT_UNAVAILABLE",
+      "MAP_REQUEST_FAILED"
+    ]
+  },
+  "out_dir": "C:\\Users\\Sshah-Hexaware\\OneDrive - Pike Enterprises, LLC\\Desktop\\TCP\\runs\\20261013-135651-cb692c\\output",
+  "outputs": [
+    "eligibility_result.json",
+    "project_geometry.json",
+    "run_report.txt"
+  ],
+  "plan_hash": null,
+  "reason_codes": [
+    "MAP_CONTEXT_UNAVAILABLE",
+    "MAP_REQUEST_FAILED"
+  ]
+}

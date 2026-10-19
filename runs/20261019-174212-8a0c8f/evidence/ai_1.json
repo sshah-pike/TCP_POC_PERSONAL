@@ -1,0 +1,297 @@
+{
+  "backend": "openai_responses",
+  "centerline_views": false,
+  "deployment": "gpt-5.6-sol",
+  "duration_ms": 130952.3,
+  "evidence_mode": "single",
+  "osm_claims": false,
+  "profile": "gpt-5.6-sol",
+  "provider": "foundry",
+  "request": {
+    "api": "openai_responses",
+    "effort": "high",
+    "images_sha256": "676c14f18dd19fb92136dd43a32cc7601db1818ead29eddfe3e6a3c65568ed2d",
+    "model": "gpt-5.6-sol",
+    "profile": "gpt-5.6-sol",
+    "prompt_sha256": "2230da1939c5d3a3559437394ae70236d581df10c2aded10a954ad6d17d5b592",
+    "schema_sha256": "e42647478ef479d9d5a9724bf0813ecac46cf8bdda44b28fd00ed39b33ec9ab7"
+  },
+  "result": {
+    "debug_sent": null,
+    "deployment": "gpt-5.6-sol",
+    "evidence_mode": "single",
+    "foundry_api": "openai_responses",
+    "grounding": {
+      "checks": [
+        {
+          "detail": {
+            "appears_outside": false,
+            "distance_to_nearest_edge_m": 0.0,
+            "relative_position": "TRAVELED_WAY"
+          },
+          "id": "C1_WORK_VS_DISTANCE",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "lane_count_total": 2,
+            "reasons": [
+              "7.15 m per lane outside (2.4, 5.5)"
+            ],
+            "traveled_way_width_m": 14.3
+          },
+          "id": "C2_WIDTH_VS_EDGES",
+          "result": "DOWNGRADED"
+        },
+        {
+          "detail": {
+            "action": null,
+            "geometry_side": "LEFT",
+            "model_side": "UNKNOWN"
+          },
+          "id": "C3_SIDE_VS_GEOMETRY",
+          "result": "NOT_CHECKABLE"
+        },
+        {
+          "detail": {
+            "note": "OSM claims switch off"
+          },
+          "id": "C4_JUNCTIONS_VS_OSM",
+          "result": "NOT_APPLICABLE"
+        }
+      ],
+      "claims": null,
+      "evidence": null,
+      "extras": [
+        {
+          "category": "curb",
+          "confidence": 0.9,
+          "description": "Curbs are visible along both sides of the selected road near the work reference.",
+          "image_x": 640,
+          "image_y": 640
+        },
+        {
+          "category": "turn_lane",
+          "confidence": 0.82,
+          "description": "Dedicated turn-lane markings are visible on the selected-road approach to the intersection south of the reference.",
+          "image_x": 671,
+          "image_y": 760
+        }
+      ],
+      "format": "agent-call1-v1",
+      "images": [
+        {
+          "annotation": "annot-v1",
+          "image": "IMAGE_1",
+          "model_input_sha256": "ab6a91c2e0f9bd95b5cb8bbb355795d94296416d0001f776db7934a55d09100e",
+          "raw_pixel_sha256": "6d70d80d5eebefa18c8f0292d96dbdfd64054a75d76f0cbcc31cfa1e432da16c",
+          "work_reference_px": [
+            640.0,
+            640.0
+          ]
+        }
+      ],
+      "measurements": {
+        "distance_measured_in": "IMAGE_1",
+        "distance_to_nearest_edge_m": 0.0,
+        "traveled_way_width_m": 14.3,
+        "width_measured_in": "IMAGE_1"
+      },
+      "osm_claim_checks": null
+    },
+    "model": "gpt-5.6-sol",
+    "observation": {
+      "attribute_confidence": {
+        "divided_road": 0.98,
+        "intersection_conflict": 0.67,
+        "lane_count_total": 0.88,
+        "outside_traveled_way": 0.98,
+        "pedestrian_impact": 0.8,
+        "road_edges": 0.39,
+        "two_way_visible": 0.94,
+        "work_side": 0.18
+      },
+      "divided_road_visible": false,
+      "features": {
+        "crosswalks": [
+          {
+            "confidence": 0.78,
+            "description": "Marked crossing of the selected road at the northern intersection",
+            "image_x": 594.0,
+            "image_y": 65.0,
+            "side": "BOTH"
+          },
+          {
+            "confidence": 0.82,
+            "description": "Marked crossing of the selected road at the intersection south of the work reference",
+            "image_x": 675.0,
+            "image_y": 791.0,
+            "side": "BOTH"
+          }
+        ],
+        "driveways": [
+          {
+            "confidence": 0.86,
+            "description": "Commercial parking-lot entrance from the selected road",
+            "image_x": 638.0,
+            "image_y": 414.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.89,
+            "description": "Commercial parking-lot entrance from the selected road",
+            "image_x": 651.0,
+            "image_y": 548.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.78,
+            "description": "Residential driveway near the work reference",
+            "image_x": 621.0,
+            "image_y": 646.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.87,
+            "description": "Commercial entrance south of the work reference",
+            "image_x": 670.0,
+            "image_y": 705.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.81,
+            "description": "Commercial parking entrance south of the major intersection",
+            "image_x": 688.0,
+            "image_y": 929.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.8,
+            "description": "Commercial parking entrance in the southern part of the image",
+            "image_x": 726.0,
+            "image_y": 1060.0,
+            "side": "RIGHT"
+          }
+        ],
+        "intersections": [
+          {
+            "confidence": 0.94,
+            "description": "Public-road intersection on the selected road near the northern image edge",
+            "image_x": 592.0,
+            "image_y": 48.0,
+            "side": "BOTH"
+          },
+          {
+            "confidence": 0.88,
+            "description": "Public-road intersection west of the selected road",
+            "image_x": 22.0,
+            "image_y": 339.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.82,
+            "description": "Public-road T-junction west of the selected road",
+            "image_x": 382.0,
+            "image_y": 341.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.96,
+            "description": "Public-road T-intersection entering the selected road from the west",
+            "image_x": 614.0,
+            "image_y": 344.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.86,
+            "description": "Public-road intersection west of the selected road",
+            "image_x": 21.0,
+            "image_y": 807.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.9,
+            "description": "Public-road intersection west of the selected road",
+            "image_x": 385.0,
+            "image_y": 807.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.96,
+            "description": "Public-road intersection south of the work reference",
+            "image_x": 680.0,
+            "image_y": 807.0,
+            "side": "BOTH"
+          }
+        ],
+        "obstructions": [
+          {
+            "confidence": 0.94,
+            "description": "Mature roadside tree and canopy near the work reference",
+            "image_x": 604.0,
+            "image_y": 680.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.73,
+            "description": "Utility pole close to the left sidewalk",
+            "image_x": 620.0,
+            "image_y": 620.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.86,
+            "description": "Parked vehicles in commercial frontage close to the roadside",
+            "image_x": 681.0,
+            "image_y": 600.0,
+            "side": "RIGHT"
+          }
+        ],
+        "ramps": [],
+        "roundabouts": []
+      },
+      "image_quality": "GOOD",
+      "lane_count_total": 2,
+      "lane_markings_visible": true,
+      "notes": "The work-reference center lies within the traveled way, slightly left of the visible centerline. Width is measured perpendicular to the selected road from the visible pavement edges.",
+      "osm_conflicts": [],
+      "road_edges": {
+        "left_visible": true,
+        "right_visible": true,
+        "traveled_way_width_px": null
+      },
+      "shoulders": {
+        "left_present": false,
+        "right_present": false
+      },
+      "sidewalks": {
+        "left_present": true,
+        "right_present": true
+      },
+      "two_way_visible": true,
+      "work_reference": {
+        "appears_outside_traveled_way": false,
+        "appears_roadside": false,
+        "relative_position": "TRAVELED_WAY",
+        "side": "UNKNOWN"
+      }
+    },
+    "profile": "gpt-5.6-sol",
+    "provider": "foundry",
+    "raw_response": "{\"lane_count_total\":2,\"two_way_visible\":\"YES\",\"divided_road_visible\":\"NO\",\"lane_markings_visible\":\"YES\",\"road_edges\":{\"left_visible\":true,\"right_visible\":true,\"traveled_way_width_m\":14.3,\"width_measured_in\":\"IMAGE_1\"},\"shoulders\":{\"left_present\":\"NO\",\"right_present\":\"NO\"},\"sidewalks\":{\"left_present\":\"YES\",\"right_present\":\"YES\"},\"work_reference\":{\"appears_roadside\":\"NO\",\"side\":\"UNKNOWN\",\"appears_outside_traveled_way\":\"NO\",\"relative_position\":\"TRAVELED_WAY\",\"distance_to_nearest_edge_m\":0.0,\"distance_measured_in\":\"IMAGE_1\"},\"features\":{\"intersections\":[{\"description\":\"Public-road intersection on the selected road near the northern image edge\",\"side\":\"BOTH\",\"confidence\":0.94,\"image\":\"IMAGE_1\",\"x\":592,\"y\":48},{\"description\":\"Public-road intersection west of the selected road\",\"side\":\"LEFT\",\"confidence\":0.88,\"image\":\"IMAGE_1\",\"x\":22,\"y\":339},{\"description\":\"Public-road T-junction west of the selected road\",\"side\":\"LEFT\",\"confidence\":0.82,\"image\":\"IMAGE_1\",\"x\":382,\"y\":341},{\"description\":\"Public-road T-intersection entering the selected road from the west\",\"side\":\"LEFT\",\"confidence\":0.96,\"image\":\"IMAGE_1\",\"x\":614,\"y\":344},{\"description\":\"Public-road intersection west of the selected road\",\"side\":\"LEFT\",\"confidence\":0.86,\"image\":\"IMAGE_1\",\"x\":21,\"y\":807},{\"description\":\"Public-road intersection west of the selected road\",\"side\":\"LEFT\",\"confidence\":0.9,\"image\":\"IMAGE_1\",\"x\":385,\"y\":807},{\"description\":\"Public-road intersection south of the work reference\",\"side\":\"BOTH\",\"confidence\":0.96,\"image\":\"IMAGE_1\",\"x\":680,\"y\":807}],\"driveways\":[{\"description\":\"Commercial parking-lot entrance from the selected road\",\"side\":\"RIGHT\",\"confidence\":0.86,\"image\":\"IMAGE_1\",\"x\":638,\"y\":414},{\"description\":\"Commercial parking-lot entrance from the selected road\",\"side\":\"RIGHT\",\"confidence\":0.89,\"image\":\"IMAGE_1\",\"x\":651,\"y\":548},{\"description\":\"Residential driveway near the work reference\",\"side\":\"LEFT\",\"confidence\":0.78,\"image\":\"IMAGE_1\",\"x\":621,\"y\":646},{\"description\":\"Commercial entrance south of the work reference\",\"side\":\"RIGHT\",\"confidence\":0.87,\"image\":\"IMAGE_1\",\"x\":670,\"y\":705},{\"description\":\"Commercial parking entrance south of the major intersection\",\"side\":\"LEFT\",\"confidence\":0.81,\"image\":\"IMAGE_1\",\"x\":688,\"y\":929},{\"description\":\"Commercial parking entrance in the southern part of the image\",\"side\":\"RIGHT\",\"confidence\":0.8,\"image\":\"IMAGE_1\",\"x\":726,\"y\":1060}],\"crosswalks\":[{\"description\":\"Marked crossing of the selected road at the northern intersection\",\"side\":\"BOTH\",\"confidence\":0.78,\"image\":\"IMAGE_1\",\"x\":594,\"y\":65},{\"description\":\"Marked crossing of the selected road at the intersection south of the work reference\",\"side\":\"BOTH\",\"confidence\":0.82,\"image\":\"IMAGE_1\",\"x\":675,\"y\":791}],\"roundabouts\":[],\"ramps\":[],\"obstructions\":[{\"description\":\"Mature roadside tree and canopy near the work reference\",\"side\":\"LEFT\",\"confidence\":0.94,\"image\":\"IMAGE_1\",\"x\":604,\"y\":680},{\"description\":\"Utility pole close to the left sidewalk\",\"side\":\"LEFT\",\"confidence\":0.73,\"image\":\"IMAGE_1\",\"x\":620,\"y\":620},{\"description\":\"Parked vehicles in commercial frontage close to the roadside\",\"side\":\"RIGHT\",\"confidence\":0.86,\"image\":\"IMAGE_1\",\"x\":681,\"y\":600}]},\"image_quality\":\"GOOD\",\"attribute_confidence\":{\"lane_count_total\":0.88,\"two_way_visible\":0.94,\"divided_road\":0.98,\"road_edges\":0.83,\"work_side\":0.18,\"outside_traveled_way\":0.98,\"intersection_conflict\":0.67,\"pedestrian_impact\":0.8},\"notes\":\"The work-reference center lies within the traveled way, slightly left of the visible centerline. Width is measured perpendicular to the selected road from the visible pavement edges.\",\"extras\":[{\"category\":\"curb\",\"description\":\"Curbs are visible along both sides of the selected road near the work reference.\",\"image_x\":640,\"image_y\":640,\"confidence\":0.9},{\"category\":\"turn_lane\",\"description\":\"Dedicated turn-lane markings are visible on the selected-road approach to the intersection south of the reference.\",\"image_x\":671,\"image_y\":760,\"confidence\":0.82}]}",
+    "request_id": "resp_05768bec3e228d89006ad609269ff08195aaa923c47d2cff05",
+    "usage": {
+      "cache_creation_input_tokens": 3178,
+      "cache_read_input_tokens": 0,
+      "input_tokens": 3181,
+      "output_tokens": 10757,
+      "reasoning_tokens": 9718
+    },
+    "views": [],
+    "vision_mode": "agent_call1",
+    "wire_format": "tri-state-v1"
+  },
+  "status": "OK",
+  "views": [],
+  "vision_mode": "agent_call1"
+}

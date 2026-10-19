@@ -1,0 +1,126 @@
+{
+  "backend": "openai_responses",
+  "deployment": "gpt-5.6-sol",
+  "duration_ms": 70757.8,
+  "evidence_mode": "single",
+  "profile": "gpt-5.6-sol",
+  "provider": "foundry",
+  "result": {
+    "deployment": "gpt-5.6-sol",
+    "evidence_mode": "single",
+    "foundry_api": "openai_responses",
+    "model": "gpt-5.6-sol",
+    "observation": {
+      "attribute_confidence": {
+        "divided_road": 0.98,
+        "intersection_conflict": 0.82,
+        "lane_count_total": 0.96,
+        "outside_traveled_way": 0.82,
+        "pedestrian_impact": 0.86,
+        "road_edges": 0.78,
+        "two_way_visible": 0.93,
+        "work_side": 0.93
+      },
+      "divided_road_visible": false,
+      "features": {
+        "crosswalks": [],
+        "driveways": [
+          {
+            "confidence": 0.66,
+            "description": "Residential or property access joining the left side of the selected road.",
+            "image_x": 124,
+            "image_y": 718,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.72,
+            "description": "Property access joining the left side of the road.",
+            "image_x": 337,
+            "image_y": 607,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.9,
+            "description": "Paved access connecting the road to the visible parking area.",
+            "image_x": 584,
+            "image_y": 493,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.72,
+            "description": "Residential access joining the left side of the road.",
+            "image_x": 702,
+            "image_y": 433,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.82,
+            "description": "Curving residential access joining the right side of the road.",
+            "image_x": 815,
+            "image_y": 376,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.68,
+            "description": "Property access joining the left side of the road.",
+            "image_x": 881,
+            "image_y": 342,
+            "side": "LEFT"
+          }
+        ],
+        "intersections": [
+          {
+            "confidence": 0.68,
+            "description": "Paved side-road or broad access junction; exact classification is visually uncertain.",
+            "image_x": 78,
+            "image_y": 750,
+            "side": "RIGHT"
+          }
+        ],
+        "obstructions": [],
+        "ramps": [],
+        "roundabouts": []
+      },
+      "image_quality": "GOOD",
+      "lane_count_total": 2,
+      "lane_markings_visible": true,
+      "notes": "A visible two-lane undivided road runs southwest\u2013northeast. The image-centre reference appears on the northwest/LEFT roadside beyond the narrow visible shoulder, rather than within the edge-line-to-edge-line traveled way. Width is approximate because of aerial-image resolution.",
+      "osm_conflicts": [],
+      "road_edges": {
+        "left_visible": true,
+        "right_visible": true,
+        "traveled_way_width_px": 16
+      },
+      "shoulders": {
+        "left_present": true,
+        "right_present": true
+      },
+      "sidewalks": {
+        "left_present": false,
+        "right_present": false
+      },
+      "two_way_visible": true,
+      "work_reference": {
+        "appears_outside_traveled_way": true,
+        "appears_roadside": true,
+        "relative_position": "BEYOND_SHOULDER",
+        "side": "LEFT"
+      }
+    },
+    "profile": "gpt-5.6-sol",
+    "provider": "foundry",
+    "raw_response": "{\"lane_count_total\":2,\"two_way_visible\":\"YES\",\"divided_road_visible\":\"NO\",\"lane_markings_visible\":\"YES\",\"road_edges\":{\"left_visible\":true,\"right_visible\":true,\"traveled_way_width_px\":16},\"shoulders\":{\"left_present\":\"YES\",\"right_present\":\"YES\"},\"sidewalks\":{\"left_present\":\"NO\",\"right_present\":\"NO\"},\"work_reference\":{\"appears_roadside\":\"YES\",\"side\":\"LEFT\",\"appears_outside_traveled_way\":\"YES\",\"relative_position\":\"BEYOND_SHOULDER\"},\"features\":{\"intersections\":[{\"description\":\"Paved side-road or broad access junction; exact classification is visually uncertain.\",\"image_x\":78,\"image_y\":750,\"side\":\"RIGHT\",\"confidence\":0.68}],\"driveways\":[{\"description\":\"Residential or property access joining the left side of the selected road.\",\"image_x\":124,\"image_y\":718,\"side\":\"LEFT\",\"confidence\":0.66},{\"description\":\"Property access joining the left side of the road.\",\"image_x\":337,\"image_y\":607,\"side\":\"LEFT\",\"confidence\":0.72},{\"description\":\"Paved access connecting the road to the visible parking area.\",\"image_x\":584,\"image_y\":493,\"side\":\"RIGHT\",\"confidence\":0.9},{\"description\":\"Residential access joining the left side of the road.\",\"image_x\":702,\"image_y\":433,\"side\":\"LEFT\",\"confidence\":0.72},{\"description\":\"Curving residential access joining the right side of the road.\",\"image_x\":815,\"image_y\":376,\"side\":\"RIGHT\",\"confidence\":0.82},{\"description\":\"Property access joining the left side of the road.\",\"image_x\":881,\"image_y\":342,\"side\":\"LEFT\",\"confidence\":0.68}],\"crosswalks\":[],\"roundabouts\":[],\"ramps\":[],\"obstructions\":[]},\"image_quality\":\"GOOD\",\"attribute_confidence\":{\"lane_count_total\":0.96,\"two_way_visible\":0.93,\"divided_road\":0.98,\"road_edges\":0.78,\"work_side\":0.93,\"outside_traveled_way\":0.82,\"intersection_conflict\":0.82,\"pedestrian_impact\":0.86},\"osm_conflicts\":[],\"notes\":\"A visible two-lane undivided road runs southwest\u2013northeast. The image-centre reference appears on the northwest/LEFT roadside beyond the narrow visible shoulder, rather than within the edge-line-to-edge-line traveled way. Width is approximate because of aerial-image resolution.\"}",
+    "request_id": "resp_064cec13982dbcb7006ad25553f87c8193bf9cfc778ae2b3dd",
+    "usage": {
+      "cache_creation_input_tokens": 1750,
+      "cache_read_input_tokens": 0,
+      "input_tokens": 1753,
+      "output_tokens": 5016,
+      "reasoning_tokens": 4487
+    },
+    "views": [],
+    "wire_format": "tri-state-v1"
+  },
+  "status": "OK",
+  "views": []
+}

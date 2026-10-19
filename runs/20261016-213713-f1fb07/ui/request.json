@@ -1,0 +1,41 @@
+{
+  "argv": [
+    "--kml",
+    "C:\\Users\\Sshah-Hexaware\\OneDrive - Pike Enterprises, LLC\\Desktop\\TCP\\runs\\20261016-213713-f1fb07\\input\\demo) RI-91 Alton Bradford Rd - single point (demo, not a real pole).kml",
+    "--road-type",
+    "RURAL",
+    "--map-provider",
+    "azure_maps",
+    "--no-dwt",
+    "--ai-provider",
+    "foundry",
+    "--out",
+    "C:\\Users\\Sshah-Hexaware\\OneDrive - Pike Enterprises, LLC\\Desktop\\TCP\\runs\\20261016-213713-f1fb07\\output"
+  ],
+  "created_at": "2026-10-16T16:07:13.247+00:00",
+  "request": {
+    "advanced": {
+      "ai_provider": "foundry",
+      "dwt_mode": null,
+      "map_provider": "azure_maps",
+      "no_dwt": true
+    },
+    "input_type": "kml",
+    "kml_filename": "demo) RI-91 Alton Bradford Rd - single point (demo, not a real pole).kml",
+    "kml_saved_path": "C:\\Users\\Sshah-Hexaware\\OneDrive - Pike Enterprises, LLC\\Desktop\\TCP\\runs\\20261016-213713-f1fb07\\input\\demo) RI-91 Alton Bradford Rd - single point (demo, not a real pole).kml",
+    "kml_size_bytes": 2339,
+    "operator": {
+      "options": [],
+      "requires_lane_closure": false,
+      "road_type": "RURAL",
+      "speed": null
+    },
+    "resume": {
+      "ai_profile": "claude-opus-5-5",
+      "comparison_id": "20261016-213713-468adc",
+      "parent_run_id": "20261016-213622-483ff4",
+      "requested_stage": "vision"
+    }
+  },
+  "run_id": "20261016-213713-f1fb07"
+}

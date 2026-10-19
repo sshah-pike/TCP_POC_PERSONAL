@@ -1,0 +1,9 @@
+usage: tcp_demo.py [-h] [--kml KML | --offline OFFLINE] [--lat LAT]
+                   [--lon LON] [--offline-input {coordinates,kml}]
+                   [--road-type ROAD_TYPE] [--speed SPEED]
+                   [--requires-lane-closure] [--option OPTION] [--out OUT]
+                   [--rule-pack RULE_PACK] [--config CONFIG]
+                   [--dwt-config DWT_CONFIG] [--dwt-mode {PLAN,AERIAL_BASE}]
+                   [--no-dwt] [--map-provider MAP_PROVIDER]
+                   [--ai-provider AI_PROVIDER] [--log-exact-coordinates]
+tcp_demo.py: error: argument --lat: invalid float value: 'abc'

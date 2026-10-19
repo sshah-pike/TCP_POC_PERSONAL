@@ -1,0 +1,34 @@
+{"attributes": {"input_type": "KML"}, "event": "span_start", "name": "tcp.input.parse", "t": "2026-10-16T17:32:17.391+00:00"}
+{"attributes": {"features": 1, "input_hash": "sha256:391ef33639ff", "input_type": "KML"}, "duration_ms": 1.3, "event": "span_end", "name": "tcp.input.parse", "status": "OK", "t": "2026-10-16T17:32:17.397+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.rulepack.load", "t": "2026-10-16T17:32:17.398+00:00"}
+{"attributes": {"rule_pack_hash": "9402591080b1b03c", "rule_pack_id": "APPROVED_TWO_LANE_POC_RULE_PACK", "rule_pack_version": "1.0.0"}, "duration_ms": 204.0, "event": "span_end", "name": "tcp.rulepack.load", "status": "OK", "t": "2026-10-16T17:32:17.603+00:00"}
+{"attributes": {"provider": "azure_maps"}, "event": "span_start", "name": "tcp.map.retrieve", "t": "2026-10-16T17:32:17.604+00:00"}
+{"action": "reused", "artifact_id": "map_1", "event": "evidence", "kind": "map", "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1", "source_artifact_id": "map_1", "source_run": "20261016-213622-483ff4", "span": "tcp.map.retrieve", "t": "2026-10-16T17:32:17.831+00:00"}
+{"attributes": {"metres_per_pixel": 0.447835, "provider": "azure_maps", "width_px": 1280}, "duration_ms": 223.0, "event": "span_end", "name": "tcp.map.retrieve", "status": "OK", "t": "2026-10-16T17:32:17.831+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.osm.resolve", "t": "2026-10-16T17:32:17.832+00:00"}
+{"action": "reused", "artifact_id": "osm_1", "event": "evidence", "kind": "osm", "sha256": "2ac7bc19a24d850cc61a5438a11838b8c91e9cf33ffbd8e0d529517a8a5164bc", "source_artifact_id": "osm_1", "source_run": "20261016-213622-483ff4", "span": "tcp.osm.resolve", "t": "2026-10-16T17:32:17.918+00:00"}
+{"attributes": {"highway": "secondary", "way_count": 1}, "duration_ms": 92.2, "event": "span_end", "name": "tcp.osm.resolve", "status": "OK", "t": "2026-10-16T17:32:17.924+00:00"}
+{"attributes": {"provider": "foundry"}, "event": "span_start", "name": "tcp.vision.analyze", "t": "2026-10-16T17:32:17.925+00:00"}
+{"action": "reused", "artifact_id": "map_view_1", "event": "evidence", "kind": "map_view", "sha256": "959768acb820394177caddc81758ec4af20d3660c34a508337ff19645cf6ebe0", "source_artifact_id": "map_view_1", "source_run": "20261016-221800-2b4518", "span": "tcp.vision.analyze", "t": "2026-10-16T17:32:18.137+00:00"}
+{"action": "reused", "artifact_id": "map_view_2", "event": "evidence", "kind": "map_view", "sha256": "1c36bfdb37470eaf2ea8d8d59b3f23b2e0ea1f8ef0b58cf2b350951c6d022fe0", "source_artifact_id": "map_view_2", "source_run": "20261016-221800-2b4518", "span": "tcp.vision.analyze", "t": "2026-10-16T17:32:18.274+00:00"}
+{"action": "reused", "artifact_id": "map_view_3", "event": "evidence", "kind": "map_view", "sha256": "7668f4aed72814e73f5177894c645c3740f4a2fc82583ae744b87445080158a3", "source_artifact_id": "map_view_3", "source_run": "20261016-221800-2b4518", "span": "tcp.vision.analyze", "t": "2026-10-16T17:32:18.491+00:00"}
+{"action": "saved", "artifact_id": "ai_1", "event": "evidence", "file": "ai_1.json", "kind": "ai", "sha256": "57def2a10c995989c0b1e8948401cd39720db548ba5177ed4e5da51b8474cedf", "span": "tcp.vision.analyze", "t": "2026-10-16T17:33:49.975+00:00"}
+{"attributes": {"model": "gpt-5.6-sol", "provider": "foundry", "status_code": "OK"}, "duration_ms": 92047.7, "event": "span_end", "name": "tcp.vision.analyze", "status": "OK", "t": "2026-10-16T17:33:49.976+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.fuse", "t": "2026-10-16T17:33:49.976+00:00"}
+{"attributes": {"conflicts": 0, "inputs_complete": true, "site_model_id": "SITE-447867F259C1AB6F"}, "duration_ms": 7.6, "event": "span_end", "name": "tcp.site.fuse", "status": "OK", "t": "2026-10-16T17:33:49.984+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.eligibility", "t": "2026-10-16T17:33:49.992+00:00"}
+{"attributes": {"decision": "SUPPORTED_AUTO", "reason_codes": ""}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.site.eligibility", "status": "OK", "t": "2026-10-16T17:33:49.992+00:00"}
+{"attributes": {"ta_id": "TA-1"}, "event": "span_start", "name": "tcp.rules.execute", "t": "2026-10-16T17:33:49.995+00:00"}
+{"attributes": {"objects": 3, "options": 0, "ta_id": "TA-1"}, "duration_ms": 0.3, "event": "span_end", "name": "tcp.rules.execute", "status": "OK", "t": "2026-10-16T17:33:49.997+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.geometry.place", "t": "2026-10-16T17:33:49.998+00:00"}
+{"attributes": {"issues": ""}, "duration_ms": 0.3, "event": "span_end", "name": "tcp.geometry.place", "status": "OK", "t": "2026-10-16T17:33:49.998+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.plan.validate", "t": "2026-10-16T17:33:49.999+00:00"}
+{"attributes": {"geometry": "PASS", "rule": "PASS"}, "duration_ms": 1.2, "event": "span_end", "name": "tcp.plan.validate", "status": "OK", "t": "2026-10-16T17:33:50.000+00:00"}
+{"attributes": {"plan_id": "TCP-4BD0B0FD35284480"}, "event": "span_start", "name": "tcp.debug.render", "t": "2026-10-16T17:33:50.016+00:00"}
+{"attributes": {"plan_id": "TCP-4BD0B0FD35284480"}, "duration_ms": 1683.4, "event": "span_end", "name": "tcp.debug.render", "status": "OK", "t": "2026-10-16T17:33:51.700+00:00"}
+{"attributes": {"plan_id": "TCP-4BD0B0FD35284480"}, "event": "span_start", "name": "tcp.sheet.render", "t": "2026-10-16T17:33:51.701+00:00"}
+{"action": "reuse_rejected", "event": "evidence", "kind": "map", "reason": "request differs from the saved map artifact (half_extent_m, size_px)", "source_run": "20261016-213622-483ff4", "span": "tcp.sheet.render", "t": "2026-10-16T17:33:51.705+00:00"}
+{"action": "saved", "artifact_id": "map_2", "event": "evidence", "file": "map_2.png", "kind": "map", "sha256": "21dc1ba28751812aca804b0b18f5106bdf434f3e0e8f089f970ba58d41f5c26a", "span": "tcp.sheet.render", "t": "2026-10-16T17:34:05.605+00:00"}
+{"attributes": {"plan_id": "TCP-4BD0B0FD35284480", "scale_ft_per_in": 50, "status_code": "RENDERED"}, "duration_ms": 32953.5, "event": "span_end", "name": "tcp.sheet.render", "status": "OK", "t": "2026-10-16T17:34:24.656+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.dwt.render", "t": "2026-10-16T17:34:24.660+00:00"}
+{"attributes": {"status_code": "SKIPPED_NO_DWT_CONFIG"}, "duration_ms": 0.0, "event": "span_end", "name": "tcp.dwt.render", "status": "OK", "t": "2026-10-16T17:34:24.661+00:00"}

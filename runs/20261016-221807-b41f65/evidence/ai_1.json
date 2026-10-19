@@ -1,0 +1,156 @@
+{
+  "backend": "openai_responses",
+  "deployment": "gpt-5.6-sol",
+  "duration_ms": 117050.4,
+  "evidence_mode": "multi",
+  "profile": "gpt-5.6-sol",
+  "provider": "foundry",
+  "result": {
+    "deployment": "gpt-5.6-sol",
+    "evidence_mode": "multi",
+    "foundry_api": "openai_responses",
+    "model": "gpt-5.6-sol",
+    "observation": {
+      "attribute_confidence": {
+        "divided_road": 0.99,
+        "intersection_conflict": 0.76,
+        "lane_count_total": 0.98,
+        "outside_traveled_way": 0.96,
+        "pedestrian_impact": 0.91,
+        "road_edges": 0.9,
+        "two_way_visible": 0.97,
+        "work_side": 0.3
+      },
+      "divided_road_visible": false,
+      "features": {
+        "crosswalks": [],
+        "driveways": [
+          {
+            "confidence": 0.72,
+            "description": "Narrow property or farm access meeting the southeast side of the road",
+            "image_x": 84,
+            "image_y": 729,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.68,
+            "description": "Residential property access on the southeast side",
+            "image_x": 151,
+            "image_y": 695,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.76,
+            "description": "Residential driveway on the southeast side",
+            "image_x": 378,
+            "image_y": 580,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.72,
+            "description": "Residential driveway on the southeast side",
+            "image_x": 430,
+            "image_y": 554,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.94,
+            "description": "Paved access to the parking area southeast of the road",
+            "image_x": 580,
+            "image_y": 478,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.82,
+            "description": "Residential driveway northwest of the road",
+            "image_x": 668,
+            "image_y": 433,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.82,
+            "description": "Property driveway northwest of the road",
+            "image_x": 706,
+            "image_y": 414,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.88,
+            "description": "Branching property access southeast of the road",
+            "image_x": 833,
+            "image_y": 349,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.82,
+            "description": "Residential driveway northwest of the road",
+            "image_x": 901,
+            "image_y": 315,
+            "side": "LEFT"
+          }
+        ],
+        "intersections": [],
+        "obstructions": [],
+        "ramps": [],
+        "roundabouts": []
+      },
+      "image_quality": "GOOD",
+      "lane_count_total": 2,
+      "lane_markings_visible": true,
+      "notes": "Visible two-lane undivided road with double-yellow center markings, white edge lines, and narrow paved shoulders. The work reference appears on or very near the centerline within the traveled way; no distinct left/right side is assigned.",
+      "osm_conflicts": [],
+      "road_edges": {
+        "left_visible": true,
+        "right_visible": true,
+        "traveled_way_width_px": 12.5
+      },
+      "shoulders": {
+        "left_present": true,
+        "right_present": true
+      },
+      "sidewalks": {
+        "left_present": false,
+        "right_present": false
+      },
+      "two_way_visible": true,
+      "work_reference": {
+        "appears_outside_traveled_way": false,
+        "appears_roadside": false,
+        "relative_position": "TRAVELED_WAY",
+        "side": "UNKNOWN"
+      }
+    },
+    "profile": "gpt-5.6-sol",
+    "provider": "foundry",
+    "raw_response": "{\"lane_count_total\":2,\"two_way_visible\":\"YES\",\"divided_road_visible\":\"NO\",\"lane_markings_visible\":\"YES\",\"road_edges\":{\"left_visible\":true,\"right_visible\":true,\"traveled_way_width_px\":12.5},\"shoulders\":{\"left_present\":\"YES\",\"right_present\":\"YES\"},\"sidewalks\":{\"left_present\":\"NO\",\"right_present\":\"NO\"},\"work_reference\":{\"appears_roadside\":\"NO\",\"side\":\"UNKNOWN\",\"appears_outside_traveled_way\":\"NO\",\"relative_position\":\"TRAVELED_WAY\"},\"features\":{\"intersections\":[],\"driveways\":[{\"description\":\"Narrow property or farm access meeting the southeast side of the road\",\"image_x\":84,\"image_y\":729,\"side\":\"RIGHT\",\"confidence\":0.72},{\"description\":\"Residential property access on the southeast side\",\"image_x\":151,\"image_y\":695,\"side\":\"RIGHT\",\"confidence\":0.68},{\"description\":\"Residential driveway on the southeast side\",\"image_x\":378,\"image_y\":580,\"side\":\"RIGHT\",\"confidence\":0.76},{\"description\":\"Residential driveway on the southeast side\",\"image_x\":430,\"image_y\":554,\"side\":\"RIGHT\",\"confidence\":0.72},{\"description\":\"Paved access to the parking area southeast of the road\",\"image_x\":580,\"image_y\":478,\"side\":\"RIGHT\",\"confidence\":0.94},{\"description\":\"Residential driveway northwest of the road\",\"image_x\":668,\"image_y\":433,\"side\":\"LEFT\",\"confidence\":0.82},{\"description\":\"Property driveway northwest of the road\",\"image_x\":706,\"image_y\":414,\"side\":\"LEFT\",\"confidence\":0.82},{\"description\":\"Branching property access southeast of the road\",\"image_x\":833,\"image_y\":349,\"side\":\"RIGHT\",\"confidence\":0.88},{\"description\":\"Residential driveway northwest of the road\",\"image_x\":901,\"image_y\":315,\"side\":\"LEFT\",\"confidence\":0.82}],\"crosswalks\":[],\"roundabouts\":[],\"ramps\":[],\"obstructions\":[]},\"image_quality\":\"GOOD\",\"attribute_confidence\":{\"lane_count_total\":0.98,\"two_way_visible\":0.97,\"divided_road\":0.99,\"road_edges\":0.9,\"work_side\":0.3,\"outside_traveled_way\":0.96,\"intersection_conflict\":0.76,\"pedestrian_impact\":0.91},\"osm_conflicts\":[],\"notes\":\"Visible two-lane undivided road with double-yellow center markings, white edge lines, and narrow paved shoulders. The work reference appears on or very near the centerline within the traveled way; no distinct left/right side is assigned.\"}",
+    "request_id": "resp_0d1f002375adf377006ad25555746481979175787b7ee0f67f",
+    "usage": {
+      "cache_creation_input_tokens": 4134,
+      "cache_read_input_tokens": 0,
+      "input_tokens": 4137,
+      "output_tokens": 8328,
+      "reasoning_tokens": 7768
+    },
+    "views": [
+      "work_area",
+      "corridor_ahead",
+      "corridor_behind"
+    ],
+    "wire_format": "tri-state-v1"
+  },
+  "status": "OK",
+  "views": [
+    {
+      "pixel_sha256": "539b4c91c3b5ed0caed968b20caeb926907d97522fdea614756aa5fa82d4b633",
+      "role": "work_area"
+    },
+    {
+      "pixel_sha256": "612ff5025558ac3bf1fdc98c97bfb92cfa4aa07bf4c675a5d79f33c60efa95e7",
+      "role": "corridor_ahead"
+    },
+    {
+      "pixel_sha256": "90319e153e13963aedc5be200340f71a912ff0fb0abe46fb544dfe432792959a",
+      "role": "corridor_behind"
+    }
+  ]
+}

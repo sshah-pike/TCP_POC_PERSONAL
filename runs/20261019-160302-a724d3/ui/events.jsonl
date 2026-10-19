@@ -1,0 +1,21 @@
+{"attributes": {"input_type": "KML"}, "event": "span_start", "name": "tcp.input.parse", "t": "2026-10-19T10:33:15.835+00:00"}
+{"attributes": {"features": 1, "input_hash": "sha256:391ef33639ff", "input_type": "KML"}, "duration_ms": 1.1, "event": "span_end", "name": "tcp.input.parse", "status": "OK", "t": "2026-10-19T10:33:15.837+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.rulepack.load", "t": "2026-10-19T10:33:15.838+00:00"}
+{"attributes": {"rule_pack_hash": "9402591080b1b03c", "rule_pack_id": "APPROVED_TWO_LANE_POC_RULE_PACK", "rule_pack_version": "1.0.0"}, "duration_ms": 4.8, "event": "span_end", "name": "tcp.rulepack.load", "status": "OK", "t": "2026-10-19T10:33:15.844+00:00"}
+{"attributes": {"provider": "azure_maps"}, "event": "span_start", "name": "tcp.map.retrieve", "t": "2026-10-19T10:33:15.845+00:00"}
+{"action": "saved", "artifact_id": "map_1", "event": "evidence", "file": "map_1.png", "kind": "map", "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1", "span": "tcp.map.retrieve", "t": "2026-10-19T10:33:17.978+00:00"}
+{"attributes": {"metres_per_pixel": 0.447835, "provider": "azure_maps", "width_px": 1280}, "duration_ms": 2130.5, "event": "span_end", "name": "tcp.map.retrieve", "status": "OK", "t": "2026-10-19T10:33:17.979+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.osm.resolve", "t": "2026-10-19T10:33:17.979+00:00"}
+{"action": "saved", "artifact_id": "osm_1", "event": "evidence", "file": "osm_1.json", "kind": "osm", "sha256": "d9608ab27271194ce1ddef6eca85b41b596f7220f1b1a94f0caa78be52bbe438", "span": "tcp.osm.resolve", "t": "2026-10-19T10:33:19.573+00:00"}
+{"attributes": {"highway": "secondary", "way_count": 1}, "duration_ms": 1600.9, "event": "span_end", "name": "tcp.osm.resolve", "status": "OK", "t": "2026-10-19T10:33:19.580+00:00"}
+{"attributes": {"provider": "foundry"}, "event": "span_start", "name": "tcp.vision.analyze", "t": "2026-10-19T10:33:19.581+00:00"}
+{"action": "saved", "artifact_id": "ai_1", "event": "evidence", "file": "ai_1.json", "kind": "ai", "sha256": "10fc7040ef41b51689d97d69dbe32ce98f7e3023e04063cfef33e5546c4f81c1", "span": "tcp.vision.analyze", "t": "2026-10-19T10:33:46.342+00:00"}
+{"action": "saved", "artifact_id": "map_crop_1", "event": "evidence", "file": "map_crop_1.png", "kind": "map_crop", "sha256": "959768acb820394177caddc81758ec4af20d3660c34a508337ff19645cf6ebe0", "span": "tcp.vision.analyze", "t": "2026-10-19T10:33:48.713+00:00"}
+{"action": "saved", "artifact_id": "map_crop_2", "event": "evidence", "file": "map_crop_2.png", "kind": "map_crop", "sha256": "826bd9adf747cc94f4f038cb40264e42fe4f8c47e844f3285b6356ee9e12db41", "span": "tcp.vision.analyze", "t": "2026-10-19T10:33:50.287+00:00"}
+{"action": "saved", "artifact_id": "map_crop_3", "event": "evidence", "file": "map_crop_3.png", "kind": "map_crop", "sha256": "a5cc03dc5766eb13598008c3d239a31ca1ab886d12841e22d966f8745d72f79e", "span": "tcp.vision.analyze", "t": "2026-10-19T10:33:51.824+00:00"}
+{"action": "saved", "artifact_id": "ai_2", "event": "evidence", "file": "ai_2.json", "kind": "ai", "sha256": "780895df3da043964bda18e3750e6458d0a43743c7efaf60611112a14fab4949", "span": "tcp.vision.analyze", "t": "2026-10-19T10:33:54.600+00:00"}
+{"attributes": {"crops": 3, "model": "claude-opus-5-5", "model_calls": 2, "provider": "foundry", "status_code": "OK"}, "duration_ms": 35018.0, "event": "span_end", "name": "tcp.vision.analyze", "status": "OK", "t": "2026-10-19T10:33:54.601+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.fuse", "t": "2026-10-19T10:33:54.604+00:00"}
+{"attributes": {"conflicts": 0, "inputs_complete": false, "site_model_id": "SITE-EF856D2E49C20401"}, "duration_ms": 3.0, "event": "span_end", "name": "tcp.site.fuse", "status": "OK", "t": "2026-10-19T10:33:54.608+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.eligibility", "t": "2026-10-19T10:33:54.614+00:00"}
+{"attributes": {"decision": "REVIEW_REQUIRED", "reason_codes": "AI_CALL2_UNAVAILABLE,INTERSECTION_CONFLICT_UNRESOLVED,ROAD_EDGES_LOW_CONFIDENCE,ROAD_TYPE_UNRESOLVED,TWO_WAY_STATUS_LOW_CONFIDENCE,WORK_LOCATION_LOW_CONFIDENCE"}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.site.eligibility", "status": "OK", "t": "2026-10-19T10:33:54.615+00:00"}

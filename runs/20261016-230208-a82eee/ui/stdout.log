@@ -1,0 +1,22 @@
+TCP POC Pipeline 2  (tcp-poc 0.2.0)
+1 Input: KML  work reference 41.415, -71.742 (rounded)  path points 0
+2 Rule pack: APPROVED_TWO_LANE_POC_RULE_PACK v1.0.0 APPROVED_FOR_POC sha256 9402591080b1b03c... verified
+3 Imagery: AZURE_MAPS  573 m across, 0.448 m/px
+4 OSM: road 'Alton Bradford Road' highway=secondary lanes_tag=None oneway=None
+5 AI observation: received from foundry (gpt-5.6-sol)
+6 SiteModel SITE-447867F259C1AB6F critical fields:
+   lane_count         2                  RESOLVED        confidence HIGH
+   two_way            True               RESOLVED        confidence HIGH
+   divided            False              RESOLVED        confidence HIGH
+   facility_type      CONVENTIONAL_ROAD  RESOLVED        confidence HIGH
+   road_type          RURAL              RESOLVED        confidence HIGH
+   work.side          LEFT               RESOLVED        confidence HIGH
+   work.location      BEYOND_SHOULDER    RESOLVED        confidence HIGH
+   work.encroaches    False              RESOLVED        confidence HIGH
+   work.lane_closure  False              RESOLVED        confidence HIGH
+   work.pedestrian    False              RESOLVED        confidence HIGH
+   road_edges         7.199 m            RESOLVED
+7 Eligibility: SUPPORTED_AUTO  (all conditions pass)
+8 Rules: TA-1 Table 6B-1 RURAL A = 500 ft; 3 objects placed
+9 Validation: rule PASS  geometry PASS
+10 Plan TCP-4BD0B0FD35284480 exported (hash 4bd0b0fd35284480...); DWT: SKIPPED

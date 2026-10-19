@@ -1,0 +1,171 @@
+{
+  "decision": "REVIEW_REQUIRED",
+  "eligibility": {
+    "decision": "REVIEW_REQUIRED",
+    "detected_facts": {
+      "facility_type": {
+        "status": "UNRESOLVED",
+        "value": null
+      },
+      "road.divided": {
+        "status": "UNRESOLVED",
+        "value": null
+      },
+      "road.lane_count": {
+        "status": "UNRESOLVED",
+        "value": null
+      },
+      "road.traffic_direction": {
+        "status": "UNRESOLVED",
+        "value": null
+      },
+      "site.complex_intersection_conflict": {
+        "status": "UNRESOLVED",
+        "value": null
+      },
+      "work.affects_pedestrian_route": {
+        "status": "UNRESOLVED",
+        "value": null
+      },
+      "work.encroaches_traveled_way": {
+        "status": "UNRESOLVED",
+        "value": null
+      },
+      "work.location": {
+        "status": "UNRESOLVED",
+        "value": null
+      },
+      "work.requires_alternating_one_lane_traffic": {
+        "status": "UNRESOLVED",
+        "value": null
+      },
+      "work.requires_lane_closure": {
+        "status": "UNRESOLVED",
+        "value": null
+      }
+    },
+    "failed_conditions": [],
+    "generate_draft": false,
+    "intersection_analysis": {
+      "features_in_window": [],
+      "window_m": 182.4
+    },
+    "message": "Automatic generation stopped: one or more safety-critical site facts are missing, low-confidence or conflicting. A person must resolve them before a draft can be generated.",
+    "passed_conditions": [],
+    "reason_codes": [
+      "AI_OBSERVATION_UNAVAILABLE",
+      "ALTERNATING_TRAFFIC_UNRESOLVED",
+      "DIVIDED_STATUS_UNRESOLVED",
+      "FACILITY_TYPE_UNRESOLVED",
+      "INTERSECTION_CONFLICT_UNRESOLVED",
+      "LANE_CLOSURE_UNRESOLVED",
+      "LANE_COUNT_UNRESOLVED",
+      "PEDESTRIAN_IMPACT_UNRESOLVED",
+      "ROAD_EDGES_UNRESOLVED",
+      "TRAVELED_WAY_ENCROACHMENT_UNRESOLVED",
+      "TWO_WAY_STATUS_UNRESOLVED",
+      "WORK_LOCATION_UNRESOLVED",
+      "WORK_SIDE_UNRESOLVED"
+    ],
+    "rule_pack": {
+      "hash": "9402591080b1b03cec63c2aa4b0a022760c960015967b975b2adc11e8e64f3d4",
+      "id": "APPROVED_TWO_LANE_POC_RULE_PACK",
+      "version": "1.0.0"
+    },
+    "selected_typical_application": null,
+    "site_model": {
+      "id": "SITE-5D148443A6C84CA9",
+      "version": 1
+    },
+    "unresolved_fields": [
+      {
+        "field": "road.lane_count",
+        "reason_code": "LANE_COUNT_UNRESOLVED",
+        "status": "UNRESOLVED"
+      },
+      {
+        "field": "road.traffic_direction",
+        "reason_code": "TWO_WAY_STATUS_UNRESOLVED",
+        "status": "UNRESOLVED"
+      },
+      {
+        "field": "road.divided",
+        "reason_code": "DIVIDED_STATUS_UNRESOLVED",
+        "status": "UNRESOLVED"
+      },
+      {
+        "field": "facility_type",
+        "reason_code": "FACILITY_TYPE_UNRESOLVED",
+        "status": "UNRESOLVED"
+      },
+      {
+        "field": "work.location",
+        "reason_code": "WORK_LOCATION_UNRESOLVED",
+        "status": "UNRESOLVED"
+      },
+      {
+        "field": "work.encroaches_traveled_way",
+        "reason_code": "TRAVELED_WAY_ENCROACHMENT_UNRESOLVED",
+        "status": "UNRESOLVED"
+      },
+      {
+        "field": "work.requires_lane_closure",
+        "reason_code": "LANE_CLOSURE_UNRESOLVED",
+        "status": "UNRESOLVED"
+      },
+      {
+        "field": "work.requires_alternating_one_lane_traffic",
+        "reason_code": "ALTERNATING_TRAFFIC_UNRESOLVED",
+        "status": "UNRESOLVED"
+      },
+      {
+        "field": "work.affects_pedestrian_route",
+        "reason_code": "PEDESTRIAN_IMPACT_UNRESOLVED",
+        "status": "UNRESOLVED"
+      },
+      {
+        "field": "site.complex_intersection_conflict",
+        "reason_code": "INTERSECTION_CONFLICT_UNRESOLVED",
+        "status": "UNRESOLVED"
+      },
+      {
+        "field": "road.road_edges",
+        "reason_code": "ROAD_EDGES_UNRESOLVED",
+        "status": "UNRESOLVED"
+      },
+      {
+        "field": "work.side",
+        "reason_code": "WORK_SIDE_UNRESOLVED",
+        "status": "UNRESOLVED"
+      },
+      {
+        "field": "evidence.ai",
+        "reason_code": "AI_OBSERVATION_UNAVAILABLE",
+        "status": "UNAVAILABLE"
+      }
+    ]
+  },
+  "out_dir": "C:\\Users\\Sshah-Hexaware\\OneDrive - Pike Enterprises, LLC\\Desktop\\TCP\\runs\\20261016-201859-092b32\\output",
+  "outputs": [
+    "eligibility_result.json",
+    "project_geometry.json",
+    "run_report.txt",
+    "site_model.json"
+  ],
+  "plan_hash": null,
+  "reason_codes": [
+    "AI_OBSERVATION_UNAVAILABLE",
+    "ALTERNATING_TRAFFIC_UNRESOLVED",
+    "DIVIDED_STATUS_UNRESOLVED",
+    "FACILITY_TYPE_UNRESOLVED",
+    "INTERSECTION_CONFLICT_UNRESOLVED",
+    "LANE_CLOSURE_UNRESOLVED",
+    "LANE_COUNT_UNRESOLVED",
+    "PEDESTRIAN_IMPACT_UNRESOLVED",
+    "ROAD_EDGES_UNRESOLVED",
+    "TRAVELED_WAY_ENCROACHMENT_UNRESOLVED",
+    "TWO_WAY_STATUS_UNRESOLVED",
+    "WORK_LOCATION_UNRESOLVED",
+    "WORK_SIDE_UNRESOLVED"
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "backend": "openai_responses",
+  "deployment": "gpt-5.6-sol",
+  "duration_ms": 86670.2,
+  "evidence_mode": "single",
+  "profile": "gpt-5.6-sol",
+  "provider": "foundry",
+  "result": {
+    "deployment": "gpt-5.6-sol",
+    "evidence_mode": "single",
+    "foundry_api": "openai_responses",
+    "model": "gpt-5.6-sol",
+    "observation": {
+      "attribute_confidence": {
+        "divided_road": 0.98,
+        "intersection_conflict": 0.81,
+        "lane_count_total": 0.94,
+        "outside_traveled_way": 0.9,
+        "pedestrian_impact": 0.74,
+        "road_edges": 0.82,
+        "two_way_visible": 0.92,
+        "work_side": 0.96
+      },
+      "divided_road_visible": false,
+      "features": {
+        "crosswalks": [],
+        "driveways": [
+          {
+            "confidence": 0.7,
+            "description": "Property access visible on the southeast side.",
+            "image_x": 115,
+            "image_y": 735,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.72,
+            "description": "Residential property access visible on the southeast side.",
+            "image_x": 394,
+            "image_y": 598,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.76,
+            "description": "Property access visible on the northwest side.",
+            "image_x": 589,
+            "image_y": 486,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.84,
+            "description": "Access toward the parking area and large building on the southeast side.",
+            "image_x": 621,
+            "image_y": 477,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.76,
+            "description": "Property access visible on the northwest side.",
+            "image_x": 741,
+            "image_y": 416,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.81,
+            "description": "Long property access visible on the northwest side.",
+            "image_x": 827,
+            "image_y": 372,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.7,
+            "description": "Property access visible on the southeast side.",
+            "image_x": 855,
+            "image_y": 358,
+            "side": "RIGHT"
+          }
+        ],
+        "intersections": [
+          {
+            "confidence": 0.72,
+            "description": "Minor road or access forms a T-junction from the southeast side of the selected road.",
+            "image_x": 78,
+            "image_y": 770,
+            "side": "RIGHT"
+          }
+        ],
+        "obstructions": [],
+        "ramps": [],
+        "roundabouts": []
+      },
+      "image_quality": "GOOD",
+      "lane_count_total": 2,
+      "lane_markings_visible": true,
+      "notes": "A visible undivided two-lane road runs southwest to northeast. The center reference point is northwest of the traveled way and appears beyond the narrow left shoulder. Width is an approximate perpendicular edge-line-to-edge-line measurement.",
+      "osm_conflicts": [],
+      "road_edges": {
+        "left_visible": true,
+        "right_visible": true,
+        "traveled_way_width_px": 15.0
+      },
+      "shoulders": {
+        "left_present": true,
+        "right_present": true
+      },
+      "sidewalks": {
+        "left_present": false,
+        "right_present": false
+      },
+      "two_way_visible": true,
+      "work_reference": {
+        "appears_outside_traveled_way": true,
+        "appears_roadside": true,
+        "relative_position": "BEYOND_SHOULDER",
+        "side": "LEFT"
+      }
+    },
+    "profile": "gpt-5.6-sol",
+    "provider": "foundry",
+    "raw_response": "{\"lane_count_total\":2,\"two_way_visible\":\"YES\",\"divided_road_visible\":\"NO\",\"lane_markings_visible\":\"YES\",\"road_edges\":{\"left_visible\":true,\"right_visible\":true,\"traveled_way_width_px\":15.0},\"shoulders\":{\"left_present\":\"YES\",\"right_present\":\"YES\"},\"sidewalks\":{\"left_present\":\"NO\",\"right_present\":\"NO\"},\"work_reference\":{\"appears_roadside\":\"YES\",\"side\":\"LEFT\",\"appears_outside_traveled_way\":\"YES\",\"relative_position\":\"BEYOND_SHOULDER\"},\"features\":{\"intersections\":[{\"description\":\"Minor road or access forms a T-junction from the southeast side of the selected road.\",\"image_x\":78,\"image_y\":770,\"side\":\"RIGHT\",\"confidence\":0.72}],\"driveways\":[{\"description\":\"Property access visible on the southeast side.\",\"image_x\":115,\"image_y\":735,\"side\":\"RIGHT\",\"confidence\":0.7},{\"description\":\"Residential property access visible on the southeast side.\",\"image_x\":394,\"image_y\":598,\"side\":\"RIGHT\",\"confidence\":0.72},{\"description\":\"Property access visible on the northwest side.\",\"image_x\":589,\"image_y\":486,\"side\":\"LEFT\",\"confidence\":0.76},{\"description\":\"Access toward the parking area and large building on the southeast side.\",\"image_x\":621,\"image_y\":477,\"side\":\"RIGHT\",\"confidence\":0.84},{\"description\":\"Property access visible on the northwest side.\",\"image_x\":741,\"image_y\":416,\"side\":\"LEFT\",\"confidence\":0.76},{\"description\":\"Long property access visible on the northwest side.\",\"image_x\":827,\"image_y\":372,\"side\":\"LEFT\",\"confidence\":0.81},{\"description\":\"Property access visible on the southeast side.\",\"image_x\":855,\"image_y\":358,\"side\":\"RIGHT\",\"confidence\":0.7}],\"crosswalks\":[],\"roundabouts\":[],\"ramps\":[],\"obstructions\":[]},\"image_quality\":\"GOOD\",\"attribute_confidence\":{\"lane_count_total\":0.94,\"two_way_visible\":0.92,\"divided_road\":0.98,\"road_edges\":0.82,\"work_side\":0.96,\"outside_traveled_way\":0.9,\"intersection_conflict\":0.81,\"pedestrian_impact\":0.74},\"osm_conflicts\":[],\"notes\":\"A visible undivided two-lane road runs southwest to northeast. The center reference point is northwest of the traveled way and appears beyond the narrow left shoulder. Width is an approximate perpendicular edge-line-to-edge-line measurement.\"}",
+    "request_id": "resp_0548340ead592c8a006ad25984cdb08197814ce303efb8d83a",
+    "usage": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 1750,
+      "input_tokens": 1753,
+      "output_tokens": 5719,
+      "reasoning_tokens": 5178
+    },
+    "views": [],
+    "wire_format": "tri-state-v1"
+  },
+  "status": "OK",
+  "views": []
+}

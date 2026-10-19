@@ -1,0 +1,2 @@
+{"attributes": {"input_type": "COORDINATES"}, "event": "span_start", "name": "tcp.input.parse", "t": "2026-10-13T13:18:35.088+00:00"}
+{"attributes": {"decision": "UNSUPPORTED_POC", "input_type": "COORDINATES", "reason_codes": "INVALID_COORDINATES"}, "duration_ms": 1.6, "event": "span_end", "name": "tcp.input.parse", "status": "OK", "t": "2026-10-13T13:18:35.091+00:00"}

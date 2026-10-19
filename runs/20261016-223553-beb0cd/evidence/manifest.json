@@ -1,0 +1,167 @@
+{
+  "artifacts": [
+    {
+      "artifact_id": "map_1",
+      "created_at": "2026-10-16T17:05:55.949+00:00",
+      "kind": "map",
+      "metadata": {
+        "format": "PNG",
+        "geometry_hash": "771bbc3d0913044a281f9073acad4083f8d5e151abdae5495d7467587022b94f",
+        "height": 1280,
+        "meta": {
+          "api_version": "2024-04-01",
+          "bounding_box": {
+            "max_latitude": 41.4176953,
+            "max_longitude": -71.7381078,
+            "min_latitude": 41.4125459,
+            "min_longitude": -71.7449742
+          },
+          "center": {
+            "latitude": 41.4151206,
+            "longitude": -71.741541
+          },
+          "georeference_model": "LOCAL_TANGENT_PLANE_AT_CENTER",
+          "ground_extent_m": {
+            "height": 573.229,
+            "width": 573.229
+          },
+          "height_pixels": 1280,
+          "metres_per_pixel": 0.447835,
+          "orientation": "NORTH_UP",
+          "provider": "AZURE_MAPS",
+          "request_tiles": 1,
+          "retrieved_at": "2026-10-16T16:06:29+00:00",
+          "scale_model": "azure-static-512px-v2",
+          "tileset": "microsoft.imagery",
+          "width_pixels": 1280,
+          "zoom": 17
+        },
+        "pixel_sha256": "e8fa339d1042346f3a56961691678d29b34da79a4d0594427986261214083f19",
+        "width": 1280
+      },
+      "mode": "reference",
+      "producer_span": "tcp.map.retrieve",
+      "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1",
+      "signature": {
+        "api_version": "2024-04-01",
+        "geometry_hash": "771bbc3d0913044a281f9073acad4083f8d5e151abdae5495d7467587022b94f",
+        "half_extent_m": 212.4,
+        "kind": "map",
+        "provider": "azure_maps",
+        "scale_model": "azure-static-512px-v2",
+        "service": null,
+        "size_px": 1280
+      },
+      "signature_hash": "57bc48c00bd5b5fc55d5cd0a4eef97d5310313d20f6b87e52e36e07290c2b8cd",
+      "source_artifact_id": "map_1",
+      "source_file": "map_1.png",
+      "source_run": "20261016-213622-483ff4"
+    },
+    {
+      "artifact_id": "osm_1",
+      "created_at": "2026-10-16T17:05:55.987+00:00",
+      "kind": "osm",
+      "metadata": {
+        "element_count": 4
+      },
+      "mode": "reference",
+      "producer_span": "tcp.osm.resolve",
+      "sha256": "2ac7bc19a24d850cc61a5438a11838b8c91e9cf33ffbd8e0d529517a8a5164bc",
+      "signature": {
+        "kind": "osm",
+        "lat": 41.4151206,
+        "lon": -71.741541,
+        "radius_m": 262.4,
+        "source": "osm_api"
+      },
+      "signature_hash": "5d77c0870d57f892c52086cb5074b1822aa486eec5384577a9fb627224853ad8",
+      "source_artifact_id": "osm_1",
+      "source_file": "osm_1.json",
+      "source_run": "20261016-213622-483ff4"
+    },
+    {
+      "artifact_id": "ai_1",
+      "created_at": "2026-10-16T17:05:56.037+00:00",
+      "kind": "ai",
+      "metadata": {
+        "backend": "openai_responses",
+        "deployment": "gpt-5.6-sol",
+        "evidence_mode": "single",
+        "profile": "gpt-5.6-sol",
+        "provider": "foundry",
+        "views": []
+      },
+      "mode": "reference",
+      "producer_span": "tcp.vision.analyze",
+      "sha256": "302a883a750b2cacd5fedc08f9b8aadc5944c8e69513a61e70af2bc9e191798b",
+      "signature": {
+        "context_hash": "f597c276e9572ab739112bf8014fbede8290b561a2ba7b29543767fbb07496f1",
+        "image_pixel_sha256": "920007b73035f03657fd46cb1883bfae520e524392bc21d803938878129f6459",
+        "kind": "ai"
+      },
+      "signature_hash": "023f39943c1c036b77d6c558e795e8f3e883f86ce8094a5ad347b2655e2c5664",
+      "source_artifact_id": "ai_1",
+      "source_file": "ai_1.json",
+      "source_run": "20261016-221807-a49f7b"
+    },
+    {
+      "artifact_id": "map_2",
+      "created_at": "2026-10-16T17:05:58.161+00:00",
+      "kind": "map",
+      "metadata": {
+        "format": "PNG",
+        "geometry_hash": "771bbc3d0913044a281f9073acad4083f8d5e151abdae5495d7467587022b94f",
+        "height": 2560,
+        "meta": {
+          "api_version": "2024-04-01",
+          "bounding_box": {
+            "max_latitude": 41.42027,
+            "max_longitude": -71.7346745,
+            "min_latitude": 41.4099712,
+            "min_longitude": -71.7484075
+          },
+          "center": {
+            "latitude": 41.4151206,
+            "longitude": -71.741541
+          },
+          "georeference_model": "LOCAL_TANGENT_PLANE_AT_CENTER",
+          "ground_extent_m": {
+            "height": 1146.458,
+            "width": 1146.458
+          },
+          "height_pixels": 2560,
+          "metres_per_pixel": 0.447835,
+          "orientation": "NORTH_UP",
+          "provider": "AZURE_MAPS",
+          "request_tiles": 4,
+          "retrieved_at": "2026-10-16T16:49:44+00:00",
+          "scale_model": "azure-static-512px-v2",
+          "tileset": "microsoft.imagery",
+          "width_pixels": 2560,
+          "zoom": 17
+        },
+        "pixel_sha256": "8b15f46bc708a0ff8b9631251b19b3635fe134ae9f070938a9712eff7cfcdaa0",
+        "width": 2560
+      },
+      "mode": "reference",
+      "producer_span": "tcp.sheet.render",
+      "sha256": "21dc1ba28751812aca804b0b18f5106bdf434f3e0e8f089f970ba58d41f5c26a",
+      "signature": {
+        "api_version": "2024-04-01",
+        "geometry_hash": "771bbc3d0913044a281f9073acad4083f8d5e151abdae5495d7467587022b94f",
+        "half_extent_m": 298.722116,
+        "kind": "map",
+        "provider": "azure_maps",
+        "scale_model": "azure-static-512px-v2",
+        "service": null,
+        "size_px": 2560
+      },
+      "signature_hash": "56df9b79e1c0f6c45f54de25bda5dd5cdec29eb7f6b5aab7ca1356c5e078212a",
+      "source_artifact_id": "map_2",
+      "source_file": "map_2.png",
+      "source_run": "20261016-221807-a49f7b"
+    }
+  ],
+  "run_id": "20261016-223553-beb0cd",
+  "schema": "tcp-evidence-v1"
+}

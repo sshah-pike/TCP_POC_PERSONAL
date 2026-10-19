@@ -1,0 +1,20 @@
+OFFLINE scenario 'four_lane' - simulated road, imagery, OSM and AI observation (not real data)
+TCP POC Pipeline 2  (tcp-poc 0.2.0)
+1 Input: COORDINATES  work reference 33.000, -97.000 (rounded)  path points 0
+2 Rule pack: APPROVED_TWO_LANE_POC_RULE_PACK v1.0.0 APPROVED_FOR_POC sha256 9402591080b1b03c... verified
+3 Imagery: OFFLINE_SYNTHETIC  500 m across, 0.391 m/px
+4 OSM: road 'Demo Road' highway=secondary lanes_tag=4 oneway=None
+5 AI observation: received from offline_static (simulated-observation)
+6 SiteModel SITE-9311A9A3A5C13A35 critical fields:
+   lane_count         4                  RESOLVED        confidence HIGH
+   two_way            True               RESOLVED        confidence HIGH
+   divided            False              RESOLVED        confidence HIGH
+   facility_type      CONVENTIONAL_ROAD  RESOLVED        confidence HIGH
+   road_type          RURAL              RESOLVED        confidence HIGH
+   work.side          LEFT               RESOLVED        confidence HIGH
+   work.location      BEYOND_SHOULDER    RESOLVED        confidence HIGH
+   work.encroaches    False              RESOLVED        confidence HIGH
+   work.lane_closure  False              RESOLVED        confidence HIGH
+   work.pedestrian    False              RESOLVED        confidence HIGH
+   road_edges         14.6 m             RESOLVED
+7 Eligibility: UNSUPPORTED_POC  LANE_COUNT_NOT_TWO

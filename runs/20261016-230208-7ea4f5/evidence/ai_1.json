@@ -1,0 +1,29 @@
+{
+  "backend": "anthropic_messages",
+  "centerline_views": false,
+  "deployment": "claude-opus-5-5",
+  "details": {},
+  "duration_ms": 3005.1,
+  "error_code": "AI_BAD_REQUEST",
+  "evidence_mode": "multi",
+  "message": "Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'The compiled grammar is too large, which would cause performance issues. Simplify your tool schemas or reduce the number of strict tools.'}, 'request_id': 'req_011Cg6KGExWujbphQ1TvMNWN'}",
+  "osm_claims": false,
+  "profile": "claude-opus-5-5",
+  "provider": "foundry",
+  "status": "ERROR",
+  "views": [
+    {
+      "pixel_sha256": "539b4c91c3b5ed0caed968b20caeb926907d97522fdea614756aa5fa82d4b633",
+      "role": "work_area"
+    },
+    {
+      "pixel_sha256": "612ff5025558ac3bf1fdc98c97bfb92cfa4aa07bf4c675a5d79f33c60efa95e7",
+      "role": "corridor_ahead"
+    },
+    {
+      "pixel_sha256": "90319e153e13963aedc5be200340f71a912ff0fb0abe46fb544dfe432792959a",
+      "role": "corridor_behind"
+    }
+  ],
+  "vision_mode": "grounded_v2"
+}

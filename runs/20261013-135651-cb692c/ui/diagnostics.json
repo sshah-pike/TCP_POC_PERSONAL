@@ -1,0 +1,12 @@
+[
+  {
+    "category": "READ_TIMEOUT",
+    "duration_ms": 506.1,
+    "exception_type": "requests.exceptions.ReadTimeout",
+    "http_status": null,
+    "message": "HTTPSConnectionPool(host='imagery.nationalmap.gov', port=443): Read timed out. (read timeout=0.001)",
+    "pipeline_error_code": "MAP_REQUEST_FAILED",
+    "provider": "usgs_naip",
+    "span": "tcp.map.retrieve"
+  }
+]

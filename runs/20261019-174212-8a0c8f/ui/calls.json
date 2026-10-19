@@ -1,0 +1,63 @@
+[
+  {
+    "duration_ms": 1825.1,
+    "external": true,
+    "provider": "azure_maps",
+    "requests": 1,
+    "service": "map",
+    "span": "tcp.map.retrieve"
+  },
+  {
+    "duration_ms": 2264.9,
+    "external": true,
+    "provider": "osm_api",
+    "requests": 1,
+    "service": "osm",
+    "span": "tcp.osm.resolve"
+  },
+  {
+    "duration_ms": 1385.7,
+    "external": true,
+    "provider": "azure_maps",
+    "purpose": "agent crop zoom 19",
+    "requests": 1,
+    "service": "map",
+    "span": "tcp.vision.analyze"
+  },
+  {
+    "duration_ms": 1389.7,
+    "external": true,
+    "provider": "azure_maps",
+    "purpose": "agent crop zoom 19",
+    "requests": 1,
+    "service": "map",
+    "span": "tcp.vision.analyze"
+  },
+  {
+    "duration_ms": 1395.7,
+    "external": true,
+    "provider": "azure_maps",
+    "purpose": "agent crop zoom 19",
+    "requests": 1,
+    "service": "map",
+    "span": "tcp.vision.analyze"
+  },
+  {
+    "duration_ms": 1693.5,
+    "external": true,
+    "provider": "azure_maps",
+    "purpose": "agent crop zoom 19",
+    "requests": 1,
+    "service": "map",
+    "span": "tcp.vision.analyze"
+  },
+  {
+    "duration_ms": 1416.6,
+    "external": true,
+    "provider": "azure_maps",
+    "purpose": "agent crop zoom 19",
+    "requests": 1,
+    "service": "map",
+    "span": "tcp.vision.analyze"
+  }
+]

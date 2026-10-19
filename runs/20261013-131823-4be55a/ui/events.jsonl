@@ -1,0 +1,2 @@
+{"attributes": {"input_type": "KML"}, "event": "span_start", "name": "tcp.input.parse", "t": "2026-10-13T13:18:35.188+00:00"}
+{"attributes": {"decision": "UNSUPPORTED_POC", "input_type": "KML", "reason_codes": "MULTIPLE_WORK_POINTS"}, "duration_ms": 2.5, "event": "span_end", "name": "tcp.input.parse", "status": "OK", "t": "2026-10-13T13:18:35.191+00:00"}

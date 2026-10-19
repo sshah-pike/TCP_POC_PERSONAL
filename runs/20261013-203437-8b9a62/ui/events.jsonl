@@ -1,0 +1,14 @@
+{"attributes": {"input_type": "KML"}, "event": "span_start", "name": "tcp.input.parse", "t": "2026-10-13T15:04:40.027+00:00"}
+{"attributes": {"features": 1, "input_hash": "sha256:391ef33639ff", "input_type": "KML"}, "duration_ms": 1.4, "event": "span_end", "name": "tcp.input.parse", "status": "OK", "t": "2026-10-13T15:04:40.030+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.rulepack.load", "t": "2026-10-13T15:04:40.031+00:00"}
+{"attributes": {"rule_pack_hash": "9402591080b1b03c", "rule_pack_id": "APPROVED_TWO_LANE_POC_RULE_PACK", "rule_pack_version": "1.0.0"}, "duration_ms": 2.8, "event": "span_end", "name": "tcp.rulepack.load", "status": "OK", "t": "2026-10-13T15:04:40.034+00:00"}
+{"attributes": {"provider": "usgs_naip"}, "event": "span_start", "name": "tcp.map.retrieve", "t": "2026-10-13T15:04:40.035+00:00"}
+{"attributes": {"metres_per_pixel": 0.331875, "provider": "usgs_naip", "width_px": 1280}, "duration_ms": 2055.3, "event": "span_end", "name": "tcp.map.retrieve", "status": "OK", "t": "2026-10-13T15:04:42.094+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.osm.resolve", "t": "2026-10-13T15:04:42.096+00:00"}
+{"attributes": {"highway": "secondary", "way_count": 1}, "duration_ms": 1649.0, "event": "span_end", "name": "tcp.osm.resolve", "status": "OK", "t": "2026-10-13T15:04:43.746+00:00"}
+{"attributes": {"provider": "anthropic"}, "event": "span_start", "name": "tcp.vision.analyze", "t": "2026-10-13T15:04:43.751+00:00"}
+{"attributes": {"model": null, "provider": "anthropic", "status_code": "AI_CREDIT_BALANCE_TOO_LOW"}, "duration_ms": 2361.8, "event": "span_end", "name": "tcp.vision.analyze", "status": "OK", "t": "2026-10-13T15:04:46.113+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.fuse", "t": "2026-10-13T15:04:46.114+00:00"}
+{"attributes": {"conflicts": 0, "inputs_complete": false, "site_model_id": "SITE-DDF42986F80211A1"}, "duration_ms": 1.0, "event": "span_end", "name": "tcp.site.fuse", "status": "OK", "t": "2026-10-13T15:04:46.115+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.eligibility", "t": "2026-10-13T15:04:46.121+00:00"}
+{"attributes": {"decision": "REVIEW_REQUIRED", "reason_codes": "AI_OBSERVATION_UNAVAILABLE,ALTERNATING_TRAFFIC_UNRESOLVED,DIVIDED_STATUS_UNRESOLVED,FACILITY_TYPE_UNRESOLVED,INTERSECTION_CONFLICT_UNRESOLVED,LANE_CLOSURE_UNRESOLVED,LANE_COUNT_UNRESOLVED,PEDESTRIAN_IMPACT_UNRESOLVED,ROAD_EDGES_UNRESOLVED,ROAD_TYPE_UNRESOLVED,TRAVELED_WAY_ENCROACHMENT_UNRESOLVED,TWO_WAY_STATUS_UNRESOLVED,WORK_LOCATION_UNRESOLVED,WORK_SIDE_UNRESOLVED"}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.site.eligibility", "status": "OK", "t": "2026-10-13T15:04:46.122+00:00"}

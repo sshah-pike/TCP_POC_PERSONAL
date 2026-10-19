@@ -1,0 +1,33 @@
+TCP POC Pipeline 2  (tcp-poc 0.2.0)
+1 Input: KML  work reference 41.415, -71.742 (rounded)  path points 0
+2 Rule pack: APPROVED_TWO_LANE_POC_RULE_PACK v1.0.0 APPROVED_FOR_POC sha256 9402591080b1b03c... verified
+3 Imagery: AZURE_MAPS  573 m across, 0.448 m/px
+4 OSM: road 'Alton Bradford Road' highway=secondary lanes_tag=None oneway=None
+5 AI vision: provider foundry, profile gpt-5.6-sol, deployment gpt-5.6-sol, api openai_responses - max 2 model calls
+   call 1 started: 1 image(s) -> foundry gpt-5.6-sol
+   call 1 (wide, blind to OSM): foundry gpt-5.6-sol - 3 extras
+   compare: unresolved after call 1: road_edges (road.road_edges=UNRESOLVED)
+   CROP_1 work_point for road_edges: zoom requested 19 used 19
+   call 2 started: 2 image(s) -> foundry gpt-5.6-sol
+   consistency road_width: call 1 8.101 / call 2 7.6 -> NOT_CHECKED_UNRESOLVED_AFTER_CALL1
+   consistency lane_count: call 1 2 / call 2 2 -> MATCH
+   consistency work_side: call 1 LEFT / call 2 LEFT -> MATCH
+   consistency work_location: call 1 BEYOND_SHOULDER / call 2 BEYOND_SHOULDER -> MATCH
+   call 2 (1 crops + wide image, 0 OSM claims): gpt-5.6-sol; answers taken for: road_edges
+   result: received from foundry (gpt-5.6-sol); model calls 2 of max 2
+6 SiteModel SITE-83E39A78486C8637 critical fields:
+   lane_count         2                  RESOLVED        confidence HIGH
+   two_way            True               RESOLVED        confidence HIGH
+   divided            False              RESOLVED        confidence HIGH
+   facility_type      CONVENTIONAL_ROAD  RESOLVED        confidence HIGH
+   road_type          RURAL              RESOLVED        confidence HIGH
+   work.side          LEFT               RESOLVED        confidence HIGH
+   work.location      BEYOND_SHOULDER    RESOLVED        confidence HIGH
+   work.encroaches    False              RESOLVED        confidence HIGH
+   work.lane_closure  False              RESOLVED        confidence HIGH
+   work.pedestrian    False              RESOLVED        confidence HIGH
+   road_edges         7.6 m              RESOLVED
+7 Eligibility: SUPPORTED_AUTO  (all conditions pass)
+8 Rules: TA-1 Table 6B-1 RURAL A = 500 ft; 3 objects placed
+9 Validation: rule PASS  geometry PASS
+10 Plan TCP-E44B73A0EBE2630A exported (hash e44b73a0ebe2630a...); DWT: DWT_TOOLCHAIN_MISSING

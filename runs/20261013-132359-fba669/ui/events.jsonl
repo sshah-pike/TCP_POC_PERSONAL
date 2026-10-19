@@ -1,0 +1,26 @@
+{"attributes": {"input_type": "COORDINATES"}, "event": "span_start", "name": "tcp.input.parse", "t": "2026-10-13T13:24:08.354+00:00"}
+{"attributes": {"features": 1, "input_hash": "sha256:2ac5a76d2bf4", "input_type": "COORDINATES"}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.input.parse", "status": "OK", "t": "2026-10-13T13:24:08.355+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.rulepack.load", "t": "2026-10-13T13:24:08.357+00:00"}
+{"attributes": {"rule_pack_hash": "9402591080b1b03c", "rule_pack_id": "APPROVED_TWO_LANE_POC_RULE_PACK", "rule_pack_version": "1.0.0"}, "duration_ms": 110.1, "event": "span_end", "name": "tcp.rulepack.load", "status": "OK", "t": "2026-10-13T13:24:08.467+00:00"}
+{"attributes": {"provider": "offline_synthetic"}, "event": "span_start", "name": "tcp.map.retrieve", "t": "2026-10-13T13:24:08.471+00:00"}
+{"attributes": {"metres_per_pixel": 0.390625, "provider": "offline_synthetic", "width_px": 1280}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.map.retrieve", "status": "OK", "t": "2026-10-13T13:24:08.472+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.osm.resolve", "t": "2026-10-13T13:24:08.472+00:00"}
+{"attributes": {"highway": "secondary", "way_count": 1}, "duration_ms": 0.8, "event": "span_end", "name": "tcp.osm.resolve", "status": "OK", "t": "2026-10-13T13:24:08.473+00:00"}
+{"attributes": {"provider": "offline_static"}, "event": "span_start", "name": "tcp.vision.analyze", "t": "2026-10-13T13:24:08.474+00:00"}
+{"attributes": {"model": "simulated-observation", "provider": "offline_static", "status_code": "OK"}, "duration_ms": 21.8, "event": "span_end", "name": "tcp.vision.analyze", "status": "OK", "t": "2026-10-13T13:24:08.496+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.fuse", "t": "2026-10-13T13:24:08.497+00:00"}
+{"attributes": {"conflicts": 0, "inputs_complete": true, "site_model_id": "SITE-B95F8A0EC850E47B"}, "duration_ms": 2.0, "event": "span_end", "name": "tcp.site.fuse", "status": "OK", "t": "2026-10-13T13:24:08.499+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.eligibility", "t": "2026-10-13T13:24:08.569+00:00"}
+{"attributes": {"decision": "SUPPORTED_AUTO", "reason_codes": ""}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.site.eligibility", "status": "OK", "t": "2026-10-13T13:24:08.569+00:00"}
+{"attributes": {"ta_id": "TA-1"}, "event": "span_start", "name": "tcp.rules.execute", "t": "2026-10-13T13:24:08.571+00:00"}
+{"attributes": {"objects": 3, "options": 0, "ta_id": "TA-1"}, "duration_ms": 0.2, "event": "span_end", "name": "tcp.rules.execute", "status": "OK", "t": "2026-10-13T13:24:08.571+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.geometry.place", "t": "2026-10-13T13:24:08.572+00:00"}
+{"attributes": {"issues": ""}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.geometry.place", "status": "OK", "t": "2026-10-13T13:24:08.572+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.plan.validate", "t": "2026-10-13T13:24:08.573+00:00"}
+{"attributes": {"geometry": "PASS", "rule": "PASS"}, "duration_ms": 0.3, "event": "span_end", "name": "tcp.plan.validate", "status": "OK", "t": "2026-10-13T13:24:08.574+00:00"}
+{"attributes": {"plan_id": "TCP-C21128B0C70412CB"}, "event": "span_start", "name": "tcp.debug.render", "t": "2026-10-13T13:24:08.713+00:00"}
+{"attributes": {"plan_id": "TCP-C21128B0C70412CB"}, "duration_ms": 3126.2, "event": "span_end", "name": "tcp.debug.render", "status": "OK", "t": "2026-10-13T13:24:11.840+00:00"}
+{"attributes": {"plan_id": "TCP-C21128B0C70412CB"}, "event": "span_start", "name": "tcp.sheet.render", "t": "2026-10-13T13:24:11.841+00:00"}
+{"attributes": {"plan_id": "TCP-C21128B0C70412CB", "scale_ft_per_in": 40, "status_code": "RENDERED"}, "duration_ms": 39077.9, "event": "span_end", "name": "tcp.sheet.render", "status": "OK", "t": "2026-10-13T13:24:50.967+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.dwt.render", "t": "2026-10-13T13:24:50.968+00:00"}
+{"attributes": {"mode": "PLAN", "status_code": "DWT_TOOLCHAIN_MISSING"}, "duration_ms": 513.9, "event": "span_end", "name": "tcp.dwt.render", "status": "OK", "t": "2026-10-13T13:24:51.520+00:00"}

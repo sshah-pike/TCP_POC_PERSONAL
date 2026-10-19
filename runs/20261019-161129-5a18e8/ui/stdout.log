@@ -1,0 +1,29 @@
+TCP POC Pipeline 2  (tcp-poc 0.2.0)
+1 Input: KML  work reference 41.415, -71.742 (rounded)  path points 0
+2 Rule pack: APPROVED_TWO_LANE_POC_RULE_PACK v1.0.0 APPROVED_FOR_POC sha256 9402591080b1b03c... verified
+3 Imagery: AZURE_MAPS  573 m across, 0.448 m/px
+4 OSM: road 'Alton Bradford Road' highway=secondary lanes_tag=None oneway=None
+5 AI observation: received from foundry (gpt-5.6-sol); model calls 2 of max 2
+   call 1 (wide, blind to OSM): foundry gpt-5.6-sol - 1 extras
+   compare: unresolved after call 1: features (intersection_conflict=LOW_CONFIDENCE), work_location (work.encroaches_traveled_way=CONFLICT; work.location=CONFLICT; work.requires_lane_closure=UNRESOLVED; work.requires_alternating_one_lane_traffic=UNRESOLVED), work_side (work.side=CONFLICT)
+   CROP_1 work_point for work_location,work_side: zoom requested 20 used 19 (fallback: zoom 20 fetch failed (MAP_REQUEST_FAILED))
+   CROP_2 corridor for features: zoom requested 18 used 18
+   CROP_3 corridor for features: zoom requested 18 used 18
+   consistency road_width: call 1 7.801 / call 2 7.501 -> MATCH
+   consistency lane_count: call 1 2 / call 2 2 -> MATCH
+   consistency work_side: call 1 RIGHT / call 2 LEFT -> CROSS_VIEW_MISMATCH
+   consistency work_location: call 1 TRAVELED_WAY / call 2 BEYOND_SHOULDER -> CROSS_VIEW_MISMATCH
+   call 2 (3 crops + wide image, 3 OSM claims): gpt-5.6-sol; answers taken for: features, work_location, work_side
+6 SiteModel SITE-BB549BCD4D79C107 critical fields:
+   lane_count         2                  RESOLVED        confidence HIGH
+   two_way            True               RESOLVED        confidence HIGH
+   divided            False              RESOLVED        confidence HIGH
+   facility_type      CONVENTIONAL_ROAD  RESOLVED        confidence HIGH
+   road_type          None               UNRESOLVED      confidence NONE
+   work.side          None               CROSS_VIEW_MISMATCH confidence NONE
+   work.location      None               CROSS_VIEW_MISMATCH confidence NONE
+   work.encroaches    None               CROSS_VIEW_MISMATCH confidence NONE
+   work.lane_closure  None               UNRESOLVED      confidence NONE
+   work.pedestrian    False              RESOLVED        confidence HIGH
+   road_edges         7.801 m            RESOLVED
+7 Eligibility: REVIEW_REQUIRED  ALTERNATING_TRAFFIC_UNRESOLVED, CROSS_VIEW_MISMATCH, LANE_CLOSURE_UNRESOLVED, ROAD_TYPE_UNRESOLVED, TRAVELED_WAY_ENCROACHMENT_CROSS_VIEW_MISMATCH, WORK_LOCATION_CROSS_VIEW_MISMATCH, WORK_SIDE_CROSS_VIEW_MISMATCH

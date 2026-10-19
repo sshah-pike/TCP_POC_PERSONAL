@@ -1,0 +1,16 @@
+[
+  {
+    "deployment": "claude-opus-5-5-fast",
+    "duration_ms": 11176.0,
+    "profile": "claude-opus-5-5-fast",
+    "provider": "foundry",
+    "requested_model": "claude-opus-5-5-fast",
+    "response_model": "claude-opus-5-5",
+    "usage": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "input_tokens": 9058,
+      "output_tokens": 2233
+    }
+  }
+]

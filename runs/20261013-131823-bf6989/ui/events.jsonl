@@ -1,0 +1,20 @@
+{"attributes": {"input_type": "COORDINATES"}, "event": "span_start", "name": "tcp.input.parse", "t": "2026-10-13T13:18:35.380+00:00"}
+{"attributes": {"features": 1, "input_hash": "sha256:2ac5a76d2bf4", "input_type": "COORDINATES"}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.input.parse", "status": "OK", "t": "2026-10-13T13:18:35.381+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.rulepack.load", "t": "2026-10-13T13:18:35.382+00:00"}
+{"attributes": {"rule_pack_hash": "9402591080b1b03c", "rule_pack_id": "APPROVED_TWO_LANE_POC_RULE_PACK", "rule_pack_version": "1.0.0"}, "duration_ms": 109.7, "event": "span_end", "name": "tcp.rulepack.load", "status": "OK", "t": "2026-10-13T13:18:35.492+00:00"}
+{"attributes": {"provider": "offline_synthetic"}, "event": "span_start", "name": "tcp.map.retrieve", "t": "2026-10-13T13:18:35.521+00:00"}
+{"attributes": {"metres_per_pixel": 0.390625, "provider": "offline_synthetic", "width_px": 1280}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.map.retrieve", "status": "OK", "t": "2026-10-13T13:18:35.522+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.osm.resolve", "t": "2026-10-13T13:18:35.522+00:00"}
+{"attributes": {"highway": "secondary", "way_count": 1}, "duration_ms": 0.8, "event": "span_end", "name": "tcp.osm.resolve", "status": "OK", "t": "2026-10-13T13:18:35.523+00:00"}
+{"attributes": {"provider": "offline_static"}, "event": "span_start", "name": "tcp.vision.analyze", "t": "2026-10-13T13:18:35.524+00:00"}
+{"attributes": {"model": "simulated-observation", "provider": "offline_static", "status_code": "OK"}, "duration_ms": 21.5, "event": "span_end", "name": "tcp.vision.analyze", "status": "OK", "t": "2026-10-13T13:18:35.546+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.fuse", "t": "2026-10-13T13:18:35.546+00:00"}
+{"attributes": {"conflicts": 0, "inputs_complete": true, "site_model_id": "SITE-672B32C8D7FC2440"}, "duration_ms": 1.9, "event": "span_end", "name": "tcp.site.fuse", "status": "OK", "t": "2026-10-13T13:18:35.548+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.eligibility", "t": "2026-10-13T13:18:35.590+00:00"}
+{"attributes": {"decision": "SUPPORTED_AUTO", "reason_codes": ""}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.site.eligibility", "status": "OK", "t": "2026-10-13T13:18:35.591+00:00"}
+{"attributes": {"ta_id": "TA-1"}, "event": "span_start", "name": "tcp.rules.execute", "t": "2026-10-13T13:18:35.592+00:00"}
+{"attributes": {"objects": 3, "options": 0, "ta_id": "TA-1"}, "duration_ms": 0.2, "event": "span_end", "name": "tcp.rules.execute", "status": "OK", "t": "2026-10-13T13:18:35.593+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.geometry.place", "t": "2026-10-13T13:18:35.593+00:00"}
+{"attributes": {"issues": ""}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.geometry.place", "status": "OK", "t": "2026-10-13T13:18:35.594+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.plan.validate", "t": "2026-10-13T13:18:35.595+00:00"}
+{"attributes": {"geometry": "FAIL", "rule": "PASS"}, "duration_ms": 0.3, "event": "span_end", "name": "tcp.plan.validate", "status": "OK", "t": "2026-10-13T13:18:35.595+00:00"}

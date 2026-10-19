@@ -1,0 +1,19 @@
+TCP POC Pipeline 2  (tcp-poc 0.2.0)
+1 Input: KML  work reference 41.415, -71.742 (rounded)  path points 0
+2 Rule pack: APPROVED_TWO_LANE_POC_RULE_PACK v1.0.0 APPROVED_FOR_POC sha256 9402591080b1b03c... verified
+3 Imagery: AZURE_MAPS  573 m across, 0.448 m/px
+4 OSM: road 'Alton Bradford Road' highway=secondary lanes_tag=None oneway=None
+5 AI observation: UNAVAILABLE (AI_BAD_REQUEST)
+6 SiteModel SITE-5D148443A6C84CA9 critical fields:
+   lane_count         None               UNRESOLVED      confidence NONE
+   two_way            None               UNRESOLVED      confidence NONE
+   divided            None               UNRESOLVED      confidence NONE
+   facility_type      None               UNRESOLVED      confidence NONE
+   road_type          RURAL              RESOLVED        confidence HIGH
+   work.side          None               UNRESOLVED      confidence NONE
+   work.location      None               UNRESOLVED      confidence NONE
+   work.encroaches    None               UNRESOLVED      confidence NONE
+   work.lane_closure  None               UNRESOLVED      confidence NONE
+   work.pedestrian    None               UNRESOLVED      confidence NONE
+   road_edges         None m             UNRESOLVED
+7 Eligibility: REVIEW_REQUIRED  AI_OBSERVATION_UNAVAILABLE, ALTERNATING_TRAFFIC_UNRESOLVED, DIVIDED_STATUS_UNRESOLVED, FACILITY_TYPE_UNRESOLVED, INTERSECTION_CONFLICT_UNRESOLVED, LANE_CLOSURE_UNRESOLVED, LANE_COUNT_UNRESOLVED, PEDESTRIAN_IMPACT_UNRESOLVED, ROAD_EDGES_UNRESOLVED, TRAVELED_WAY_ENCROACHMENT_UNRESOLVED, TWO_WAY_STATUS_UNRESOLVED, WORK_LOCATION_UNRESOLVED, WORK_SIDE_UNRESOLVED

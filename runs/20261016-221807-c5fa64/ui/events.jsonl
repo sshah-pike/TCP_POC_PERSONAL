@@ -1,0 +1,17 @@
+{"attributes": {"input_type": "KML"}, "event": "span_start", "name": "tcp.input.parse", "t": "2026-10-16T16:48:17.987+00:00"}
+{"attributes": {"features": 1, "input_hash": "sha256:391ef33639ff", "input_type": "KML"}, "duration_ms": 1.4, "event": "span_end", "name": "tcp.input.parse", "status": "OK", "t": "2026-10-16T16:48:18.022+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.rulepack.load", "t": "2026-10-16T16:48:18.024+00:00"}
+{"attributes": {"rule_pack_hash": "9402591080b1b03c", "rule_pack_id": "APPROVED_TWO_LANE_POC_RULE_PACK", "rule_pack_version": "1.0.0"}, "duration_ms": 20.8, "event": "span_end", "name": "tcp.rulepack.load", "status": "OK", "t": "2026-10-16T16:48:18.045+00:00"}
+{"attributes": {"provider": "azure_maps"}, "event": "span_start", "name": "tcp.map.retrieve", "t": "2026-10-16T16:48:18.045+00:00"}
+{"action": "reused", "artifact_id": "map_1", "event": "evidence", "kind": "map", "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1", "source_artifact_id": "map_1", "source_run": "20261016-213622-483ff4", "span": "tcp.map.retrieve", "t": "2026-10-16T16:48:18.223+00:00"}
+{"attributes": {"metres_per_pixel": 0.447835, "provider": "azure_maps", "width_px": 1280}, "duration_ms": 173.1, "event": "span_end", "name": "tcp.map.retrieve", "status": "OK", "t": "2026-10-16T16:48:18.224+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.osm.resolve", "t": "2026-10-16T16:48:18.224+00:00"}
+{"action": "reused", "artifact_id": "osm_1", "event": "evidence", "kind": "osm", "sha256": "2ac7bc19a24d850cc61a5438a11838b8c91e9cf33ffbd8e0d529517a8a5164bc", "source_artifact_id": "osm_1", "source_run": "20261016-213622-483ff4", "span": "tcp.osm.resolve", "t": "2026-10-16T16:48:18.327+00:00"}
+{"attributes": {"highway": "secondary", "way_count": 1}, "duration_ms": 113.8, "event": "span_end", "name": "tcp.osm.resolve", "status": "OK", "t": "2026-10-16T16:48:18.338+00:00"}
+{"attributes": {"provider": "foundry"}, "event": "span_start", "name": "tcp.vision.analyze", "t": "2026-10-16T16:48:18.339+00:00"}
+{"action": "saved", "artifact_id": "ai_1", "event": "evidence", "file": "ai_1.json", "kind": "ai", "sha256": "e9504be3fb8e67b7665e84979f40a04e50eda6a58b46986cf84db6cd841397e2", "span": "tcp.vision.analyze", "t": "2026-10-16T16:48:27.542+00:00"}
+{"attributes": {"model": "claude-opus-5-5", "provider": "foundry", "status_code": "OK"}, "duration_ms": 9203.0, "event": "span_end", "name": "tcp.vision.analyze", "status": "OK", "t": "2026-10-16T16:48:27.542+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.fuse", "t": "2026-10-16T16:48:27.543+00:00"}
+{"attributes": {"conflicts": 0, "inputs_complete": false, "site_model_id": "SITE-F09BFEED20A1CD6F"}, "duration_ms": 2.6, "event": "span_end", "name": "tcp.site.fuse", "status": "OK", "t": "2026-10-16T16:48:27.546+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.eligibility", "t": "2026-10-16T16:48:27.553+00:00"}
+{"attributes": {"decision": "REVIEW_REQUIRED", "reason_codes": "ALTERNATING_TRAFFIC_UNRESOLVED,INTERSECTION_CONFLICT_LOW_CONFIDENCE,LANE_CLOSURE_UNRESOLVED,LANE_COUNT_LOW_CONFIDENCE,PEDESTRIAN_IMPACT_LOW_CONFIDENCE,ROAD_EDGES_LOW_CONFIDENCE,TRAVELED_WAY_ENCROACHMENT_UNRESOLVED,TWO_WAY_STATUS_LOW_CONFIDENCE,WORK_LOCATION_UNRESOLVED,WORK_SIDE_LOW_CONFIDENCE"}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.site.eligibility", "status": "OK", "t": "2026-10-16T16:48:27.554+00:00"}

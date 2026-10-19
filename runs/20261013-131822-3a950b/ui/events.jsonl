@@ -1,0 +1,14 @@
+{"attributes": {"input_type": "COORDINATES"}, "event": "span_start", "name": "tcp.input.parse", "t": "2026-10-13T13:18:32.781+00:00"}
+{"attributes": {"features": 1, "input_hash": "sha256:2ac5a76d2bf4", "input_type": "COORDINATES"}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.input.parse", "status": "OK", "t": "2026-10-13T13:18:32.783+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.rulepack.load", "t": "2026-10-13T13:18:32.784+00:00"}
+{"attributes": {"rule_pack_hash": "9402591080b1b03c", "rule_pack_id": "APPROVED_TWO_LANE_POC_RULE_PACK", "rule_pack_version": "1.0.0"}, "duration_ms": 27.2, "event": "span_end", "name": "tcp.rulepack.load", "status": "OK", "t": "2026-10-13T13:18:32.812+00:00"}
+{"attributes": {"provider": "offline_synthetic"}, "event": "span_start", "name": "tcp.map.retrieve", "t": "2026-10-13T13:18:32.817+00:00"}
+{"attributes": {"metres_per_pixel": 0.390625, "provider": "offline_synthetic", "width_px": 1280}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.map.retrieve", "status": "OK", "t": "2026-10-13T13:18:32.817+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.osm.resolve", "t": "2026-10-13T13:18:32.818+00:00"}
+{"attributes": {"highway": "secondary", "way_count": 1}, "duration_ms": 0.9, "event": "span_end", "name": "tcp.osm.resolve", "status": "OK", "t": "2026-10-13T13:18:32.819+00:00"}
+{"attributes": {"provider": "offline_static"}, "event": "span_start", "name": "tcp.vision.analyze", "t": "2026-10-13T13:18:32.820+00:00"}
+{"attributes": {"model": "simulated-observation", "provider": "offline_static", "status_code": "OK"}, "duration_ms": 21.8, "event": "span_end", "name": "tcp.vision.analyze", "status": "OK", "t": "2026-10-13T13:18:32.842+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.fuse", "t": "2026-10-13T13:18:32.843+00:00"}
+{"attributes": {"conflicts": 0, "inputs_complete": true, "site_model_id": "SITE-D9344B3CB424731D"}, "duration_ms": 1.9, "event": "span_end", "name": "tcp.site.fuse", "status": "OK", "t": "2026-10-13T13:18:32.845+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.eligibility", "t": "2026-10-13T13:18:32.864+00:00"}
+{"attributes": {"decision": "UNSUPPORTED_POC", "reason_codes": "NOT_TWO_WAY"}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.site.eligibility", "status": "OK", "t": "2026-10-13T13:18:32.865+00:00"}

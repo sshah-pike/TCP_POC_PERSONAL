@@ -1,0 +1,265 @@
+{
+  "backend": "openai_responses",
+  "centerline_views": false,
+  "deployment": "gpt-5.6-sol",
+  "duration_ms": 105372.9,
+  "evidence_mode": "single",
+  "osm_claims": false,
+  "profile": "gpt-5.6-sol",
+  "provider": "foundry",
+  "request": {
+    "api": "openai_responses",
+    "effort": "high",
+    "images_sha256": "a129c6a75c9339ab61420b59e4bb73c35f918a9e914c687729321a7046547b6e",
+    "model": "gpt-5.6-sol",
+    "profile": "gpt-5.6-sol",
+    "prompt_sha256": "8e37c2a12d20f065a1964148125fae319afdc43a60efce9553106b6a62c462de",
+    "schema_sha256": "e42647478ef479d9d5a9724bf0813ecac46cf8bdda44b28fd00ed39b33ec9ab7"
+  },
+  "result": {
+    "debug_sent": null,
+    "deployment": "gpt-5.6-sol",
+    "evidence_mode": "single",
+    "foundry_api": "openai_responses",
+    "grounding": {
+      "checks": [
+        {
+          "detail": {
+            "appears_outside": true,
+            "distance_to_nearest_edge_m": 7.5,
+            "relative_position": "BEYOND_SHOULDER"
+          },
+          "id": "C1_WORK_VS_DISTANCE",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "lane_count_total": 2,
+            "reasons": [],
+            "traveled_way_width_m": 7.6
+          },
+          "id": "C2_WIDTH_VS_EDGES",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "action": null,
+            "geometry_side": "LEFT",
+            "model_side": "LEFT"
+          },
+          "id": "C3_SIDE_VS_GEOMETRY",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "note": "OSM claims switch off"
+          },
+          "id": "C4_JUNCTIONS_VS_OSM",
+          "result": "NOT_APPLICABLE"
+        }
+      ],
+      "claims": null,
+      "evidence": null,
+      "extras": [
+        {
+          "category": "shoulder_width",
+          "confidence": 0.83,
+          "description": "Narrow roadside strips are visible outside the edge lines on both sides.",
+          "image_x": 650,
+          "image_y": 664
+        },
+        {
+          "category": "parking",
+          "confidence": 0.97,
+          "description": "Off-road parking lot with marked spaces on the right side of the selected road.",
+          "image_x": 781,
+          "image_y": 704
+        }
+      ],
+      "format": "agent-call1-v1",
+      "images": [
+        {
+          "annotation": "annot-v1",
+          "image": "IMAGE_1",
+          "model_input_sha256": "f98064d4d1c56b270d9c509eed9dfcead97131da96369a5f67e5c4846f9b190e",
+          "raw_pixel_sha256": "e8fa339d1042346f3a56961691678d29b34da79a4d0594427986261214083f19",
+          "work_reference_px": [
+            640.0,
+            640.0
+          ]
+        }
+      ],
+      "measurements": {
+        "distance_measured_in": "IMAGE_1",
+        "distance_to_nearest_edge_m": 7.5,
+        "traveled_way_width_m": 7.6,
+        "width_measured_in": "IMAGE_1"
+      },
+      "osm_claim_checks": null
+    },
+    "model": "gpt-5.6-sol",
+    "observation": {
+      "attribute_confidence": {
+        "divided_road": 0.98,
+        "intersection_conflict": 0.75,
+        "lane_count_total": 0.93,
+        "outside_traveled_way": 0.93,
+        "pedestrian_impact": 0.92,
+        "road_edges": 0.82,
+        "two_way_visible": 0.92,
+        "work_side": 0.99
+      },
+      "divided_road_visible": false,
+      "features": {
+        "crosswalks": [],
+        "driveways": [
+          {
+            "confidence": 0.82,
+            "description": "Private residential driveway",
+            "image_x": 70.0,
+            "image_y": 968.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.84,
+            "description": "Farm or property access",
+            "image_x": 102.0,
+            "image_y": 952.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.8,
+            "description": "Private residential driveway",
+            "image_x": 177.0,
+            "image_y": 911.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.83,
+            "description": "Private residential access",
+            "image_x": 466.0,
+            "image_y": 765.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.85,
+            "description": "Private residential access",
+            "image_x": 557.0,
+            "image_y": 716.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.9,
+            "description": "Residential driveway near work reference",
+            "image_x": 634.0,
+            "image_y": 660.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.94,
+            "description": "Parking or business entrance",
+            "image_x": 738.0,
+            "image_y": 620.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.87,
+            "description": "Private residential driveway",
+            "image_x": 819.0,
+            "image_y": 574.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.84,
+            "description": "Shared residential access",
+            "image_x": 893.0,
+            "image_y": 537.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.86,
+            "description": "Private residential driveway",
+            "image_x": 986.0,
+            "image_y": 491.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.85,
+            "description": "Shared private access to buildings",
+            "image_x": 1037.0,
+            "image_y": 465.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.8,
+            "description": "Private residential driveway",
+            "image_x": 1074.0,
+            "image_y": 447.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.78,
+            "description": "Private property access",
+            "image_x": 1153.0,
+            "image_y": 408.0,
+            "side": "LEFT"
+          }
+        ],
+        "intersections": [],
+        "obstructions": [
+          {
+            "confidence": 0.92,
+            "description": "Trees and dense brush close to the left roadside near the work reference",
+            "image_x": 616.0,
+            "image_y": 615.0,
+            "side": "LEFT"
+          }
+        ],
+        "ramps": [],
+        "roundabouts": []
+      },
+      "image_quality": "FAIR",
+      "lane_count_total": 2,
+      "lane_markings_visible": true,
+      "notes": "The selected road is a two-lane undivided roadway with visible center and edge markings. Width and reference offset are approximate aerial measurements.",
+      "osm_conflicts": [],
+      "road_edges": {
+        "left_visible": true,
+        "right_visible": true,
+        "traveled_way_width_px": 16.97
+      },
+      "shoulders": {
+        "left_present": true,
+        "right_present": true
+      },
+      "sidewalks": {
+        "left_present": false,
+        "right_present": false
+      },
+      "two_way_visible": true,
+      "work_reference": {
+        "appears_outside_traveled_way": true,
+        "appears_roadside": true,
+        "relative_position": "BEYOND_SHOULDER",
+        "side": "LEFT"
+      }
+    },
+    "profile": "gpt-5.6-sol",
+    "provider": "foundry",
+    "raw_response": "{\"lane_count_total\":2,\"two_way_visible\":\"YES\",\"divided_road_visible\":\"NO\",\"lane_markings_visible\":\"YES\",\"road_edges\":{\"left_visible\":true,\"right_visible\":true,\"traveled_way_width_m\":7.6,\"width_measured_in\":\"IMAGE_1\"},\"shoulders\":{\"left_present\":\"YES\",\"right_present\":\"YES\"},\"sidewalks\":{\"left_present\":\"NO\",\"right_present\":\"NO\"},\"work_reference\":{\"appears_roadside\":\"YES\",\"side\":\"LEFT\",\"appears_outside_traveled_way\":\"YES\",\"relative_position\":\"BEYOND_SHOULDER\",\"distance_to_nearest_edge_m\":7.5,\"distance_measured_in\":\"IMAGE_1\"},\"features\":{\"intersections\":[],\"driveways\":[{\"description\":\"Private residential driveway\",\"side\":\"LEFT\",\"confidence\":0.82,\"image\":\"IMAGE_1\",\"x\":70,\"y\":968},{\"description\":\"Farm or property access\",\"side\":\"RIGHT\",\"confidence\":0.84,\"image\":\"IMAGE_1\",\"x\":102,\"y\":952},{\"description\":\"Private residential driveway\",\"side\":\"LEFT\",\"confidence\":0.8,\"image\":\"IMAGE_1\",\"x\":177,\"y\":911},{\"description\":\"Private residential access\",\"side\":\"RIGHT\",\"confidence\":0.83,\"image\":\"IMAGE_1\",\"x\":466,\"y\":765},{\"description\":\"Private residential access\",\"side\":\"RIGHT\",\"confidence\":0.85,\"image\":\"IMAGE_1\",\"x\":557,\"y\":716},{\"description\":\"Residential driveway near work reference\",\"side\":\"LEFT\",\"confidence\":0.9,\"image\":\"IMAGE_1\",\"x\":634,\"y\":660},{\"description\":\"Parking or business entrance\",\"side\":\"RIGHT\",\"confidence\":0.94,\"image\":\"IMAGE_1\",\"x\":738,\"y\":620},{\"description\":\"Private residential driveway\",\"side\":\"LEFT\",\"confidence\":0.87,\"image\":\"IMAGE_1\",\"x\":819,\"y\":574},{\"description\":\"Shared residential access\",\"side\":\"LEFT\",\"confidence\":0.84,\"image\":\"IMAGE_1\",\"x\":893,\"y\":537},{\"description\":\"Private residential driveway\",\"side\":\"RIGHT\",\"confidence\":0.86,\"image\":\"IMAGE_1\",\"x\":986,\"y\":491},{\"description\":\"Shared private access to buildings\",\"side\":\"LEFT\",\"confidence\":0.85,\"image\":\"IMAGE_1\",\"x\":1037,\"y\":465},{\"description\":\"Private residential driveway\",\"side\":\"RIGHT\",\"confidence\":0.8,\"image\":\"IMAGE_1\",\"x\":1074,\"y\":447},{\"description\":\"Private property access\",\"side\":\"LEFT\",\"confidence\":0.78,\"image\":\"IMAGE_1\",\"x\":1153,\"y\":408}],\"crosswalks\":[],\"roundabouts\":[],\"ramps\":[],\"obstructions\":[{\"description\":\"Trees and dense brush close to the left roadside near the work reference\",\"side\":\"LEFT\",\"confidence\":0.92,\"image\":\"IMAGE_1\",\"x\":616,\"y\":615}]},\"image_quality\":\"FAIR\",\"attribute_confidence\":{\"lane_count_total\":0.93,\"two_way_visible\":0.92,\"divided_road\":0.98,\"road_edges\":0.82,\"work_side\":0.99,\"outside_traveled_way\":0.93,\"intersection_conflict\":0.75,\"pedestrian_impact\":0.92},\"notes\":\"The selected road is a two-lane undivided roadway with visible center and edge markings. Width and reference offset are approximate aerial measurements.\",\"extras\":[{\"category\":\"shoulder_width\",\"description\":\"Narrow roadside strips are visible outside the edge lines on both sides.\",\"image_x\":650,\"image_y\":664,\"confidence\":0.83},{\"category\":\"parking\",\"description\":\"Off-road parking lot with marked spaces on the right side of the selected road.\",\"image_x\":781,\"image_y\":704,\"confidence\":0.97}]}",
+    "request_id": "resp_064a2e5acaa7c8ca006ad605472a488190ae393c56ee7aeeb6",
+    "usage": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 3178,
+      "input_tokens": 3181,
+      "output_tokens": 8688,
+      "reasoning_tokens": 7876
+    },
+    "views": [],
+    "vision_mode": "agent_call1",
+    "wire_format": "tri-state-v1"
+  },
+  "status": "OK",
+  "views": [],
+  "vision_mode": "agent_call1"
+}

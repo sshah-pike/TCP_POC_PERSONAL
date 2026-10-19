@@ -1,0 +1,11 @@
+{
+  "bearing_deg": 63.1,
+  "ended_at": "2026-10-16T16:48:07.505+00:00",
+  "ok": true,
+  "state": "FINISHED",
+  "views": [
+    "work_area",
+    "corridor_ahead",
+    "corridor_behind"
+  ]
+}

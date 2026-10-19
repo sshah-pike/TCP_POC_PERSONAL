@@ -1,0 +1,12 @@
+[
+  {
+    "category": "UNKNOWN_PROVIDER_ERROR",
+    "duration_ms": 27.6,
+    "exception_type": "tcp_poc.models.MapProviderError",
+    "http_status": null,
+    "message": "set AZURE_MAPS_KEY to use Azure Maps imagery",
+    "pipeline_error_code": "MAP_CREDENTIALS_MISSING",
+    "provider": "azure_maps",
+    "span": "tcp.map.retrieve"
+  }
+]

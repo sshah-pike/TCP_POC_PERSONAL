@@ -1,0 +1,30 @@
+{"attributes": {"input_type": "KML"}, "event": "span_start", "name": "tcp.input.parse", "t": "2026-10-16T17:05:55.859+00:00"}
+{"attributes": {"features": 1, "input_hash": "sha256:391ef33639ff", "input_type": "KML"}, "duration_ms": 1.7, "event": "span_end", "name": "tcp.input.parse", "status": "OK", "t": "2026-10-16T17:05:55.865+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.rulepack.load", "t": "2026-10-16T17:05:55.867+00:00"}
+{"attributes": {"rule_pack_hash": "9402591080b1b03c", "rule_pack_id": "APPROVED_TWO_LANE_POC_RULE_PACK", "rule_pack_version": "1.0.0"}, "duration_ms": 5.0, "event": "span_end", "name": "tcp.rulepack.load", "status": "OK", "t": "2026-10-16T17:05:55.872+00:00"}
+{"attributes": {"provider": "azure_maps"}, "event": "span_start", "name": "tcp.map.retrieve", "t": "2026-10-16T17:05:55.873+00:00"}
+{"action": "reused", "artifact_id": "map_1", "event": "evidence", "kind": "map", "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1", "source_artifact_id": "map_1", "source_run": "20261016-213622-483ff4", "span": "tcp.map.retrieve", "t": "2026-10-16T17:05:55.985+00:00"}
+{"attributes": {"metres_per_pixel": 0.447835, "provider": "azure_maps", "width_px": 1280}, "duration_ms": 108.5, "event": "span_end", "name": "tcp.map.retrieve", "status": "OK", "t": "2026-10-16T17:05:55.986+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.osm.resolve", "t": "2026-10-16T17:05:55.986+00:00"}
+{"action": "reused", "artifact_id": "osm_1", "event": "evidence", "kind": "osm", "sha256": "2ac7bc19a24d850cc61a5438a11838b8c91e9cf33ffbd8e0d529517a8a5164bc", "source_artifact_id": "osm_1", "source_run": "20261016-213622-483ff4", "span": "tcp.osm.resolve", "t": "2026-10-16T17:05:55.992+00:00"}
+{"attributes": {"highway": "secondary", "way_count": 1}, "duration_ms": 11.6, "event": "span_end", "name": "tcp.osm.resolve", "status": "OK", "t": "2026-10-16T17:05:55.998+00:00"}
+{"attributes": {"provider": "foundry"}, "event": "span_start", "name": "tcp.vision.analyze", "t": "2026-10-16T17:05:56.000+00:00"}
+{"action": "reused", "artifact_id": "ai_1", "event": "evidence", "kind": "ai", "sha256": "302a883a750b2cacd5fedc08f9b8aadc5944c8e69513a61e70af2bc9e191798b", "source_artifact_id": "ai_1", "source_run": "20261016-221807-a49f7b", "span": "tcp.vision.analyze", "t": "2026-10-16T17:05:56.041+00:00"}
+{"attributes": {"model": "gpt-5.6-sol", "provider": "foundry", "status_code": "OK"}, "duration_ms": 41.0, "event": "span_end", "name": "tcp.vision.analyze", "status": "OK", "t": "2026-10-16T17:05:56.041+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.fuse", "t": "2026-10-16T17:05:56.042+00:00"}
+{"attributes": {"conflicts": 0, "inputs_complete": true, "site_model_id": "SITE-688FEDC874AFE565"}, "duration_ms": 9.7, "event": "span_end", "name": "tcp.site.fuse", "status": "OK", "t": "2026-10-16T17:05:56.052+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.eligibility", "t": "2026-10-16T17:05:56.059+00:00"}
+{"attributes": {"decision": "SUPPORTED_AUTO", "reason_codes": ""}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.site.eligibility", "status": "OK", "t": "2026-10-16T17:05:56.060+00:00"}
+{"attributes": {"ta_id": "TA-1"}, "event": "span_start", "name": "tcp.rules.execute", "t": "2026-10-16T17:05:56.061+00:00"}
+{"attributes": {"objects": 3, "options": 0, "ta_id": "TA-1"}, "duration_ms": 0.5, "event": "span_end", "name": "tcp.rules.execute", "status": "OK", "t": "2026-10-16T17:05:56.063+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.geometry.place", "t": "2026-10-16T17:05:56.063+00:00"}
+{"attributes": {"issues": ""}, "duration_ms": 0.2, "event": "span_end", "name": "tcp.geometry.place", "status": "OK", "t": "2026-10-16T17:05:56.064+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.plan.validate", "t": "2026-10-16T17:05:56.064+00:00"}
+{"attributes": {"geometry": "PASS", "rule": "PASS"}, "duration_ms": 1.3, "event": "span_end", "name": "tcp.plan.validate", "status": "OK", "t": "2026-10-16T17:05:56.066+00:00"}
+{"attributes": {"plan_id": "TCP-1B2261E3C58315E2"}, "event": "span_start", "name": "tcp.debug.render", "t": "2026-10-16T17:05:56.096+00:00"}
+{"attributes": {"plan_id": "TCP-1B2261E3C58315E2"}, "duration_ms": 1810.6, "event": "span_end", "name": "tcp.debug.render", "status": "OK", "t": "2026-10-16T17:05:57.907+00:00"}
+{"attributes": {"plan_id": "TCP-1B2261E3C58315E2"}, "event": "span_start", "name": "tcp.sheet.render", "t": "2026-10-16T17:05:57.908+00:00"}
+{"action": "reused", "artifact_id": "map_2", "event": "evidence", "kind": "map", "sha256": "21dc1ba28751812aca804b0b18f5106bdf434f3e0e8f089f970ba58d41f5c26a", "source_artifact_id": "map_2", "source_run": "20261016-221807-a49f7b", "span": "tcp.sheet.render", "t": "2026-10-16T17:05:58.165+00:00"}
+{"attributes": {"plan_id": "TCP-1B2261E3C58315E2", "scale_ft_per_in": 50, "status_code": "RENDERED"}, "duration_ms": 19975.6, "event": "span_end", "name": "tcp.sheet.render", "status": "OK", "t": "2026-10-16T17:06:17.893+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.dwt.render", "t": "2026-10-16T17:06:17.894+00:00"}
+{"attributes": {"status_code": "SKIPPED_NO_DWT_CONFIG"}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.dwt.render", "status": "OK", "t": "2026-10-16T17:06:17.894+00:00"}

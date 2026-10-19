@@ -1,0 +1,279 @@
+{
+  "backend": "openai_responses",
+  "centerline_views": false,
+  "deployment": "gpt-5.6-sol",
+  "duration_ms": 105390.9,
+  "evidence_mode": "multi",
+  "osm_claims": true,
+  "profile": "gpt-5.6-sol",
+  "provider": "foundry",
+  "request": {
+    "api": "openai_responses",
+    "effort": "high",
+    "images_sha256": "c68ae891aa60b3d76d0f37bd09863747cdaeba832929c780a7e5675bfbbbc76d",
+    "model": "gpt-5.6-sol",
+    "profile": "gpt-5.6-sol",
+    "prompt_sha256": "230d07187474f5d7eb99d764f2fdbc52d872d43e819b7b9fcdea40ac321f1ea5",
+    "schema_sha256": "9ec537d3eb0e12179d256448f0e62a978bf449e04cc534f24140db0aeb21acb0"
+  },
+  "result": {
+    "debug_sent": null,
+    "deployment": "gpt-5.6-sol",
+    "evidence_mode": "multi",
+    "foundry_api": "openai_responses",
+    "grounding": {
+      "checks": [
+        {
+          "detail": {
+            "appears_outside": true,
+            "distance_to_nearest_edge_m": 5.0,
+            "relative_position": "BEYOND_SHOULDER"
+          },
+          "id": "C1_WORK_VS_DISTANCE",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "lane_count_total": 2,
+            "reasons": [],
+            "traveled_way_width_m": 7.6
+          },
+          "id": "C2_WIDTH_VS_EDGES",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "action": null,
+            "geometry_side": "LEFT",
+            "model_side": "LEFT"
+          },
+          "id": "C3_SIDE_VS_GEOMETRY",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "claims_not_reported": [],
+            "disagreements": []
+          },
+          "id": "C4_JUNCTIONS_VS_OSM",
+          "result": "PASS"
+        }
+      ],
+      "claims": [],
+      "evidence": {
+        "divided": {
+          "basis": "The road is one continuous paved roadway with no physical median or separated carriageways.",
+          "image": "IMAGE_2"
+        },
+        "intersections": {
+          "basis": "Visible side connections lead to residences, fields, or parking areas; no clearly continuing public-road junction, roundabout, or ramp is visible.",
+          "image": "IMAGE_1"
+        },
+        "lane_count": {
+          "basis": "One through lane is visible on each side of the double-yellow center line.",
+          "image": "IMAGE_2"
+        },
+        "pedestrian": {
+          "basis": "Both roadsides near the reference are visible without sidewalks or a marked crosswalk.",
+          "image": "IMAGE_2"
+        },
+        "road_edges": {
+          "basis": "Both white traveled-way edge lines are visible at the reference cross-section and measure about 7.6 m apart.",
+          "image": "IMAGE_2"
+        },
+        "two_way": {
+          "basis": "A double-yellow center line visibly separates the two through lanes.",
+          "image": "IMAGE_2"
+        },
+        "work_location": {
+          "basis": "The reference is in grass beyond the left paved shoulder, about 5.0 m from the white edge line.",
+          "image": "IMAGE_2"
+        },
+        "work_side": {
+          "basis": "The reference ring is on the northwest, or left, side for travel toward the northeast.",
+          "image": "IMAGE_2"
+        }
+      },
+      "format": "agent-call2-v1",
+      "images": [
+        {
+          "annotation": "annot-v1",
+          "image": "IMAGE_1",
+          "model_input_sha256": "f98064d4d1c56b270d9c509eed9dfcead97131da96369a5f67e5c4846f9b190e",
+          "raw_pixel_sha256": "e8fa339d1042346f3a56961691678d29b34da79a4d0594427986261214083f19",
+          "work_reference_px": [
+            640.0,
+            640.0
+          ]
+        },
+        {
+          "annotation": "annot-v1",
+          "image": "IMAGE_2",
+          "model_input_sha256": "c1abe540bd2f0c58666929b72649ead0668994007af330caffe37be447a9d11c",
+          "raw_pixel_sha256": "539b4c91c3b5ed0caed968b20caeb926907d97522fdea614756aa5fa82d4b633",
+          "work_reference_px": [
+            512.0,
+            512.0
+          ]
+        }
+      ],
+      "measurements": {
+        "distance_measured_in": "IMAGE_2",
+        "distance_to_nearest_edge_m": 5.0,
+        "traveled_way_width_m": 7.6,
+        "width_measured_in": "IMAGE_2"
+      },
+      "osm_claim_checks": null
+    },
+    "model": "gpt-5.6-sol",
+    "observation": {
+      "attribute_confidence": {
+        "divided_road": 0.97,
+        "intersection_conflict": 0.76,
+        "lane_count_total": 0.98,
+        "outside_traveled_way": 0.98,
+        "pedestrian_impact": 0.93,
+        "road_edges": 0.92,
+        "two_way_visible": 0.98,
+        "work_side": 0.99
+      },
+      "divided_road_visible": false,
+      "features": {
+        "crosswalks": [],
+        "driveways": [
+          {
+            "confidence": 0.78,
+            "description": "Farm or residential access",
+            "image_x": 107.0,
+            "image_y": 982.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.76,
+            "description": "Residential access",
+            "image_x": 161.0,
+            "image_y": 910.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.75,
+            "description": "Residential access",
+            "image_x": 490.0,
+            "image_y": 761.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.91,
+            "description": "Narrow residential access near the work reference",
+            "image_x": 619.5,
+            "image_y": 654.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.94,
+            "description": "Parking-lot or business entrance",
+            "image_x": 737.3,
+            "image_y": 616.5,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.78,
+            "description": "Residential access",
+            "image_x": 815.0,
+            "image_y": 536.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.75,
+            "description": "Residential access",
+            "image_x": 1007.0,
+            "image_y": 502.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.74,
+            "description": "Residential access",
+            "image_x": 1040.0,
+            "image_y": 415.0,
+            "side": "LEFT"
+          }
+        ],
+        "intersections": [],
+        "obstructions": [
+          {
+            "confidence": 0.95,
+            "description": "Small roadside tree close to the work reference",
+            "image_x": 646.3,
+            "image_y": 632.2,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.9,
+            "description": "Roadside utility pole northeast of the work reference",
+            "image_x": 696.3,
+            "image_y": 624.2,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.88,
+            "description": "Roadside utility pole opposite the work reference",
+            "image_x": 643.0,
+            "image_y": 667.8,
+            "side": "RIGHT"
+          }
+        ],
+        "ramps": [],
+        "roundabouts": []
+      },
+      "image_quality": "GOOD",
+      "lane_count_total": 2,
+      "lane_markings_visible": true,
+      "notes": "The work reference is in grass beyond the left paved shoulder. Width and edge distance are scale measurements from IMAGE_2.",
+      "osm_conflicts": [],
+      "road_edges": {
+        "left_visible": true,
+        "right_visible": true,
+        "traveled_way_width_px": 16.97
+      },
+      "shoulders": {
+        "left_present": true,
+        "right_present": true
+      },
+      "sidewalks": {
+        "left_present": false,
+        "right_present": false
+      },
+      "two_way_visible": true,
+      "work_reference": {
+        "appears_outside_traveled_way": true,
+        "appears_roadside": true,
+        "relative_position": "BEYOND_SHOULDER",
+        "side": "LEFT"
+      }
+    },
+    "profile": "gpt-5.6-sol",
+    "provider": "foundry",
+    "raw_response": "{\"lane_count_total\":2,\"two_way_visible\":\"YES\",\"divided_road_visible\":\"NO\",\"lane_markings_visible\":\"YES\",\"road_edges\":{\"left_visible\":true,\"right_visible\":true,\"traveled_way_width_m\":7.6,\"width_measured_in\":\"IMAGE_2\"},\"shoulders\":{\"left_present\":\"YES\",\"right_present\":\"YES\"},\"sidewalks\":{\"left_present\":\"NO\",\"right_present\":\"NO\"},\"work_reference\":{\"appears_roadside\":\"YES\",\"side\":\"LEFT\",\"appears_outside_traveled_way\":\"YES\",\"relative_position\":\"BEYOND_SHOULDER\",\"distance_to_nearest_edge_m\":5.0,\"distance_measured_in\":\"IMAGE_2\"},\"features\":{\"intersections\":[],\"driveways\":[{\"description\":\"Farm or residential access\",\"side\":\"RIGHT\",\"confidence\":0.78,\"image\":\"IMAGE_1\",\"x\":107,\"y\":982},{\"description\":\"Residential access\",\"side\":\"LEFT\",\"confidence\":0.76,\"image\":\"IMAGE_1\",\"x\":161,\"y\":910},{\"description\":\"Residential access\",\"side\":\"RIGHT\",\"confidence\":0.75,\"image\":\"IMAGE_1\",\"x\":490,\"y\":761},{\"description\":\"Narrow residential access near the work reference\",\"side\":\"LEFT\",\"confidence\":0.91,\"image\":\"IMAGE_2\",\"x\":430,\"y\":568},{\"description\":\"Parking-lot or business entrance\",\"side\":\"RIGHT\",\"confidence\":0.94,\"image\":\"IMAGE_2\",\"x\":901,\"y\":418},{\"description\":\"Residential access\",\"side\":\"LEFT\",\"confidence\":0.78,\"image\":\"IMAGE_1\",\"x\":815,\"y\":536},{\"description\":\"Residential access\",\"side\":\"RIGHT\",\"confidence\":0.75,\"image\":\"IMAGE_1\",\"x\":1007,\"y\":502},{\"description\":\"Residential access\",\"side\":\"LEFT\",\"confidence\":0.74,\"image\":\"IMAGE_1\",\"x\":1040,\"y\":415}],\"crosswalks\":[],\"roundabouts\":[],\"ramps\":[],\"obstructions\":[{\"description\":\"Small roadside tree close to the work reference\",\"side\":\"LEFT\",\"confidence\":0.95,\"image\":\"IMAGE_2\",\"x\":537,\"y\":481},{\"description\":\"Roadside utility pole northeast of the work reference\",\"side\":\"LEFT\",\"confidence\":0.9,\"image\":\"IMAGE_2\",\"x\":737,\"y\":449},{\"description\":\"Roadside utility pole opposite the work reference\",\"side\":\"RIGHT\",\"confidence\":0.88,\"image\":\"IMAGE_2\",\"x\":524,\"y\":623}]},\"image_quality\":\"GOOD\",\"attribute_confidence\":{\"lane_count_total\":0.98,\"two_way_visible\":0.98,\"divided_road\":0.97,\"road_edges\":0.92,\"work_side\":0.99,\"outside_traveled_way\":0.98,\"intersection_conflict\":0.76,\"pedestrian_impact\":0.93},\"osm_conflicts\":[],\"notes\":\"The work reference is in grass beyond the left paved shoulder. Width and edge distance are scale measurements from IMAGE_2.\",\"evidence\":{\"lane_count\":{\"image\":\"IMAGE_2\",\"basis\":\"One through lane is visible on each side of the double-yellow center line.\"},\"two_way\":{\"image\":\"IMAGE_2\",\"basis\":\"A double-yellow center line visibly separates the two through lanes.\"},\"divided\":{\"image\":\"IMAGE_2\",\"basis\":\"The road is one continuous paved roadway with no physical median or separated carriageways.\"},\"road_edges\":{\"image\":\"IMAGE_2\",\"basis\":\"Both white traveled-way edge lines are visible at the reference cross-section and measure about 7.6 m apart.\"},\"work_side\":{\"image\":\"IMAGE_2\",\"basis\":\"The reference ring is on the northwest, or left, side for travel toward the northeast.\"},\"work_location\":{\"image\":\"IMAGE_2\",\"basis\":\"The reference is in grass beyond the left paved shoulder, about 5.0 m from the white edge line.\"},\"intersections\":{\"image\":\"IMAGE_1\",\"basis\":\"Visible side connections lead to residences, fields, or parking areas; no clearly continuing public-road junction, roundabout, or ramp is visible.\"},\"pedestrian\":{\"image\":\"IMAGE_2\",\"basis\":\"Both roadsides near the reference are visible without sidewalks or a marked crosswalk.\"}}}",
+    "request_id": "resp_05aecd4b141e9e33006ad6075d310481968f2051fc2275f706",
+    "usage": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 3998,
+      "input_tokens": 4001,
+      "output_tokens": 8146,
+      "reasoning_tokens": 7250
+    },
+    "views": [
+      "CROP_1"
+    ],
+    "vision_mode": "agent_call2",
+    "wire_format": "tri-state-v1"
+  },
+  "status": "OK",
+  "views": [
+    {
+      "pixel_sha256": "539b4c91c3b5ed0caed968b20caeb926907d97522fdea614756aa5fa82d4b633",
+      "role": "CROP_1"
+    }
+  ],
+  "vision_mode": "agent_call2"
+}

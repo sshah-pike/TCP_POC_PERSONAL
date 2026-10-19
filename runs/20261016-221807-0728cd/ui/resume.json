@@ -1,0 +1,104 @@
+{
+  "ai_profile": "claude-opus-5-5",
+  "ai_provider": "foundry",
+  "comparison_id": "20261016-221800-2b4518",
+  "evidence_mode": "single",
+  "extra_sources": [],
+  "parent_decision": "REVIEW_REQUIRED",
+  "parent_run_id": "20261016-213622-483ff4",
+  "preview": {
+    "ai_profile": "claude-opus-5-5",
+    "ai_provider": "foundry",
+    "dependency_changes": [],
+    "evidence_mode": "single",
+    "legacy": false,
+    "legacy_reason": null,
+    "move_reason": null,
+    "moved_earlier": false,
+    "note": "Prediction from artifact hashes and configuration hashes. During the run every reused artifact is validated against the exact request; any mismatch re-acquires it and is recorded.",
+    "parent_run_id": "20261016-213622-483ff4",
+    "predicted_actual_stage": "vision",
+    "requested_stage": "vision",
+    "rerun": [
+      {
+        "external_call": null,
+        "reason": "re-run locally (input re-parsed, rule pack re-verified by hash)",
+        "stage": "input",
+        "title": "Input"
+      },
+      {
+        "external_call": null,
+        "reason": "re-run locally (input re-parsed, rule pack re-verified by hash)",
+        "stage": "rule_pack",
+        "title": "Rule Pack"
+      },
+      {
+        "external_call": "AI provider foundry, Foundry profile claude-opus-5-5",
+        "reason": "requested re-run",
+        "stage": "vision",
+        "title": "AI Vision"
+      },
+      {
+        "external_call": null,
+        "reason": "re-runs deterministically on the reused or new evidence",
+        "stage": "fusion",
+        "title": "Fusion"
+      },
+      {
+        "external_call": null,
+        "reason": "re-runs deterministically on the reused or new evidence",
+        "stage": "eligibility",
+        "title": "Eligibility"
+      },
+      {
+        "external_call": null,
+        "reason": "re-runs deterministically on the reused or new evidence",
+        "stage": "rules",
+        "title": "Rules / Placement"
+      },
+      {
+        "external_call": null,
+        "reason": "re-runs deterministically on the reused or new evidence",
+        "stage": "validation",
+        "title": "Validation"
+      },
+      {
+        "external_call": "map provider for the wider sheet aerial unless the saved one matches (SUPPORTED_AUTO only)",
+        "reason": "re-runs deterministically on the reused or new evidence",
+        "stage": "render",
+        "title": "Render / Export"
+      }
+    ],
+    "reuse_kinds": [
+      "map",
+      "osm"
+    ],
+    "reused": [
+      {
+        "api_call": false,
+        "artifact": "map_1",
+        "file": "map_1.png",
+        "kind": "map",
+        "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1",
+        "source_run": "20261016-213622-483ff4",
+        "stage": "imagery",
+        "title": "Imagery"
+      },
+      {
+        "api_call": false,
+        "artifact": "osm_1",
+        "file": "osm_1.json",
+        "kind": "osm",
+        "sha256": "2ac7bc19a24d850cc61a5438a11838b8c91e9cf33ffbd8e0d529517a8a5164bc",
+        "source_run": "20261016-213622-483ff4",
+        "stage": "osm",
+        "title": "OSM"
+      }
+    ]
+  },
+  "requested_stage": "vision",
+  "reuse_kinds": [
+    "map",
+    "osm"
+  ]
+}

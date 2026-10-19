@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "--lat=91.1234567890123",
+    "--lon=-82.960710",
+    "--out",
+    "C:\\Users\\Sshah-Hexaware\\OneDrive - Pike Enterprises, LLC\\Desktop\\TCP\\runs\\20261013-131823-7166ba\\output"
+  ],
+  "created_at": "2026-10-13T13:18:23.737+00:00",
+  "request": {
+    "advanced": {
+      "ai_provider": null,
+      "dwt_mode": null,
+      "map_provider": null,
+      "no_dwt": false
+    },
+    "input_type": "coordinates",
+    "operator": {
+      "options": [],
+      "requires_lane_closure": false,
+      "road_type": null,
+      "speed": null
+    }
+  },
+  "run_id": "20261013-131823-7166ba"
+}

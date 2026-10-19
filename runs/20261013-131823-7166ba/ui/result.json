@@ -1,0 +1,21 @@
+{
+  "decision": "UNSUPPORTED_POC",
+  "eligibility": {
+    "decision": "UNSUPPORTED_POC",
+    "details": {},
+    "generate_draft": false,
+    "message": "Input rejected: latitude/longitude out of range. This POC currently processes only two-lane, two-way, undivided conventional roads with work beyond the shoulder and no lane or pedestrian impact.",
+    "reason_codes": [
+      "INVALID_COORDINATES"
+    ]
+  },
+  "out_dir": "C:\\Users\\Sshah-Hexaware\\OneDrive - Pike Enterprises, LLC\\Desktop\\TCP\\runs\\20261013-131823-7166ba\\output",
+  "outputs": [
+    "eligibility_result.json",
+    "run_report.txt"
+  ],
+  "plan_hash": null,
+  "reason_codes": [
+    "INVALID_COORDINATES"
+  ]
+}

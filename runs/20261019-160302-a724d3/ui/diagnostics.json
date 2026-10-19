@@ -1,0 +1,12 @@
+[
+  {
+    "category": "HTTP_ERROR",
+    "duration_ms": 660.0,
+    "exception_type": "tcp_poc.models.MapProviderError",
+    "http_status": 400,
+    "message": "Azure Maps HTTP 400",
+    "pipeline_error_code": "MAP_REQUEST_FAILED",
+    "provider": "azure_maps",
+    "span": "tcp.vision.analyze"
+  }
+]

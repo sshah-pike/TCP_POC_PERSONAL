@@ -1,0 +1,34 @@
+[
+  {
+    "call": "agent_call1",
+    "deployment": "gpt-5.6-sol",
+    "duration_ms": 85100.1,
+    "profile": "gpt-5.6-sol",
+    "provider": "foundry",
+    "requested_model": "gpt-5.6-sol",
+    "response_model": "gpt-5.6-sol",
+    "usage": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 3135,
+      "input_tokens": 3138,
+      "output_tokens": 7217,
+      "reasoning_tokens": 6501
+    }
+  },
+  {
+    "call": "agent_call2",
+    "deployment": "gpt-5.6-sol",
+    "duration_ms": 105765.3,
+    "profile": "gpt-5.6-sol",
+    "provider": "foundry",
+    "requested_model": "gpt-5.6-sol",
+    "response_model": "gpt-5.6-sol",
+    "usage": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 5870,
+      "input_tokens": 5873,
+      "output_tokens": 8657,
+      "reasoning_tokens": 7729
+    }
+  }
+]

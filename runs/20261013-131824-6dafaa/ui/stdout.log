@@ -1,0 +1,23 @@
+OFFLINE scenario 'supported' - simulated road, imagery, OSM and AI observation (not real data)
+TCP POC Pipeline 2  (tcp-poc 0.2.0)
+1 Input: KML  work reference 33.000, -97.000 (rounded)  path points 0
+2 Rule pack: APPROVED_TWO_LANE_POC_RULE_PACK v1.0.0 APPROVED_FOR_POC sha256 9402591080b1b03c... verified
+3 Imagery: OFFLINE_SYNTHETIC  500 m across, 0.391 m/px
+4 OSM: road 'Demo Road' highway=secondary lanes_tag=2 oneway=None
+5 AI observation: received from offline_static (simulated-observation)
+6 SiteModel SITE-08EC755101D72890 critical fields:
+   lane_count         2                  RESOLVED        confidence HIGH
+   two_way            True               RESOLVED        confidence HIGH
+   divided            False              RESOLVED        confidence HIGH
+   facility_type      CONVENTIONAL_ROAD  RESOLVED        confidence HIGH
+   road_type          URBAN_LOW_SPEED    RESOLVED        confidence HIGH
+   work.side          LEFT               RESOLVED        confidence HIGH
+   work.location      BEYOND_SHOULDER    RESOLVED        confidence HIGH
+   work.encroaches    False              RESOLVED        confidence HIGH
+   work.lane_closure  False              RESOLVED        confidence HIGH
+   work.pedestrian    False              RESOLVED        confidence HIGH
+   road_edges         7.3 m              RESOLVED
+7 Eligibility: SUPPORTED_AUTO  (all conditions pass)
+8 Rules: TA-1 Table 6B-1 URBAN_LOW_SPEED A = 100 ft; 3 objects placed
+9 Validation: rule PASS  geometry PASS
+10 Plan TCP-071C1A10CA060410 exported (hash 071c1a10ca060410...); DWT: SKIPPED

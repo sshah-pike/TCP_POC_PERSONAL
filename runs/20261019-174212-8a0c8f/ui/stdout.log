@@ -1,0 +1,38 @@
+TCP POC Pipeline 2  (tcp-poc 0.2.0)
+1 Input: KML  work reference 41.372, -71.820 (rounded)  path points 0
+2 Rule pack: APPROVED_TWO_LANE_POC_RULE_PACK v1.0.0 APPROVED_FOR_POC sha256 9402591080b1b03c... verified
+3 Imagery: AZURE_MAPS  574 m across, 0.448 m/px
+4 OSM: road 'Granite Street' highway=primary lanes_tag=4 oneway=None
+5 AI vision: provider foundry, profile gpt-5.6-sol, deployment gpt-5.6-sol, api openai_responses - max 2 model calls
+   call 1 started: 1 image(s) -> foundry gpt-5.6-sol
+   call 1 (wide, blind to OSM): foundry gpt-5.6-sol - 2 extras
+   measure work_point (station 382 m): INCONCLUSIVE - 1 of 3 sections measured (need 2): no edge-line pair fits 2 lane(s) (3 line candidates); no edge-line pair fits 2 lane(s) (3 line candidates)
+   measure sign_increasing_station (station 230 m): INCONCLUSIVE - 1 of 3 sections measured (need 2): no edge-line pair fits 2 lane(s) (3 line candidates); no edge-line pair fits 2 lane(s) (2 line candidates)
+   measure sign_decreasing_station (station 535 m): INCONCLUSIVE - 1 of 3 sections measured (need 2): no edge-line pair fits 2 lane(s) (3 line candidates); no edge-line pair fits 2 lane(s) (1 line candidates)
+   compare: unresolved after call 1: features (model-reported intersections at station 524.12 within 15.0 m of a planned sign), lane_count (road.lane_count=CONFLICT), road_edges (road.road_edges=UNRESOLVED), sign_clearance (sign close views at stations 229.86, 534.66), work_location (work.encroaches_traveled_way=UNRESOLVED; work.location=UNRESOLVED; work.requires_lane_closure=UNRESOLVED; work.requires_alternating_one_lane_traffic=UNRESOLVED)
+   CROP_1 work_point for lane_count,road_edges,work_location: zoom requested 19 used 19
+   CROP_2 sign_location for features,sign_clearance: zoom requested 19 used 19
+   CROP_3 sign_location for features,sign_clearance: zoom requested 19 used 19
+   CROP_4 corridor for features: zoom requested 19 used 19
+   CROP_5 corridor for features: zoom requested 19 used 19
+   call 2 started: 6 image(s) -> foundry gpt-5.6-sol
+   consistency road_width: call 1 None / call 2 13.798 -> NOT_CHECKED_UNRESOLVED_AFTER_CALL1
+   consistency lane_count: call 1 2 / call 2 4 -> NOT_CHECKED_UNRESOLVED_AFTER_CALL1
+   consistency work_side: call 1 None / call 2 LEFT -> NOT_COMPARABLE
+   consistency work_location: call 1 TRAVELED_WAY / call 2 BEYOND_SHOULDER -> NOT_CHECKED_UNRESOLVED_AFTER_CALL1
+   call 2 (5 crops + wide image, 17 OSM claims): gpt-5.6-sol; answers taken for: features, lane_count, road_edges, sign_clearance, work_location
+   result: received from foundry (gpt-5.6-sol); model calls 2 of max 2
+6 SiteModel SITE-D1BE82501E849089 critical fields:
+   lane_count         4                  RESOLVED        confidence HIGH
+   two_way            True               RESOLVED        confidence HIGH
+   divided            False              RESOLVED        confidence HIGH
+   facility_type      CONVENTIONAL_ROAD  RESOLVED        confidence HIGH
+   road_type          RURAL              RESOLVED        confidence HIGH
+   work.side          LEFT               RESOLVED        confidence HIGH
+   work.location      TRAVELED_WAY       RESOLVED        confidence HIGH
+   work.encroaches    True               RESOLVED        confidence HIGH
+   work.lane_closure  True               RESOLVED        confidence HIGH
+   work.pedestrian    True               RESOLVED        confidence MEDIUM
+   road_edges         13.798 m           RESOLVED
+   CONFLICT road.centerline: OSM=attributes vary along road: lanes,maxspeed AI=None
+7 Eligibility: UNSUPPORTED_POC  ALTERNATING_TRAFFIC_REQUIRED, CENTERLINE_CONFLICT, CENTERLINE_UNRESOLVED, INTERSECTION_CONFLICT, LANE_CLOSURE_REQUIRED, LANE_COUNT_NOT_TWO, PEDESTRIAN_ROUTE_IMPACT, TRAVELED_WAY_ENCROACHMENT, WORK_NOT_BEYOND_SHOULDER

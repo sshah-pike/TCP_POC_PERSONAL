@@ -1,0 +1,17 @@
+[
+  {
+    "deployment": "gpt-5.6-sol",
+    "duration_ms": 86666.4,
+    "profile": "gpt-5.6-sol",
+    "provider": "foundry",
+    "requested_model": "gpt-5.6-sol",
+    "response_model": "gpt-5.6-sol",
+    "usage": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 1750,
+      "input_tokens": 1753,
+      "output_tokens": 5719,
+      "reasoning_tokens": 5178
+    }
+  }
+]
