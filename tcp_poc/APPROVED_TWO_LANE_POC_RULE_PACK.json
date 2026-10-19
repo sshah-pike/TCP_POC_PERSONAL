@@ -1,0 +1,478 @@
+{
+  "rule_pack": {
+    "id": "APPROVED_TWO_LANE_POC_RULE_PACK",
+    "version": "1.0.0",
+    "status": "APPROVED_FOR_POC",
+    "scenario_scope": "TA-1_WORK_BEYOND_SHOULDER_ON_TWO_LANE_TWO_WAY_CONVENTIONAL_ROAD",
+    "source": {
+      "publisher": "FHWA",
+      "document": "MUTCD 11th Edition with Revision 1",
+      "date": "December 2025",
+      "part": "6",
+      "chapters": [
+        "6A",
+        "6B",
+        "6P"
+      ],
+      "typical_application": "TA-1 / Figure 6P-1"
+    },
+    "excluded_project_reference": "1A8P1SA WPI 3167248 is not the governing KML/example for this pack",
+    "design_rule": "Only MUTCD-stated regulatory values are populated. Geometry transforms and DWT asset names are explicitly non-regulatory implementation inputs.",
+    "content_sha256": "9402591080b1b03cec63c2aa4b0a022760c960015967b975b2adc11e8e64f3d4"
+  },
+  "01_eligibility_rules": {
+    "all_required": [
+      {
+        "field": "road.lane_count",
+        "operator": "EQ",
+        "value": 2
+      },
+      {
+        "field": "road.traffic_direction",
+        "operator": "EQ",
+        "value": "TWO_WAY"
+      },
+      {
+        "field": "road.divided",
+        "operator": "EQ",
+        "value": false
+      },
+      {
+        "field": "facility_type",
+        "operator": "EQ",
+        "value": "CONVENTIONAL_ROAD"
+      },
+      {
+        "field": "work.location",
+        "operator": "EQ",
+        "value": "BEYOND_SHOULDER"
+      },
+      {
+        "field": "work.encroaches_traveled_way",
+        "operator": "EQ",
+        "value": false
+      },
+      {
+        "field": "work.requires_lane_closure",
+        "operator": "EQ",
+        "value": false
+      },
+      {
+        "field": "work.requires_alternating_one_lane_traffic",
+        "operator": "EQ",
+        "value": false
+      },
+      {
+        "field": "work.affects_pedestrian_route",
+        "operator": "EQ",
+        "value": false
+      },
+      {
+        "field": "site.complex_intersection_conflict",
+        "operator": "EQ",
+        "value": false
+      }
+    ],
+    "on_fail": {
+      "decision": "UNSUPPORTED_POC",
+      "generate_draft": false,
+      "return_failed_conditions": true
+    }
+  },
+  "02_road_work_classification": {
+    "road": {
+      "lane_count": 2,
+      "traffic_direction": "TWO_WAY",
+      "divided": false,
+      "facility_type": "CONVENTIONAL_ROAD"
+    },
+    "work": {
+      "classification": "WORK_BEYOND_SHOULDER",
+      "active_lanes_remain_open": true,
+      "lane_shift": false,
+      "lane_closure": false
+    },
+    "mutcd_basis": "TA-1 Work Beyond the Shoulder"
+  },
+  "03_typical_application_selection": {
+    "selected_ta": "TA-1",
+    "figure": "6P-1",
+    "title": "Work Beyond the Shoulder",
+    "selection_conditions": {
+      "work_location": "BEYOND_SHOULDER",
+      "traveled_way_affected": false
+    },
+    "other_tas_allowed": []
+  },
+  "04_sign_catalog": {
+    "W20-1": {
+      "name": "ROAD WORK AHEAD",
+      "category": "WARNING",
+      "shape": "DIAMOND",
+      "background_color": "ORANGE",
+      "legend_color": "BLACK",
+      "used_by": [
+        "TA-1"
+      ]
+    },
+    "SHOULDER_WORK": {
+      "name": "SHOULDER WORK",
+      "category": "WARNING",
+      "shape": "DIAMOND",
+      "background_color": "ORANGE",
+      "legend_color": "BLACK",
+      "used_as": "TA-1 optional replacement when work is adjacent to shoulder"
+    }
+  },
+  "05_sign_selection_rules": [
+    {
+      "id": "TA1-SIGN-01",
+      "strength": "OPTION",
+      "when": {
+        "work.location": "ADJACENT_TO_SHOULDER"
+      },
+      "action": {
+        "replace": "W20-1",
+        "with": "SHOULDER_WORK"
+      }
+    },
+    {
+      "id": "TA1-SIGN-02",
+      "strength": "OPTION",
+      "when_any": [
+        {
+          "work.behind_barrier": true
+        },
+        {
+          "work.distance_behind_curb_in": ">24"
+        },
+        {
+          "work.distance_from_edge_of_roadway_ft": ">=15"
+        }
+      ],
+      "action": {
+        "W20-1": "MAY_BE_OMITTED"
+      }
+    },
+    {
+      "id": "TA1-SIGN-03",
+      "strength": "OPTION",
+      "when": {
+        "operation_type": [
+          "SHORT_TERM",
+          "SHORT_DURATION",
+          "MOBILE"
+        ],
+        "vehicle_high_intensity_warning_lights": true
+      },
+      "action": {
+        "all_signs_and_channelizing_devices": "MAY_BE_ELIMINATED"
+      }
+    },
+    {
+      "id": "TA1-SIGN-04",
+      "strength": "STANDARD",
+      "when": {
+        "vehicle_hazard_warning_signals": true
+      },
+      "action": {
+        "hazard_signals_cannot_replace_high_intensity_warning_lights": true
+      }
+    }
+  ],
+  "06_advance_warning_spacing_tables": {
+    "table": "6B-1",
+    "units": "ft",
+    "values": [
+      {
+        "road_type": "URBAN_LOW_SPEED",
+        "A": 100,
+        "B": 100,
+        "C": 100
+      },
+      {
+        "road_type": "URBAN_HIGH_SPEED",
+        "A": 350,
+        "B": 350,
+        "C": 350
+      },
+      {
+        "road_type": "RURAL",
+        "A": 500,
+        "B": 500,
+        "C": 500
+      },
+      {
+        "road_type": "EXPRESSWAY_FREEWAY",
+        "A": 1000,
+        "B": 1500,
+        "C": 2640
+      }
+    ],
+    "definitions": {
+      "A": "restriction/transition to nearest sign",
+      "B": "nearest sign to second sign",
+      "C": "second sign to furthest upstream sign"
+    },
+    "application": "Distances are approximate guidance and are adjusted using engineering judgment for field conditions. TA-1 uses the applicable A dimension for W20-1."
+  },
+  "07_taper_formulas": {
+    "table": "6B-3 and 6B-4",
+    "variables": {
+      "L": "taper length, ft",
+      "W": "offset width, ft",
+      "S": "speed, mph"
+    },
+    "base_L": [
+      {
+        "when": "S <= 40",
+        "formula": "L = W * S^2 / 60"
+      },
+      {
+        "when": "S >= 45",
+        "formula": "L = W * S"
+      }
+    ],
+    "taper_types": {
+      "MERGING": "at least L",
+      "SHIFTING": "at least 0.5 * L",
+      "SHOULDER": "at least 0.33 * L",
+      "ONE_LANE_TWO_WAY": {
+        "min_ft": 50,
+        "max_ft": 100
+      }
+    },
+    "active_for_selected_TA": false,
+    "selected_TA_value_ft": 0,
+    "reason": "TA-1 does not shift or close a traveled lane"
+  },
+  "08_buffer_tables": {
+    "table": "6B-2",
+    "name": "Stopping Sight Distance on Level Roads",
+    "units": "ft",
+    "values": [
+      {
+        "speed_mph": 20,
+        "distance_ft": 115
+      },
+      {
+        "speed_mph": 25,
+        "distance_ft": 155
+      },
+      {
+        "speed_mph": 30,
+        "distance_ft": 200
+      },
+      {
+        "speed_mph": 35,
+        "distance_ft": 250
+      },
+      {
+        "speed_mph": 40,
+        "distance_ft": 305
+      },
+      {
+        "speed_mph": 45,
+        "distance_ft": 360
+      },
+      {
+        "speed_mph": 50,
+        "distance_ft": 425
+      },
+      {
+        "speed_mph": 55,
+        "distance_ft": 495
+      },
+      {
+        "speed_mph": 60,
+        "distance_ft": 570
+      },
+      {
+        "speed_mph": 65,
+        "distance_ft": 645
+      },
+      {
+        "speed_mph": 70,
+        "distance_ft": 730
+      },
+      {
+        "speed_mph": 75,
+        "distance_ft": 820
+      }
+    ],
+    "active_for_selected_TA": false,
+    "reason": "No longitudinal buffer is generated for the selected beyond-shoulder POC unless the approved template explicitly requires one"
+  },
+  "09_channelizing_device_rules": {
+    "selected_TA": {
+      "required": false,
+      "devices": []
+    },
+    "general_controls": [
+      "Devices used shall comply with applicable MUTCD provisions",
+      "Devices no longer appropriate shall be removed or covered",
+      "Devices shall be crashworthy where MUTCD crashworthiness provisions apply"
+    ]
+  },
+  "10_lane_width_rules": {
+    "mutcd_numeric_value": null,
+    "selected_TA_changes_lane_width": false,
+    "validation": "Existing traveled lanes remain unchanged; if work or a device reduces usable lane width, case is outside this POC",
+    "note": "No lane-width number is inserted because TA-1 and the cited federal subset do not provide a universal POC lane-width value."
+  },
+  "11_work_vehicle_rules": {
+    "ta1_short_term_option": {
+      "all_signs_and_devices_may_be_eliminated_if_high_intensity_warning_lights_used": true
+    },
+    "hazard_warning_signal_rule": {
+      "may_supplement_high_intensity_lights": true,
+      "may_replace_high_intensity_lights": false
+    },
+    "placement": {
+      "must_remain_outside_traveled_way": true,
+      "if_encroachment_detected": "UNSUPPORTED_POC"
+    }
+  },
+  "12_sign_placement_rules": {
+    "W20-1": {
+      "approach": "approaching traffic",
+      "longitudinal_distance": "Table 6B-1 A for resolved road type",
+      "lateral_position": "outside traveled way on appropriate roadside",
+      "visibility": "must be visible to approaching road users",
+      "conflict_adjustment": "may be adjusted for intersections, major driveways, reaction time, and field conditions using engineering judgment"
+    },
+    "sign_support": "Each generated sign object references an approved sign/support asset; exact support geometry is outside this rule pack"
+  },
+  "13_station_offset_formulas": {
+    "regulatory_status": "IMPLEMENTATION_GEOMETRY_NOT_MUTCD_VALUE",
+    "stationing": {
+      "origin": "projected work-reference point on selected road centerline",
+      "upstream_station": "origin_station - rule_distance_ft",
+      "downstream_station": "origin_station + rule_distance_ft"
+    },
+    "offset": {
+      "reference": "derived roadway edge",
+      "direction": "away from traveled way",
+      "distance": "renderer/site-geometry configuration; no invented regulatory number"
+    },
+    "geodesic_conversion": "interpolate along georeferenced centerline by station, then offset using local normal"
+  },
+  "14_orientation_rules": {
+    "regulatory_status": "IMPLEMENTATION_GEOMETRY_NOT_MUTCD_VALUE",
+    "rule": "Face sign toward the approaching traffic stream so its message is visible to intended road users",
+    "calculation": "sign_face_azimuth = normalize(local_approach_bearing + 180 degrees)",
+    "dwt_rotation_correction": "EXTERNAL_DWT_CONFIGURATION"
+  },
+  "15_work_zone_geometry": {
+    "areas": {
+      "ADVANCE_WARNING": {
+        "active": true
+      },
+      "TRANSITION": {
+        "active": false
+      },
+      "ACTIVITY": {
+        "active": true
+      },
+      "TERMINATION": {
+        "active": false
+      }
+    },
+    "work_area": {
+      "source": "KML point/line plus confirmed site observations",
+      "must_be_beyond_shoulder": true,
+      "must_not_intersect_traveled_way": true
+    },
+    "roadside_recovery": "Provide unencumbered recovery/clear area where practical; equipment and materials positioned to reduce run-off-road exposure"
+  },
+  "16_termination_rules": {
+    "selected_TA": {
+      "termination_sign_required": false,
+      "downstream_taper_required": false
+    },
+    "general": "Remove or cover TTC devices as soon as practical when no longer needed"
+  },
+  "17_exceptions_optional_devices": {
+    "ta1_options": [
+      "ROAD WORK AHEAD may be replaced with an appropriate sign such as SHOULDER WORK",
+      "ROAD WORK AHEAD may be omitted when work is behind a barrier, more than 24 inches behind curb, or at least 15 feet from roadway edge",
+      "For short-term, short-duration, or mobile work, signs/devices may be eliminated when a vehicle uses activated high-intensity warning lights",
+      "Vehicle hazard warning signals may supplement, but shall not replace, high-intensity warning lights"
+    ],
+    "automation_policy": "Optional deletions are executed only when the corresponding structured condition is confirmed"
+  },
+  "18_validation_rules": [
+    {
+      "id": "VAL-ELIGIBILITY",
+      "check": "all 01 eligibility rules pass",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "VAL-TA",
+      "check": "selected TA is TA-1 and its applicability conditions pass",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "VAL-SIGN",
+      "check": "W20-1 exists unless a documented TA-1 option applies",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "VAL-SPACING",
+      "check": "W20-1 longitudinal distance equals applicable Table 6B-1 A value before documented field adjustment",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "VAL-LANE",
+      "check": "work, vehicle, signs and devices do not intersect traveled way",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "VAL-PED",
+      "check": "no pedestrian route impact",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "VAL-CONFLICT",
+      "check": "sign is not hidden and does not create unresolved driveway/intersection conflict",
+      "severity": "BLOCK"
+    },
+    {
+      "id": "VAL-TRACE",
+      "check": "every object records rule_pack, TA, rule/table and source reference",
+      "severity": "BLOCK"
+    }
+  ],
+  "19_dwt_block_mapping": {
+    "regulatory_status": "NON_MUTCD_RENDERER_CONFIGURATION",
+    "layers": {
+      "aerial": "TCP-AERIAL",
+      "road_centerline": "TCP-CENTERLINE",
+      "road_edges": "TCP-ROAD-EDGE",
+      "work_area": "TCP-WORK-AREA",
+      "signs": "TCP-SIGNS",
+      "work_vehicle": "TCP-WORK-VEHICLE",
+      "dimensions": "TCP-DIMENSIONS",
+      "notes": "TCP-NOTES"
+    },
+    "blocks": {
+      "W20-1": "REQUIRED_APPROVED_DWT_BLOCK_W20_1",
+      "SHOULDER_WORK": "REQUIRED_APPROVED_DWT_BLOCK_SHOULDER_WORK",
+      "WORK_LOCATION": "REQUIRED_APPROVED_DWT_BLOCK_WORK_LOCATION",
+      "WORK_VEHICLE": "REQUIRED_APPROVED_DWT_BLOCK_WORK_VEHICLE"
+    },
+    "required_title_fields": [
+      "plan_id",
+      "plan_version",
+      "rule_pack_id",
+      "rule_pack_version",
+      "rule_pack_hash",
+      "TA_id",
+      "site_model_id",
+      "DWT_version",
+      "generated_timestamp"
+    ],
+    "draft_marking": "AUTOMATED DRAFT - NOT APPROVED FOR FIELD USE",
+    "render_block_if_missing_asset": true
+  }
+}

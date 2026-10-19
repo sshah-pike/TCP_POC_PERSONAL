@@ -1,0 +1,120 @@
+{
+  "config_id": "TCP_POC_IMPLEMENTATION_CONFIG",
+  "version": "1.0.0",
+  "regulatory_status": "IMPLEMENTATION_GEOMETRY_NOT_MUTCD_VALUE",
+  "note": "Implementation, scope and evidence-quality settings only. No MUTCD value lives here; all regulatory values come from the approved rule pack.",
+  "supported_road_types": [
+    "URBAN_LOW_SPEED",
+    "URBAN_HIGH_SPEED",
+    "RURAL"
+  ],
+  "imagery": {
+    "width_px": 1280,
+    "height_px": 1280,
+    "ai_image_px": 1024,
+    "wide_image_px": 1280,
+    "sheet_px": 2560,
+    "analysis_margin_m": 60.0
+  },
+  "agent": {
+    "max_model_calls": 2,
+    "agreement_floor": 0.5,
+    "agreement_osm_max_age_years": 5,
+    "agreement_fields": {
+      "lane_count": ["lanes"],
+      "two_way": ["oneway"],
+      "divided": ["divider", "dual_carriageway"],
+      "sidewalks": ["sidewalk", "sidewalk:left", "sidewalk:right"],
+      "road_width": ["width"]
+    }
+  },
+  "crops": {
+    "primary_zoom": 19,
+    "fallback_zoom": 19,
+    "corridor_zoom": 18,
+    "image_px": 1024,
+    "min_px_per_lane": 15,
+    "max_images_call2": 6,
+    "dedupe_min_separation_ratio": 0.5,
+    "field_map": {
+      "road_edges": ["work_point"],
+      "lane_count": ["work_point"],
+      "two_way": ["work_point"],
+      "divided": ["work_point"],
+      "shoulders": ["work_point"],
+      "work_side": ["work_point"],
+      "work_location": ["work_point"],
+      "lane_markings": ["work_point"],
+      "pedestrian": ["work_side"],
+      "features": ["corridor"],
+      "sign_clearance": ["sign_location"],
+      "feature_no_position": ["feature_location"]
+    }
+  },
+  "consistency": {
+    "enabled": true,
+    "width_tolerance_m": 1.0,
+    "fields": ["road_width", "lane_count", "work_side", "work_location"]
+  },
+  "cross_section": {
+    "enabled": true,
+    "require_verified_centerline": true,
+    "measure_sign_locations": true,
+    "sections": 3,
+    "section_spacing_m": 6.0,
+    "profile_half_length_m": 18.0,
+    "sample_step_m": 0.05,
+    "line_background_window_m": 2.0,
+    "line_min_contrast": 22,
+    "yellow_min_contrast": 12,
+    "line_max_chroma": 45,
+    "yellow_min_rb": 22,
+    "line_merge_gap_m": 0.12,
+    "line_max_width_m": 0.9,
+    "symmetry_tolerance_m": 1.0,
+    "max_section_spread_m": 0.5,
+    "min_valid_sections": 2,
+    "max_centerline_correction_m": 6.0,
+    "centerline_resample_m": 5.0
+  },
+  "sharpness": {
+    "enabled": true,
+    "min_detail_gain_ratio": 1.15,
+    "uniform_max_std": 3.0
+  },
+  "extras": {
+    "max_items": 5,
+    "categories": ["barrier_guardrail", "curb", "shoulder_width", "curve_or_hill", "parking", "turn_lane", "median",
+                   "bike_lane", "regulatory_or_speed_sign"]
+  },
+  "osm": {
+    "extra_radius_m": 50.0,
+    "endpoint_join_tolerance_m": 1.0,
+    "feature_attach_distance_m": 4.0,
+    "node_attach_distance_m": 15.0
+  },
+  "input": {
+    "max_work_path_m": 150.0
+  },
+  "fusion": {
+    "min_critical_confidence": 0.7,
+    "osm_tag_confidence": 0.9,
+    "osm_implicit_confidence": 0.6,
+    "road_width_conflict_tolerance_m": 1.5,
+    "width_max_measure_mpp": 0.25,
+    "work_side_min_lateral_m": 0.5,
+    "pedestrian_conflict_radius_m": 30.0,
+    "max_work_to_centerline_m": 40.0,
+    "work_side_geometry_min_distance_m": 3.0,
+    "lane_width_plausible_m": [2.4, 5.5],
+    "encroachment_tolerance_m": 1.5,
+    "centerline_error_allowance_m": 2.5
+  },
+  "eligibility": {
+    "intersection_window_margin_m": 30.0
+  },
+  "placement": {
+    "sign_offset_beyond_edge_m": 2.0,
+    "sign_feature_clearance_m": 15.0
+  }
+}

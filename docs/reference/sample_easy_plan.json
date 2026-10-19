@@ -1,0 +1,124 @@
+{
+ "location": [
+  33.0,
+  -97.0
+ ],
+ "speed_mph": 35,
+ "lanes": 2,
+ "verdict": "EASY, with items to review",
+ "blockers": [],
+ "review": [
+  "driveway at -165 ft from work start"
+ ],
+ "ask_user": [],
+ "ai_reading": {
+  "lane_count_total": 2,
+  "lane_markings_visible": true,
+  "shoulder_present": true,
+  "sidewalks_present": false,
+  "driveways_count": 1,
+  "intersections_visible": false,
+  "crosswalks_visible": false,
+  "parked_vehicles_count": 0,
+  "poles_visible": false,
+  "image_quality": "good",
+  "confidence": 0.8,
+  "notes": "SIMULATED AI OUTPUT (offline self-test)"
+ },
+ "scale_ft_per_px": 1.282,
+ "devices": [
+  {
+   "type": "sign",
+   "kind": "advance",
+   "st": 98.58,
+   "off": 5.66,
+   "x": -151.14,
+   "y": -21.87,
+   "id": "S1",
+   "code": "W20-1",
+   "text": "ROAD WORK AHEAD",
+   "ft_from_work_start": -500
+  },
+  {
+   "type": "sign",
+   "kind": "advance",
+   "st": 159.54,
+   "off": 5.66,
+   "x": -90.21,
+   "y": -16.35,
+   "id": "S2",
+   "code": "W20-1",
+   "text": "ROAD WORK AHEAD",
+   "ft_from_work_start": -300
+  },
+  {
+   "type": "sign",
+   "kind": "advance",
+   "st": 220.5,
+   "off": 5.66,
+   "x": -29.57,
+   "y": -9.37,
+   "id": "S3",
+   "code": "W20-1",
+   "text": "ROAD WORK AHEAD",
+   "ft_from_work_start": -100
+  },
+  {
+   "type": "cone",
+   "st": 220.5,
+   "off": 3.96,
+   "x": -29.77,
+   "y": -7.68,
+   "id": "C1",
+   "ft_from_work_start": -100
+  },
+  {
+   "type": "cone",
+   "st": 229.64,
+   "off": 3.46,
+   "x": -20.75,
+   "y": -6.07,
+   "id": "C2",
+   "ft_from_work_start": -70
+  },
+  {
+   "type": "cone",
+   "st": 238.78,
+   "off": 2.96,
+   "x": -11.73,
+   "y": -4.44,
+   "id": "C3",
+   "ft_from_work_start": -40
+  },
+  {
+   "type": "cone",
+   "st": 247.93,
+   "off": 2.46,
+   "x": -2.72,
+   "y": -2.82,
+   "id": "C4",
+   "ft_from_work_start": -10
+  },
+  {
+   "type": "cone",
+   "st": 269.26,
+   "off": 2.46,
+   "x": 18.45,
+   "y": -0.18,
+   "id": "C5",
+   "ft_from_work_start": 60
+  },
+  {
+   "type": "sign",
+   "kind": "end",
+   "st": 311.94,
+   "off": 5.66,
+   "x": 61.16,
+   "y": 1.74,
+   "id": "S4",
+   "code": "G20-2",
+   "text": "END ROAD WORK",
+   "ft_from_work_start": 200
+  }
+ ]
+}

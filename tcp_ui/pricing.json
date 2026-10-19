@@ -1,0 +1,27 @@
+{
+  "_note": "UI-only. Per-million-token USD prices used to ESTIMATE AI cost from the usage the Anthropic API actually returned. Prices are intentionally null: fill them in from official Anthropic pricing (and set 'source') before any cost is shown. While a needed price is null the UI shows 'Not Available', never $0. Keys are the model id reported in the API response. The 'foundry' section is for Claude deployed in Microsoft Foundry (billed through Azure); keys are the model id the response reports.",
+  "source": null,
+  "currency": "USD",
+  "anthropic": {
+    "claude-opus-5-5": {
+      "input_per_mtok": null,
+      "output_per_mtok": null,
+      "cache_write_per_mtok": null,
+      "cache_read_per_mtok": null
+    },
+    "claude-sonnet-5-5": {
+      "input_per_mtok": null,
+      "output_per_mtok": null,
+      "cache_write_per_mtok": null,
+      "cache_read_per_mtok": null
+    }
+  },
+  "foundry": {
+    "claude-opus-5-5": {
+      "input_per_mtok": null,
+      "output_per_mtok": null,
+      "cache_write_per_mtok": null,
+      "cache_read_per_mtok": null
+    }
+  }
+}

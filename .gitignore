@@ -1,0 +1,42 @@
+# Secrets / local config (keep .env.example)
+.env
+.env.*
+!.env.example
+
+# Backups and archives
+backup/
+*.zip
+*.bak
+*- Copy*
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.coverage
+htmlcov/
+
+# Node / frontend build
+node_modules/
+dist/
+
+# Generated output / run artifacts
+runs/
+labels/
+output/
+debug_sent/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Claude Code local settings
+.claude/settings.local.json
