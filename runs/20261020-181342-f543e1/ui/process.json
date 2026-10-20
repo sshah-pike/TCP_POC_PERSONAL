@@ -1,0 +1,11 @@
+{
+  "ended_at": "2026-10-20T12:48:41.837+00:00",
+  "exit_code": 1,
+  "pid": 12384,
+  "started_at": "2026-10-20T12:43:42.458+00:00",
+  "state": "FINISHED",
+  "unhandled_error": {
+    "error_code": "RUN_STOPPED",
+    "message": "run stopped by the user"
+  }
+}

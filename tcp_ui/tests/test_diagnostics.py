@@ -59,11 +59,11 @@ class FakeResponse:
 
 
 def assert_fail_closed(code, st, rdir):
-    assert code == 3 and st["decision"] == "REVIEW_REQUIRED"
+    assert code == 3 and st["decision"] == "ERROR"
     assert st["reason_codes"] == EXPECTED_CODES
     assert not st["draft_generated"] and not ({o["name"] for o in st["outputs"]} & DRAFT)
     stages = {s["key"]: s for s in st["stages"]}
-    assert stages["imagery"]["status"] == "REVIEW"
+    assert stages["imagery"]["status"] == "ERROR"
     assert all(stages[k]["status"] == "NOT_RUN" for k in ("osm", "vision", "fusion", "eligibility", "render"))
     with open(os.path.join(rdir, "output", "eligibility_result.json"), encoding="utf-8") as f:
         assert json.load(f)["reason_codes"] == EXPECTED_CODES
@@ -157,7 +157,7 @@ def test_osm_tls_failure_after_imagery_succeeds(inproc):
                           "certificate chain (_ssl.c:1032)')))")
 
     code, st, rdir = inproc(fake_get)
-    assert code == 3 and st["decision"] == "REVIEW_REQUIRED"
+    assert code == 3 and st["decision"] == "ERROR"
     assert st["reason_codes"] == ["OSM_CONTEXT_UNAVAILABLE", "OSM_REQUEST_FAILED"]
     stages = {s["key"]: s for s in st["stages"]}
     assert stages["imagery"]["status"] == "COMPLETED" and stages["imagery"]["diagnostics"] == []

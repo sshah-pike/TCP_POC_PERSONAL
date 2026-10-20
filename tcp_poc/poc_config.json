@@ -14,6 +14,7 @@
     "ai_image_px": 1024,
     "wide_image_px": 1280,
     "sheet_px": 2560,
+    "sheet_single_request": true,
     "analysis_margin_m": 60.0
   },
   "agent": {
@@ -60,6 +61,7 @@
     "enabled": true,
     "require_verified_centerline": true,
     "measure_sign_locations": true,
+    "sign_locations_only_if_unresolved": true,
     "sections": 3,
     "section_spacing_m": 6.0,
     "profile_half_length_m": 18.0,

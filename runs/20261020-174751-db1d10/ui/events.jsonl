@@ -1,0 +1,45 @@
+{"attributes": {"input_type": "KML"}, "event": "span_start", "name": "tcp.input.parse", "t": "2026-10-20T12:17:53.638+00:00"}
+{"attributes": {"features": 1, "input_hash": "sha256:391ef33639ff", "input_type": "KML"}, "duration_ms": 1.2, "event": "span_end", "name": "tcp.input.parse", "status": "OK", "t": "2026-10-20T12:17:53.640+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.rulepack.load", "t": "2026-10-20T12:17:53.641+00:00"}
+{"attributes": {"rule_pack_hash": "9402591080b1b03c", "rule_pack_id": "APPROVED_TWO_LANE_POC_RULE_PACK", "rule_pack_version": "1.0.0"}, "duration_ms": 6.7, "event": "span_end", "name": "tcp.rulepack.load", "status": "OK", "t": "2026-10-20T12:17:53.648+00:00"}
+{"attributes": {"provider": "azure_maps"}, "event": "span_start", "name": "tcp.map.retrieve", "t": "2026-10-20T12:17:53.649+00:00"}
+{"action": "saved", "artifact_id": "map_1", "event": "evidence", "file": "map_1.png", "kind": "map", "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1", "span": "tcp.map.retrieve", "t": "2026-10-20T12:17:55.779+00:00"}
+{"attributes": {"metres_per_pixel": 0.447835, "provider": "azure_maps", "width_px": 1280}, "duration_ms": 2126.9, "event": "span_end", "name": "tcp.map.retrieve", "status": "OK", "t": "2026-10-20T12:17:55.780+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.osm.resolve", "t": "2026-10-20T12:17:55.780+00:00"}
+{"action": "saved", "artifact_id": "osm_1", "event": "evidence", "file": "osm_1.json", "kind": "osm", "sha256": "d9608ab27271194ce1ddef6eca85b41b596f7220f1b1a94f0caa78be52bbe438", "span": "tcp.osm.resolve", "t": "2026-10-20T12:17:57.468+00:00"}
+{"attributes": {"highway": "secondary", "way_count": 1}, "duration_ms": 1693.0, "event": "span_end", "name": "tcp.osm.resolve", "status": "OK", "t": "2026-10-20T12:17:57.473+00:00"}
+{"attributes": {"api": "openai_responses", "deployment": "gpt-5.6-sol", "profile": "gpt-5.6-sol", "provider": "foundry"}, "event": "span_start", "name": "tcp.vision.analyze", "t": "2026-10-20T12:17:57.474+00:00"}
+{"attributes": {"deployment": "gpt-5.6-sol", "provider": "foundry", "purpose": "wide image, blind to OSM", "views_sent": 1}, "event": "span_start", "name": "tcp.agent.call1", "t": "2026-10-20T12:17:57.475+00:00"}
+{"action": "saved", "artifact_id": "ai_1", "event": "evidence", "file": "ai_1.json", "kind": "ai", "sha256": "d98324e98c8f892c156b96fd3fb24788a44b06d76c950c09b4daf35408d422a9", "span": "tcp.vision.analyze", "t": "2026-10-20T12:19:20.883+00:00"}
+{"attributes": {"deployment": "gpt-5.6-sol", "error_code": null, "model": "gpt-5.6-sol", "outcome": "OK", "provider": "foundry", "purpose": "wide image, blind to OSM", "usage_in": 3181, "usage_out": 5747, "views_sent": 1}, "duration_ms": 83406.8, "event": "span_end", "name": "tcp.agent.call1", "status": "OK", "t": "2026-10-20T12:19:20.883+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.agent.compare", "t": "2026-10-20T12:19:20.883+00:00"}
+{"attributes": {"outcome": "UNRESOLVED", "unresolved": "road_edges"}, "duration_ms": 2.9, "event": "span_end", "name": "tcp.agent.compare", "status": "OK", "t": "2026-10-20T12:19:20.887+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.agent.measure", "t": "2026-10-20T12:19:20.887+00:00"}
+{"action": "saved", "artifact_id": "map_crop_1", "event": "evidence", "file": "map_crop_1.png", "kind": "map_crop", "sha256": "959768acb820394177caddc81758ec4af20d3660c34a508337ff19645cf6ebe0", "span": "tcp.vision.analyze", "t": "2026-10-20T12:19:22.442+00:00"}
+{"action": "saved", "artifact_id": "map_crop_2", "event": "evidence", "file": "map_crop_2.png", "kind": "map_crop", "sha256": "2a297f4f69b6afeded37e5d2bfd9bce9488e94fcc3db582a9d9d0f1a5fc82ba8", "span": "tcp.vision.analyze", "t": "2026-10-20T12:19:24.639+00:00"}
+{"action": "saved", "artifact_id": "map_crop_3", "event": "evidence", "file": "map_crop_3.png", "kind": "map_crop", "sha256": "4cdffbd57ae0d476d2eba7b4430ba3f251aa1cf2e2ffa21063a90cf93fa2a588", "span": "tcp.vision.analyze", "t": "2026-10-20T12:19:26.310+00:00"}
+{"attributes": {"centre_offset": 2.85, "outcome": "OK", "views": 3, "width": 7.25}, "duration_ms": 5436.3, "event": "span_end", "name": "tcp.agent.measure", "status": "OK", "t": "2026-10-20T12:19:26.324+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.agent.crops", "t": "2026-10-20T12:19:26.390+00:00"}
+{"attributes": {"outcome": "SKIPPED", "reason": "nothing unresolved after call 1 and measurement"}, "duration_ms": 0.0, "event": "span_end", "name": "tcp.agent.crops", "status": "OK", "t": "2026-10-20T12:19:26.391+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.agent.call2", "t": "2026-10-20T12:19:26.391+00:00"}
+{"attributes": {"outcome": "SKIPPED", "reason": "nothing unresolved after call 1 and measurement"}, "duration_ms": 0.0, "event": "span_end", "name": "tcp.agent.call2", "status": "OK", "t": "2026-10-20T12:19:26.392+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.agent.consistency", "t": "2026-10-20T12:19:26.392+00:00"}
+{"attributes": {"outcome": "SKIPPED", "reason": "nothing unresolved after call 1 and measurement"}, "duration_ms": 0.0, "event": "span_end", "name": "tcp.agent.consistency", "status": "OK", "t": "2026-10-20T12:19:26.392+00:00"}
+{"attributes": {"api": "openai_responses", "crops": 0, "deployment": "gpt-5.6-sol", "model": "gpt-5.6-sol", "model_calls": 1, "profile": "gpt-5.6-sol", "provider": "foundry", "status_code": "OK"}, "duration_ms": 88917.2, "event": "span_end", "name": "tcp.vision.analyze", "status": "OK", "t": "2026-10-20T12:19:26.393+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.fuse", "t": "2026-10-20T12:19:26.393+00:00"}
+{"attributes": {"conflicts": 0, "inputs_complete": true, "site_model_id": "SITE-34D3C17B47E11B6E"}, "duration_ms": 63.0, "event": "span_end", "name": "tcp.site.fuse", "status": "OK", "t": "2026-10-20T12:19:26.456+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.eligibility", "t": "2026-10-20T12:19:26.463+00:00"}
+{"attributes": {"decision": "SUPPORTED_AUTO", "reason_codes": ""}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.site.eligibility", "status": "OK", "t": "2026-10-20T12:19:26.463+00:00"}
+{"attributes": {"ta_id": "TA-1"}, "event": "span_start", "name": "tcp.rules.execute", "t": "2026-10-20T12:19:26.464+00:00"}
+{"attributes": {"objects": 3, "options": 0, "ta_id": "TA-1"}, "duration_ms": 0.2, "event": "span_end", "name": "tcp.rules.execute", "status": "OK", "t": "2026-10-20T12:19:26.465+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.geometry.place", "t": "2026-10-20T12:19:26.465+00:00"}
+{"attributes": {"issues": ""}, "duration_ms": 1.6, "event": "span_end", "name": "tcp.geometry.place", "status": "OK", "t": "2026-10-20T12:19:26.467+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.plan.validate", "t": "2026-10-20T12:19:26.468+00:00"}
+{"attributes": {"geometry": "PASS", "rule": "PASS"}, "duration_ms": 4.4, "event": "span_end", "name": "tcp.plan.validate", "status": "OK", "t": "2026-10-20T12:19:26.473+00:00"}
+{"attributes": {"plan_id": "TCP-47B5EDABBAE47832"}, "event": "span_start", "name": "tcp.debug.render", "t": "2026-10-20T12:19:26.489+00:00"}
+{"attributes": {"plan_id": "TCP-47B5EDABBAE47832"}, "duration_ms": 4381.6, "event": "span_end", "name": "tcp.debug.render", "status": "OK", "t": "2026-10-20T12:19:30.871+00:00"}
+{"attributes": {"plan_id": "TCP-47B5EDABBAE47832"}, "event": "span_start", "name": "tcp.sheet.render", "t": "2026-10-20T12:19:30.872+00:00"}
+{"action": "saved", "artifact_id": "map_2", "event": "evidence", "file": "map_2.png", "kind": "map", "sha256": "21dc1ba28751812aca804b0b18f5106bdf434f3e0e8f089f970ba58d41f5c26a", "span": "tcp.sheet.render", "t": "2026-10-20T12:19:38.951+00:00"}
+{"attributes": {"plan_id": "TCP-47B5EDABBAE47832", "scale_ft_per_in": 50, "status_code": "RENDERED"}, "duration_ms": 27214.1, "event": "span_end", "name": "tcp.sheet.render", "status": "OK", "t": "2026-10-20T12:19:58.087+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.dwt.render", "t": "2026-10-20T12:19:58.087+00:00"}
+{"attributes": {"status_code": "SKIPPED_NO_DWT_CONFIG"}, "duration_ms": 0.0, "event": "span_end", "name": "tcp.dwt.render", "status": "OK", "t": "2026-10-20T12:19:58.088+00:00"}

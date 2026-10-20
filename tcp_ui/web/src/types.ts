@@ -1,8 +1,8 @@
 // Shapes returned by tcp_ui/server.py (see tcp_ui/store.py). Display-only.
 
 export type StageStatus =
-  | "WAITING" | "RUNNING" | "COMPLETED" | "WARNING" | "REVIEW" | "FAILED" | "UNSUPPORTED" | "NOT_RUN";
-export type Decision = "SUPPORTED_AUTO" | "REVIEW_REQUIRED" | "UNSUPPORTED_POC" | "FAILED" | "STOPPED";
+  | "WAITING" | "RUNNING" | "COMPLETED" | "WARNING" | "REVIEW" | "ERROR" | "FAILED" | "UNSUPPORTED" | "NOT_RUN";
+export type Decision = "SUPPORTED_AUTO" | "REVIEW_REQUIRED" | "ERROR" | "UNSUPPORTED_POC" | "FAILED" | "STOPPED";
 export type InputType = "kml" | "coordinates" | "offline";
 
 export interface Span {

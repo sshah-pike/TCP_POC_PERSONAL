@@ -1,0 +1,165 @@
+{
+  "backend": "openai_responses",
+  "centerline_views": false,
+  "deployment": "gpt-5.6-sol",
+  "duration_ms": 56089.0,
+  "evidence_mode": "single",
+  "osm_claims": false,
+  "profile": "gpt-5.6-sol",
+  "provider": "foundry",
+  "request": {
+    "api": "openai_responses",
+    "effort": "high",
+    "images_sha256": "33f9edaedb6b2cb4c77bfc52428d545ae9e0ed4ed24d2b41309d14260303a0c6",
+    "model": "gpt-5.6-sol",
+    "profile": "gpt-5.6-sol",
+    "prompt_sha256": "d91ad71f0764e07769b7489b42e422f7fde80ca7958d7fe6f302da8f1d8cf940",
+    "schema_sha256": "e42647478ef479d9d5a9724bf0813ecac46cf8bdda44b28fd00ed39b33ec9ab7"
+  },
+  "result": {
+    "debug_sent": null,
+    "deployment": "gpt-5.6-sol",
+    "evidence_mode": "single",
+    "foundry_api": "openai_responses",
+    "grounding": {
+      "checks": [
+        {
+          "detail": {
+            "appears_outside": true,
+            "distance_to_nearest_edge_m": 10.0,
+            "relative_position": "BEYOND_SHOULDER"
+          },
+          "id": "C1_WORK_VS_DISTANCE",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "lane_count_total": 2,
+            "reasons": [],
+            "traveled_way_width_m": 8.0
+          },
+          "id": "C2_WIDTH_VS_EDGES",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "action": null,
+            "geometry_side": "RIGHT",
+            "model_side": "RIGHT"
+          },
+          "id": "C3_SIDE_VS_GEOMETRY",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "note": "OSM claims switch off"
+          },
+          "id": "C4_JUNCTIONS_VS_OSM",
+          "result": "NOT_APPLICABLE"
+        }
+      ],
+      "claims": null,
+      "evidence": null,
+      "extras": [],
+      "format": "agent-call1-v1",
+      "images": [
+        {
+          "annotation": "annot-v1",
+          "image": "IMAGE_1",
+          "model_input_sha256": "bb755cf25c035f6c982d00de151351923b16e85cca338f167abbdcace4b503b9",
+          "raw_pixel_sha256": "ec9c6115d188775dcb2006c7d77238400c508bc428b953b1615e8537602d6047",
+          "work_reference_px": [
+            640.0,
+            640.0
+          ]
+        }
+      ],
+      "measurements": {
+        "distance_measured_in": "IMAGE_1",
+        "distance_to_nearest_edge_m": 10.0,
+        "traveled_way_width_m": 8.0,
+        "width_measured_in": "IMAGE_1"
+      },
+      "osm_claim_checks": null
+    },
+    "model": "gpt-5.6-sol",
+    "observation": {
+      "attribute_confidence": {
+        "divided_road": 0.98,
+        "intersection_conflict": 0.93,
+        "lane_count_total": 0.92,
+        "outside_traveled_way": 0.96,
+        "pedestrian_impact": 0.95,
+        "road_edges": 0.84,
+        "two_way_visible": 0.88,
+        "work_side": 0.99
+      },
+      "divided_road_visible": false,
+      "features": {
+        "crosswalks": [],
+        "driveways": [],
+        "intersections": [],
+        "obstructions": [
+          {
+            "confidence": 0.97,
+            "description": "Dense trees and vegetation beside the road near the work reference",
+            "image_x": 640.0,
+            "image_y": 610.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.95,
+            "description": "Dense trees and vegetation along the opposite roadside",
+            "image_x": 640.0,
+            "image_y": 720.0,
+            "side": "LEFT"
+          }
+        ],
+        "ramps": [],
+        "roundabouts": []
+      },
+      "image_quality": "FAIR",
+      "lane_count_total": 2,
+      "lane_markings_visible": true,
+      "notes": "The selected road is nearly straight through the image. Width and work-reference distance are approximate measurements from the wide overview.",
+      "osm_conflicts": [],
+      "road_edges": {
+        "left_visible": true,
+        "right_visible": true,
+        "traveled_way_width_px": 17.91
+      },
+      "shoulders": {
+        "left_present": true,
+        "right_present": true
+      },
+      "sidewalks": {
+        "left_present": false,
+        "right_present": false
+      },
+      "two_way_visible": true,
+      "work_reference": {
+        "appears_outside_traveled_way": true,
+        "appears_roadside": true,
+        "relative_position": "BEYOND_SHOULDER",
+        "side": "RIGHT"
+      }
+    },
+    "profile": "gpt-5.6-sol",
+    "provider": "foundry",
+    "raw_response": "{\"lane_count_total\":2,\"two_way_visible\":\"YES\",\"divided_road_visible\":\"NO\",\"lane_markings_visible\":\"YES\",\"road_edges\":{\"left_visible\":true,\"right_visible\":true,\"traveled_way_width_m\":8.0,\"width_measured_in\":\"IMAGE_1\"},\"shoulders\":{\"left_present\":\"YES\",\"right_present\":\"YES\"},\"sidewalks\":{\"left_present\":\"NO\",\"right_present\":\"NO\"},\"work_reference\":{\"appears_roadside\":\"YES\",\"side\":\"RIGHT\",\"appears_outside_traveled_way\":\"YES\",\"relative_position\":\"BEYOND_SHOULDER\",\"distance_to_nearest_edge_m\":10.0,\"distance_measured_in\":\"IMAGE_1\"},\"features\":{\"intersections\":[],\"driveways\":[],\"crosswalks\":[],\"roundabouts\":[],\"ramps\":[],\"obstructions\":[{\"description\":\"Dense trees and vegetation beside the road near the work reference\",\"side\":\"RIGHT\",\"confidence\":0.97,\"image\":\"IMAGE_1\",\"x\":640,\"y\":610},{\"description\":\"Dense trees and vegetation along the opposite roadside\",\"side\":\"LEFT\",\"confidence\":0.95,\"image\":\"IMAGE_1\",\"x\":640,\"y\":720}]},\"image_quality\":\"FAIR\",\"attribute_confidence\":{\"lane_count_total\":0.92,\"two_way_visible\":0.88,\"divided_road\":0.98,\"road_edges\":0.84,\"work_side\":0.99,\"outside_traveled_way\":0.96,\"intersection_conflict\":0.93,\"pedestrian_impact\":0.95},\"notes\":\"The selected road is nearly straight through the image. Width and work-reference distance are approximate measurements from the wide overview.\",\"extras\":[]}",
+    "request_id": "resp_00a5aacf9c4dd5d3006ad77432f0148193bde6e989c6ed4a77",
+    "usage": {
+      "cache_creation_input_tokens": 3178,
+      "cache_read_input_tokens": 0,
+      "input_tokens": 3181,
+      "output_tokens": 3830,
+      "reasoning_tokens": 3467
+    },
+    "views": [],
+    "vision_mode": "agent_call1",
+    "wire_format": "tri-state-v1"
+  },
+  "status": "OK",
+  "views": [],
+  "vision_mode": "agent_call1"
+}

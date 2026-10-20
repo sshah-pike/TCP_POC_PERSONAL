@@ -1,0 +1,12 @@
+{"attributes": {"input_type": "KML"}, "event": "span_start", "name": "tcp.input.parse", "t": "2026-10-20T12:43:56.544+00:00"}
+{"attributes": {"features": 1, "input_hash": "sha256:391ef33639ff", "input_type": "KML"}, "duration_ms": 1.2, "event": "span_end", "name": "tcp.input.parse", "status": "OK", "t": "2026-10-20T12:43:56.546+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.rulepack.load", "t": "2026-10-20T12:43:56.548+00:00"}
+{"attributes": {"rule_pack_hash": "9402591080b1b03c", "rule_pack_id": "APPROVED_TWO_LANE_POC_RULE_PACK", "rule_pack_version": "1.0.0"}, "duration_ms": 6.0, "event": "span_end", "name": "tcp.rulepack.load", "status": "OK", "t": "2026-10-20T12:43:56.554+00:00"}
+{"attributes": {"provider": "azure_maps"}, "event": "span_start", "name": "tcp.map.retrieve", "t": "2026-10-20T12:43:56.555+00:00"}
+{"action": "saved", "artifact_id": "map_1", "event": "evidence", "file": "map_1.png", "kind": "map", "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1", "span": "tcp.map.retrieve", "t": "2026-10-20T12:43:59.176+00:00"}
+{"attributes": {"metres_per_pixel": 0.447835, "provider": "azure_maps", "width_px": 1280}, "duration_ms": 2616.5, "event": "span_end", "name": "tcp.map.retrieve", "status": "OK", "t": "2026-10-20T12:43:59.176+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.osm.resolve", "t": "2026-10-20T12:43:59.177+00:00"}
+{"action": "saved", "artifact_id": "osm_1", "event": "evidence", "file": "osm_1.json", "kind": "osm", "sha256": "d9608ab27271194ce1ddef6eca85b41b596f7220f1b1a94f0caa78be52bbe438", "span": "tcp.osm.resolve", "t": "2026-10-20T12:44:00.865+00:00"}
+{"attributes": {"highway": "secondary", "way_count": 1}, "duration_ms": 1693.9, "event": "span_end", "name": "tcp.osm.resolve", "status": "OK", "t": "2026-10-20T12:44:00.871+00:00"}
+{"attributes": {"api": "openai_responses", "deployment": "gpt-5.6-sol", "profile": "gpt-5.6-sol", "provider": "foundry"}, "event": "span_start", "name": "tcp.vision.analyze", "t": "2026-10-20T12:44:00.872+00:00"}
+{"attributes": {"deployment": "gpt-5.6-sol", "provider": "foundry", "purpose": "wide image, blind to OSM", "views_sent": 1}, "event": "span_start", "name": "tcp.agent.call1", "t": "2026-10-20T12:44:00.873+00:00"}

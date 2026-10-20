@@ -1,0 +1,7 @@
+TCP POC Pipeline 2  (tcp-poc 0.2.0)
+1 Input: KML  work reference 41.415, -71.742 (rounded)  path points 0
+2 Rule pack: APPROVED_TWO_LANE_POC_RULE_PACK v1.0.0 APPROVED_FOR_POC sha256 9402591080b1b03c... verified
+3 Imagery: AZURE_MAPS  573 m across, 0.448 m/px
+4 OSM: road 'Alton Bradford Road' highway=secondary lanes_tag=None oneway=None
+5 AI vision: provider foundry, profile gpt-5.6-sol, deployment gpt-5.6-sol, api openai_responses - max 2 model calls
+   call 1 started: 1 image(s) -> foundry gpt-5.6-sol

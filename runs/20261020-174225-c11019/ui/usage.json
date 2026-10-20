@@ -1,0 +1,12 @@
+[
+  {
+    "call": "agent_call1",
+    "deployment": "gpt-5.6-sol",
+    "duration_ms": 62404.1,
+    "error": "AI_API_ERROR",
+    "profile": "gpt-5.6-sol",
+    "provider": "foundry",
+    "requested_model": "gpt-5.6-sol",
+    "usage": null
+  }
+]

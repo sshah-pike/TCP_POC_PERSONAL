@@ -1,0 +1,230 @@
+{
+  "backend": "openai_responses",
+  "centerline_views": false,
+  "deployment": "gpt-5.6-sol",
+  "duration_ms": 83372.3,
+  "evidence_mode": "single",
+  "osm_claims": false,
+  "profile": "gpt-5.6-sol",
+  "provider": "foundry",
+  "request": {
+    "api": "openai_responses",
+    "effort": "high",
+    "images_sha256": "a129c6a75c9339ab61420b59e4bb73c35f918a9e914c687729321a7046547b6e",
+    "model": "gpt-5.6-sol",
+    "profile": "gpt-5.6-sol",
+    "prompt_sha256": "8e37c2a12d20f065a1964148125fae319afdc43a60efce9553106b6a62c462de",
+    "schema_sha256": "e42647478ef479d9d5a9724bf0813ecac46cf8bdda44b28fd00ed39b33ec9ab7"
+  },
+  "result": {
+    "debug_sent": null,
+    "deployment": "gpt-5.6-sol",
+    "evidence_mode": "single",
+    "foundry_api": "openai_responses",
+    "grounding": {
+      "checks": [
+        {
+          "detail": {
+            "appears_outside": true,
+            "distance_to_nearest_edge_m": 6.5,
+            "relative_position": "BEYOND_SHOULDER"
+          },
+          "id": "C1_WORK_VS_DISTANCE",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "lane_count_total": 2,
+            "reasons": [],
+            "traveled_way_width_m": 7.8
+          },
+          "id": "C2_WIDTH_VS_EDGES",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "action": null,
+            "geometry_side": "LEFT",
+            "model_side": "LEFT"
+          },
+          "id": "C3_SIDE_VS_GEOMETRY",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "note": "OSM claims switch off"
+          },
+          "id": "C4_JUNCTIONS_VS_OSM",
+          "result": "NOT_APPLICABLE"
+        }
+      ],
+      "claims": null,
+      "evidence": null,
+      "extras": [
+        {
+          "category": "shoulder_width",
+          "confidence": 0.77,
+          "description": "Narrow shoulder strips are visible outside the traveled-way edge lines on both sides near the work reference.",
+          "image_x": 660,
+          "image_y": 657
+        },
+        {
+          "category": "curve_or_hill",
+          "confidence": 0.9,
+          "description": "The selected road follows a gentle horizontal curve through the image and is nearly straight at the work reference.",
+          "image_x": 640,
+          "image_y": 665
+        }
+      ],
+      "format": "agent-call1-v1",
+      "images": [
+        {
+          "annotation": "annot-v1",
+          "image": "IMAGE_1",
+          "model_input_sha256": "f98064d4d1c56b270d9c509eed9dfcead97131da96369a5f67e5c4846f9b190e",
+          "raw_pixel_sha256": "e8fa339d1042346f3a56961691678d29b34da79a4d0594427986261214083f19",
+          "work_reference_px": [
+            640.0,
+            640.0
+          ]
+        }
+      ],
+      "measurements": {
+        "distance_measured_in": "IMAGE_1",
+        "distance_to_nearest_edge_m": 6.5,
+        "traveled_way_width_m": 7.8,
+        "width_measured_in": "IMAGE_1"
+      },
+      "osm_claim_checks": null
+    },
+    "model": "gpt-5.6-sol",
+    "observation": {
+      "attribute_confidence": {
+        "divided_road": 0.97,
+        "intersection_conflict": 0.74,
+        "lane_count_total": 0.93,
+        "outside_traveled_way": 0.9,
+        "pedestrian_impact": 0.94,
+        "road_edges": 0.8,
+        "two_way_visible": 0.88,
+        "work_side": 0.97
+      },
+      "divided_road_visible": false,
+      "features": {
+        "crosswalks": [],
+        "driveways": [
+          {
+            "confidence": 0.79,
+            "description": "Paved rural-property or farm access branching from the selected road",
+            "image_x": 96.0,
+            "image_y": 966.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.75,
+            "description": "Residential driveway connecting to buildings southeast of the road",
+            "image_x": 467.0,
+            "image_y": 786.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.86,
+            "description": "Driveway to the residence northwest of the road near the work reference",
+            "image_x": 615.0,
+            "image_y": 665.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.9,
+            "description": "Entrance to the parking area and large building southeast of the road",
+            "image_x": 724.0,
+            "image_y": 625.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.84,
+            "description": "Driveway serving the property northwest of the road",
+            "image_x": 809.0,
+            "image_y": 556.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.83,
+            "description": "Long access serving multiple buildings northwest of the road",
+            "image_x": 1027.0,
+            "image_y": 468.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.83,
+            "description": "Curved residential driveway southeast of the road",
+            "image_x": 1073.0,
+            "image_y": 456.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.76,
+            "description": "Property access northwest of the road near the northeast portion of the image",
+            "image_x": 1150.0,
+            "image_y": 396.0,
+            "side": "LEFT"
+          }
+        ],
+        "intersections": [],
+        "obstructions": [
+          {
+            "confidence": 0.92,
+            "description": "Trees and dense roadside vegetation close to the work-reference area",
+            "image_x": 601.0,
+            "image_y": 618.0,
+            "side": "LEFT"
+          }
+        ],
+        "ramps": [],
+        "roundabouts": []
+      },
+      "image_quality": "FAIR",
+      "lane_count_total": 2,
+      "lane_markings_visible": true,
+      "notes": "The work-reference center is on the vegetated left roadside beyond the visible shoulder. The annotation partly covers the nearest roadside detail.",
+      "osm_conflicts": [],
+      "road_edges": {
+        "left_visible": true,
+        "right_visible": true,
+        "traveled_way_width_px": 17.42
+      },
+      "shoulders": {
+        "left_present": true,
+        "right_present": true
+      },
+      "sidewalks": {
+        "left_present": false,
+        "right_present": false
+      },
+      "two_way_visible": true,
+      "work_reference": {
+        "appears_outside_traveled_way": true,
+        "appears_roadside": true,
+        "relative_position": "BEYOND_SHOULDER",
+        "side": "LEFT"
+      }
+    },
+    "profile": "gpt-5.6-sol",
+    "provider": "foundry",
+    "raw_response": "{\"lane_count_total\":2,\"two_way_visible\":\"YES\",\"divided_road_visible\":\"NO\",\"lane_markings_visible\":\"YES\",\"road_edges\":{\"left_visible\":true,\"right_visible\":true,\"traveled_way_width_m\":7.8,\"width_measured_in\":\"IMAGE_1\"},\"shoulders\":{\"left_present\":\"YES\",\"right_present\":\"YES\"},\"sidewalks\":{\"left_present\":\"NO\",\"right_present\":\"NO\"},\"work_reference\":{\"appears_roadside\":\"YES\",\"side\":\"LEFT\",\"appears_outside_traveled_way\":\"YES\",\"relative_position\":\"BEYOND_SHOULDER\",\"distance_to_nearest_edge_m\":6.5,\"distance_measured_in\":\"IMAGE_1\"},\"features\":{\"intersections\":[],\"driveways\":[{\"description\":\"Paved rural-property or farm access branching from the selected road\",\"side\":\"RIGHT\",\"confidence\":0.79,\"image\":\"IMAGE_1\",\"x\":96,\"y\":966},{\"description\":\"Residential driveway connecting to buildings southeast of the road\",\"side\":\"RIGHT\",\"confidence\":0.75,\"image\":\"IMAGE_1\",\"x\":467,\"y\":786},{\"description\":\"Driveway to the residence northwest of the road near the work reference\",\"side\":\"LEFT\",\"confidence\":0.86,\"image\":\"IMAGE_1\",\"x\":615,\"y\":665},{\"description\":\"Entrance to the parking area and large building southeast of the road\",\"side\":\"RIGHT\",\"confidence\":0.9,\"image\":\"IMAGE_1\",\"x\":724,\"y\":625},{\"description\":\"Driveway serving the property northwest of the road\",\"side\":\"LEFT\",\"confidence\":0.84,\"image\":\"IMAGE_1\",\"x\":809,\"y\":556},{\"description\":\"Long access serving multiple buildings northwest of the road\",\"side\":\"LEFT\",\"confidence\":0.83,\"image\":\"IMAGE_1\",\"x\":1027,\"y\":468},{\"description\":\"Curved residential driveway southeast of the road\",\"side\":\"RIGHT\",\"confidence\":0.83,\"image\":\"IMAGE_1\",\"x\":1073,\"y\":456},{\"description\":\"Property access northwest of the road near the northeast portion of the image\",\"side\":\"LEFT\",\"confidence\":0.76,\"image\":\"IMAGE_1\",\"x\":1150,\"y\":396}],\"crosswalks\":[],\"roundabouts\":[],\"ramps\":[],\"obstructions\":[{\"description\":\"Trees and dense roadside vegetation close to the work-reference area\",\"side\":\"LEFT\",\"confidence\":0.92,\"image\":\"IMAGE_1\",\"x\":601,\"y\":618}]},\"image_quality\":\"FAIR\",\"attribute_confidence\":{\"lane_count_total\":0.93,\"two_way_visible\":0.88,\"divided_road\":0.97,\"road_edges\":0.8,\"work_side\":0.97,\"outside_traveled_way\":0.9,\"intersection_conflict\":0.74,\"pedestrian_impact\":0.94},\"notes\":\"The work-reference center is on the vegetated left roadside beyond the visible shoulder. The annotation partly covers the nearest roadside detail.\",\"extras\":[{\"category\":\"shoulder_width\",\"description\":\"Narrow shoulder strips are visible outside the traveled-way edge lines on both sides near the work reference.\",\"image_x\":660,\"image_y\":657,\"confidence\":0.77},{\"category\":\"curve_or_hill\",\"description\":\"The selected road follows a gentle horizontal curve through the image and is nearly straight at the work reference.\",\"image_x\":640,\"image_y\":665,\"confidence\":0.9}]}",
+    "request_id": "resp_0e59ec9814a08fd7006ad75bf7f3ec8194b9aef776b2abc200",
+    "usage": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 3178,
+      "input_tokens": 3181,
+      "output_tokens": 5747,
+      "reasoning_tokens": 5022
+    },
+    "views": [],
+    "vision_mode": "agent_call1",
+    "wire_format": "tri-state-v1"
+  },
+  "status": "OK",
+  "views": [],
+  "vision_mode": "agent_call1"
+}

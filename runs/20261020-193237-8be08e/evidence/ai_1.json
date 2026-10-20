@@ -1,0 +1,265 @@
+{
+  "backend": "openai_responses",
+  "centerline_views": false,
+  "deployment": "gpt-5.6-sol",
+  "duration_ms": 92995.8,
+  "evidence_mode": "single",
+  "osm_claims": false,
+  "profile": "gpt-5.6-sol",
+  "provider": "foundry",
+  "request": {
+    "api": "openai_responses",
+    "effort": "high",
+    "images_sha256": "f3c6db79a65811f02ce70a901e989a78dd5a5328e4eacc7a2d3c005d78a34ea9",
+    "model": "gpt-5.6-sol",
+    "profile": "gpt-5.6-sol",
+    "prompt_sha256": "bbef291eb3d03777588ec79fd38e5b558df5c6d60b26dc6305e9753ed7ba1249",
+    "schema_sha256": "e42647478ef479d9d5a9724bf0813ecac46cf8bdda44b28fd00ed39b33ec9ab7"
+  },
+  "result": {
+    "debug_sent": null,
+    "deployment": "gpt-5.6-sol",
+    "evidence_mode": "single",
+    "foundry_api": "openai_responses",
+    "grounding": {
+      "checks": [
+        {
+          "detail": {
+            "appears_outside": true,
+            "distance_to_nearest_edge_m": 5.8,
+            "relative_position": "BEYOND_SHOULDER"
+          },
+          "id": "C1_WORK_VS_DISTANCE",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "lane_count_total": 2,
+            "reasons": [],
+            "traveled_way_width_m": 8.1
+          },
+          "id": "C2_WIDTH_VS_EDGES",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "action": null,
+            "geometry_side": "LEFT",
+            "model_side": "LEFT"
+          },
+          "id": "C3_SIDE_VS_GEOMETRY",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "note": "OSM claims switch off"
+          },
+          "id": "C4_JUNCTIONS_VS_OSM",
+          "result": "NOT_APPLICABLE"
+        }
+      ],
+      "claims": null,
+      "evidence": null,
+      "extras": [
+        {
+          "category": "shoulder_width",
+          "confidence": 0.76,
+          "description": "Paved shoulders are visible on both sides near the reference, approximately 2.5\u20133 m wide.",
+          "image_x": 640,
+          "image_y": 660
+        },
+        {
+          "category": "parking",
+          "confidence": 0.96,
+          "description": "Off-road parking lot on the right side near the work reference.",
+          "image_x": 731,
+          "image_y": 724
+        }
+      ],
+      "format": "agent-call1-v1",
+      "images": [
+        {
+          "annotation": "annot-v1",
+          "image": "IMAGE_1",
+          "model_input_sha256": "55c923f35c9f26349c746fdade4d6ad30a8d33578489d1cfe6383dfcdbc58175",
+          "raw_pixel_sha256": "bab8f9ab776dfd077a9ec57e9a616d4776ad4de13023298095a238c1a8b8d884",
+          "work_reference_px": [
+            640.0,
+            640.0
+          ]
+        }
+      ],
+      "measurements": {
+        "distance_measured_in": "IMAGE_1",
+        "distance_to_nearest_edge_m": 5.8,
+        "traveled_way_width_m": 8.1,
+        "width_measured_in": "IMAGE_1"
+      },
+      "osm_claim_checks": null
+    },
+    "model": "gpt-5.6-sol",
+    "observation": {
+      "attribute_confidence": {
+        "divided_road": 0.97,
+        "intersection_conflict": 0.78,
+        "lane_count_total": 0.94,
+        "outside_traveled_way": 0.94,
+        "pedestrian_impact": 0.91,
+        "road_edges": 0.82,
+        "two_way_visible": 0.91,
+        "work_side": 0.98
+      },
+      "divided_road_visible": false,
+      "features": {
+        "crosswalks": [],
+        "driveways": [
+          {
+            "confidence": 0.91,
+            "description": "Farm or property access from the selected road",
+            "image_x": 43.0,
+            "image_y": 970.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.82,
+            "description": "Residential driveway",
+            "image_x": 112.0,
+            "image_y": 920.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.8,
+            "description": "Residential driveway",
+            "image_x": 286.0,
+            "image_y": 844.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.75,
+            "description": "Residential driveway",
+            "image_x": 410.0,
+            "image_y": 778.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.78,
+            "description": "Residential driveway",
+            "image_x": 461.0,
+            "image_y": 761.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.82,
+            "description": "Residential driveway",
+            "image_x": 531.0,
+            "image_y": 708.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.77,
+            "description": "Residential or property driveway near the work reference",
+            "image_x": 618.0,
+            "image_y": 665.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.92,
+            "description": "Parking-lot or business entrance",
+            "image_x": 714.0,
+            "image_y": 624.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.82,
+            "description": "Residential driveway",
+            "image_x": 791.0,
+            "image_y": 576.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.89,
+            "description": "Residential property access",
+            "image_x": 966.0,
+            "image_y": 500.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.78,
+            "description": "Residential driveway",
+            "image_x": 1007.0,
+            "image_y": 477.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.74,
+            "description": "Residential driveway",
+            "image_x": 1111.0,
+            "image_y": 421.0,
+            "side": "LEFT"
+          }
+        ],
+        "intersections": [],
+        "obstructions": [
+          {
+            "confidence": 0.9,
+            "description": "Mature trees and vegetation close to the left roadside near the work reference",
+            "image_x": 590.0,
+            "image_y": 623.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.82,
+            "description": "Trees close to the right roadside near the parking-lot frontage",
+            "image_x": 690.0,
+            "image_y": 675.0,
+            "side": "RIGHT"
+          }
+        ],
+        "ramps": [],
+        "roundabouts": []
+      },
+      "image_quality": "FAIR",
+      "lane_count_total": 2,
+      "lane_markings_visible": true,
+      "notes": "The magenta reference annotation partly covers the immediate left roadside; measurements use adjacent visible road edges and the stated image scale.",
+      "osm_conflicts": [],
+      "road_edges": {
+        "left_visible": true,
+        "right_visible": true,
+        "traveled_way_width_px": 18.09
+      },
+      "shoulders": {
+        "left_present": true,
+        "right_present": true
+      },
+      "sidewalks": {
+        "left_present": false,
+        "right_present": false
+      },
+      "two_way_visible": true,
+      "work_reference": {
+        "appears_outside_traveled_way": true,
+        "appears_roadside": true,
+        "relative_position": "BEYOND_SHOULDER",
+        "side": "LEFT"
+      }
+    },
+    "profile": "gpt-5.6-sol",
+    "provider": "foundry",
+    "raw_response": "{\"lane_count_total\":2,\"two_way_visible\":\"YES\",\"divided_road_visible\":\"NO\",\"lane_markings_visible\":\"YES\",\"road_edges\":{\"left_visible\":true,\"right_visible\":true,\"traveled_way_width_m\":8.1,\"width_measured_in\":\"IMAGE_1\"},\"shoulders\":{\"left_present\":\"YES\",\"right_present\":\"YES\"},\"sidewalks\":{\"left_present\":\"NO\",\"right_present\":\"NO\"},\"work_reference\":{\"appears_roadside\":\"YES\",\"side\":\"LEFT\",\"appears_outside_traveled_way\":\"YES\",\"relative_position\":\"BEYOND_SHOULDER\",\"distance_to_nearest_edge_m\":5.8,\"distance_measured_in\":\"IMAGE_1\"},\"features\":{\"intersections\":[],\"driveways\":[{\"description\":\"Farm or property access from the selected road\",\"side\":\"RIGHT\",\"confidence\":0.91,\"image\":\"IMAGE_1\",\"x\":43,\"y\":970},{\"description\":\"Residential driveway\",\"side\":\"LEFT\",\"confidence\":0.82,\"image\":\"IMAGE_1\",\"x\":112,\"y\":920},{\"description\":\"Residential driveway\",\"side\":\"RIGHT\",\"confidence\":0.8,\"image\":\"IMAGE_1\",\"x\":286,\"y\":844},{\"description\":\"Residential driveway\",\"side\":\"LEFT\",\"confidence\":0.75,\"image\":\"IMAGE_1\",\"x\":410,\"y\":778},{\"description\":\"Residential driveway\",\"side\":\"RIGHT\",\"confidence\":0.78,\"image\":\"IMAGE_1\",\"x\":461,\"y\":761},{\"description\":\"Residential driveway\",\"side\":\"LEFT\",\"confidence\":0.82,\"image\":\"IMAGE_1\",\"x\":531,\"y\":708},{\"description\":\"Residential or property driveway near the work reference\",\"side\":\"LEFT\",\"confidence\":0.77,\"image\":\"IMAGE_1\",\"x\":618,\"y\":665},{\"description\":\"Parking-lot or business entrance\",\"side\":\"RIGHT\",\"confidence\":0.92,\"image\":\"IMAGE_1\",\"x\":714,\"y\":624},{\"description\":\"Residential driveway\",\"side\":\"LEFT\",\"confidence\":0.82,\"image\":\"IMAGE_1\",\"x\":791,\"y\":576},{\"description\":\"Residential property access\",\"side\":\"RIGHT\",\"confidence\":0.89,\"image\":\"IMAGE_1\",\"x\":966,\"y\":500},{\"description\":\"Residential driveway\",\"side\":\"LEFT\",\"confidence\":0.78,\"image\":\"IMAGE_1\",\"x\":1007,\"y\":477},{\"description\":\"Residential driveway\",\"side\":\"LEFT\",\"confidence\":0.74,\"image\":\"IMAGE_1\",\"x\":1111,\"y\":421}],\"crosswalks\":[],\"roundabouts\":[],\"ramps\":[],\"obstructions\":[{\"description\":\"Mature trees and vegetation close to the left roadside near the work reference\",\"side\":\"LEFT\",\"confidence\":0.9,\"image\":\"IMAGE_1\",\"x\":590,\"y\":623},{\"description\":\"Trees close to the right roadside near the parking-lot frontage\",\"side\":\"RIGHT\",\"confidence\":0.82,\"image\":\"IMAGE_1\",\"x\":690,\"y\":675}]},\"image_quality\":\"FAIR\",\"attribute_confidence\":{\"lane_count_total\":0.94,\"two_way_visible\":0.91,\"divided_road\":0.97,\"road_edges\":0.82,\"work_side\":0.98,\"outside_traveled_way\":0.94,\"intersection_conflict\":0.78,\"pedestrian_impact\":0.91},\"notes\":\"The magenta reference annotation partly covers the immediate left roadside; measurements use adjacent visible road edges and the stated image scale.\",\"extras\":[{\"category\":\"shoulder_width\",\"description\":\"Paved shoulders are visible on both sides near the reference, approximately 2.5\u20133 m wide.\",\"image_x\":640,\"image_y\":660,\"confidence\":0.76},{\"category\":\"parking\",\"description\":\"Off-road parking lot on the right side near the work reference.\",\"image_x\":731,\"image_y\":724,\"confidence\":0.96}]}",
+    "request_id": "resp_08806f8c5d0a2031006ad77485af4c8195a6b3555207c4eccb",
+    "usage": {
+      "cache_creation_input_tokens": 3178,
+      "cache_read_input_tokens": 0,
+      "input_tokens": 3181,
+      "output_tokens": 6962,
+      "reasoning_tokens": 6141
+    },
+    "views": [],
+    "vision_mode": "agent_call1",
+    "wire_format": "tri-state-v1"
+  },
+  "status": "OK",
+  "views": [],
+  "vision_mode": "agent_call1"
+}

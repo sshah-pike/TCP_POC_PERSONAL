@@ -173,8 +173,8 @@ button.btn:disabled { opacity: 0.55; cursor: default; }
 .st-warning::before, .st-review::before { background: #f59e0b; }
 .st-warning .stage-status, .st-review .stage-status, .st-warning .icon, .st-review .icon { color: var(--amber); }
 .st-warning .icon, .st-review .icon { background: var(--amber-soft); }
-.st-failed::before, .st-unsupported::before { background: var(--red); }
-.st-failed .stage-status, .st-unsupported .stage-status, .st-failed .icon, .st-unsupported .icon { color: var(--red); }
+.st-error::before, .st-failed::before, .st-unsupported::before { background: var(--red); }
+.st-error .stage-status, .st-error .icon, .st-failed .stage-status, .st-unsupported .stage-status, .st-error .icon, .st-failed .icon, .st-unsupported .icon { color: var(--red); }
 .st-failed .icon, .st-unsupported .icon { background: var(--red-soft); }
 .spin { display: inline-block; animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }

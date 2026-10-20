@@ -1,0 +1,28 @@
+{
+  "backend": "openai_responses",
+  "centerline_views": false,
+  "deployment": "gpt-5.6-sol",
+  "details": {
+    "api_error_text": "{ \"statusCode\": 500, \"message\": \"Internal server error\", \"activityId\": \"<redacted>\" }",
+    "http_status": 500
+  },
+  "duration_ms": 62405.8,
+  "error_code": "AI_API_ERROR",
+  "evidence_mode": "single",
+  "message": "{ \"statusCode\": 500, \"message\": \"Internal server error\", \"activityId\": \"<redacted>\" }",
+  "osm_claims": false,
+  "profile": "gpt-5.6-sol",
+  "provider": "foundry",
+  "request": {
+    "api": "openai_responses",
+    "effort": "high",
+    "images_sha256": "a129c6a75c9339ab61420b59e4bb73c35f918a9e914c687729321a7046547b6e",
+    "model": "gpt-5.6-sol",
+    "profile": "gpt-5.6-sol",
+    "prompt_sha256": "8e37c2a12d20f065a1964148125fae319afdc43a60efce9553106b6a62c462de",
+    "schema_sha256": "e42647478ef479d9d5a9724bf0813ecac46cf8bdda44b28fd00ed39b33ec9ab7"
+  },
+  "status": "ERROR",
+  "views": [],
+  "vision_mode": "agent_call1"
+}

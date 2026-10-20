@@ -1,0 +1,357 @@
+{
+  "backend": "openai_responses",
+  "centerline_views": false,
+  "deployment": "gpt-5.6-sol",
+  "duration_ms": 151862.7,
+  "evidence_mode": "multi",
+  "osm_claims": true,
+  "profile": "gpt-5.6-sol",
+  "provider": "foundry",
+  "request": {
+    "api": "openai_responses",
+    "effort": "high",
+    "images_sha256": "cab741b925207bf5a69dea003fca0d4b64c07c77c4aada4fdfc268a75dd8a353",
+    "model": "gpt-5.6-sol",
+    "profile": "gpt-5.6-sol",
+    "prompt_sha256": "8faaa1ba9072a313ac52606dca5f805c2cace2653c4053bf22692a3152b5f07f",
+    "schema_sha256": "6e5ad2c5c708ddecfc55ec79236499ce0cb448fab47e029287faf3ed78d3ee17"
+  },
+  "result": {
+    "debug_sent": null,
+    "deployment": "gpt-5.6-sol",
+    "evidence_mode": "multi",
+    "foundry_api": "openai_responses",
+    "grounding": {
+      "checks": [
+        {
+          "detail": {
+            "appears_outside": true,
+            "distance_to_nearest_edge_m": 8.5,
+            "relative_position": "BEYOND_SHOULDER"
+          },
+          "id": "C1_WORK_VS_DISTANCE",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "lane_count_total": 2,
+            "reasons": [],
+            "traveled_way_width_m": 7.8
+          },
+          "id": "C2_WIDTH_VS_EDGES",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "action": null,
+            "geometry_side": "LEFT",
+            "model_side": "LEFT"
+          },
+          "id": "C3_SIDE_VS_GEOMETRY",
+          "result": "PASS"
+        },
+        {
+          "detail": {
+            "claims_not_reported": [],
+            "disagreements": []
+          },
+          "id": "C4_JUNCTIONS_VS_OSM",
+          "result": "PASS"
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "OSM-1",
+          "highway": "service",
+          "image_1_px": [
+            1050.0,
+            464.6
+          ],
+          "mapped_as": "DRIVEWAY_OR_SERVICE",
+          "osm_id": "850032350",
+          "osm_kind": "driveways",
+          "side_hint": "left side of the selected road"
+        },
+        {
+          "claim_id": "OSM-2",
+          "highway": "service",
+          "image_1_px": [
+            103.6,
+            954.6
+          ],
+          "mapped_as": "DRIVEWAY_OR_SERVICE",
+          "osm_id": "890965796",
+          "osm_kind": "driveways",
+          "side_hint": "right side of the selected road"
+        },
+        {
+          "claim_id": "OSM-3",
+          "highway": "service",
+          "image_1_px": [
+            733.0,
+            629.2
+          ],
+          "mapped_as": "DRIVEWAY_OR_SERVICE",
+          "osm_id": "891746355",
+          "osm_kind": "driveways",
+          "side_hint": "right side of the selected road"
+        }
+      ],
+      "evidence": {
+        "divided": {
+          "basis": "The road is one continuous paved carriageway with no physical median or barrier.",
+          "image": "IMAGE_3"
+        },
+        "intersections": {
+          "basis": "No visible branch in the analysis area continues beyond private parcels as a public road.",
+          "image": "IMAGE_1"
+        },
+        "lane_count": {
+          "basis": "Two through lanes are directly visible between the white edge lines.",
+          "image": "IMAGE_3"
+        },
+        "pedestrian": {
+          "basis": "Both roadsides are visible without sidewalks or marked pedestrian crossings near the reference.",
+          "image": "IMAGE_3"
+        },
+        "road_edges": {
+          "basis": "White edge lines and both traveled-way edges are visible at the work cross-section.",
+          "image": "IMAGE_3"
+        },
+        "two_way": {
+          "basis": "A yellow center marking separates the two opposing sides of the single roadway.",
+          "image": "IMAGE_3"
+        },
+        "work_location": {
+          "basis": "The reference is visibly off the pavement beyond the left paved shoulder.",
+          "image": "IMAGE_3"
+        },
+        "work_side": {
+          "basis": "The magenta reference lies northwest of the road, the left side when traveling northeast.",
+          "image": "IMAGE_3"
+        }
+      },
+      "format": "agent-call2-v1",
+      "images": [
+        {
+          "annotation": "annot-v1",
+          "image": "IMAGE_1",
+          "model_input_sha256": "f98064d4d1c56b270d9c509eed9dfcead97131da96369a5f67e5c4846f9b190e",
+          "raw_pixel_sha256": "e8fa339d1042346f3a56961691678d29b34da79a4d0594427986261214083f19",
+          "work_reference_px": [
+            640.0,
+            640.0
+          ]
+        },
+        {
+          "annotation": "annot-v1",
+          "image": "IMAGE_2",
+          "model_input_sha256": "6b36540f37a3df6f8dc474f47bb9a92c406fa618663ae76a88a753cc47fca199",
+          "raw_pixel_sha256": "2e524657015c6b8820edafd9c26d2c4e12d96b6de5f6aea6a2bde4fe2d17aefa",
+          "work_reference_px": [
+            27.7,
+            688.9
+          ]
+        },
+        {
+          "annotation": "annot-v1",
+          "image": "IMAGE_3",
+          "model_input_sha256": "900f277d05b1209efc8d328510e5e06aad2e675d4ce814a2c6f11a1516d3dd60",
+          "raw_pixel_sha256": "51e7e12938a76854278f97c7a72c4853bfbefaecfaa0ae7b3f0aa81fd660116d",
+          "work_reference_px": [
+            936.2,
+            216.6
+          ]
+        }
+      ],
+      "measurements": {
+        "distance_measured_in": "IMAGE_3",
+        "distance_to_nearest_edge_m": 8.5,
+        "traveled_way_width_m": 7.8,
+        "width_measured_in": "IMAGE_3"
+      },
+      "osm_claim_checks": [
+        {
+          "basis": "A driveway connects the road to developed private property near IMAGE_1 pixel (1050,465).",
+          "claim_id": "OSM-1",
+          "classification": "DRIVEWAY_OR_SERVICE",
+          "seen": "YES"
+        },
+        {
+          "basis": "A service or farm-property entrance is visible near IMAGE_1 pixel (104,955), without visible public-road continuation.",
+          "claim_id": "OSM-2",
+          "classification": "DRIVEWAY_OR_SERVICE",
+          "seen": "YES"
+        },
+        {
+          "basis": "A paved entrance leads from the road into the parking and building property near IMAGE_1 pixel (733,629).",
+          "claim_id": "OSM-3",
+          "classification": "DRIVEWAY_OR_SERVICE",
+          "seen": "YES"
+        }
+      ]
+    },
+    "model": "gpt-5.6-sol",
+    "observation": {
+      "attribute_confidence": {
+        "divided_road": 0.97,
+        "intersection_conflict": 0.82,
+        "lane_count_total": 0.98,
+        "outside_traveled_way": 0.95,
+        "pedestrian_impact": 0.95,
+        "road_edges": 0.93,
+        "two_way_visible": 0.97,
+        "work_side": 0.96
+      },
+      "divided_road_visible": false,
+      "features": {
+        "crosswalks": [],
+        "driveways": [
+          {
+            "confidence": 0.8,
+            "description": "Service or farm-property entrance",
+            "image_x": 104.0,
+            "image_y": 955.0,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.9,
+            "description": "Gravel property access beside the southwest portion of the road",
+            "image_x": 187.9,
+            "image_y": 882.7,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.92,
+            "description": "Residential driveway",
+            "image_x": 476.9,
+            "image_y": 759.2,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.91,
+            "description": "Residential driveway serving the roadside homes",
+            "image_x": 538.4,
+            "image_y": 719.7,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.82,
+            "description": "Residential-property driveway near the work reference",
+            "image_x": 671.9,
+            "image_y": 619.2,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.96,
+            "description": "Paved parking-lot or business entrance",
+            "image_x": 728.7,
+            "image_y": 647.5,
+            "side": "RIGHT"
+          },
+          {
+            "confidence": 0.92,
+            "description": "Residential driveway",
+            "image_x": 825.2,
+            "image_y": 563.5,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.94,
+            "description": "Broad gravel entrance to a developed property",
+            "image_x": 924.2,
+            "image_y": 511.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.95,
+            "description": "Driveway or service entrance to the northern property",
+            "image_x": 1050.2,
+            "image_y": 465.0,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.92,
+            "description": "Opposing residential driveway",
+            "image_x": 1042.7,
+            "image_y": 490.5,
+            "side": "RIGHT"
+          }
+        ],
+        "intersections": [],
+        "obstructions": [
+          {
+            "confidence": 0.93,
+            "description": "Dense mature trees and vegetation close to the left roadside",
+            "image_x": 566.9,
+            "image_y": 669.2,
+            "side": "LEFT"
+          },
+          {
+            "confidence": 0.91,
+            "description": "Trees and brush close to the right roadside northeast of the work reference",
+            "image_x": 758.7,
+            "image_y": 620.5,
+            "side": "RIGHT"
+          }
+        ],
+        "ramps": [],
+        "roundabouts": []
+      },
+      "image_quality": "GOOD",
+      "lane_count_total": 2,
+      "lane_markings_visible": true,
+      "notes": "The width and work-reference offset are approximate aerial-image measurements. Visible branches connect to parcels, homes, or parking areas rather than visibly continuing as public roads.",
+      "osm_conflicts": [],
+      "road_edges": {
+        "left_visible": true,
+        "right_visible": true,
+        "traveled_way_width_px": 17.42
+      },
+      "shoulders": {
+        "left_present": true,
+        "right_present": true
+      },
+      "sidewalks": {
+        "left_present": false,
+        "right_present": false
+      },
+      "two_way_visible": true,
+      "work_reference": {
+        "appears_outside_traveled_way": true,
+        "appears_roadside": true,
+        "relative_position": "BEYOND_SHOULDER",
+        "side": "LEFT"
+      }
+    },
+    "profile": "gpt-5.6-sol",
+    "provider": "foundry",
+    "raw_response": "{\"lane_count_total\":2,\"two_way_visible\":\"YES\",\"divided_road_visible\":\"NO\",\"lane_markings_visible\":\"YES\",\"road_edges\":{\"left_visible\":true,\"right_visible\":true,\"traveled_way_width_m\":7.8,\"width_measured_in\":\"IMAGE_3\"},\"shoulders\":{\"left_present\":\"YES\",\"right_present\":\"YES\"},\"sidewalks\":{\"left_present\":\"NO\",\"right_present\":\"NO\"},\"work_reference\":{\"appears_roadside\":\"YES\",\"side\":\"LEFT\",\"appears_outside_traveled_way\":\"YES\",\"relative_position\":\"BEYOND_SHOULDER\",\"distance_to_nearest_edge_m\":8.5,\"distance_measured_in\":\"IMAGE_3\"},\"features\":{\"intersections\":[],\"driveways\":[{\"description\":\"Service or farm-property entrance\",\"side\":\"RIGHT\",\"confidence\":0.8,\"image\":\"IMAGE_1\",\"x\":104,\"y\":955},{\"description\":\"Gravel property access beside the southwest portion of the road\",\"side\":\"LEFT\",\"confidence\":0.9,\"image\":\"IMAGE_3\",\"x\":32,\"y\":702},{\"description\":\"Residential driveway\",\"side\":\"RIGHT\",\"confidence\":0.92,\"image\":\"IMAGE_3\",\"x\":610,\"y\":455},{\"description\":\"Residential driveway serving the roadside homes\",\"side\":\"RIGHT\",\"confidence\":0.91,\"image\":\"IMAGE_3\",\"x\":733,\"y\":376},{\"description\":\"Residential-property driveway near the work reference\",\"side\":\"LEFT\",\"confidence\":0.82,\"image\":\"IMAGE_3\",\"x\":1000,\"y\":175},{\"description\":\"Paved parking-lot or business entrance\",\"side\":\"RIGHT\",\"confidence\":0.96,\"image\":\"IMAGE_2\",\"x\":205,\"y\":704},{\"description\":\"Residential driveway\",\"side\":\"LEFT\",\"confidence\":0.92,\"image\":\"IMAGE_2\",\"x\":398,\"y\":536},{\"description\":\"Broad gravel entrance to a developed property\",\"side\":\"LEFT\",\"confidence\":0.94,\"image\":\"IMAGE_2\",\"x\":596,\"y\":431},{\"description\":\"Driveway or service entrance to the northern property\",\"side\":\"LEFT\",\"confidence\":0.95,\"image\":\"IMAGE_2\",\"x\":848,\"y\":339},{\"description\":\"Opposing residential driveway\",\"side\":\"RIGHT\",\"confidence\":0.92,\"image\":\"IMAGE_2\",\"x\":833,\"y\":390}],\"crosswalks\":[],\"roundabouts\":[],\"ramps\":[],\"obstructions\":[{\"description\":\"Dense mature trees and vegetation close to the left roadside\",\"side\":\"LEFT\",\"confidence\":0.93,\"image\":\"IMAGE_3\",\"x\":790,\"y\":275},{\"description\":\"Trees and brush close to the right roadside northeast of the work reference\",\"side\":\"RIGHT\",\"confidence\":0.91,\"image\":\"IMAGE_2\",\"x\":265,\"y\":650}]},\"image_quality\":\"GOOD\",\"attribute_confidence\":{\"lane_count_total\":0.98,\"two_way_visible\":0.97,\"divided_road\":0.97,\"road_edges\":0.93,\"work_side\":0.96,\"outside_traveled_way\":0.95,\"intersection_conflict\":0.82,\"pedestrian_impact\":0.95},\"osm_conflicts\":[],\"notes\":\"The width and work-reference offset are approximate aerial-image measurements. Visible branches connect to parcels, homes, or parking areas rather than visibly continuing as public roads.\",\"evidence\":{\"lane_count\":{\"image\":\"IMAGE_3\",\"basis\":\"Two through lanes are directly visible between the white edge lines.\"},\"two_way\":{\"image\":\"IMAGE_3\",\"basis\":\"A yellow center marking separates the two opposing sides of the single roadway.\"},\"divided\":{\"image\":\"IMAGE_3\",\"basis\":\"The road is one continuous paved carriageway with no physical median or barrier.\"},\"road_edges\":{\"image\":\"IMAGE_3\",\"basis\":\"White edge lines and both traveled-way edges are visible at the work cross-section.\"},\"work_side\":{\"image\":\"IMAGE_3\",\"basis\":\"The magenta reference lies northwest of the road, the left side when traveling northeast.\"},\"work_location\":{\"image\":\"IMAGE_3\",\"basis\":\"The reference is visibly off the pavement beyond the left paved shoulder.\"},\"intersections\":{\"image\":\"IMAGE_1\",\"basis\":\"No visible branch in the analysis area continues beyond private parcels as a public road.\"},\"pedestrian\":{\"image\":\"IMAGE_3\",\"basis\":\"Both roadsides are visible without sidewalks or marked pedestrian crossings near the reference.\"}},\"osm_claim_checks\":[{\"claim_id\":\"OSM-1\",\"seen\":\"YES\",\"classification\":\"DRIVEWAY_OR_SERVICE\",\"basis\":\"A driveway connects the road to developed private property near IMAGE_1 pixel (1050,465).\"},{\"claim_id\":\"OSM-2\",\"seen\":\"YES\",\"classification\":\"DRIVEWAY_OR_SERVICE\",\"basis\":\"A service or farm-property entrance is visible near IMAGE_1 pixel (104,955), without visible public-road continuation.\"},{\"claim_id\":\"OSM-3\",\"seen\":\"YES\",\"classification\":\"DRIVEWAY_OR_SERVICE\",\"basis\":\"A paved entrance leads from the road into the parking and building property near IMAGE_1 pixel (733,629).\"}]}",
+    "request_id": "resp_0a0a752e9ad18acc006ad763ab1f6881958278f594c854fd8e",
+    "usage": {
+      "cache_creation_input_tokens": 5081,
+      "cache_read_input_tokens": 0,
+      "input_tokens": 5084,
+      "output_tokens": 10496,
+      "reasoning_tokens": 9427
+    },
+    "views": [
+      "CROP_1",
+      "CROP_2"
+    ],
+    "vision_mode": "agent_call2",
+    "wire_format": "tri-state-v1"
+  },
+  "status": "OK",
+  "views": [
+    {
+      "pixel_sha256": "2e524657015c6b8820edafd9c26d2c4e12d96b6de5f6aea6a2bde4fe2d17aefa",
+      "role": "CROP_1"
+    },
+    {
+      "pixel_sha256": "51e7e12938a76854278f97c7a72c4853bfbefaecfaa0ae7b3f0aa81fd660116d",
+      "role": "CROP_2"
+    }
+  ],
+  "vision_mode": "agent_call2"
+}

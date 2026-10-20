@@ -237,7 +237,10 @@ def run_pipeline(*, out_dir, kml=None, lat=None, lon=None, operator=None, map_pr
                 need = sheet.view_half_extent_m(plan)
                 if need > half:  # sheet view is larger than the analysis image: fetch a display-only aerial
                     try:
-                        s_img, s_meta = mp.fetch_context(pg, need, config["imagery"].get("sheet_px", 2560))
+                        sheet_px = config["imagery"].get("sheet_px", 2560)
+                        if config["imagery"].get("sheet_single_request"):  # display-only: one request, not an n x n tile mosaic
+                            sheet_px = min(sheet_px, getattr(mp, "MAX_REQUEST_PX", sheet_px))
+                        s_img, s_meta = mp.fetch_context(pg, need, sheet_px)
                         s_img.save(run.path("sheet_aerial.jpg"), format="JPEG", quality=90); run.written.append("sheet_aerial.jpg")
                     except MapProviderError as e:
                         tel.set(sp, sheet_aerial=e.code)

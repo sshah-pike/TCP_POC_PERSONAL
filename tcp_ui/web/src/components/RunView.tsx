@@ -45,6 +45,16 @@ function DecisionPanel({ run }: { run: RunState }) {
           {run.message && <div className="muted small">{run.message}</div>}
         </div>
       );
+    case "ERROR":
+      return (
+        <div className="banner bad">
+          <div className="big">ERROR</div>
+          <div className="small">Reason codes:</div>
+          {codes}
+          <div>A service or API call failed (imagery, OSM or AI). This is not a site discrepancy. No TCP draft was generated.</div>
+          {run.message && <div className="muted small">{run.message}</div>}
+        </div>
+      );
     case "UNSUPPORTED_POC":
       return (
         <div className="banner bad">

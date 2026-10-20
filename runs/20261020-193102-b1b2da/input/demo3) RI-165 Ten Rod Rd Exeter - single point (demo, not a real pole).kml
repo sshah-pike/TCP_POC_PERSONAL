@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"><Document>
+<name>DEMO - RI-165 Ten Rod Rd (Exeter) - single point.kml</name>
+<Placemark><name>DEMO-3</name><description>Demo work point (not a real pole): north roadside of RI-165, station ~780 m of OSM way 92387458, chosen 461 m clear of junctions.</description>
+<Point><coordinates>-71.6908347,41.5773933,0</coordinates></Point></Placemark>
+</Document></kml>

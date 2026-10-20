@@ -39,6 +39,15 @@ STAGES = (
      ("plan.json", "aerial_image.jpg", "debug_plan.png", "debug_plan.pdf", "sheet_aerial.jpg", "tcp_sheet.png",
       "tcp_sheet.pdf", "plan.dxf", "plan.dwg", "dwt_result.json")),
 )
+# reason codes that mean a service/API failure (not a site-fact discrepancy): shown as ERROR, not REVIEW
+ERROR_REASON_CODES = {"MAP_CONTEXT_UNAVAILABLE", "OSM_CONTEXT_UNAVAILABLE", "AI_OBSERVATION_UNAVAILABLE",
+                      "AI_CALL2_UNAVAILABLE", "CROPS_UNAVAILABLE"}
+
+
+def _is_error(codes):
+    return any(c in ERROR_REASON_CODES for c in codes or ())
+
+
 EXIT_DECISION = {0: "SUPPORTED_AUTO", 3: "REVIEW_REQUIRED", 4: "UNSUPPORTED_POC"}
 RUN_STOPPED = "RUN_STOPPED"  # error code written by the server when the user stops a run
 
@@ -226,13 +235,14 @@ def _stage_outcome(key, attrs):
     if key == "input" and a.get("decision") == "UNSUPPORTED_POC":
         return "UNSUPPORTED", [f"decision={a['decision']}", f"reason_codes={a.get('reason_codes')}"]
     if key in ("imagery", "osm") and a.get("error_code"):
-        return "REVIEW", [f"error_code={a['error_code']}"]
+        return "ERROR", [f"error_code={a['error_code']}"]
     if key == "vision" and a.get("status_code") not in (None, "OK"):
-        return "WARNING", [f"status_code={a['status_code']}"]
+        return "ERROR", [f"status_code={a['status_code']}"]
     if key == "fusion" and (a.get("conflicts") or a.get("inputs_complete") is False):
         return "WARNING", [f"conflicts={a.get('conflicts')}", f"inputs_complete={a.get('inputs_complete')}"]
     if key == "eligibility" and a.get("decision") in ("REVIEW_REQUIRED", "UNSUPPORTED_POC"):
-        return ("REVIEW" if a["decision"] == "REVIEW_REQUIRED" else "UNSUPPORTED"), \
+        codes = str(a.get("reason_codes") or "").split(",")
+        return ("ERROR" if _is_error(codes) else "REVIEW" if a["decision"] == "REVIEW_REQUIRED" else "UNSUPPORTED"), \
             [f"decision={a['decision']}", f"reason_codes={a.get('reason_codes')}"]
     if key == "rules" and a.get("issues"):
         return "WARNING", [f"placement issues={a['issues']}"]
@@ -332,6 +342,8 @@ def build_state(run_id, live_ids=(), with_lineage=True):
     else:
         decision = None
     elig = (result or {}).get("eligibility") or _read_json(os.path.join(rdir, "output", "eligibility_result.json"))
+    if decision == "REVIEW_REQUIRED" and _is_error((result or {}).get("reason_codes") or (elig or {}).get("reason_codes")):
+        decision = "ERROR"  # API / service failure, not a site-understanding discrepancy
     draft = decision == "SUPPORTED_AUTO" and exit_code == 0 and "plan.json" in have
 
     span_total = round(sum(s["duration_ms"] or 0 for s in spans), 1)
@@ -441,6 +453,9 @@ def cost_summary(req, spans, usage_calls, have, calls=None, ev_events=()):
             by.get("tcp.sheet.render") or {}).get("attributes", {}).get("sheet_aerial")) else 0)
         osm_requests = 1 if (by.get("tcp.osm.resolve") and not offline) else 0
 
+    map_breakdown = ", ".join(f"{c.get('purpose') or c.get('span')}: {c.get('requests', 1)}" for c in (calls or [])
+                              if c.get("service") == "map" and c.get("external"))
+
     def note(kind, offline_note, live_note, n):
         if kind in reused and not n:
             return "reused artifact from run " + ", ".join(sorted(x for x in reused[kind] if x)) + " - no new provider call"
@@ -449,7 +464,8 @@ def cost_summary(req, spans, usage_calls, have, calls=None, ev_events=()):
         {"service": "Imagery", "provider": (map_span or {}).get("attributes", {}).get("provider"),
          "requests": map_requests, "new_api_call": map_requests > 0, "reused_from": sorted(reused.get("map", ())),
          "cost_usd": None, "note": note("map", "offline synthetic image, no external call",
-                                        "provider does not report usage cost to the pipeline", map_requests)},
+                                        "provider does not report usage cost to the pipeline" +
+                                        (f" - requests: {map_breakdown}" if map_breakdown else ""), map_requests)},
         {"service": "OpenStreetMap", "provider": "OSM API", "requests": osm_requests, "new_api_call": osm_requests > 0,
          "reused_from": sorted(reused.get("osm", ())), "cost_usd": None,
          "note": note("osm", "offline synthetic data, no external call", "public API; no cost reported", osm_requests)},

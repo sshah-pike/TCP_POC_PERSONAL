@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "--kml",
+    "C:\\Users\\Sshah-Hexaware\\OneDrive - Pike Enterprises, LLC\\Desktop\\TCP\\runs\\20261020-193237-8be08e\\input\\demo2) RI-91 Alton Bradford Rd - shifted 20m NE (demo, not a real pole).kml",
+    "--road-type",
+    "RURAL",
+    "--no-dwt",
+    "--out",
+    "C:\\Users\\Sshah-Hexaware\\OneDrive - Pike Enterprises, LLC\\Desktop\\TCP\\runs\\20261020-193237-8be08e\\output"
+  ],
+  "created_at": "2026-10-20T14:02:37.027+00:00",
+  "request": {
+    "advanced": {
+      "ai_profile": null,
+      "ai_provider": null,
+      "dwt_mode": null,
+      "evidence_mode": "single",
+      "map_provider": null,
+      "no_dwt": true
+    },
+    "input_type": "kml",
+    "kml_filename": "demo2) RI-91 Alton Bradford Rd - shifted 20m NE (demo, not a real pole).kml",
+    "kml_saved_path": "C:\\Users\\Sshah-Hexaware\\OneDrive - Pike Enterprises, LLC\\Desktop\\TCP\\runs\\20261020-193237-8be08e\\input\\demo2) RI-91 Alton Bradford Rd - shifted 20m NE (demo, not a real pole).kml",
+    "kml_size_bytes": 2362,
+    "operator": {
+      "options": [],
+      "requires_lane_closure": false,
+      "road_type": "RURAL",
+      "speed": null
+    }
+  },
+  "run_id": "20261020-193237-8be08e"
+}

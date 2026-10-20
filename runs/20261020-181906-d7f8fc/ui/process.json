@@ -1,0 +1,8 @@
+{
+  "ended_at": "2026-10-20T12:53:20.595+00:00",
+  "exit_code": 3,
+  "runtime_ms": 253643.9,
+  "started_at": "2026-10-20T12:49:06.947+00:00",
+  "state": "FINISHED",
+  "unhandled_error": null
+}

@@ -59,10 +59,10 @@ def raising(exc):
 
 
 def assert_fail_closed(code, st, rdir, expected=EXPECTED):
-    assert code == 3 and st["decision"] == "REVIEW_REQUIRED" and st["reason_codes"] == expected
+    assert code == 3 and st["decision"] == "ERROR" and st["reason_codes"] == expected
     assert not st["draft_generated"] and not ({o["name"] for o in st["outputs"]} & DRAFT)
     stages = {s["key"]: s for s in st["stages"]}
-    assert stages["imagery"]["status"] == "REVIEW"
+    assert stages["imagery"]["status"] == "ERROR"
     assert all(stages[k]["status"] == "NOT_RUN" for k in ("osm", "vision", "fusion", "eligibility", "render"))
     with open(os.path.join(rdir, "output", "eligibility_result.json"), encoding="utf-8") as f:
         assert json.load(f)["reason_codes"] == expected

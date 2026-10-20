@@ -73,7 +73,7 @@ def stage(st, key):
 def test_azure_image_persisted_immediately_and_kept_after_review(env, monkeypatch):
     h = http(monkeypatch, osm_error=requests.exceptions.ReadTimeout("Read timed out."))
     rid, st = azure_run()
-    assert st["decision"] == "REVIEW_REQUIRED" and st["reason_codes"] == ["OSM_CONTEXT_UNAVAILABLE", "OSM_REQUEST_FAILED"]
+    assert st["decision"] == "ERROR" and st["reason_codes"] == ["OSM_CONTEXT_UNAVAILABLE", "OSM_REQUEST_FAILED"]
     [m] = [e for e in load_manifest(store.run_path(rid)) if e["kind"] == "map"]
     assert m["producer_span"] == "tcp.map.retrieve" and m["mode"] == "saved"
     path = store.run_path(rid, "evidence", m["file"])
@@ -269,7 +269,7 @@ def test_azure_sheet_mosaic_within_limits_and_georeferenced(monkeypatch):
 def test_azure_non_image_response_fails_closed_as_map_failure(env, monkeypatch, response):
     http(monkeypatch, azure=response)
     rid, st = azure_run()
-    assert st["decision"] == "REVIEW_REQUIRED" and st["exit_code"] == 3
+    assert st["decision"] == "ERROR" and st["exit_code"] == 3
     assert st["reason_codes"] == ["MAP_CONTEXT_UNAVAILABLE", "MAP_REQUEST_FAILED"]
     d = stage(st, "imagery")["diagnostics"][0]
     assert d["pipeline_error_code"] == "MAP_REQUEST_FAILED" and d["http_status"] == 200

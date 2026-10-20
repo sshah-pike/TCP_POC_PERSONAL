@@ -294,7 +294,7 @@ class EvidenceMapProvider:
     """Real map provider + diagnostics + persistence at acquisition + verified replay for resumed runs."""
 
     def __init__(self, inner, ev):
-        self._inner = inner; self._ev = ev
+        self._inner = inner; self._ev = ev; self.last_reused = False; self.purpose = None
 
     def __getattr__(self, item):
         return getattr(self._inner, item)
@@ -327,6 +327,7 @@ class EvidenceMapProvider:
         name = getattr(inner, "name", None)
         ev.rec.add_call({"service": "map", "provider": name, "external": name not in E.OFFLINE_PROVIDERS,
                          "requests": int(meta.get("request_tiles", 1)) if isinstance(meta, dict) else 1,
+                         "purpose": "sheet aerial (display only)" if ev.rec.span() == "tcp.sheet.render" else "analysis map",
                          "duration_ms": round((time.perf_counter() - t0) * 1000, 1)})
         if sig:
             buf = io.BytesIO(); img.save(buf, "PNG")
@@ -350,7 +351,7 @@ class EvidenceMapProvider:
                 from PIL import Image
                 with Image.open(found["path"]) as im: img = im.convert("RGB")
                 if E.pixel_hash(img) != found["metadata"].get("pixel_sha256"): raise ValueError("pixel hash mismatch")
-                ev.accept(found)
+                ev.accept(found); self.last_reused = True
                 return img, dict(found["metadata"]["meta"])
             except Exception as e:
                 ev.reject("map_crop", f"saved crop failed validation ({e})")
@@ -361,7 +362,7 @@ class EvidenceMapProvider:
             _record(ev.rec, e, name, t0)
             raise
         ev.rec.add_call({"service": "map", "provider": name, "external": name not in E.OFFLINE_PROVIDERS,
-                         "requests": int(meta.get("request_tiles", 1)), "purpose": f"agent crop zoom {int(zoom)}",
+                         "requests": int(meta.get("request_tiles", 1)), "purpose": f"{self.purpose or 'agent crop'} (zoom {int(zoom)})",
                          "duration_ms": round((time.perf_counter() - t0) * 1000, 1)})
         if sig:
             buf = io.BytesIO(); img.save(buf, "PNG")

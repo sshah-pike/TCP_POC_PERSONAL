@@ -267,7 +267,7 @@ class Agent:
         self.now = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat()
         self.calls = []; self.crops = []; self.crops_dropped = []; self.consistency = []; self.escalations = []
         self.checks = {}; self.extras = []; self.group_source = {}; self.forced = {}; self.unresolved = {}
-        self.results = {}; self.views = []; self.signs = []; self._fetched = {}; self.measurements = []
+        self.results = {}; self.views = []; self.signs = []; self._fetched = {}; self.measurements = []; self.map_fetches = []
         self.ai_result = None; self.ai_error = None; self.ai_error_text = None; self.call2_ran = False
         self.tel = telemetry
         self.lines = []; self._out = say  # say: live progress callback (the pipeline's console / run report)
@@ -325,7 +325,7 @@ class Agent:
         return G.check(obs, info, self.geo_side, claims, tuple(self.cfg["fusion"]["lane_width_plausible_m"]))
 
     # ------------------------------------------------------------ run
-    STEPS = ("call1", "compare", "measure", "crops", "call2", "consistency")
+    STEPS = ("call1", "compare", "measure", "recompare", "crops", "call2", "consistency")
 
     def _step(self, name, **attrs):
         """Telemetry span per agent step (tcp.agent.<step>): the UI shows them live as the AI Vision step tracker."""
@@ -377,25 +377,48 @@ class Agent:
                       unresolved=sorted(self.unresolved))
         # ---- measure (deterministic cross-sections from close views; map requests only) ----
         if self.cfg["cross_section"]["enabled"]:
+            xs = self.cfg["cross_section"]
+            lazy_signs = xs["measure_sign_locations"] and xs.get("sign_locations_only_if_unresolved", False)
+            n0 = len(self.map_fetches)
             with self._step("measure") as sp:
-                self._measure()
+                self._measure(sign_locations=xs["measure_sign_locations"] and not lazy_signs)
+                if lazy_signs and self.work_point_measurement():
+                    # sign close views only when the work-point measurement left something unresolved
+                    left = self._unresolved(build_site_model(self.pg, self.osm, self.ai_result, None, self.meta,
+                                                             self.operator, self.cfg, agent=self.fusion_inputs()))
+                    if left: self._measure(sign_locations=True, work_point=False)
+                    else: self._say("   measure: work-point view resolved everything - sign close views skipped")
+                elif lazy_signs: self._measure(sign_locations=True, work_point=False)
                 wp = self.work_point_measurement()
+                mine = self.map_fetches[n0:]
                 self._set(sp, outcome="OK" if wp else "INCONCLUSIVE", views=len(self.measurements),
+                          images=len(mine), map_requests=sum(1 for f in mine if f["api"]),
+                          reused_views=sum(1 for f in mine if not f["api"]), sources=self._sources(mine),
                           width=(wp or {}).get("width_m"), centre_offset=(wp or {}).get("centre_offset_m"))
             # re-compare on the corrected centreline and the measured width
-            site1 = build_site_model(self.pg, self.osm, self.ai_result, None, self.meta, self.operator, self.cfg,
-                                     agent=self.fusion_inputs())
-            self.unresolved = self._unresolved(site1)
+            with self._step("recompare") as sp:
+                site1 = build_site_model(self.pg, self.osm, self.ai_result, None, self.meta, self.operator, self.cfg,
+                                         agent=self.fusion_inputs())
+                self.unresolved = self._unresolved(site1)
+                self._set(sp, outcome="UNRESOLVED" if self.unresolved else "RESOLVED_AFTER_MEASURE",
+                          unresolved=sorted(self.unresolved))
         if not self.unresolved:
+            nf = len(self.map_fetches); na = sum(1 for f in self.map_fetches if f["api"])
             self._say("   compare: every image-resolvable field resolved - call 2 skipped")
-            self._skip("crops", "call2", "consistency", reason="nothing unresolved after call 1 and measurement")
+            self._skip("crops", "call2", "consistency",
+                       reason=f"nothing unresolved after call 1 and measurement; {nf} close view(s) already fetched "
+                              f"for measurement ({na} map request(s)), no extra crops needed")
             return self
         self._say("   compare: unresolved after call 1: " +
                   ", ".join(f"{g} ({'; '.join(v)})" for g, v in sorted(self.unresolved.items())))
 
         # ---- crops (map requests only) ----
         with self._step("crops") as sp:
+            n0 = len(self.map_fetches)
             self.views = self._fetch_crops(self._plan_crops())
+            new = self.map_fetches[n0:]
+            self._set(sp, images=len(self.views), map_requests=sum(1 for f in new if f["api"]),
+                      reused_views=sum(1 for f in new if not f["api"]), sources=self._sources(new))
             self._set(sp, outcome="OK" if self.views else "NONE_AVAILABLE", crops=len(self.views),
                       zooms=[c["zoom_used"] for c in self.crops if c.get("zoom_used") is not None],
                       fallbacks=sum(1 for c in self.crops if c["fallback"]), dropped=len(self.crops_dropped))
@@ -434,7 +457,7 @@ class Agent:
         return self
 
     # ------------------------------------------------------------ deterministic cross-sections
-    def _measure(self):
+    def _measure(self, sign_locations=True, work_point=True):
         """Zoom-crops.primary_zoom views at the work point and the planned sign stations; each measured with
         cross_section.measure (edge lines, centre line). No model call."""
         from .cross_section import measure
@@ -443,15 +466,15 @@ class Agent:
         lat0 = self.pg["work_reference"]["latitude"]; lon0 = self.pg["work_reference"]["longitude"]
         if not lanes:
             self._say("   measure: skipped - call 1 gave no lane count"); return
-        where = [("work_point", self.s0, (0.0, 0.0))]
-        if self.cfg["cross_section"]["measure_sign_locations"]:
+        where = [("work_point", self.s0, (0.0, 0.0))] if work_point else []
+        if sign_locations:
             where += [(f"sign_{sg['approach'].lower()}", sg["station_m"], at(self.cl, sg["station_m"])[0]) for sg in self.signs]
         for role, station, (x, y) in where:
             lat, lon = inv(x, y, lat0, lon0)
             spec = {"lat": round(lat, 7), "lon": round(lon, 7)}
             rec = {"role": role, "station_m": round(station, 2), "zoom": c["primary_zoom"], "offset_m": (round(x, 2), round(y, 2))}
             try:
-                img, meta = self._fetch(spec, c["primary_zoom"], c["image_px"])
+                img, meta = self._fetch(spec, c["primary_zoom"], c["image_px"], f"measure {role}")
                 rec.update(measure(img, meta, (x, y), self.cl, station, lanes, self.cfg))
             except Exception as e:
                 rec.update(status="INCONCLUSIVE", reason=f"view unavailable ({getattr(e, 'code', type(e).__name__)})")
@@ -576,10 +599,18 @@ class Agent:
         for s in self.crops_dropped: s["reason"] = f"crops.max_images_call2 = {c['max_images_call2']} reached"
         return kept[:cap]
 
-    def _fetch(self, spec, zoom, size):
+    @staticmethod
+    def _sources(fetches):
+        return "; ".join(f"{f['purpose']}: {'Azure API request' if f['api'] else 'retrieved from cache'}" for f in fetches)
+
+    def _fetch(self, spec, zoom, size, purpose="crop"):
         key = (spec["lat"], spec["lon"], int(zoom), int(size))
         if key not in self._fetched:  # measurement views double as call-2 crops: one map request per view
+            try: self.mp.purpose = purpose  # read by the evidence wrapper to label the recorded call
+            except Exception: pass
+            self.mp.last_reused = False
             self._fetched[key] = self.mp.fetch_view(spec["lat"], spec["lon"], zoom, size)
+            self.map_fetches.append({"purpose": purpose, "zoom": int(zoom), "api": not getattr(self.mp, "last_reused", False)})
         return self._fetched[key]
 
     def _fetch_crops(self, plan):
@@ -594,11 +625,11 @@ class Agent:
             chosen = None
             if spec["zoom"] == c["primary_zoom"] and c["fallback_zoom"] < c["primary_zoom"]:
                 hi = lo = None; hi_err = lo_err = None
-                try: hi = self._fetch(spec, c["primary_zoom"], px)
+                try: hi = self._fetch(spec, c["primary_zoom"], px, "call-2 crop")
                 except Exception as e: hi_err = getattr(e, "code", type(e).__name__)
                 need_lo = sh["enabled"] or hi is None
                 if need_lo:
-                    try: lo = self._fetch(spec, c["fallback_zoom"], px)
+                    try: lo = self._fetch(spec, c["fallback_zoom"], px, "call-2 crop (sharpness check)")
                     except Exception as e: lo_err = getattr(e, "code", type(e).__name__)
                 reason = None
                 if hi is None: reason = f"zoom {c['primary_zoom']} fetch failed ({hi_err})"
@@ -632,7 +663,7 @@ class Agent:
                 if spec["zoom"] == c["primary_zoom"]:
                     rec["sharpness"] = {"decision": "not measured: crops.primary_zoom equals crops.fallback_zoom"}
                 try:
-                    got = self._fetch(spec, spec["zoom"], px)
+                    got = self._fetch(spec, spec["zoom"], px, "call-2 crop")
                     if _grey_std(got[0]) < sh["uniform_max_std"]: rec["unavailable"] = "blank or near-uniform image"
                     else: chosen = (got, spec["zoom"])
                 except Exception as e:

@@ -61,7 +61,8 @@ def test_ui_reports_existing_decision(api, tmp_path, name):
     st = run({"input_type": "offline", "offline_scenario": name})
     ref = direct(name, tmp_path / "ref")
 
-    assert st["decision"] == ref["decision"]
+    shown = "ERROR" if ref["decision"] == "REVIEW_REQUIRED" and store._is_error(ref["reason_codes"]) else ref["decision"]
+    assert st["decision"] == shown  # service/API failures are shown as ERROR, not REVIEW_REQUIRED
     assert st["reason_codes"] == ref["reason_codes"]
     assert st["exit_code"] == EXIT[ref["decision"]]
     outputs = {o["name"] for o in st["outputs"]}
@@ -81,7 +82,7 @@ def test_ui_reports_existing_decision(api, tmp_path, name):
         if ref["decision"] == "REVIEW_REQUIRED":
             assert by["validation"]["status"] == "REVIEW" and by["render"]["status"] == "NOT_RUN"
     else:
-        assert elig["status"] == {"REVIEW_REQUIRED": "REVIEW", "UNSUPPORTED_POC": "UNSUPPORTED"}[ref["decision"]]
+        assert elig["status"] == {"REVIEW_REQUIRED": "REVIEW", "ERROR": "ERROR", "UNSUPPORTED_POC": "UNSUPPORTED"}[shown]
         assert all(by[k]["status"] == "NOT_RUN" for k in ("rules", "validation", "render"))
     if ref["decision"] == "SUPPORTED_AUTO":
         a, b = (json.load(open(os.path.join(d, "plan.json"), encoding="utf-8"))

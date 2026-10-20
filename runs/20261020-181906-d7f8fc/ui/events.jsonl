@@ -1,0 +1,43 @@
+{"attributes": {"input_type": "KML"}, "event": "span_start", "name": "tcp.input.parse", "t": "2026-10-20T12:49:09.613+00:00"}
+{"attributes": {"features": 1, "input_hash": "sha256:391ef33639ff", "input_type": "KML"}, "duration_ms": 1.4, "event": "span_end", "name": "tcp.input.parse", "status": "OK", "t": "2026-10-20T12:49:09.616+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.rulepack.load", "t": "2026-10-20T12:49:09.617+00:00"}
+{"attributes": {"rule_pack_hash": "9402591080b1b03c", "rule_pack_id": "APPROVED_TWO_LANE_POC_RULE_PACK", "rule_pack_version": "1.0.0"}, "duration_ms": 6.7, "event": "span_end", "name": "tcp.rulepack.load", "status": "OK", "t": "2026-10-20T12:49:09.624+00:00"}
+{"attributes": {"provider": "azure_maps"}, "event": "span_start", "name": "tcp.map.retrieve", "t": "2026-10-20T12:49:09.624+00:00"}
+{"action": "saved", "artifact_id": "map_1", "event": "evidence", "file": "map_1.png", "kind": "map", "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1", "span": "tcp.map.retrieve", "t": "2026-10-20T12:49:11.709+00:00"}
+{"attributes": {"metres_per_pixel": 0.447835, "provider": "azure_maps", "width_px": 1280}, "duration_ms": 2080.9, "event": "span_end", "name": "tcp.map.retrieve", "status": "OK", "t": "2026-10-20T12:49:11.710+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.osm.resolve", "t": "2026-10-20T12:49:11.710+00:00"}
+{"action": "saved", "artifact_id": "osm_1", "event": "evidence", "file": "osm_1.json", "kind": "osm", "sha256": "d9608ab27271194ce1ddef6eca85b41b596f7220f1b1a94f0caa78be52bbe438", "span": "tcp.osm.resolve", "t": "2026-10-20T12:49:13.252+00:00"}
+{"attributes": {"highway": "secondary", "way_count": 1}, "duration_ms": 1547.0, "event": "span_end", "name": "tcp.osm.resolve", "status": "OK", "t": "2026-10-20T12:49:13.258+00:00"}
+{"attributes": {"api": "openai_responses", "deployment": "gpt-5.6-sol", "profile": "gpt-5.6-sol", "provider": "foundry"}, "event": "span_start", "name": "tcp.vision.analyze", "t": "2026-10-20T12:49:13.259+00:00"}
+{"attributes": {"deployment": "gpt-5.6-sol", "provider": "foundry", "purpose": "wide image, blind to OSM", "views_sent": 1}, "event": "span_start", "name": "tcp.agent.call1", "t": "2026-10-20T12:49:13.259+00:00"}
+{"action": "saved", "artifact_id": "ai_1", "event": "evidence", "file": "ai_1.json", "kind": "ai", "sha256": "e389d7132a8ca839481194aaf9713a0240aa58609a240e43af6f981568ca3b92", "span": "tcp.vision.analyze", "t": "2026-10-20T12:50:39.688+00:00"}
+{"attributes": {"deployment": "gpt-5.6-sol", "error_code": null, "model": "gpt-5.6-sol", "outcome": "OK", "provider": "foundry", "purpose": "wide image, blind to OSM", "usage_in": 3181, "usage_out": 5970, "views_sent": 1}, "duration_ms": 86427.4, "event": "span_end", "name": "tcp.agent.call1", "status": "OK", "t": "2026-10-20T12:50:39.689+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.agent.compare", "t": "2026-10-20T12:50:39.689+00:00"}
+{"attributes": {"outcome": "UNRESOLVED", "unresolved": "features,road_edges"}, "duration_ms": 3.3, "event": "span_end", "name": "tcp.agent.compare", "status": "OK", "t": "2026-10-20T12:50:39.693+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.agent.measure", "t": "2026-10-20T12:50:39.693+00:00"}
+{"action": "saved", "artifact_id": "map_crop_1", "event": "evidence", "file": "map_crop_1.png", "kind": "map_crop", "sha256": "959768acb820394177caddc81758ec4af20d3660c34a508337ff19645cf6ebe0", "span": "tcp.vision.analyze", "t": "2026-10-20T12:50:41.287+00:00"}
+{"action": "saved", "artifact_id": "map_crop_2", "event": "evidence", "file": "map_crop_2.png", "kind": "map_crop", "sha256": "2a297f4f69b6afeded37e5d2bfd9bce9488e94fcc3db582a9d9d0f1a5fc82ba8", "span": "tcp.vision.analyze", "t": "2026-10-20T12:50:43.123+00:00"}
+{"action": "saved", "artifact_id": "map_crop_3", "event": "evidence", "file": "map_crop_3.png", "kind": "map_crop", "sha256": "4cdffbd57ae0d476d2eba7b4430ba3f251aa1cf2e2ffa21063a90cf93fa2a588", "span": "tcp.vision.analyze", "t": "2026-10-20T12:50:44.703+00:00"}
+{"attributes": {"centre_offset": 2.85, "map_requests": 3, "outcome": "OK", "reused_views": 0, "sources": "measure work_point: Azure API request; measure sign_increasing_station: Azure API request; measure sign_decreasing_station: Azure API request", "views": 3, "width": 7.25}, "duration_ms": 5021.2, "event": "span_end", "name": "tcp.agent.measure", "status": "OK", "t": "2026-10-20T12:50:44.715+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.agent.recompare", "t": "2026-10-20T12:50:44.715+00:00"}
+{"attributes": {"outcome": "UNRESOLVED", "unresolved": "features"}, "duration_ms": 68.6, "event": "span_end", "name": "tcp.agent.recompare", "status": "OK", "t": "2026-10-20T12:50:44.784+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.agent.crops", "t": "2026-10-20T12:50:44.785+00:00"}
+{"action": "saved", "artifact_id": "map_crop_4", "event": "evidence", "file": "map_crop_4.png", "kind": "map_crop", "sha256": "826bd9adf747cc94f4f038cb40264e42fe4f8c47e844f3285b6356ee9e12db41", "span": "tcp.vision.analyze", "t": "2026-10-20T12:50:46.348+00:00"}
+{"action": "saved", "artifact_id": "map_crop_5", "event": "evidence", "file": "map_crop_5.png", "kind": "map_crop", "sha256": "a5cc03dc5766eb13598008c3d239a31ca1ab886d12841e22d966f8745d72f79e", "span": "tcp.vision.analyze", "t": "2026-10-20T12:50:48.570+00:00"}
+{"attributes": {"crops": 2, "dropped": 0, "fallbacks": 0, "map_requests": 2, "outcome": "OK", "reused_views": 0, "sources": "call-2 crop: Azure API request; call-2 crop: Azure API request", "zooms": "18,18"}, "duration_ms": 3790.2, "event": "span_end", "name": "tcp.agent.crops", "status": "OK", "t": "2026-10-20T12:50:48.576+00:00"}
+{"attributes": {"deployment": "gpt-5.6-sol", "fields": "features", "osm_claims": 3, "provider": "foundry", "views_sent": 3}, "event": "span_start", "name": "tcp.agent.call2", "t": "2026-10-20T12:50:48.576+00:00"}
+{"action": "saved", "artifact_id": "ai_2", "event": "evidence", "file": "ai_2.json", "kind": "ai", "sha256": "5b80c3f1bc4d3a6ba2bcc8a12237e0bfe0042beabb705c65466034e8c565ee42", "span": "tcp.vision.analyze", "t": "2026-10-20T12:53:20.508+00:00"}
+{"attributes": {"deployment": "gpt-5.6-sol", "error_code": null, "fields": "features", "model": "gpt-5.6-sol", "osm_claims": 3, "outcome": "OK", "provider": "foundry", "usage_in": 5084, "usage_out": 10496, "views_sent": 3}, "duration_ms": 151929.6, "event": "span_end", "name": "tcp.agent.call2", "status": "OK", "t": "2026-10-20T12:53:20.509+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.agent.consistency", "t": "2026-10-20T12:53:20.510+00:00"}
+{"attributes": {"mismatches": "", "outcome": "OK"}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.agent.consistency", "status": "OK", "t": "2026-10-20T12:53:20.510+00:00"}
+{"attributes": {"api": "openai_responses", "crops": 2, "deployment": "gpt-5.6-sol", "model": "gpt-5.6-sol", "model_calls": 2, "profile": "gpt-5.6-sol", "provider": "foundry", "status_code": "OK"}, "duration_ms": 247247.6, "event": "span_end", "name": "tcp.vision.analyze", "status": "OK", "t": "2026-10-20T12:53:20.511+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.fuse", "t": "2026-10-20T12:53:20.511+00:00"}
+{"attributes": {"conflicts": 0, "inputs_complete": true, "site_model_id": "SITE-6FE44DE1B7B2C111"}, "duration_ms": 61.1, "event": "span_end", "name": "tcp.site.fuse", "status": "OK", "t": "2026-10-20T12:53:20.572+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.eligibility", "t": "2026-10-20T12:53:20.581+00:00"}
+{"attributes": {"decision": "SUPPORTED_AUTO", "reason_codes": ""}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.site.eligibility", "status": "OK", "t": "2026-10-20T12:53:20.582+00:00"}
+{"attributes": {"ta_id": "TA-1"}, "event": "span_start", "name": "tcp.rules.execute", "t": "2026-10-20T12:53:20.583+00:00"}
+{"attributes": {"objects": 3, "options": 0, "ta_id": "TA-1"}, "duration_ms": 0.2, "event": "span_end", "name": "tcp.rules.execute", "status": "OK", "t": "2026-10-20T12:53:20.584+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.geometry.place", "t": "2026-10-20T12:53:20.584+00:00"}
+{"attributes": {"issues": ""}, "duration_ms": 0.7, "event": "span_end", "name": "tcp.geometry.place", "status": "OK", "t": "2026-10-20T12:53:20.585+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.plan.validate", "t": "2026-10-20T12:53:20.586+00:00"}
+{"attributes": {"geometry": "FAIL", "rule": "PASS"}, "duration_ms": 4.2, "event": "span_end", "name": "tcp.plan.validate", "status": "OK", "t": "2026-10-20T12:53:20.590+00:00"}

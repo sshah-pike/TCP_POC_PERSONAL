@@ -1,0 +1,53 @@
+[
+  {
+    "duration_ms": 1964.0,
+    "external": true,
+    "provider": "azure_maps",
+    "requests": 1,
+    "service": "map",
+    "span": "tcp.map.retrieve"
+  },
+  {
+    "duration_ms": 1681.5,
+    "external": true,
+    "provider": "osm_api",
+    "requests": 1,
+    "service": "osm",
+    "span": "tcp.osm.resolve"
+  },
+  {
+    "duration_ms": 1422.9,
+    "external": true,
+    "provider": "azure_maps",
+    "purpose": "agent crop zoom 19",
+    "requests": 1,
+    "service": "map",
+    "span": "tcp.vision.analyze"
+  },
+  {
+    "duration_ms": 1829.8,
+    "external": true,
+    "provider": "azure_maps",
+    "purpose": "agent crop zoom 19",
+    "requests": 1,
+    "service": "map",
+    "span": "tcp.vision.analyze"
+  },
+  {
+    "duration_ms": 1495.4,
+    "external": true,
+    "provider": "azure_maps",
+    "purpose": "agent crop zoom 19",
+    "requests": 1,
+    "service": "map",
+    "span": "tcp.vision.analyze"
+  },
+  {
+    "duration_ms": 7421.3,
+    "external": true,
+    "provider": "azure_maps",
+    "requests": 4,
+    "service": "map",
+    "span": "tcp.sheet.render"
+  }
+]

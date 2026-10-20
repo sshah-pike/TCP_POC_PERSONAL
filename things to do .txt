@@ -1,0 +1,10 @@
+cache image with  time to live to avoid stalesness with exact co-ordinates so no new API call 
+search for python to crop images so save Azure API calls 
+Hallucination reduction for AI 
+
+
+
+Fix - 01 
+error status display instead of review 
+reduce api call
+show measure etc pipline of AI doing 

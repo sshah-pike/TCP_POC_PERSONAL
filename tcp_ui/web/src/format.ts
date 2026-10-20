@@ -30,17 +30,17 @@ export function fmtUsd(v: number | null | undefined): string {
 }
 
 export const STATUS_LABEL: Record<StageStatus, string> = {
-  WAITING: "Waiting", RUNNING: "Running", COMPLETED: "Completed", WARNING: "Warning", REVIEW: "Review required",
+  WAITING: "Waiting", RUNNING: "Running", COMPLETED: "Completed", WARNING: "Warning", REVIEW: "Review required", ERROR: "Error",
   FAILED: "Failed", UNSUPPORTED: "Unsupported", NOT_RUN: "Not run",
 };
 
 export const STATUS_ICON: Record<StageStatus, string> = {
-  WAITING: "○", RUNNING: "◉", COMPLETED: "✓", WARNING: "!", REVIEW: "!", FAILED: "✕", UNSUPPORTED: "✕", NOT_RUN: "–",
+  WAITING: "○", RUNNING: "◉", COMPLETED: "✓", WARNING: "!", REVIEW: "!", ERROR: "✕", FAILED: "✕", UNSUPPORTED: "✕", NOT_RUN: "–",
 };
 
 export function decisionClass(d: Decision | null | undefined): string {
   if (d === "SUPPORTED_AUTO") return "ok";
   if (d === "REVIEW_REQUIRED" || d === "STOPPED") return "warn";
-  if (d === "UNSUPPORTED_POC" || d === "FAILED") return "bad";
+  if (d === "UNSUPPORTED_POC" || d === "FAILED" || d === "ERROR") return "bad";
   return "run";
 }

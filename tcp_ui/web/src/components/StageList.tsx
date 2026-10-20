@@ -12,7 +12,7 @@ interface Props {
   resumableStages?: string[];
 }
 
-const RESUMABLE = new Set(["COMPLETED", "WARNING", "REVIEW", "FAILED", "UNSUPPORTED"]);
+const RESUMABLE = new Set(["COMPLETED", "WARNING", "REVIEW", "ERROR", "FAILED", "UNSUPPORTED"]);
 
 function headline(s: Stage): string {
   if (s.status === "WAITING") return "Waiting";
@@ -27,7 +27,9 @@ function headline(s: Stage): string {
 
 const AGENT_STEPS: { key: string; title: string; hint: string }[] = [
   { key: "call1", title: "Call 1", hint: "wide image, blind to OSM" },
-  { key: "compare", title: "Compare", hint: "deterministic, OSM + geometry" },
+  { key: "compare", title: "Compare", hint: "after call 1: deterministic, OSM + geometry" },
+  { key: "measure", title: "Measure", hint: "close map views, cross-section measurement (no model call)" },
+  { key: "recompare", title: "Re-compare", hint: "after measurement: what is still unresolved" },
   { key: "crops", title: "Crops", hint: "close views for unresolved fields" },
   { key: "call2", title: "Call 2", hint: "crops + wide image + OSM claims" },
   { key: "consistency", title: "Consistency", hint: "call 1 vs call 2" },
@@ -40,6 +42,11 @@ function stepDetail(a: Record<string, unknown>): string {
   if (a.views_sent !== undefined) bits.push(`${a.views_sent} image${a.views_sent === 1 ? "" : "s"}`);
   if (a.fields) bits.push(`fields: ${a.fields}`);
   if (a.unresolved) bits.push(`unresolved: ${a.unresolved}`);
+  if (a.images !== undefined && a.crops === undefined) bits.push(`${a.images} image${a.images === 1 ? "" : "s"}`);
+  if (a.map_requests !== undefined) bits.push(`${a.map_requests} map API request${a.map_requests === 1 ? "" : "s"}`);
+  if (a.reused_views) bits.push(`${a.reused_views} retrieved from cache (no API call)`);
+  if (a.sources) bits.push(String(a.sources));
+  if (a.width !== undefined && a.width !== null) bits.push(`width ${a.width} m, centre offset ${a.centre_offset} m`);
   if (a.crops !== undefined) bits.push(`${a.crops} crop(s), zoom ${a.zooms || "–"}`);
   if (a.mismatches) bits.push(`mismatch: ${a.mismatches}`);
   if (a.usage_in) bits.push(`${a.usage_in} in / ${a.usage_out} out tokens`);
@@ -57,14 +64,14 @@ function AgentSteps({ steps, running, now }: { steps: Span[]; running: boolean; 
         const outcome = String(sp?.attributes.outcome ?? "");
         const state = !sp ? (running ? "pending" : "none") : sp.ended_at === null ? "active"
           : outcome === "SKIPPED" ? "skipped" : ["ERROR", "NOT_MADE", "NONE_AVAILABLE"].includes(outcome) ? "error"
-          : ["UNRESOLVED", "MISMATCH"].includes(outcome) ? "attention" : "done";
+          : ["UNRESOLVED", "MISMATCH", "INCONCLUSIVE"].includes(outcome) ? "attention" : "done";
         const dur = sp ? (sp.ended_at === null ? now - Date.parse(sp.started_at) : sp.duration_ms) : null;
         return (
           <div key={st.key} className={`step step-${state}`} title={st.hint}>
             <div className="step-dot">{state === "active" ? <span className="spin">◌</span> : state === "done" ? "✓" : state === "skipped" ? "–" : state === "error" ? "✕" : state === "attention" ? "!" : i + 1}</div>
             <div className="step-text">
               <div className="step-title">{st.title}{sp && <span className="step-dur mono">{fmtMs(dur)}</span>}</div>
-              <div className={`step-sub ${sp ? "outcome" : ""}`}>{sp ? (state === "active" ? "running…" : outcome.toLowerCase().replace("_", " ")) : st.hint}</div>
+              <div className={`step-sub ${sp ? "outcome" : ""}`}>{sp ? (state === "active" ? "running…" : outcome.toLowerCase().replace(/_/g, " ")) : st.hint}</div>
               {sp && <div className="step-detail">{stepDetail(sp.attributes)}</div>}
             </div>
           </div>
@@ -113,7 +120,14 @@ function StageRow({ runId, stage: s, now, sizes, onResume, resumable }: { runId:
             </div>
           ))}
           {s.new_calls.length > 0 && (
-            <div className="small">New external calls: {s.new_calls.map((c) => `${c.service} (${c.provider}, ${c.requests} request${c.requests === 1 ? "" : "s"}${c.purpose ? ", " + c.purpose : ""})`).join("; ")}</div>
+            <div className="small">
+              New external calls ({s.new_calls.length}, {s.new_calls.reduce((n, c) => n + c.requests, 0)} requests):
+              {s.new_calls.map((c, i) => (
+                <div key={i} className="mono">
+                  {i + 1}. {c.service} · {c.provider} · {c.requests} request{c.requests === 1 ? "" : "s"}{c.purpose ? " · " + c.purpose : ""} · {fmtMs(c.duration_ms)}
+                </div>
+              ))}
+            </div>
           )}
           {onResume && resumable && RESUMABLE.has(s.status) && (
             <div className="buttons">

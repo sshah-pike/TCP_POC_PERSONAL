@@ -1,0 +1,26 @@
+{
+  "decision": "REVIEW_REQUIRED",
+  "eligibility": {
+    "decision": "REVIEW_REQUIRED",
+    "details": {},
+    "generate_draft": false,
+    "message": "Draft blocked: independent validation failed; no plan exported.",
+    "reason_codes": [
+      "GEO-DRIVEWAY-INTERSECTION-CONFLICT",
+      "PLAN_VALIDATION_FAILED"
+    ]
+  },
+  "out_dir": "C:\\Users\\Sshah-Hexaware\\OneDrive - Pike Enterprises, LLC\\Desktop\\TCP\\runs\\20261020-181906-d7f8fc\\output",
+  "outputs": [
+    "eligibility_result.json",
+    "project_geometry.json",
+    "run_report.txt",
+    "site_model.json",
+    "validation_results.json"
+  ],
+  "plan_hash": null,
+  "reason_codes": [
+    "GEO-DRIVEWAY-INTERSECTION-CONFLICT",
+    "PLAN_VALIDATION_FAILED"
+  ]
+}
