@@ -40,6 +40,7 @@ export const STATUS_ICON: Record<StageStatus, string> = {
 
 export function decisionClass(d: Decision | null | undefined): string {
   if (d === "SUPPORTED_AUTO") return "ok";
+  if ((d as string) === "DRAFT_WITH_ENGINEERING_EXCEPTION") return "exc";
   if (d === "REVIEW_REQUIRED" || d === "STOPPED") return "warn";
   if (d === "UNSUPPORTED_POC" || d === "FAILED" || d === "ERROR") return "bad";
   return "run";

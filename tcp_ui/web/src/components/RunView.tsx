@@ -8,6 +8,8 @@ import ArtifactLink from "./ArtifactLink";
 import FinalDraft from "./FinalDraft";
 import StageList from "./StageList";
 import Summary from "./Summary";
+import SmeReviewEntry from "../assistant/SmeReviewEntry";
+import type { WhoAmI } from "../assistant/types";
 
 interface Props {
   runId: string;
@@ -15,6 +17,8 @@ interface Props {
   onFinished: () => void;
   onOpenRun: (runId: string) => void;
   onOpenComparison: (comparisonId: string) => void;
+  assistantEnabled?: boolean;
+  me?: WhoAmI | null;
 }
 
 function DecisionPanel({ run }: { run: RunState }) {
@@ -27,6 +31,15 @@ function DecisionPanel({ run }: { run: RunState }) {
       ))}
     </div>
   );
+  if ((run.decision as string) === "DRAFT_WITH_ENGINEERING_EXCEPTION") {
+    return (
+      <div className="banner exc">
+        <div className="big">DRAFT WITH ENGINEERING EXCEPTION – draft exported (SME revision)</div>
+        <div>One or more validator results remain CONFLICT and were accepted as plan-specific SME exceptions
+          (self-confirmed POC, not independently approved). Not a compliant draft.</div>
+      </div>
+    );
+  }
   switch (run.decision) {
     case "SUPPORTED_AUTO":
       return (
@@ -91,7 +104,7 @@ function DecisionPanel({ run }: { run: RunState }) {
 
 type Panel = { kind: "resume"; stage: string; title: string } | { kind: "compare" };
 
-export default function RunView({ runId, meta, onFinished, onOpenRun, onOpenComparison }: Props) {
+export default function RunView({ runId, meta, onFinished, onOpenRun, onOpenComparison, assistantEnabled, me }: Props) {
   const [run, setRun] = useState<RunState | null>(null);
   const [panel, setPanel] = useState<Panel | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -207,6 +220,8 @@ export default function RunView({ runId, meta, onFinished, onOpenRun, onOpenComp
       {panel?.kind === "compare" && (
         <ComparisonSetup runId={run.run_id} meta={meta} onStarted={onOpenComparison} onCancel={() => setPanel(null)} />
       )}
+
+      {!running && assistantEnabled && <SmeReviewEntry run={run} me={me ?? null} onOpenRun={onOpenRun} />}
 
       {run.draft_generated && <FinalDraft run={run} />}
 
