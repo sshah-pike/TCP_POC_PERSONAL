@@ -1,0 +1,104 @@
+{
+  "_note": "Assistant profiles on the common backend. Only sme_review is implemented; the others are reserved and disabled.",
+  "profiles": {
+    "sme_review": {
+      "enabled": true,
+      "version": "1.0.0",
+      "display_name": "TCP SME Review Assistant",
+      "allowed_tools": [
+        "load_run_context",
+        "list_review_findings",
+        "generate_annotated_image",
+        "get_annotated_image",
+        "preview_site_decisions",
+        "create_change_set",
+        "build_final_review",
+        "confirm_change_set",
+        "create_site_evidence_version",
+        "create_plan_version",
+        "determine_resume_step",
+        "resume_pipeline",
+        "finalize_resume",
+        "get_current_plan_version",
+        "calculate_device_position",
+        "check_spatial_conflicts",
+        "calculate_candidate_positions",
+        "evaluate_rule_impact",
+        "evaluate_ta_applicability",
+        "check_artifact_coverage",
+        "create_local_crop",
+        "record_exception",
+        "propose_object",
+        "interpret_sme_instruction",
+        "stage_decision",
+        "unstage_decision",
+        "build_proposal",
+        "stage_placement",
+        "stage_object",
+        "remove_object"
+      ],
+      "read_permissions": [
+        "review:read",
+        "artifact:read"
+      ],
+      "write_permissions": [
+        "review:decide",
+        "changeset:create",
+        "changeset:confirm",
+        "exception:confirm",
+        "pipeline:resume",
+        "message:submit"
+      ],
+      "confirmation_required_for": [
+        "confirm_change_set",
+        "create_site_evidence_version",
+        "create_plan_version",
+        "resume_pipeline",
+        "record_exception"
+      ],
+      "exception_policy": "SME_ACTION_POLICY.json",
+      "prompt_id": "sme_intent",
+      "prompt_version": "sme_intent_v1",
+      "guardrail_version": "sme_review_guardrails_v1",
+      "model": {
+        "provider": "foundry",
+        "foundry_profile": "gpt-5.6-sol",
+        "max_calls_per_message": 1,
+        "retry_policy": "NONE",
+        "timeout_s": 90,
+        "max_output_chars": 20000
+      },
+      "max_authorized_actions_per_conversation": 500,
+      "limits": {
+        "max_message_chars": 2000,
+        "messages_per_10_min": 20
+      },
+      "fail_closed_conditions": [
+        "INTENT_AMBIGUOUS",
+        "GEOMETRY_UNAVAILABLE",
+        "POSITION_NOT_CALCULABLE",
+        "ESSENTIAL_FACT_UNKNOWN",
+        "OUTSIDE_EVIDENCE_COVERAGE",
+        "RULE_APPLICABILITY_UNRESOLVED",
+        "TA_APPLICABILITY_UNRESOLVED",
+        "BLOCKING_CONFLICT_UNRESOLVED",
+        "AUTHORIZATION_ABSENT",
+        "EXCEPTION_REASON_MISSING",
+        "VERSION_WRITE_FAILED",
+        "AUDIT_WRITE_FAILED",
+        "ARTIFACT_WRITE_FAILED",
+        "STALE_REVIEW"
+      ]
+    },
+    "tcp_knowledge": {
+      "enabled": false,
+      "reserved": true,
+      "display_name": "TCP Knowledge Assistant (future)"
+    },
+    "document_revision": {
+      "enabled": false,
+      "reserved": true,
+      "display_name": "Document Revision Assistant (future)"
+    }
+  }
+}

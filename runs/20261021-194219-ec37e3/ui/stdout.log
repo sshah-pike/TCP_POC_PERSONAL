@@ -1,0 +1,30 @@
+TCP POC Pipeline 2  (tcp-poc 0.2.0)
+1 Input: KML  work reference 41.577, -71.691 (rounded)  path points 0
+2 Rule pack: APPROVED_TWO_LANE_POC_RULE_PACK v1.0.0 APPROVED_FOR_POC sha256 9402591080b1b03c... verified
+   SME revision tcp-plan-25a87c36-v2 (change set cs-20261021T140710-c588c8c4) verified
+3 Imagery: AZURE_MAPS  572 m across, 0.447 m/px
+4 OSM: road 'Ten Rod Road' highway=secondary lanes_tag=2 oneway=None
+5 AI vision: provider foundry, profile gpt-5.6-sol, deployment gpt-5.6-sol, api openai_responses - max 2 model calls
+   call 1 started: 1 image(s) -> foundry gpt-5.6-sol
+   call 1 (wide, blind to OSM): foundry gpt-5.6-sol - 0 extras
+   measure work_point (station 780 m): OK - width 6.8 m, road centre -3.17 m from OSM (YELLOW_LINE)
+   measure: work-point view resolved everything - sign close views skipped
+   compare: every image-resolvable field resolved - call 2 skipped
+   result: received from foundry (gpt-5.6-sol); model calls 1 of max 2
+6 SiteModel SITE-D7714CB174AB9834 critical fields:
+   lane_count         2                  RESOLVED        confidence HIGH
+   two_way            True               RESOLVED        confidence HIGH
+   divided            False              RESOLVED        confidence HIGH
+   facility_type      CONVENTIONAL_ROAD  RESOLVED        confidence HIGH
+   road_type          RURAL              RESOLVED        confidence HIGH
+   work.side          RIGHT              RESOLVED        confidence HIGH
+   work.location      BEYOND_SHOULDER    RESOLVED        confidence HIGH
+   work.encroaches    False              RESOLVED        confidence HIGH
+   work.lane_closure  False              RESOLVED        confidence HIGH
+   work.pedestrian    False              RESOLVED        confidence NONE
+   road_edges         6.8 m              RESOLVED
+7 Eligibility: SUPPORTED_AUTO  (all conditions pass)
+8 Rules: TA-1 Table 6B-1 RURAL A = 500 ft; 3 objects placed
+9 Validation: rule FAIL  geometry FAIL
+   SME disposition: DRAFT_WITH_ENGINEERING_EXCEPTION (2 active SME exception(s))
+10 Plan TCP-D7B520C2BA29D109 exported (hash d7b520c2ba29d109...); DWT: SKIPPED

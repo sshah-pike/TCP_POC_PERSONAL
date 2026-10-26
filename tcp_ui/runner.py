@@ -167,6 +167,7 @@ class _Evidence:
         self.vision_mode = (run or {}).get("vision_mode") or "baseline"
         self.osm_claims = bool((run or {}).get("osm_claims"))
         self.centerline_views = bool((run or {}).get("centerline_views"))
+        self.strict = bool((run or {}).get("strict_replay"))  # SME revision runs: replay or fail, never call a provider
         self.analysis = None  # (map provider, project geometry, half extent) of the analysis image
         self.osm_elements = None  # OSM elements the pipeline used (fetched or replayed)
         self._osm_geo = None
@@ -203,6 +204,7 @@ class _Evidence:
                     out.append({**spec, "image": img, "meta": found["metadata"]["meta"]}); continue
                 except Exception as e:
                     self.reject(V.VIEW_KIND, "saved view failed validation (%s)" % e)
+            self.strict_block(V.VIEW_KIND, ProviderError)
             t0 = time.perf_counter()
             try:
                 img, meta = inner.fetch_view(spec["lat"], spec["lon"], spec["zoom"], spec["size_px"])
@@ -276,6 +278,14 @@ class _Evidence:
                            source_run=self.replay.parent)
         return found
 
+    def strict_block(self, kind, error_cls):
+        """Strict replay: no verified saved artifact for this exact request -> fail closed instead of calling the provider."""
+        if not self.strict: return
+        self.rec.event(event="evidence", action="strict_replay_blocked", kind=kind, span=self.rec.span(),
+                       source_run=self.replay.parent if self.replay else None)
+        raise error_cls("REPLAY_EVIDENCE_REQUIRED", f"strict replay: no verified saved {kind} artifact matches this "
+                                                    "request; the provider is not called")
+
     def accept(self, found):
         self.store.reference(found, self.rec.span())
 
@@ -318,6 +328,8 @@ class EvidenceMapProvider:
                 return img, dict(meta)
             except Exception as e:
                 ev.reject("map", f"saved map artifact failed validation ({e})")
+        from tcp_poc.models import MapProviderError
+        ev.strict_block("map", MapProviderError)
         t0 = time.perf_counter()
         try:
             img, meta = inner.fetch_context(project_geometry, half_extent_m, size_px)
@@ -355,6 +367,8 @@ class EvidenceMapProvider:
                 return img, dict(found["metadata"]["meta"])
             except Exception as e:
                 ev.reject("map_crop", f"saved crop failed validation ({e})")
+        from tcp_poc.models import MapProviderError
+        ev.strict_block("map_crop", MapProviderError)
         t0 = time.perf_counter()
         try:
             img, meta = inner.fetch_view(lat, lon, zoom, size_px)
@@ -389,6 +403,8 @@ class EvidenceOsmSource:
                 return elements
             except Exception as e:
                 ev.reject("osm", f"saved OSM artifact failed validation ({e})")
+        from tcp_poc.models import OsmError
+        ev.strict_block("osm", OsmError)
         t0 = time.perf_counter()
         try:
             elements = self._fetch(lat, lon, radius_m)
@@ -452,6 +468,7 @@ class EvidenceVisionProvider:
                 return result
             except Exception as e:
                 ev.reject("ai", f"saved AI artifact failed validation ({getattr(e, 'code', '') or e})")
+        ev.strict_block("ai", ProviderError)
         t0 = time.perf_counter()
         meta = {"provider": getattr(self._inner, "name", None), "profile": getattr(self._inner, "profile", None),
                 "deployment": getattr(self._inner, "deployment", None), "backend": getattr(self._inner, "api", None),
@@ -554,6 +571,7 @@ def _run_context(run_dir, req, rec):
         ctx["evidence_mode"] = resume.get("evidence_mode") or ctx["evidence_mode"]
         for k in ("vision_mode", "osm_claims", "centerline_views"):
             if k in resume: ctx[k] = resume[k]
+        ctx["strict_replay"] = resume.get("strict_replay") is True  # SME revision runs only
         if resume.get("ai_profile"): os.environ["TCP_FOUNDRY_PROFILE"] = resume["ai_profile"]
     return ctx
 

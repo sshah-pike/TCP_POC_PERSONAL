@@ -47,6 +47,10 @@ def intersection_conflict(site_model, rule_pack, config):
     ai_ok = site_model["evidence"]["ai"]["available"] and ai_conf is not None and \
         ai_conf >= config["fusion"]["min_critical_confidence"]
     details = {"window_m": None if win == float("inf") else round(win, 2), "features_in_window": hits}
+    sme = ((site_model.get("sme_overlay") or {}).get("facts") or {}).get("site.complex_intersection_conflict")
+    if sme is not None and not hits:  # SME decision (revision runs only); feature evidence in the window takes precedence
+        details["sme_decision"] = sme
+        return sme["value"], (RESOLVED if sme["value"] is not None else "UNRESOLVED"), details
     if hits and win == float("inf"):
         # spacing unknown: only features inside the smallest possible approved window are definite conflicts
         margin = config["eligibility"]["intersection_window_margin_m"]

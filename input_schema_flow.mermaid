@@ -1,0 +1,12 @@
+flowchart TD
+  M[Mandatory start fields<br/>SME types them in the UI] --> R{All filled?}
+  R -- no --> M
+  R -- yes --> A[Run: KML coordinates + map]
+  A --> B[Call 1: AI marks positions<br/>and observes common facts]
+  B --> C[Code computes all lengths]
+  C --> D[Router picks the TA]
+  D --> E[Call 2: only the chosen TA's fields]
+  E --> F{Still unknown, or a check<br/>contradicts a mandatory value?}
+  F -- yes --> G[One SME form:<br/>asked-if-needed fields and conflicts]
+  F -- no --> H[Rule pack: eligibility,<br/>distances, placement]
+  G --> H

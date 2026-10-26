@@ -118,7 +118,7 @@ class DwtRenderer:
                 errors.append({"code": "DWT_LAYER_MISSING", "layers": missing,
                                "template_layers": sorted(have_layers)[:200]})
             if self.mode == "PLAN":
-                missing_blocks = [b for b in sorted({o["dwt_block"] for o in plan["objects"]})
+                missing_blocks = [b for b in sorted({o["dwt_block"] for o in plan["objects"] if o.get("dwt_block")})
                                   if not self._block_available(doc, cfg, b)]
                 if missing_blocks:
                     errors.append({"code": "DWT_BLOCK_MISSING", "blocks": missing_blocks,
@@ -200,6 +200,11 @@ class DwtRenderer:
                 msp.add_blockref(self._resolve_block(doc, cfg, o["dwt_block"]), xy,
                                  dxfattribs={"layer": layer("signs"), "rotation": rot})
                 msp.add_text(f"{o['object_id']} {o['sign_code']} {p['longitudinal_distance_ft']:g} FT",
+                             height=text_h, dxfattribs={"layer": layer("dimensions"),
+                                                        "insert": (xy[0] + text_h, xy[1] + text_h)})
+            elif o["object_type"] == "SME_PROPOSED_OBJECT":  # SME revision plans only: marker + label, no approved block
+                msp.add_circle(xy, radius=1.0 / u, dxfattribs={"layer": layer("signs")})
+                msp.add_text(f"{o['object_id']} SME PROPOSED {o.get('sme_category')} - NOT AN APPROVED TA-1 OBJECT",
                              height=text_h, dxfattribs={"layer": layer("dimensions"),
                                                         "insert": (xy[0] + text_h, xy[1] + text_h)})
 

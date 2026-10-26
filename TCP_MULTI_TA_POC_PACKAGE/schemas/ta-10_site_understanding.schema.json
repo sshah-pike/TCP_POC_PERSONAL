@@ -1,0 +1,906 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tcp-poc.local/ta-10.schema.json",
+  "title": "TA-10 Lane Closure on a Two-Lane Road Using Flaggers Site Understanding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "ta_id",
+    "source",
+    "observations",
+    "overall_confidence",
+    "review"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "ta_id": {
+      "const": "TA-10"
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "image_ids",
+        "kml_reference"
+      ],
+      "properties": {
+        "image_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "kml_reference": {
+          "type": "string"
+        }
+      }
+    },
+    "observations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lane_count",
+        "traffic_direction",
+        "divided",
+        "facility_type",
+        "posted_speed_mph",
+        "road_type",
+        "work_side",
+        "work_duration",
+        "intersection_conflict",
+        "driveway_conflict",
+        "pedestrian_route_present",
+        "pedestrian_route_affected",
+        "bicycle_facility_present",
+        "grade_crossing_nearby",
+        "available_sight_distance_ft",
+        "lane_closed",
+        "alternating_one_lane_required",
+        "one_lane_section_length_ft",
+        "flagger_control_type",
+        "flagger_mutual_visibility",
+        "queue_storage_available",
+        "night_work",
+        "flagger_station_lighted"
+      ],
+      "properties": {
+        "lane_count": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "type": "integer"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "traffic_direction": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "enum": [
+                "ONE_WAY",
+                "TWO_WAY"
+              ]
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "divided": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "facility_type": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "enum": [
+                "CONVENTIONAL_ROAD",
+                "FREEWAY_EXPRESSWAY"
+              ]
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "posted_speed_mph": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status",
+            "units"
+          ],
+          "properties": {
+            "value": {
+              "type": "integer"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            },
+            "units": {
+              "const": "mph"
+            }
+          }
+        },
+        "road_type": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "enum": [
+                "URBAN_LOW_SPEED",
+                "URBAN_HIGH_SPEED",
+                "RURAL",
+                "EXPRESSWAY_FREEWAY"
+              ]
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "work_side": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "enum": [
+                "LEFT",
+                "RIGHT",
+                "CENTER",
+                "UNKNOWN"
+              ]
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "work_duration": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "enum": [
+                "LONG_TERM",
+                "INTERMEDIATE_TERM",
+                "SHORT_TERM",
+                "SHORT_DURATION",
+                "MOBILE",
+                "UNKNOWN"
+              ]
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "intersection_conflict": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "driveway_conflict": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "pedestrian_route_present": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "pedestrian_route_affected": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "bicycle_facility_present": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "grade_crossing_nearby": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "available_sight_distance_ft": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status",
+            "units"
+          ],
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            },
+            "units": {
+              "const": "ft"
+            }
+          }
+        },
+        "lane_closed": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "alternating_one_lane_required": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "one_lane_section_length_ft": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status",
+            "units"
+          ],
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            },
+            "units": {
+              "const": "ft"
+            }
+          }
+        },
+        "flagger_control_type": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "enum": [
+                "TWO_FLAGGERS",
+                "ONE_FLAGGER",
+                "POLICE_DETAIL",
+                "AFAD",
+                "UNKNOWN"
+              ]
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "flagger_mutual_visibility": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "queue_storage_available": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "night_work": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        },
+        "flagger_station_lighted": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "confidence",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "enum": [
+                "DETERMINED",
+                "UNKNOWN",
+                "CONFLICT"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "overall_confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "review": {
+      "type": "object",
+      "required": [
+        "status",
+        "reason_codes"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "PASS",
+            "REVIEW_REQUIRED",
+            "UNSUPPORTED"
+          ]
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

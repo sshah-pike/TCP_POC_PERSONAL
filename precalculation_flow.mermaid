@@ -1,0 +1,13 @@
+flowchart TD
+  A[AI marks edges, lines,<br/>work point, objects] --> B[Code converts pixels to feet<br/>with ground scale]
+  K[KML coordinates + centerline<br/>+ USGS elevation] --> C[Code: gaps, path length,<br/>side roads, curves, crests]
+  B --> D[Lane width, shoulder, encroachment<br/>to the device face]
+  D --> E{Remaining width<br/>vs 10 ft and 9 ft}
+  E -- in uncertainty band --> U[UNKNOWN: SME confirms width]
+  E -- closure needed but SME said No --> X[Conflict on the SME form]
+  E -- consistent --> F[Fact resolved]
+  M[Mandatory SME fields<br/>road type, speed, volume,<br/>lane closure] --> F
+  T[duration, road type] --> V[Shadow vehicle, TMA,<br/>arrow board]
+  C --> F
+  V --> F
+  F --> R[Router and rule pack]

@@ -1,0 +1,40 @@
+{
+  "guardrail_version": "sme_review_guardrails_v1",
+  "note": "First-line deterministic input screening. Security does NOT rely on it: the closed schema, fixed tool allow-list, backend authorization, policy checks, deterministic validation, exact confirmation hash and immutable storage enforce the boundaries regardless of the model output.",
+  "out_of_scope_message": "This assistant only supports review and revision of the active TCP draft.",
+  "security_message": "This request cannot be processed: it asks the assistant to bypass its controls, change governed configuration, access secrets or act outside the active TCP draft. No change was made.",
+  "harmful_message": "This request cannot be processed. No change was made.",
+  "injection_patterns": [
+    "ignore (all |any |the )?(previous|prior|above|earlier) (instructions|rules|prompts?)",
+    "disregard (all |any |the )?(previous|prior|above|system)",
+    "(act|behave|pretend|respond) as (an? )?(admin|administrator|system|developer|root|superuser)",
+    "you are now", "system prompt", "jailbreak", "developer mode",
+    "approve (this|it|the change|the plan)? ?(automatically|now|for me)", "auto[- ]?approve",
+    "(return|reveal|print|show|give|send|tell)( me)? (the |your )?(api[ _-]?key|key|token|password|secret|credential|connection string|env)",
+    "(api[ _-]?key|access token|subscription key|password|credentials?)\\b",
+    "(modify|change|edit|disable|bypass|turn off|rewrite|delete) (the )?(validator|validation|rule[ -]?pack|policy|guardrail|audit)",
+    "skip (the )?(final )?(review|confirmation|validation)",
+    "(run|execute|eval) (this |the |a )?(command|script|code|shell|powershell|python)",
+    "\\b(rm -rf|del /|format c:|drop table|curl |wget |powershell|cmd\\.exe|os\\.system|subprocess)",
+    "delete (the |all )?(previous |prior |old )?(plan|run|version|artifact|evidence|file|audit)",
+    "call (azure|azure maps|foundry|osm|openstreetmap)( anyway| now)?",
+    "mark (it|this|the plan|them)? ?(as )?compliant", "make it pass", "force (it )?to pass",
+    "(change|grant|give|set) (me |my )?(role|permission|access)", "exfiltrat", "\\.env\\b", "c:\\\\\\\\|/etc/|\\.\\./"
+  ],
+  "harmful_patterns": [
+    "malware", "ransomware", "keylogger", "exploit (code|kit)?", "zero[- ]day", "phishing", "steal (credentials|passwords|data)",
+    "credential theft", "ddos", "botnet", "\\bbomb\\b", "explosive", "weapon", "\\bkill\\b", "murder", "suicide",
+    "self[- ]harm", "porn", "sexual", "\\bnude", "harass", "threaten", "racist", "terroris"
+  ],
+  "unrelated_patterns": [
+    "\\bweather\\b", "\\bjoke\\b", "\\brecipe\\b", "stock (price|market)", "\\bmovie\\b", "\\bpoem\\b", "\\bsong\\b",
+    "capital of", "who (is|was) the (president|king|ceo)", "translate (this|to)", "write (me )?an? (essay|story|email)",
+    "\\bhoroscope\\b", "\\bsports?\\b score", "\\bbitcoin\\b", "personal advice", "dating", "medical advice", "homework",
+    "search the web", "browse", "news today"
+  ],
+  "domain_terms": ["sign", "s1", "s2", "s3", "w1", "lane", "sidewalk", "pedestrian", "intersection", "driveway", "crosswalk",
+                   "upstream", "downstream", "move", "taper", "buffer", "pcms", "cone", "flagger", "work", "shoulder",
+                   "road", "station", "offset", "feet", "ft", "meter", "plan", "draft", "finding", "rule", "ta-1", "ta",
+                   "typical application", "exception", "edge", "width", "divided", "two-way", "one-way", "marking",
+                   "confirm", "reject", "unresolved", "device", "traffic", "spacing", "approach", "revision", "explain", "why"]
+}

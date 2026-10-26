@@ -167,6 +167,21 @@ class SheetRenderer:
             vp.annotate("", a1, a0, arrowprops=dict(arrowstyle="<|-|>", color="black", lw=0.8, mutation_scale=12), zorder=6)
             vp.text((a0[0] + a1[0]) / 2, (a0[1] + a1[1]) / 2, f"{p['longitudinal_distance_ft']:g}'", fontsize=11,
                     ha="center", va="center", zorder=9, bbox=dict(boxstyle="square,pad=0.2", fc="white", ec="none"))
+            if o.get("sme"):  # SME-changed object (revision plans only)
+                from .sme_render import object_tag, PURPLE
+                vp.text(sp[0] + n[0] * 0.3 * u, sp[1] + n[1] * 0.3 * u, object_tag(o), fontsize=9, color="white",
+                        ha="center", va="center", zorder=13, bbox=dict(boxstyle="square,pad=0.2", fc=PURPLE, ec="black"))
+
+        for o in objs:  # SME-proposed objects (SME revision plans only): purple marker and label, never a TA-1 symbol
+            if o["object_type"] != "SME_PROPOSED_OBJECT": continue
+            from .sme_render import PURPLE
+            sp = local(o["placement"])
+            if o["placement"].get("zone"):
+                vp.plot(*zip(*[local(q) for q in o["placement"]["zone"]]), color=PURPLE, lw=4, alpha=0.8, zorder=8)
+            vp.plot(*sp, "s", ms=9, color=PURPLE, zorder=9)
+            vp.text(sp[0], sp[1] - 0.3 * u, f"{o['object_id']} SME PROPOSED {o.get('sme_category')}\n(UNSUPPORTED - EXCEPTION)",
+                    fontsize=9, color="white", ha="center", va="top", zorder=13,
+                    bbox=dict(boxstyle="square,pad=0.2", fc=PURPLE, ec="black"))
 
         # ---- overlay in page points: notes box back on top, border, title-block values ----
         ov = fig.add_axes([0, 0, 1, 1], facecolor="none"); ov.axis("off")
@@ -202,6 +217,11 @@ class SheetRenderer:
                  "-  FIELD-VERIFY SIGN LOCATIONS; KEEP SIGNS OFF THE TRAVELED WAY AND SHOULDER; ALLOW DRIVEWAY ACCESS."]
         for i, t in enumerate(notes):
             ov.text(x0 + 7, y0 + 6 + i * 11, t, fontsize=7.6, ha="left", va="center", zorder=4)
+        from .sme_render import exception_lines, PURPLE  # SME revision plans only; empty for normal plans
+        exl = exception_lines(plan)
+        if exl:
+            ov.text(vx0 + 10, vy0 + 14, "\n".join(exl), fontsize=8, color="white", ha="left", va="top", zorder=5,
+                    bbox=dict(boxstyle="square,pad=0.4", fc=PURPLE, ec="black", lw=0.8))
         x0, y0, x1, y1 = R["scale_cell"]; bx = x0 + 105; by = y0 + 42
         ov.text(bx + 144, y0 + 18, f'1"=  {S}  FEET', fontsize=11, ha="center", va="center", color="#555", zorder=4)
         for i in range(4):

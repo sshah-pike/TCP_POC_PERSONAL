@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "sha256": {
+    "README.md": "ec92c918476a204b8da83f4d6de6a7cd66fa7b30f9a8a6a18ea9943ee04e9fec",
+    "ai/AI_SITE_UNDERSTANDING_INPUT_CONTRACT.json": "1ab35ea932909796179b3f47c100a7ff5fd2301655b8450c979ceba7559c2a34",
+    "kml/ta-10_example.kml": "f056da1672d86a38bdf2e4d72ff5904bb08eaa13bffb0e2372c0bfebad2b6923",
+    "kml/ta-33_example.kml": "89b7dcc396bb5217f2e54110c2031bdf839398e53a0c8b8ccb770b43300317f0",
+    "kml/ta-6_example.kml": "b3713dccbc019150db77b39e6dcc35c09cc0b057a556319afcd193b59217ee5c",
+    "routing/ta_schema_router.json": "a18751dc5b6eed58edc3418c5c9eaa0e6d4c3f1e8f0a22fac0cb88c9dddf19e4",
+    "rule_pack/APPROVED_MULTI_TA_POC_RULE_PACK_v2.json": "04dcab82ed24e3c1d553ea3be1295de5f113e060ca4050fe35f331dca52c54d9",
+    "schemas/ta-10_site_understanding.schema.json": "8ffe217ac94a54b794a485fad4773d7f5f0baf1c042e4ce7a7d6f33a7c36a0b1",
+    "schemas/ta-33_site_understanding.schema.json": "e91d76c32ad58118fa7561b6b3a08f67f5f4daf33300a73e88d9dd07b128b510",
+    "schemas/ta-6_site_understanding.schema.json": "054400db910aa26636523773f13725821edce2984d99047af11f5c893b61fe6c"
+  }
+}

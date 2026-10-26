@@ -1,6 +1,12 @@
 cache image with  time to live to avoid stalesness with exact co-ordinates so no new API call 
 search for python to crop images so save Azure API calls 
 Hallucination reduction for AI 
+worklocation marked and site understanding image 
+create seperate file for prompts and version control for it
+Understand intent if intent is something else say please provide info related to TCP
+1. input limits + rate limit + deterministic screening (security / harmful / clearly unrelated -> no model call)
+
+remove rate limit as done with login as only authofized role can do that
 
 
 
@@ -8,3 +14,37 @@ Fix - 01
 error status display instead of review 
 reduce api call
 show measure etc pipline of AI doing 
+
+
+
+
+Library
+state documents
+Phases how to manage 
+How handle zone work multi points 
+Zone longer than 150 m (D-19). The engine builds a work path up to 150 m, a config setting [S2]. Seven poles 30 m apart span 180 m.
+Option
+Gain
+Cost
+A. Ask the SME, with a proposed split
+No hidden overlap
+One more question
+B. Split automatically with a flag
+No effort
+Overlap at the seam, which the cross-zone check flags
+C. Raise the limit
+One real plan
+Behavior beyond 150 m is untested
+If undecided, A is the safest default.
+
+One sheet per zone plus a cover page, several adjacent zones on one sheet, or one large sheet. I don't know how your SME draws these in AutoCAD, so the reference drawings should decide it.
+
+
+a road 2 signs 1 sign  -- 2lanes 
+b road 1 sign  4 lanes -- 2 sign 
+
+
+Exceptions : 
+1 MUTCD derived exception 10m 
+2 SME derived exception 10m 
+3 

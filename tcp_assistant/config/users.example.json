@@ -1,0 +1,8 @@
+{
+  "_note": "Copy to users.local.json (git-ignored). Local POC identities for the selection dropdown. NO credentials, passwords, password hashes or secrets belong in this file; entries containing such keys are ignored. Roles: SME_REVIEWER, AUDITOR, ADMIN.",
+  "users": [
+    {"subject_id": "sme.reviewer.1", "display_name": "SME Reviewer 1", "roles": ["SME_REVIEWER"]},
+    {"subject_id": "auditor.1", "display_name": "Auditor 1", "roles": ["AUDITOR"]},
+    {"subject_id": "admin.1", "display_name": "Admin 1", "roles": ["ADMIN"]}
+  ]
+}

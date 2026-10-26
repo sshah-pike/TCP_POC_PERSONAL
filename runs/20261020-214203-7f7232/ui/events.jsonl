@@ -1,0 +1,44 @@
+{"attributes": {"input_type": "KML"}, "event": "span_start", "name": "tcp.input.parse", "t": "2026-10-20T16:12:22.524+00:00"}
+{"attributes": {"features": 1, "input_hash": "sha256:758d94c870b8", "input_type": "KML"}, "duration_ms": 16.5, "event": "span_end", "name": "tcp.input.parse", "status": "OK", "t": "2026-10-20T16:12:22.541+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.rulepack.load", "t": "2026-10-20T16:12:22.542+00:00"}
+{"attributes": {"rule_pack_hash": "9402591080b1b03c", "rule_pack_id": "APPROVED_TWO_LANE_POC_RULE_PACK", "rule_pack_version": "1.0.0"}, "duration_ms": 5.8, "event": "span_end", "name": "tcp.rulepack.load", "status": "OK", "t": "2026-10-20T16:12:22.549+00:00"}
+{"attributes": {"provider": "azure_maps"}, "event": "span_start", "name": "tcp.map.retrieve", "t": "2026-10-20T16:12:22.549+00:00"}
+{"action": "saved", "artifact_id": "map_1", "event": "evidence", "file": "map_1.png", "kind": "map", "sha256": "863deb5a119210aeff99c85540d1985330a2dc71fec90b6d0874fdc3449f6aac", "span": "tcp.map.retrieve", "t": "2026-10-20T16:12:25.427+00:00"}
+{"attributes": {"metres_per_pixel": 0.446715, "provider": "azure_maps", "width_px": 1280}, "duration_ms": 2874.4, "event": "span_end", "name": "tcp.map.retrieve", "status": "OK", "t": "2026-10-20T16:12:25.427+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.osm.resolve", "t": "2026-10-20T16:12:25.428+00:00"}
+{"action": "saved", "artifact_id": "osm_1", "event": "evidence", "file": "osm_1.json", "kind": "osm", "sha256": "24d3365e10ee3e6cd976e3d5f1ebb78953931256c392c0eedf463a16adbe8406", "span": "tcp.osm.resolve", "t": "2026-10-20T16:12:27.482+00:00"}
+{"attributes": {"highway": "secondary", "way_count": 1}, "duration_ms": 2064.1, "event": "span_end", "name": "tcp.osm.resolve", "status": "OK", "t": "2026-10-20T16:12:27.492+00:00"}
+{"attributes": {"api": "openai_responses", "deployment": "gpt-5.6-sol", "profile": "gpt-5.6-sol", "provider": "foundry"}, "event": "span_start", "name": "tcp.vision.analyze", "t": "2026-10-20T16:12:27.496+00:00"}
+{"attributes": {"deployment": "gpt-5.6-sol", "provider": "foundry", "purpose": "wide image, blind to OSM", "views_sent": 1}, "event": "span_start", "name": "tcp.agent.call1", "t": "2026-10-20T16:12:27.497+00:00"}
+{"action": "saved", "artifact_id": "ai_1", "event": "evidence", "file": "ai_1.json", "kind": "ai", "sha256": "325fec63ce0421e714db12c3906b583d04ba86b393a611888c7db991e9780d04", "span": "tcp.vision.analyze", "t": "2026-10-20T16:13:22.755+00:00"}
+{"attributes": {"deployment": "gpt-5.6-sol", "error_code": null, "model": "gpt-5.6-sol", "outcome": "OK", "provider": "foundry", "purpose": "wide image, blind to OSM", "usage_in": 3181, "usage_out": 3982, "views_sent": 1}, "duration_ms": 55256.9, "event": "span_end", "name": "tcp.agent.call1", "status": "OK", "t": "2026-10-20T16:13:22.756+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.agent.compare", "t": "2026-10-20T16:13:22.756+00:00"}
+{"attributes": {"outcome": "UNRESOLVED", "unresolved": "road_edges"}, "duration_ms": 4.3, "event": "span_end", "name": "tcp.agent.compare", "status": "OK", "t": "2026-10-20T16:13:22.761+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.agent.measure", "t": "2026-10-20T16:13:22.761+00:00"}
+{"action": "saved", "artifact_id": "map_crop_1", "event": "evidence", "file": "map_crop_1.png", "kind": "map_crop", "sha256": "bc26b67d12f852ce2db2416969b1ccee87b64144cdaa40e6eef7c8aeae131c66", "span": "tcp.vision.analyze", "t": "2026-10-20T16:13:24.558+00:00"}
+{"attributes": {"centre_offset": -3.175, "map_requests": 1, "outcome": "OK", "reused_views": 0, "sources": "measure work_point: Azure API request", "views": 1, "width": 6.8}, "duration_ms": 2079.7, "event": "span_end", "name": "tcp.agent.measure", "status": "OK", "t": "2026-10-20T16:13:24.841+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.agent.recompare", "t": "2026-10-20T16:13:24.842+00:00"}
+{"attributes": {"outcome": "RESOLVED_AFTER_MEASURE", "unresolved": ""}, "duration_ms": 42.7, "event": "span_end", "name": "tcp.agent.recompare", "status": "OK", "t": "2026-10-20T16:13:24.885+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.agent.crops", "t": "2026-10-20T16:13:24.886+00:00"}
+{"attributes": {"outcome": "SKIPPED", "reason": "nothing unresolved after call 1 and measurement; 1 close view(s) already fetched for measurement (1 map request(s)), no extra crops needed"}, "duration_ms": 0.0, "event": "span_end", "name": "tcp.agent.crops", "status": "OK", "t": "2026-10-20T16:13:24.887+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.agent.call2", "t": "2026-10-20T16:13:24.887+00:00"}
+{"attributes": {"outcome": "SKIPPED", "reason": "nothing unresolved after call 1 and measurement; 1 close view(s) already fetched for measurement (1 map request(s)), no extra crops needed"}, "duration_ms": 0.0, "event": "span_end", "name": "tcp.agent.call2", "status": "OK", "t": "2026-10-20T16:13:24.888+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.agent.consistency", "t": "2026-10-20T16:13:24.888+00:00"}
+{"attributes": {"outcome": "SKIPPED", "reason": "nothing unresolved after call 1 and measurement; 1 close view(s) already fetched for measurement (1 map request(s)), no extra crops needed"}, "duration_ms": 0.0, "event": "span_end", "name": "tcp.agent.consistency", "status": "OK", "t": "2026-10-20T16:13:24.889+00:00"}
+{"attributes": {"api": "openai_responses", "crops": 0, "deployment": "gpt-5.6-sol", "model": "gpt-5.6-sol", "model_calls": 1, "profile": "gpt-5.6-sol", "provider": "foundry", "status_code": "OK"}, "duration_ms": 57390.9, "event": "span_end", "name": "tcp.vision.analyze", "status": "OK", "t": "2026-10-20T16:13:24.889+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.fuse", "t": "2026-10-20T16:13:24.889+00:00"}
+{"attributes": {"conflicts": 0, "inputs_complete": true, "site_model_id": "SITE-0A979FC3D06655C6"}, "duration_ms": 38.7, "event": "span_end", "name": "tcp.site.fuse", "status": "OK", "t": "2026-10-20T16:13:24.929+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.site.eligibility", "t": "2026-10-20T16:13:24.936+00:00"}
+{"attributes": {"decision": "SUPPORTED_AUTO", "reason_codes": ""}, "duration_ms": 0.1, "event": "span_end", "name": "tcp.site.eligibility", "status": "OK", "t": "2026-10-20T16:13:24.936+00:00"}
+{"attributes": {"ta_id": "TA-1"}, "event": "span_start", "name": "tcp.rules.execute", "t": "2026-10-20T16:13:24.938+00:00"}
+{"attributes": {"objects": 3, "options": 0, "ta_id": "TA-1"}, "duration_ms": 0.2, "event": "span_end", "name": "tcp.rules.execute", "status": "OK", "t": "2026-10-20T16:13:24.938+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.geometry.place", "t": "2026-10-20T16:13:24.939+00:00"}
+{"attributes": {"issues": ""}, "duration_ms": 0.6, "event": "span_end", "name": "tcp.geometry.place", "status": "OK", "t": "2026-10-20T16:13:24.940+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.plan.validate", "t": "2026-10-20T16:13:24.941+00:00"}
+{"attributes": {"geometry": "PASS", "rule": "PASS"}, "duration_ms": 4.5, "event": "span_end", "name": "tcp.plan.validate", "status": "OK", "t": "2026-10-20T16:13:24.946+00:00"}
+{"attributes": {"plan_id": "TCP-BFD7480418599BDB"}, "event": "span_start", "name": "tcp.debug.render", "t": "2026-10-20T16:13:24.965+00:00"}
+{"attributes": {"plan_id": "TCP-BFD7480418599BDB"}, "duration_ms": 4773.7, "event": "span_end", "name": "tcp.debug.render", "status": "OK", "t": "2026-10-20T16:13:29.739+00:00"}
+{"attributes": {"plan_id": "TCP-BFD7480418599BDB"}, "event": "span_start", "name": "tcp.sheet.render", "t": "2026-10-20T16:13:29.740+00:00"}
+{"attributes": {"plan_id": "TCP-BFD7480418599BDB", "scale_ft_per_in": 40, "status_code": "RENDERED"}, "duration_ms": 21055.3, "event": "span_end", "name": "tcp.sheet.render", "status": "OK", "t": "2026-10-20T16:13:50.796+00:00"}
+{"attributes": {}, "event": "span_start", "name": "tcp.dwt.render", "t": "2026-10-20T16:13:50.797+00:00"}
+{"attributes": {"status_code": "SKIPPED_NO_DWT_CONFIG"}, "duration_ms": 0.0, "event": "span_end", "name": "tcp.dwt.render", "status": "OK", "t": "2026-10-20T16:13:50.798+00:00"}

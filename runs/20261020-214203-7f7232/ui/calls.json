@@ -1,0 +1,28 @@
+[
+  {
+    "duration_ms": 2685.1,
+    "external": true,
+    "provider": "azure_maps",
+    "purpose": "analysis map",
+    "requests": 1,
+    "service": "map",
+    "span": "tcp.map.retrieve"
+  },
+  {
+    "duration_ms": 2027.9,
+    "external": true,
+    "provider": "osm_api",
+    "requests": 1,
+    "service": "osm",
+    "span": "tcp.osm.resolve"
+  },
+  {
+    "duration_ms": 1647.3,
+    "external": true,
+    "provider": "azure_maps",
+    "purpose": "measure work_point (zoom 19)",
+    "requests": 1,
+    "service": "map",
+    "span": "tcp.vision.analyze"
+  }
+]

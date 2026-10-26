@@ -1,0 +1,315 @@
+{
+  "approval_mode": "SELF_CONFIRMED_POC",
+  "change_set_id": "cs-20261023T144604-cfefdef4",
+  "config_sha256": "5a5d5f05610411d4df0d8320a18d1df1a897a02905d13eaef75c3bf0c670084e",
+  "content_sha256": "e0b5dcc1147b7c4bd2b136ec0e5af79f503b2db7a8c55fb2f02801c215a41014",
+  "created_at": "2026-10-23T14:46:04.914+00:00",
+  "created_by": "sme.reviewer.1",
+  "decisions": {
+    "facts": [],
+    "features": [],
+    "sidewalks": [
+      {
+        "action": "SET",
+        "decided_at": "2026-10-21T16:57:00.269+00:00",
+        "decided_by": "sme.reviewer.1",
+        "decision_id": "dec-20261021T165700-b2259d41",
+        "finding_id": "F-AA7C131AA7",
+        "message_id": null,
+        "present": false,
+        "reason": null,
+        "side": "LEFT"
+      },
+      {
+        "action": "SET",
+        "decided_at": "2026-10-21T14:07:10.322+00:00",
+        "decided_by": "sme.reviewer.1",
+        "decision_id": "dec-20261021T140710-8c604e33",
+        "finding_id": "F-3F9657A1CA",
+        "message_id": null,
+        "present": false,
+        "reason": "field verified - no sidewalk on right",
+        "side": "RIGHT"
+      }
+    ]
+  },
+  "exceptions": [
+    {
+      "action": "override_rule_conflict",
+      "approval_mode": "SELF_CONFIRMED_POC",
+      "check_id": "GEO-DRIVEWAY-INTERSECTION-CONFLICT",
+      "confirmed_at": "2026-10-23T14:41:36.946+00:00",
+      "confirmed_by": "sme.reviewer.1",
+      "confirmed_by_roles": [
+        "SME_REVIEWER"
+      ],
+      "current_validator_result": "PASS",
+      "detail": {
+        "conflicts": [
+          {
+            "feature": "driveways",
+            "object": "S1",
+            "source": "OSM",
+            "station_m": 549.01
+          }
+        ]
+      },
+      "disposition_if_confirmed": "ACCEPTED_WITH_SME_OVERRIDE",
+      "engineering_impact": "The plan will knowingly not satisfy VAL-CONFLICT: sign is not hidden and does not create unresolved driveway/intersection conflict. The rule result stays CONFLICT; the draft is marked DRAFT_WITH_ENGINEERING_EXCEPTION.",
+      "exception_id": "exc-20261023T144136-ea6fefbf",
+      "independent_approval": false,
+      "object_ids": [
+        "S1"
+      ],
+      "plan_status_if_confirmed": "DRAFT_WITH_ENGINEERING_EXCEPTION",
+      "proposed_validator_result": "FAIL",
+      "reason": "approved",
+      "requested_by": "sme.reviewer.1",
+      "rule_id": "VAL-CONFLICT",
+      "rule_pack": {
+        "hash": "9402591080b1b03cec63c2aa4b0a022760c960015967b975b2adc11e8e64f3d4",
+        "id": "APPROVED_TWO_LANE_POC_RULE_PACK",
+        "version": "1.0.0"
+      },
+      "rule_severity": "BLOCK",
+      "rule_status": "CONFLICT",
+      "rule_text": "sign is not hidden and does not create unresolved driveway/intersection conflict",
+      "scope": "THIS_PLAN_VERSION_ONLY",
+      "summary": "GEO-DRIVEWAY-INTERSECTION-CONFLICT accepted as SME exception",
+      "type": "RULE_CONFLICT",
+      "validator_result": "FAIL"
+    },
+    {
+      "action": "override_rule_conflict",
+      "approval_mode": "SELF_CONFIRMED_POC",
+      "check_id": "GEO-STATION",
+      "confirmed_at": "2026-10-23T14:41:22.748+00:00",
+      "confirmed_by": "sme.reviewer.1",
+      "confirmed_by_roles": [
+        "SME_REVIEWER"
+      ],
+      "current_validator_result": "FAIL",
+      "detail": {
+        "objects": [
+          "S1"
+        ]
+      },
+      "disposition_if_confirmed": "ACCEPTED_WITH_SME_OVERRIDE",
+      "engineering_impact": "The plan will knowingly not satisfy VAL-SPACING: W20-1 longitudinal distance equals applicable Table 6B-1 A value before documented field adjustment. The rule result stays CONFLICT; the draft is marked DRAFT_WITH_ENGINEERING_EXCEPTION.",
+      "exception_id": "exc-20261023T144122-4415253d",
+      "independent_approval": false,
+      "object_ids": [
+        "S1"
+      ],
+      "plan_status_if_confirmed": "DRAFT_WITH_ENGINEERING_EXCEPTION",
+      "proposed_validator_result": "FAIL",
+      "reason": "Approved",
+      "requested_by": "sme.reviewer.1",
+      "rule_id": "VAL-SPACING",
+      "rule_pack": {
+        "hash": "9402591080b1b03cec63c2aa4b0a022760c960015967b975b2adc11e8e64f3d4",
+        "id": "APPROVED_TWO_LANE_POC_RULE_PACK",
+        "version": "1.0.0"
+      },
+      "rule_severity": "BLOCK",
+      "rule_status": "CONFLICT",
+      "rule_text": "W20-1 longitudinal distance equals applicable Table 6B-1 A value before documented field adjustment",
+      "scope": "THIS_PLAN_VERSION_ONLY",
+      "summary": "GEO-STATION accepted as SME exception",
+      "type": "RULE_CONFLICT",
+      "validator_result": "FAIL"
+    },
+    {
+      "action": "override_rule_conflict",
+      "approval_mode": "SELF_CONFIRMED_POC",
+      "check_id": "VAL-SPACING",
+      "confirmed_at": "2026-10-23T14:41:04.627+00:00",
+      "confirmed_by": "sme.reviewer.1",
+      "confirmed_by_roles": [
+        "SME_REVIEWER"
+      ],
+      "current_validator_result": "FAIL",
+      "detail": {
+        "expected_ft": 500,
+        "objects": [
+          "S1"
+        ]
+      },
+      "disposition_if_confirmed": "ACCEPTED_WITH_SME_OVERRIDE",
+      "engineering_impact": "The plan will knowingly not satisfy VAL-SPACING: W20-1 longitudinal distance equals applicable Table 6B-1 A value before documented field adjustment. The rule result stays CONFLICT; the draft is marked DRAFT_WITH_ENGINEERING_EXCEPTION.",
+      "exception_id": "exc-20261023T144104-f3c06126",
+      "independent_approval": false,
+      "object_ids": [
+        "S1"
+      ],
+      "plan_status_if_confirmed": "DRAFT_WITH_ENGINEERING_EXCEPTION",
+      "proposed_validator_result": "FAIL",
+      "reason": "approved",
+      "requested_by": "sme.reviewer.1",
+      "rule_id": "VAL-SPACING",
+      "rule_pack": {
+        "hash": "9402591080b1b03cec63c2aa4b0a022760c960015967b975b2adc11e8e64f3d4",
+        "id": "APPROVED_TWO_LANE_POC_RULE_PACK",
+        "version": "1.0.0"
+      },
+      "rule_severity": "BLOCK",
+      "rule_status": "CONFLICT",
+      "rule_text": "W20-1 longitudinal distance equals applicable Table 6B-1 A value before documented field adjustment",
+      "scope": "THIS_PLAN_VERSION_ONLY",
+      "summary": "VAL-SPACING accepted as SME exception",
+      "type": "RULE_CONFLICT",
+      "validator_result": "FAIL"
+    }
+  ],
+  "expected": {
+    "objects": [
+      [
+        "S1",
+        553.937,
+        41.5773745,
+        -71.6881236
+      ],
+      [
+        "S2",
+        931.886,
+        41.577215,
+        -71.692659
+      ],
+      [
+        "W1",
+        779.486,
+        41.5773933,
+        -71.6908347
+      ]
+    ],
+    "plan_status": "DRAFT_WITH_ENGINEERING_EXCEPTION",
+    "site_model_id": "SITE-BCC8DC8F24CBFFA5"
+  },
+  "independent_approval": false,
+  "lineage_key": "25a87c36362ab66f",
+  "machine_site_model_id": "SITE-C193FE97E8572BA4",
+  "parent_run_id": "20261022-183937-50ff4c",
+  "parent_version_id": "tcp-plan-25a87c36-v5",
+  "placement_adjustments": [
+    {
+      "adjustment_id": "adj-20261023T144034-fc913baa",
+      "calculation": {
+        "accuracy": {
+          "centerline_correction_applied": true,
+          "centerline_source": "OSM+MEASURED",
+          "declared_alignment_uncertainty_m": 2.5,
+          "frame": "LOCAL_TANGENT_PLANE_AT_WORK_REFERENCE",
+          "image_metres_per_pixel": 0.446715
+        },
+        "actual_along_alignment_m": 30.48,
+        "current": {
+          "latitude": 41.5773762,
+          "longitude": -71.6884896,
+          "offset_m": -5.409,
+          "recorded_station_m": 584.416,
+          "side": "RIGHT",
+          "snap_distance_m": 0.0,
+          "station_m": 584.417
+        },
+        "lateral_offset_preserved": true,
+        "method": "Along the saved roadway alignment (cross-section-corrected OSM centerline) in the local tangent plane at the work reference; constant lateral offset; never a latitude/longitude delta",
+        "proposed": {
+          "latitude": 41.5773745,
+          "longitude": -71.6881236,
+          "offset_m": -5.409,
+          "side": "RIGHT",
+          "station_m": 553.937
+        },
+        "station_change_m": -30.48,
+        "straight_line_m": 30.48
+      },
+      "candidate_kind": null,
+      "lateral_m": -5.409,
+      "message_id": "msg-20261023T143932-70b63a23",
+      "object_id": "S1",
+      "preserve_lateral_offset": true,
+      "reason": "Approved still",
+      "requested": {
+        "device_id": "S1",
+        "direction": "UPSTREAM",
+        "distance": 100,
+        "distance_m": 30.48,
+        "operation": "MOVE_DEVICE",
+        "preserve_lateral_offset": true,
+        "unit": "FT"
+      },
+      "spatial_conflicts": [
+        {
+          "distance_to_boundary_m": 0.0,
+          "explanation": "proposed device inside the approximate driveway area",
+          "feature": {
+            "confidence": null,
+            "evidence_version": "SITE-BCC8DC8F24CBFFA5",
+            "feature_id": "osm:driveways:way:754143983",
+            "side": "RIGHT",
+            "source": "OSM",
+            "station_m": 549.01,
+            "status": "MAPPED",
+            "type": "DRIVEWAY"
+          },
+          "influence_half_length_m": 5.0,
+          "overlap_m": 0.573,
+          "relationship": "PROPOSED_POINT_INSIDE",
+          "severity": "BLOCKING"
+        },
+        {
+          "distance_m": 4.927,
+          "feature": {
+            "confidence": null,
+            "evidence_version": "SITE-BCC8DC8F24CBFFA5",
+            "feature_id": "osm:driveways:way:754143983",
+            "side": "RIGHT",
+            "source": "OSM",
+            "station_m": 549.01,
+            "status": "MAPPED",
+            "type": "DRIVEWAY"
+          },
+          "overlap_m": 10.573,
+          "overridable": true,
+          "relationship": "PLACEMENT_CLEARANCE_OVERLAPS",
+          "required_clearance_m": 15.0,
+          "rule": "GEO-DRIVEWAY-INTERSECTION-CONFLICT / VAL-CONFLICT (poc_config placement.sign_feature_clearance_m)",
+          "severity": "BLOCKING"
+        },
+        {
+          "feature": {
+            "confidence": null,
+            "evidence_version": "SITE-BCC8DC8F24CBFFA5",
+            "feature_id": "osm:driveways:way:754143983",
+            "side": "RIGHT",
+            "source": "OSM",
+            "station_m": 549.01,
+            "status": "MAPPED",
+            "type": "DRIVEWAY"
+          },
+          "relationship": "PATH_CROSSES_FEATURE",
+          "severity": "WARNING"
+        }
+      ],
+      "station_m": 553.937
+    }
+  ],
+  "plan_version_id": "tcp-plan-25a87c36-v6",
+  "policy": {
+    "id": "TCP_SME_ACTION_POLICY",
+    "sha256": "38be5352d151d80fe18340e7a8eb491206e7717195c69cdf1153cd4d9e1d9398",
+    "version": "0.1.0"
+  },
+  "proposed_objects": [],
+  "removed_objects": [],
+  "review_sha256": "2f456de298d51626e8e8f3a9579d2eeb5235295134af6f55a427f944202a60eb",
+  "revision_id": "rev-20261023T144604-600f9728",
+  "rule_pack": {
+    "hash": "9402591080b1b03cec63c2aa4b0a022760c960015967b975b2adc11e8e64f3d4",
+    "id": "APPROVED_TWO_LANE_POC_RULE_PACK",
+    "version": "1.0.0"
+  },
+  "schema": "tcp-sme-revision-v1",
+  "site_evidence_version": "se-25a87c36-v3",
+  "version_number": 6
+}

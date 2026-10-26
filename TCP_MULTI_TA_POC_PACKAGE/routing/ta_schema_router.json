@@ -1,0 +1,14 @@
+{
+  "ui": {
+    "ta_optional": true,
+    "values": [
+      "TA-6",
+      "TA-10",
+      "TA-33",
+      "UNKNOWN"
+    ]
+  },
+  "selected_flow": "Load selected TA schema, extract only its fields, then deterministically validate TA eligibility. Selection is a hypothesis.",
+  "missing_flow": "Run lightweight common-fact classifier. Auto-route only if one candidate has confidence >= 0.85; otherwise REVIEW_REQUIRED.",
+  "mismatch_reason": "TA_SELECTION_CONFLICT"
+}

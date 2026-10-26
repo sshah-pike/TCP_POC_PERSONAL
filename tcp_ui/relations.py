@@ -177,7 +177,10 @@ VISION_MODES = ("baseline", "grounded_v2")
 
 
 def create_resume_run(parent_id, stage, ai_profile=None, ai_provider=None, comparison_id=None, evidence_mode="single",
-                      extra_sources=(), vision_mode="baseline", osm_claims=False, centerline_views=False):
+                      extra_sources=(), vision_mode="baseline", osm_claims=False, centerline_views=False,
+                      sme_revision=None, strict_replay=False):
+    """sme_revision (SME Review Assistant only): revision dict written create-only to input/sme_revision.json and passed
+    as --sme-revision; strict_replay: every external artifact must replay from verified evidence or the run fails closed."""
     if vision_mode not in VISION_MODES: raise store.BadRequest("vision_mode must be baseline or grounded_v2")
     st = _parent(parent_id)
     preview = resume_preview(parent_id, stage, ai_profile, ai_provider, evidence_mode)
@@ -191,7 +194,7 @@ def create_resume_run(parent_id, stage, ai_profile=None, ai_provider=None, compa
     request = json.loads(json.dumps(parent_req.get("request") or {}))
     while i < len(src_argv):
         a = src_argv[i]
-        if a in ("--out", "--kml", "--ai-provider") and i + 1 < len(src_argv):
+        if a in ("--out", "--kml", "--ai-provider", "--sme-revision") and i + 1 < len(src_argv):
             if a == "--kml":
                 src = src_argv[i + 1]
                 if not os.path.isfile(src): raise store.BadRequest("source input file is missing")
@@ -203,6 +206,12 @@ def create_resume_run(parent_id, stage, ai_profile=None, ai_provider=None, compa
     # keep the parent's AI provider unless another is chosen (the AI evidence signature includes model + profile)
     ai_provider = ai_provider or (request.get("advanced") or {}).get("ai_provider")
     if ai_provider and not offline: argv += ["--ai-provider", ai_provider]
+    if sme_revision is not None:
+        import json as _json
+        rev_path = os.path.join(rdir, "input", "sme_revision.json")
+        with open(rev_path, "x", encoding="utf-8") as f: _json.dump(sme_revision, f, indent=2, sort_keys=True)
+        argv += ["--sme-revision", rev_path]
+        request["sme_revision"] = {k: sme_revision.get(k) for k in ("plan_version_id", "change_set_id", "content_sha256")}
     argv += ["--out", out_dir]
     request.setdefault("advanced", {})["ai_provider"] = ai_provider or request.get("advanced", {}).get("ai_provider")
     request["advanced"]["ai_profile"] = ai_profile or request["advanced"].get("ai_profile")
@@ -215,6 +224,9 @@ def create_resume_run(parent_id, stage, ai_profile=None, ai_provider=None, compa
               "evidence_mode": evidence_mode, "extra_sources": list(extra_sources), "vision_mode": vision_mode,
               "osm_claims": bool(osm_claims), "centerline_views": bool(centerline_views),
               "preview": preview, "parent_decision": st["decision"]}
+    if sme_revision is not None or strict_replay:
+        resume.update(strict_replay=bool(strict_replay), sme_revision={k: sme_revision.get(k) for k in (
+            "plan_version_id", "change_set_id", "content_sha256", "site_evidence_version")} if sme_revision else None)
     store._write_json(os.path.join(rdir, "ui", "resume.json"), resume)
     store._write_json(os.path.join(rdir, "ui", "request.json"),
                       {"run_id": run_id, "created_at": store._now(), "argv": argv, "request": request})

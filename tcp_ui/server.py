@@ -12,6 +12,7 @@ POST /api/runs/<id>/stop                stop a running run (ends its runner proc
 GET  /api/runs/<id>                     run state (stages, decision, outputs, cost)
 GET  /api/runs/<id>/files/<name>        a file the pipeline wrote to runs/<id>/output/
 GET  /*                                 built UI from tcp_ui/web/dist
+GET|POST /api/assistant/*               SME Review Assistant (tcp_assistant.api; off unless TCP_SME_ASSISTANT_ENABLED=true)
 """
 import argparse, json, mimetypes, os, shutil, subprocess, sys, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -21,6 +22,7 @@ from . import store
 
 WEB_DIST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web", "dist")
 MAX_BODY = 10 * 1024 * 1024
+ASSISTANT_MAX_BODY = 64 * 1024  # assistant requests are small structured JSON
 ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
 CONTENT_TYPES = {".json": "application/json", ".txt": "text/plain; charset=utf-8", ".png": "image/png",
                  ".jpg": "image/jpeg", ".pdf": "application/pdf", ".dxf": "application/dxf",
@@ -190,6 +192,8 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if not self._host_ok(): return
         url = urlsplit(self.path); parts = [unquote(p) for p in url.path.split("/") if p]
+        if parts[:2] == ["api", "assistant"]:
+            return self._assistant("GET", parts[2:], url.query, None)
         try:
             if parts[:1] == ["api"]:
                 if parts == ["api", "meta"]: return self._json(meta())
@@ -246,7 +250,18 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self._host_ok(): return
         path = urlsplit(self.path).path; parts = [unquote(p) for p in path.split("/") if p]
-        route = ("run" if path == "/api/runs" else "comparison" if path == "/api/comparisons"
+        if parts[:2] == ["api", "assistant"]:
+            if not (self.headers.get("Content-Type") or "").startswith("application/json"):
+                return self._json({"error": "Content-Type must be application/json"}, 415)
+            n = int(self.headers.get("Content-Length") or 0)
+            if n <= 0 or n > ASSISTANT_MAX_BODY: return self._json({"error": "request body missing or too large"}, 413)
+            try:
+                payload = json.loads(self.rfile.read(n).decode("utf-8"))
+            except (ValueError, UnicodeDecodeError):
+                return self._json({"error": "invalid JSON"}, 400)
+            if not isinstance(payload, dict): return self._json({"error": "JSON object expected"}, 400)
+            return self._assistant("POST", parts[2:], urlsplit(self.path).query, payload)
+        route =("run" if path == "/api/runs" else "comparison" if path == "/api/comparisons"
                  else "stop" if len(parts) == 4 and parts[:2] == ["api", "runs"] and parts[3] == "stop"
                  else "resume" if len(parts) == 4 and parts[:2] == ["api", "runs"] and parts[3] == "resume"
                  else "label_confirm" if len(parts) == 4 and parts[:2] == ["api", "labels"] and parts[3] == "confirm"
@@ -274,6 +289,15 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"error": "invalid JSON"}, 400)
         except store.BadRequest as e:
             return self._json({"error": str(e)}, 400)
+
+    def _assistant(self, method, parts, query, payload):
+        """SME Review Assistant routes (tcp_assistant.api); unavailable unless TCP_SME_ASSISTANT_ENABLED=true."""
+        from tcp_assistant import api as assistant_api
+        status, kind, body = assistant_api.dispatch(method, parts, parse_qs(query or ""), payload,
+                                                    {"X-TCP-Session": self.headers.get("X-TCP-Session")})
+        if kind == "file":
+            return self._file(body["path"], body.get("download", False))
+        return self._json(body, status)
 
     def _static(self, path):
         if not os.path.isdir(WEB_DIST):

@@ -1,0 +1,17 @@
+flowchart TD
+  A[Work locations from KML<br/>points, lines, polygons] --> B[Clean up<br/>duplicates, off-road, lines: cases 13-16]
+  B --> C{tcp:zone in the KML?<br/>case 18}
+  C -- yes --> K[Use KML zones]
+  C -- no --> P1
+  subgraph P1 [Pass 1: before site understanding, geometry only]
+    D[Split by road<br/>roads, intersections, sides, carriageways: cases 6-9] --> E[Join by gap<br/>gap within merge_max_gap_ft: cases 2-3]
+    E --> F[Cap size<br/>max points per zone, 150 m path: cases 4-5]
+  end
+  F --> G[Per-zone run<br/>map, call 1, router]
+  K --> G
+  G --> P2
+  subgraph P2 [Pass 2: after the TA is known]
+    H[Check TA per zone<br/>mixed or unknown TA: cases 10, 11, 17] --> I[Recheck envelopes<br/>real speed and layout length]
+  end
+  I --> J[SME confirms proposals on the one form]
+  J --> L[Sheet packing<br/>1 in = 40 ft, then 50 ft, then new sheet]

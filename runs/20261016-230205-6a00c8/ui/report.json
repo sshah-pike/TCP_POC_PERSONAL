@@ -802,7 +802,7 @@
       "ai_status": "ERROR",
       "backend": "anthropic_messages",
       "centerline_views": false,
-      "decision": "REVIEW_REQUIRED",
+      "decision": "ERROR",
       "deployment": "claude-opus-5-5",
       "draft_generated": false,
       "eligibility": {
@@ -996,7 +996,7 @@
         "SUPPORTED_AUTO",
         "REVIEW_REQUIRED",
         "SUPPORTED_AUTO",
-        "REVIEW_REQUIRED"
+        "ERROR"
       ]
     },
     {

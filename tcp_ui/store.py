@@ -48,7 +48,8 @@ def _is_error(codes):
     return any(c in ERROR_REASON_CODES for c in codes or ())
 
 
-EXIT_DECISION = {0: "SUPPORTED_AUTO", 3: "REVIEW_REQUIRED", 4: "UNSUPPORTED_POC"}
+EXIT_DECISION = {0: "SUPPORTED_AUTO", 3: "REVIEW_REQUIRED", 4: "UNSUPPORTED_POC",
+                 5: "DRAFT_WITH_ENGINEERING_EXCEPTION"}  # 5: SME revision runs only
 RUN_STOPPED = "RUN_STOPPED"  # error code written by the server when the user stops a run
 
 
@@ -345,6 +346,9 @@ def build_state(run_id, live_ids=(), with_lineage=True):
     if decision == "REVIEW_REQUIRED" and _is_error((result or {}).get("reason_codes") or (elig or {}).get("reason_codes")):
         decision = "ERROR"  # API / service failure, not a site-understanding discrepancy
     draft = decision == "SUPPORTED_AUTO" and exit_code == 0 and "plan.json" in have
+    plan_status = (result or {}).get("plan_status")  # SME revision runs only
+    if plan_status == "DRAFT_WITH_ENGINEERING_EXCEPTION" and exit_code == 5 and "plan.json" in have and not error:
+        decision, draft = plan_status, True
 
     span_total = round(sum(s["duration_ms"] or 0 for s in spans), 1)
     return {
@@ -364,7 +368,16 @@ def build_state(run_id, live_ids=(), with_lineage=True):
         "evidence": _evidence_list(rdir),
         "evidence_compat": _compat(run_id, {"stages": stages}),
         "lineage": _lineage(run_id, ui, ev_events, done) if with_lineage else None,
+        "sme_revision": _sme_revision(ui, rdir, plan_status),
     }
+
+
+def _sme_revision(ui, rdir, plan_status):
+    """SME revision lineage (revision runs only; None otherwise)."""
+    resume = _read_json(os.path.join(ui, "resume.json")) or {}
+    if not resume.get("sme_revision"): return None
+    return {**resume["sme_revision"], "strict_replay": resume.get("strict_replay"), "plan_status": plan_status,
+            "machine_site_model": os.path.isfile(os.path.join(rdir, "output", "machine_site_model.json"))}
 
 
 def _compat(run_id, partial_state):

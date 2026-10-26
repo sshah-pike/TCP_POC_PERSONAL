@@ -28,8 +28,10 @@ DWT_CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dwt_
 OUTPUT_FILES = ("project_geometry.json", "site_model.json", "eligibility_result.json", "plan.json",
                 "validation_results.json", "aerial_image.jpg", "debug_plan.png", "debug_plan.pdf", "run_report.txt",
                 "plan.dxf", "plan.dwg", "dwt_result.json",
-                "tcp_sheet.pdf", "tcp_sheet.png", "sheet_aerial.jpg")
+                "tcp_sheet.pdf", "tcp_sheet.png", "sheet_aerial.jpg",
+                "machine_site_model.json", "sme_revision_applied.json")  # last two: SME revision runs only
 EXIT = {SUPPORTED_AUTO: 0, REVIEW_REQUIRED: 3, UNSUPPORTED_POC: 4}
+EXIT_SME_EXCEPTION_DRAFT = 5  # SME revision runs only: draft exported with SME engineering exception(s)
 
 
 def load_env_file(path=".env"):
@@ -82,8 +84,11 @@ class Run:
 
 def run_pipeline(*, out_dir, kml=None, lat=None, lon=None, operator=None, map_provider=None, vision_provider=None,
                  osm_source=None, rule_pack_path=None, config_path=None, dwt_config=None, dwt_mode="PLAN",
-                 exact_coords=False):
-    """Run Pipeline 2 end-to-end. Returns a result dict; never raises for site-level outcomes."""
+                 exact_coords=False, sme_revision=None):
+    """Run Pipeline 2 end-to-end. Returns a result dict; never raises for site-level outcomes.
+
+    sme_revision: optional path of an SME revision (tcp_poc/sme_revision.py; SME Review Assistant only). When None
+    the pipeline runs exactly as before."""
     run = Run(out_dir, exact_coords); tel = run.tel
     operator = operator or {}
     result = {"decision": None, "outputs": [], "plan_hash": None}
@@ -111,6 +116,12 @@ def run_pipeline(*, out_dir, kml=None, lat=None, lon=None, operator=None, map_pr
             pack = load_rule_pack(rule_pack_path)
             tel.set(sp, rule_pack_id=pack.id, rule_pack_version=pack.version, rule_pack_hash=pack.hash[:16])
         run.say(f"2 Rule pack: {pack.id} v{pack.version} {pack.status} sha256 {pack.hash[:16]}... verified")
+        revision = None
+        if sme_revision:
+            from . import sme_revision as SR
+            revision = SR.load(sme_revision, pack)
+            run.write("sme_revision_applied.json", SR.applied_record(revision))
+            run.say(f"   SME revision {revision['plan_version_id']} (change set {revision['change_set_id']}) verified")
 
         # ---- map / imagery ----
         a_max = max(pack.spacing_value_ft(rt, "A")[1] for rt in config["supported_road_types"])
@@ -171,6 +182,13 @@ def run_pipeline(*, out_dir, kml=None, lat=None, lon=None, operator=None, map_pr
         with tel.span("tcp.site.fuse") as sp:
             site = build_site_model(pg, osm, ai_result, ai_error, meta, operator, config, ai_error_text=ai_error_text,
                                     agent=agent.fusion_inputs() if agent else None)
+            if revision is not None:  # SME decision overlay on the (replayed) machine site model; machine kept as-is
+                from . import sme_overlay
+                if site["site_model_id"] != revision["machine_site_model_id"]:
+                    raise TcpError("SME_REVISION_BASE_MISMATCH", "rebuilt machine site model differs from the reviewed one")
+                run.write("machine_site_model.json", site)
+                site = sme_overlay.apply(site, revision["decisions"], config)
+                tel.set(sp, sme_overlay=True)
             tel.set(sp, site_model_id=site["site_model_id"], conflicts=len(site["critical_conflicts"]),
                     inputs_complete=site["eligibility_inputs_complete"])
         run.write("site_model.json", site)
@@ -183,16 +201,28 @@ def run_pipeline(*, out_dir, kml=None, lat=None, lon=None, operator=None, map_pr
         run.write("eligibility_result.json", elig)
         run.say(f"7 Eligibility: {elig['decision']}  {', '.join(elig['reason_codes']) or '(all conditions pass)'}")
         run.agent_summary = _agent_summary(agent, site, elig, config)
+        ta_exc, rules_elig = None, elig
         if elig["decision"] != SUPPORTED_AUTO:
-            return _finish(run, result, elig)
+            if revision is not None:  # plan-specific SME TA exception (never selects another TA)
+                from . import sme_disposition
+                ta_exc = sme_disposition.ta_exception(elig, revision, site, pack, config)
+            if ta_exc is None:
+                return _finish(run, result, elig)
+            rules_elig = dict(elig, decision=SUPPORTED_AUTO, sme_ta_exception=ta_exc["exception_id"])
+            run.say(f"   SME TA exception {ta_exc['exception_id']}: TA-1 generated although not applicable ({elig['decision']})")
 
         # ---- rules -> placement ----
         template = pack.ta1_template()
         with tel.span("tcp.rules.execute", ta_id=template["id"]) as sp:
-            rules_out = execute_rules(site, elig, pack, template)
+            rules_out = execute_rules(site, rules_elig, pack, template)
             tel.set(sp, objects=len(rules_out["objects"]), options=len(rules_out["options_applied"]))
         with tel.span("tcp.geometry.place") as sp:
             placed, issues = place_objects(rules_out["objects"], site, config)
+            if revision is not None and (revision.get("placement_adjustments") or revision.get("proposed_objects")
+                                         or revision.get("removed_objects")):
+                from . import plan_adjustments
+                placed, more = plan_adjustments.apply(placed, revision, site, config, pack)
+                issues = issues + more
             tel.set(sp, issues=[i["code"] for i in issues])
         run.say(f"8 Rules: {template['id']} Table {rules_out['spacing']['table']} {rules_out['spacing']['road_type']} "
                 f"A = {rules_out['spacing']['value_ft']:g} ft; {len(placed)} objects placed")
@@ -210,7 +240,13 @@ def run_pipeline(*, out_dir, kml=None, lat=None, lon=None, operator=None, map_pr
         validation = {"rule_validation": rv, "geometry_validation": gv, "plan_ref": None}
         plan["validation"] = {"rule": rv["status"], "geometry": gv["status"]}
         run.say(f"9 Validation: rule {rv['status']}  geometry {gv['status']}")
-        if rv["status"] != "PASS" or gv["status"] != "PASS":
+        disp = None
+        if revision is not None:  # separate SME disposition layer; validator results stay exactly as computed
+            from .sme_pipeline import apply_revision
+            disp = apply_revision(plan, validation, revision, elig, ta_exc)
+            result["plan_status"] = disp["plan_status"] or "BLOCKED"
+            run.say(f"   SME disposition: {result['plan_status']} ({len(disp['active_exceptions'])} active SME exception(s))")
+        if (rv["status"] != "PASS" or gv["status"] != "PASS" or ta_exc is not None) and not (disp and disp["all_accepted"]):
             failed = [c["id"] for c in rv["checks"] + gv["checks"] if c["status"] == "FAIL"]
             run.write("validation_results.json", validation)
             final = _blocked(REVIEW_REQUIRED, ["PLAN_VALIDATION_FAILED"] + failed,
@@ -431,6 +467,8 @@ def main(argv=None):
     ap.add_argument("--no-dwt", action="store_true", help="skip the DWT renderer")
     ap.add_argument("--map-provider"); ap.add_argument("--ai-provider")
     ap.add_argument("--log-exact-coordinates", action="store_true")
+    ap.add_argument("--sme-revision", help="SME revision JSON from the SME Review Assistant (requires "
+                                           "TCP_SME_ASSISTANT_ENABLED=true); omit for the normal pipeline")
     a = ap.parse_args(argv)
 
     operator = {"road_type": a.road_type, "speed_mph": a.speed, "requires_lane_closure": a.requires_lane_closure,
@@ -456,8 +494,10 @@ def main(argv=None):
             except ProviderError as e: kw["vision_provider"] = e
         if a.map_provider: kw["map_provider"] = get_map_provider(a.map_provider)
         kw.update(operator=operator, kml=a.kml, lat=a.lat, lon=a.lon)
+    if a.sme_revision: kw["sme_revision"] = a.sme_revision
     res = run_pipeline(**kw)
     if res.get("error"): return 2
+    if res.get("plan_status") == "DRAFT_WITH_ENGINEERING_EXCEPTION" and res.get("plan_id"): return EXIT_SME_EXCEPTION_DRAFT
     return EXIT[res["decision"]]
 
 

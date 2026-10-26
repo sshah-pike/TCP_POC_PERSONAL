@@ -1,0 +1,173 @@
+{
+  "policy": {
+    "id": "TCP_SME_ACTION_POLICY",
+    "version": "0.1.0",
+    "status": "POC_CONFIGURATION",
+    "note": "POC configuration. Controls SME actions and plan-specific engineering exceptions. It never changes rule-pack values or validators. Requires governance review before production use."
+  },
+  "sme_exceptions_enabled": true,
+  "approval_mode": "SELF_CONFIRMED_POC",
+  "actions": {
+    "confirm_site_fact": {
+      "enabled": true,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": false,
+      "reason_required": false
+    },
+    "correct_site_fact": {
+      "enabled": true,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": false,
+      "reason_required": true
+    },
+    "mark_site_fact_unresolved": {
+      "enabled": true,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": false,
+      "reason_required": false
+    },
+    "confirm_site_feature": {
+      "enabled": true,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": false,
+      "reason_required": false
+    },
+    "reject_site_feature": {
+      "enabled": true,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": false,
+      "reason_required": true
+    },
+    "add_site_feature": {
+      "enabled": true,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": false,
+      "reason_required": true
+    },
+    "modify_site_feature": {
+      "enabled": true,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": false,
+      "reason_required": true
+    },
+    "move_existing_device": {
+      "enabled": true,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": false,
+      "reason_required": true
+    },
+    "add_approved_device": {
+      "enabled": true,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": false,
+      "reason_required": true
+    },
+    "remove_device": {
+      "enabled": true,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": false,
+      "reason_required": true
+    },
+    "add_unsupported_device": {
+      "enabled": true,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": true,
+      "reason_required": true
+    },
+    "create_taper": {
+      "enabled": true,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": true,
+      "reason_required": true
+    },
+    "create_buffer": {
+      "enabled": true,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": true,
+      "reason_required": true
+    },
+    "add_personnel_position": {
+      "enabled": true,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": true,
+      "reason_required": true
+    },
+    "override_rule_conflict": {
+      "enabled": true,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": true,
+      "reason_required": true
+    },
+    "proceed_without_applicable_ta": {
+      "enabled": true,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": true,
+      "reason_required": true
+    },
+    "request_new_analysis": {
+      "enabled": false,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": false,
+      "reason_required": false
+    },
+    "request_new_imagery": {
+      "enabled": false,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": false,
+      "reason_required": false
+    },
+    "proceed_outside_evidence_coverage": {
+      "enabled": false,
+      "roles": [
+        "SME_REVIEWER"
+      ],
+      "is_exception": true,
+      "reason_required": true
+    }
+  },
+  "overridable_conditions": {
+    "NO_USABLE_GEOMETRY": false,
+    "OUTSIDE_EVIDENCE_COVERAGE": false,
+    "EVIDENCE_CORRUPT_OR_MISSING": false,
+    "CHANGE_NOT_CALCULABLE": false,
+    "AUDIT_WRITE_FAILURE": false,
+    "VERSION_WRITE_FAILURE": false
+  },
+  "content_sha256": "38be5352d151d80fe18340e7a8eb491206e7717195c69cdf1153cd4d9e1d9398"
+}

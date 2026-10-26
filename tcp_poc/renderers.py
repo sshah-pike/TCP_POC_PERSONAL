@@ -31,6 +31,14 @@ class DebugRenderer:
         pts = []
         for o in plan["objects"]:
             p = o["placement"]; xy = px(to_local(p)); pts.append(xy)
+            if o["object_type"] == "SME_PROPOSED_OBJECT":  # SME revision plans only
+                from .sme_render import PURPLE
+                if p.get("zone"): ax.plot(*zip(*[px(to_local(q)) for q in p["zone"]]), color=PURPLE, lw=4, alpha=0.8)
+                ax.plot(*xy, "s", ms=10, mfc=PURPLE, mec="white", zorder=7)
+                ax.annotate(f"{o['object_id']} SME {o.get('sme_category')} (UNSUPPORTED)", xy, xytext=(6, -14),
+                            textcoords="offset points", fontsize=8, color="white",
+                            bbox=dict(boxstyle="round,pad=0.12", fc=PURPLE, alpha=0.85, lw=0))
+                continue
             if o["object_type"] == "WORK_LOCATION":
                 if p.get("path"):
                     ax.plot(*zip(*[px(to_local(q)) for q in p["path"]]), color="orange", lw=3, label="work path")
@@ -85,5 +93,10 @@ class DebugRenderer:
                f"Not generated: taper, lane closure, channelizing\n devices, termination sign, flagger,\n"
                f" police, arrow panel, pedestrian items.\n\nPlan hash: {plan['plan_hash'][:24]}...")
         ax2.text(0.02, 0.98, txt, va="top", ha="left", family="monospace", fontsize=8.2, bbox=dict(fc="#f4f4f4", ec="black"))
+        from .sme_render import exception_lines, PURPLE  # SME revision plans only; empty for normal plans
+        exl = exception_lines(plan)
+        if exl:
+            ax.text(0.01, 0.99, "\n".join(exl), transform=ax.transAxes, va="top", ha="left", fontsize=7.5, color="white",
+                    bbox=dict(boxstyle="round,pad=0.3", fc=PURPLE, alpha=0.85, lw=0), zorder=20)
         fig.savefig(png_path, bbox_inches="tight"); fig.savefig(pdf_path, bbox_inches="tight", metadata={"CreationDate": None})
         plt.close(fig)

@@ -1,0 +1,122 @@
+{
+  "rule_pack": {
+    "id": "APPROVED_MULTI_TA_POC_RULE_PACK",
+    "version": "2.0.0-poc",
+    "status": "AUTO_APPROVED_FOR_POC_ONLY",
+    "source": "MUTCD 11th Edition, December 2023, Part 6",
+    "warning": "Draft aid only, not approved for field use."
+  },
+  "shared_rules": {
+    "advance_warning_spacing_ft": {
+      "URBAN_LOW_SPEED": {
+        "A": 100,
+        "B": 100,
+        "C": 100
+      },
+      "URBAN_HIGH_SPEED": {
+        "A": 350,
+        "B": 350,
+        "C": 350
+      },
+      "RURAL": {
+        "A": 500,
+        "B": 500,
+        "C": 500
+      },
+      "EXPRESSWAY_FREEWAY": {
+        "A": 1000,
+        "B": 1500,
+        "C": 2640
+      }
+    },
+    "taper": {
+      "L_formula": [
+        {
+          "when": "S <= 40",
+          "formula": "W*S^2/60"
+        },
+        {
+          "when": "S >= 45",
+          "formula": "W*S"
+        }
+      ],
+      "shoulder": "0.33*L",
+      "one_lane_two_way_ft": {
+        "min": 50,
+        "max": 100
+      }
+    },
+    "channelizer_spacing": {
+      "taper_max_ft": "S",
+      "tangent_max_ft": "2*S"
+    }
+  },
+  "typical_applications": {
+    "TA-6": {
+      "title": "Shoulder Work with Minor Encroachment",
+      "eligibility": [
+        "conventional road",
+        "shoulder work with minor encroachment",
+        "minor road/low speed treatment"
+      ],
+      "rules": [
+        "10 ft minimum remaining lane width",
+        "9 ft option only for short-term, low-volume, low-speed roadway without longer/wider heavy vehicles",
+        "shoulder taper = 1/3 L",
+        "higher-speed condition requires lane-closure analysis",
+        "work and shadow vehicles require high-intensity warning lights"
+      ],
+      "signs": [
+        "W20-1 both approaches",
+        "G20-2 optional"
+      ],
+      "schema": "schemas/ta-6_site_understanding.schema.json"
+    },
+    "TA-10": {
+      "title": "Lane Closure on a Two-Lane Road Using Flaggers",
+      "eligibility": [
+        "two-lane two-way road",
+        "one lane closed",
+        "alternating traffic required"
+      ],
+      "rules": [
+        "50-100 ft one-lane two-way tapers",
+        "normally coordinated flaggers at both ends",
+        "single flagger only as MUTCD option for suitable short, low-volume, mutually visible conditions",
+        "night flagger stations illuminated except emergencies",
+        "police detail must be explicit jurisdictional input, never inferred"
+      ],
+      "signs": [
+        "W20-1",
+        "W20-4",
+        "W20-7",
+        "W16-2P optional",
+        "W3-4 optional",
+        "G20-2 optional"
+      ],
+      "schema": "schemas/ta-10_site_understanding.schema.json"
+    },
+    "TA-33": {
+      "title": "Stationary Lane Closure on a Divided Highway",
+      "eligibility": [
+        "divided highway",
+        "stationary lane closure"
+      ],
+      "rules": [
+        "left-lane equivalents when work is adjacent to median",
+        "additional TTC for side roads",
+        "affected shoulders 8 ft or wider closed before merge taper",
+        "merging taper L",
+        "arrow board required for freeway lane closure, one per closed lane"
+      ],
+      "signs": [
+        "W20-1",
+        "W20-5R/L",
+        "W4-2R/L",
+        "G20-2 optional"
+      ],
+      "scope_note": "TA-33 is not selected merely because a two-lane road has no shoulder.",
+      "schema": "schemas/ta-33_site_understanding.schema.json"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "system_instructions": [
+    "Analyze only fields in supplied schema.",
+    "Do not invent values. Use UNKNOWN or CONFLICT.",
+    "Return JSON only with value, confidence, evidence, status per field.",
+    "Selected TA is a hypothesis and must pass deterministic eligibility.",
+    "If a safety-critical field is UNKNOWN/CONFLICT or confidence < 0.80, set REVIEW_REQUIRED."
+  ],
+  "request": {
+    "selected_ta": "TA-6 | TA-10 | TA-33 | null",
+    "schema": "<TA schema JSON>",
+    "rule_context": "<eligibility and hard-block rules only>",
+    "site_input": {
+      "kml_summary": "<normalized geometry>",
+      "images": [
+        "overview",
+        "close-ups if available"
+      ],
+      "known_metadata": {
+        "posted_speed_mph": null,
+        "work_duration": "UNKNOWN",
+        "work_description": "<text>"
+      }
+    }
+  }
+}

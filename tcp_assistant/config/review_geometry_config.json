@@ -1,0 +1,17 @@
+{
+  "config_id": "TCP_SME_REVIEW_GEOMETRY",
+  "version": "0.1.0",
+  "regulatory_status": "IMPLEMENTATION_GEOMETRY_NOT_MUTCD_VALUE",
+  "status": "POC_APPROXIMATION",
+  "note": "Approximate implementation geometry used ONLY to describe spatial relationships and to propose candidate positions for SME verification. Pass/fail rule results come exclusively from the unchanged validators (poc_config placement.sign_feature_clearance_m). Not MUTCD values; requires governance review before production use.",
+  "candidate_label": "POC candidate based on saved approximate site geometry. SME verification required.",
+  "feature_influence_half_length_m": {"intersections": 15.0, "roundabouts": 25.0, "ramps": 25.0, "driveways": 5.0,
+                                      "crosswalks": 3.0, "obstructions": 2.0},
+  "device_footprint_length_m": 1.0,
+  "near_distance_m": 30.0,
+  "limited_margin_m": 5.0,
+  "device_spacing_warning_m": 3.0,
+  "candidate_step_m": 0.5,
+  "max_move_m": 400.0,
+  "path_sample_step_m": 2.0
+}
