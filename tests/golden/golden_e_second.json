@@ -1,0 +1,523 @@
+{
+ "_meta": {
+  "golden_version": "0.1",
+  "status": "DRAFT - extracted automatically, needs SME check",
+  "source_pdf": "1793015623689_1A8J1KB_WPI_3171586__E_Second_St__South_Boston__MA_-_TMP.pdf",
+  "matching_kml": "1A8J1KB_WPI_3171586_-_E_Second_Street.kml",
+  "kml_work_points": [
+   "MH 223",
+   "MH FA"
+  ],
+  "expected_ta": "TA-6",
+  "method": "Positions are the centres of the small sign-code labels printed next to each sign post, measured from the mean centre of the work-point labels, converted with the sheet scale (sheet 34 x 22 in, 72 pt per inch). Frame: sheet axes, x to the right, y down, main road roughly along x. Not georeferenced.",
+  "expected_error": "about 5 to 15 ft: label offset from the post, and the work-point label is beside the point, not on it",
+  "schematic_warning": "Some sheets are not drawn to scale for advance signs. E Second St signs are drawn about 40 ft apart but labelled 100 ft MIN. Where a dimension label exists, compare against the label value, not the drawn position.",
+  "approach_classification": "auto: main-road signs within 60 ft of the work point across the road, split by left or right of the work point. Verify by hand near intersections (Granite I, V).",
+  "not_captured": "taper, buffer and channelizer geometry (vector shapes), work-vehicle position, dimension meaning (labels kept as text with position only)",
+  "compare_rules": {
+   "exact": [
+    "expected_ta",
+    "sheet count",
+    "work points per sheet",
+    "scale",
+    "advance sequence order per approach",
+    "callout code set"
+   ],
+   "tolerance_ft": {
+    "sign_position_along_road": 15,
+    "sign_spacing": 10
+   },
+   "side": "sign must be on the same side of the road (sign of dy relative to the road centre)"
+  }
+ },
+ "sheets": [
+  {
+   "sheet_number": 1,
+   "of": 2,
+   "phase_label": "PHASE I",
+   "scale": "1\" = 40'",
+   "work_points": [
+    "MH 223"
+   ],
+   "approaches_on_main_road": {
+    "from_sheet_left": {
+     "advance_sequence_far_to_near": [
+      "W20-1",
+      "W21-5",
+      "W5-1"
+     ],
+     "positions_ft": [
+      {
+       "code": "W20-1",
+       "dx_ft": -342.4,
+       "dy_ft": 5.5
+      },
+      {
+       "code": "W21-5",
+       "dx_ft": -302.3,
+       "dy_ft": 3.3
+      },
+      {
+       "code": "W5-1",
+       "dx_ft": -262.6,
+       "dy_ft": 1.4
+      }
+     ],
+     "spacing_ft": [
+      40.1,
+      39.7
+     ],
+     "end_signs": [
+      {
+       "code": "G20-2",
+       "dx_ft": -341.8,
+       "dy_ft": -36.6
+      },
+      {
+       "code": "G20-2",
+       "dx_ft": -105.6,
+       "dy_ft": 59.2
+      },
+      {
+       "code": "G20-2",
+       "dx_ft": -61.5,
+       "dy_ft": 59.2
+      }
+     ]
+    },
+    "from_sheet_right": {
+     "advance_sequence_far_to_near": [
+      "W20-1"
+     ],
+     "positions_ft": [
+      {
+       "code": "W20-1",
+       "dx_ft": 94.9,
+       "dy_ft": -48.7
+      }
+     ],
+     "spacing_ft": [],
+     "end_signs": [
+      {
+       "code": "G20-2",
+       "dx_ft": 107.2,
+       "dy_ft": -5.8
+      }
+     ]
+    }
+   },
+   "side_street_devices": [
+    {
+     "code": "W20-1",
+     "dx_ft": -112.6,
+     "dy_ft": -94.8
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -62.8,
+     "dy_ft": -96.0
+    }
+   ],
+   "all_devices_at_posts": [
+    {
+     "code": "G20-2",
+     "dx_ft": -341.8,
+     "dy_ft": -36.6
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -112.6,
+     "dy_ft": -94.8
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -62.8,
+     "dy_ft": -96.0
+    },
+    {
+     "code": "R8-3",
+     "dx_ft": -45.4,
+     "dy_ft": -4.1
+    },
+    {
+     "code": "R8-3",
+     "dx_ft": 40.7,
+     "dy_ft": -4.1
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 94.9,
+     "dy_ft": -48.7
+    },
+    {
+     "code": "G20-2",
+     "dx_ft": 107.2,
+     "dy_ft": -5.8
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -342.4,
+     "dy_ft": 5.5
+    },
+    {
+     "code": "W21-5",
+     "dx_ft": -302.3,
+     "dy_ft": 3.3
+    },
+    {
+     "code": "W5-1",
+     "dx_ft": -262.6,
+     "dy_ft": 1.4
+    },
+    {
+     "code": "R8-3",
+     "dx_ft": -211.6,
+     "dy_ft": 3.6
+    },
+    {
+     "code": "R8-3",
+     "dx_ft": -147.9,
+     "dy_ft": 1.6
+    },
+    {
+     "code": "G20-2",
+     "dx_ft": -105.6,
+     "dy_ft": 59.2
+    },
+    {
+     "code": "G20-2",
+     "dx_ft": -61.5,
+     "dy_ft": 59.2
+    }
+   ],
+   "device_counts": {
+    "G20-2": 4,
+    "R8-3": 4,
+    "W20-1": 4,
+    "W21-5": 1,
+    "W5-1": 1
+   },
+   "callout_codes": [
+    "G20-2",
+    "R8-3",
+    "W20-1",
+    "W21-5",
+    "W5-1"
+   ],
+   "arrow_board": false,
+   "dimension_labels": [
+    {
+     "label": "100'",
+     "dx_ft": -329.0,
+     "dy_ft": 14.8
+    },
+    {
+     "label": "100'",
+     "dx_ft": -288.5,
+     "dy_ft": 13.7
+    },
+    {
+     "label": "100'",
+     "dx_ft": -249.1,
+     "dy_ft": 11.9
+    },
+    {
+     "label": "40'",
+     "dx_ft": -208.9,
+     "dy_ft": 14.0
+    },
+    {
+     "label": "10'",
+     "dx_ft": -206.8,
+     "dy_ft": -10.3
+    },
+    {
+     "label": "20'",
+     "dx_ft": -158.4,
+     "dy_ft": -15.0
+    },
+    {
+     "label": "100'",
+     "dx_ft": -119.9,
+     "dy_ft": -77.6
+    },
+    {
+     "label": "160'",
+     "dx_ft": -109.4,
+     "dy_ft": 8.6
+    },
+    {
+     "label": "26'",
+     "dx_ft": -0.4,
+     "dy_ft": -28.0
+    },
+    {
+     "label": "10'",
+     "dx_ft": 34.3,
+     "dy_ft": -17.6
+    },
+    {
+     "label": "50'",
+     "dx_ft": 34.9,
+     "dy_ft": 4.5
+    },
+    {
+     "label": "100'",
+     "dx_ft": 81.1,
+     "dy_ft": -65.6
+    }
+   ],
+   "job_notes": [
+    "- SPEED LIMIT IN THE CITY OF BOSTON IS 25 MPH.",
+    "- ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE I"
+   ]
+  },
+  {
+   "sheet_number": 2,
+   "of": 2,
+   "phase_label": "PHASE II",
+   "scale": "1\" = 40'",
+   "work_points": [
+    "MH FA"
+   ],
+   "approaches_on_main_road": {
+    "from_sheet_left": {
+     "advance_sequence_far_to_near": [
+      "W20-1",
+      "W21-5",
+      "W5-1"
+     ],
+     "positions_ft": [
+      {
+       "code": "W20-1",
+       "dx_ft": -331.1,
+       "dy_ft": -6.1
+      },
+      {
+       "code": "W21-5",
+       "dx_ft": -291.0,
+       "dy_ft": -7.8
+      },
+      {
+       "code": "W5-1",
+       "dx_ft": -251.2,
+       "dy_ft": -9.2
+      }
+     ],
+     "spacing_ft": [
+      40.1,
+      39.8
+     ],
+     "end_signs": [
+      {
+       "code": "G20-2",
+       "dx_ft": -330.3,
+       "dy_ft": -44.9
+      }
+     ]
+    },
+    "from_sheet_right": {
+     "advance_sequence_far_to_near": [
+      "W20-1"
+     ],
+     "positions_ft": [
+      {
+       "code": "W20-1",
+       "dx_ft": 161.7,
+       "dy_ft": 41.7
+      }
+     ],
+     "spacing_ft": [],
+     "end_signs": [
+      {
+       "code": "G20-2",
+       "dx_ft": 85.2,
+       "dy_ft": 33.5
+      }
+     ]
+    }
+   },
+   "side_street_devices": [
+    {
+     "code": "W20-1",
+     "dx_ft": 79.7,
+     "dy_ft": -122.5
+    },
+    {
+     "code": "G20-2",
+     "dx_ft": 156.0,
+     "dy_ft": -114.3
+    }
+   ],
+   "all_devices_at_posts": [
+    {
+     "code": "R9-11L",
+     "dx_ft": -417.8,
+     "dy_ft": -10.4
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -331.1,
+     "dy_ft": -6.1
+    },
+    {
+     "code": "G20-2",
+     "dx_ft": -330.3,
+     "dy_ft": -44.9
+    },
+    {
+     "code": "W21-5",
+     "dx_ft": -291.0,
+     "dy_ft": -7.8
+    },
+    {
+     "code": "W5-1",
+     "dx_ft": -251.2,
+     "dy_ft": -9.2
+    },
+    {
+     "code": "R8-3",
+     "dx_ft": -200.2,
+     "dy_ft": -5.0
+    },
+    {
+     "code": "R8-3",
+     "dx_ft": -146.6,
+     "dy_ft": -6.9
+    },
+    {
+     "code": "R8-3",
+     "dx_ft": -72.0,
+     "dy_ft": -11.1
+    },
+    {
+     "code": "R8-3",
+     "dx_ft": -28.0,
+     "dy_ft": -12.7
+    },
+    {
+     "code": "R9-9",
+     "dx_ft": -7.7,
+     "dy_ft": -6.5
+    },
+    {
+     "code": "R9-9",
+     "dx_ft": 29.3,
+     "dy_ft": -7.5
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 79.7,
+     "dy_ft": -122.5
+    },
+    {
+     "code": "R9-11R",
+     "dx_ft": 88.0,
+     "dy_ft": -23.9
+    },
+    {
+     "code": "G20-2",
+     "dx_ft": 156.0,
+     "dy_ft": -114.3
+    },
+    {
+     "code": "G20-2",
+     "dx_ft": 85.2,
+     "dy_ft": 33.5
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 161.7,
+     "dy_ft": 41.7
+    }
+   ],
+   "device_counts": {
+    "G20-2": 3,
+    "R8-3": 4,
+    "R9-11L": 1,
+    "R9-11R": 1,
+    "R9-9": 2,
+    "W20-1": 3,
+    "W21-5": 1,
+    "W5-1": 1
+   },
+   "callout_codes": [
+    "G20-2",
+    "R8-3",
+    "R9-11L",
+    "R9-11R",
+    "R9-9",
+    "W20-1",
+    "W21-5",
+    "W5-1"
+   ],
+   "arrow_board": false,
+   "dimension_labels": [
+    {
+     "label": "100'",
+     "dx_ft": -318.0,
+     "dy_ft": 3.4
+    },
+    {
+     "label": "100'",
+     "dx_ft": -277.5,
+     "dy_ft": 2.7
+    },
+    {
+     "label": "100'",
+     "dx_ft": -238.0,
+     "dy_ft": 1.4
+    },
+    {
+     "label": "40'",
+     "dx_ft": -197.9,
+     "dy_ft": 4.2
+    },
+    {
+     "label": "10'",
+     "dx_ft": -195.4,
+     "dy_ft": -19.7
+    },
+    {
+     "label": "160'",
+     "dx_ft": -98.1,
+     "dy_ft": 0.3
+    },
+    {
+     "label": "20'",
+     "dx_ft": -87.0,
+     "dy_ft": -26.3
+    },
+    {
+     "label": "25'",
+     "dx_ft": 9.9,
+     "dy_ft": -37.8
+    },
+    {
+     "label": "10'",
+     "dx_ft": 45.8,
+     "dy_ft": -27.3
+    },
+    {
+     "label": "100'",
+     "dx_ft": 73.1,
+     "dy_ft": -97.4
+    },
+    {
+     "label": "100'",
+     "dx_ft": 167.9,
+     "dy_ft": 3.1
+    },
+    {
+     "label": "4'",
+     "dx_ft": 413.8,
+     "dy_ft": -307.0
+    }
+   ],
+   "job_notes": [
+    "- SPEED LIMIT IN THE CITY OF BOSTON IS 25 MPH.",
+    "- ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE II"
+   ]
+  }
+ ]
+}

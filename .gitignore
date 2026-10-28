@@ -4,7 +4,8 @@
 !.env.example
 
 # Backups and archives
-backup/
+backup/*
+!backup/orphans/
 *.zip
 *.bak
 *- Copy*

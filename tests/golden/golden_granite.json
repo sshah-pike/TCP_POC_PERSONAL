@@ -1,0 +1,1629 @@
+{
+ "_meta": {
+  "golden_version": "0.1",
+  "status": "DRAFT - extracted automatically, needs SME check",
+  "source_pdf": "1793015623690_1A8L6XS_WPI_3178233_-_125-165_GRANITE_ST__US-1___WESTERLY__RI_-_TMP.pdf",
+  "matching_kml": "1A8G8FM_WPI_3159540_GRANITE1.kml (DIFFERENT JOB: WPI 3159540, poles P28-P32)",
+  "kml_work_points": [
+   "P28",
+   "P29",
+   "P30",
+   "P31",
+   "P32"
+  ],
+  "expected_ta": "TA-33",
+  "method": "Positions are the centres of the small sign-code labels printed next to each sign post, measured from the mean centre of the work-point labels, converted with the sheet scale (sheet 34 x 22 in, 72 pt per inch). Frame: sheet axes, x to the right, y down, main road roughly along x. Not georeferenced.",
+  "expected_error": "about 5 to 15 ft: label offset from the post, and the work-point label is beside the point, not on it",
+  "schematic_warning": "Some sheets are not drawn to scale for advance signs. E Second St signs are drawn about 40 ft apart but labelled 100 ft MIN. Where a dimension label exists, compare against the label value, not the drawn position.",
+  "approach_classification": "auto: main-road signs within 60 ft of the work point across the road, split by left or right of the work point. Verify by hand near intersections (Granite I, V).",
+  "not_captured": "taper, buffer and channelizer geometry (vector shapes), work-vehicle position, dimension meaning (labels kept as text with position only)",
+  "compare_rules": {
+   "exact": [
+    "expected_ta",
+    "sheet count",
+    "work points per sheet",
+    "scale",
+    "advance sequence order per approach",
+    "callout code set"
+   ],
+   "tolerance_ft": {
+    "sign_position_along_road": 15,
+    "sign_spacing": 10
+   },
+   "side": "sign must be on the same side of the road (sign of dy relative to the road centre)"
+  }
+ },
+ "sheets": [
+  {
+   "sheet_number": 1,
+   "of": 6,
+   "phase_label": "PHASE I",
+   "scale": "1\" = 40'",
+   "work_points": [
+    "P.32"
+   ],
+   "approaches_on_main_road": {
+    "from_sheet_left": {
+     "advance_sequence_far_to_near": [
+      "W20-1",
+      "W20-5R",
+      "W4-2R"
+     ],
+     "positions_ft": [
+      {
+       "code": "W20-1",
+       "dx_ft": -473.5,
+       "dy_ft": -37.2
+      },
+      {
+       "code": "W20-5R",
+       "dx_ft": -373.7,
+       "dy_ft": -32.0
+      },
+      {
+       "code": "W4-2R",
+       "dx_ft": -274.1,
+       "dy_ft": -25.2
+      }
+     ],
+     "spacing_ft": [
+      99.8,
+      99.6
+     ],
+     "end_signs": []
+    },
+    "from_sheet_right": {
+     "advance_sequence_far_to_near": [
+      "W20-1"
+     ],
+     "positions_ft": [
+      {
+       "code": "W20-1",
+       "dx_ft": 167.5,
+       "dy_ft": -51.9
+      }
+     ],
+     "spacing_ft": [],
+     "end_signs": [
+      {
+       "code": "R2-11",
+       "dx_ft": 135.0,
+       "dy_ft": -9.3
+      },
+      {
+       "code": "R2-11",
+       "dx_ft": 48.1,
+       "dy_ft": 54.6
+      }
+     ]
+    }
+   },
+   "side_street_devices": [
+    {
+     "code": "R2-11",
+     "dx_ft": -467.8,
+     "dy_ft": -80.4
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": 39.2,
+     "dy_ft": -107.4
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 43.3,
+     "dy_ft": -159.2
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": 62.0,
+     "dy_ft": -113.0
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": 18.6,
+     "dy_ft": 72.4
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 46.1,
+     "dy_ft": 103.1
+    }
+   ],
+   "all_devices_at_posts": [
+    {
+     "code": "R9-11L",
+     "dx_ft": -503.2,
+     "dy_ft": -39.0
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -473.5,
+     "dy_ft": -37.2
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -467.8,
+     "dy_ft": -80.4
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -423.6,
+     "dy_ft": -35.1
+    },
+    {
+     "code": "W20-5R",
+     "dx_ft": -373.7,
+     "dy_ft": -32.0
+    },
+    {
+     "code": "W4-2R",
+     "dx_ft": -274.1,
+     "dy_ft": -25.2
+    },
+    {
+     "code": "R9-9",
+     "dx_ft": -28.7,
+     "dy_ft": -9.4
+    },
+    {
+     "code": "R9-11R",
+     "dx_ft": 22.3,
+     "dy_ft": -10.8
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": 39.2,
+     "dy_ft": -107.4
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 43.3,
+     "dy_ft": -159.2
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": 62.0,
+     "dy_ft": -113.0
+    },
+    {
+     "code": "R9-11R",
+     "dx_ft": 75.3,
+     "dy_ft": -8.4
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": 114.4,
+     "dy_ft": -51.0
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": 135.0,
+     "dy_ft": -9.3
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 167.5,
+     "dy_ft": -51.9
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": 18.6,
+     "dy_ft": 72.4
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 46.1,
+     "dy_ft": 103.1
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": 48.1,
+     "dy_ft": 54.6
+    }
+   ],
+   "device_counts": {
+    "R2-11": 5,
+    "R9-11L": 1,
+    "R9-11R": 2,
+    "R9-9": 1,
+    "RI-27.1.1": 3,
+    "W20-1": 4,
+    "W20-5R": 1,
+    "W4-2R": 1
+   },
+   "callout_codes": [
+    "R2-11",
+    "R9-11L",
+    "R9-11R",
+    "R9-9",
+    "W20-1",
+    "W20-5R",
+    "W4-2R"
+   ],
+   "arrow_board": false,
+   "dimension_labels": [
+    {
+     "label": "100'",
+     "dx_ft": -432.4,
+     "dy_ft": -22.7
+    },
+    {
+     "label": "100'",
+     "dx_ft": -332.3,
+     "dy_ft": -15.8
+    },
+    {
+     "label": "100'",
+     "dx_ft": -232.3,
+     "dy_ft": -9.1
+    },
+    {
+     "label": "115'",
+     "dx_ft": -124.9,
+     "dy_ft": -3.1
+    },
+    {
+     "label": "10'",
+     "dx_ft": -81.3,
+     "dy_ft": -17.3
+    },
+    {
+     "label": "11'",
+     "dx_ft": -45.9,
+     "dy_ft": -28.5
+    },
+    {
+     "label": "50'",
+     "dx_ft": -42.3,
+     "dy_ft": 1.1
+    },
+    {
+     "label": "100'",
+     "dx_ft": 12.2,
+     "dy_ft": -116.8
+    },
+    {
+     "label": "100'",
+     "dx_ft": 65.0,
+     "dy_ft": 58.4
+    },
+    {
+     "label": "100'",
+     "dx_ft": 125.6,
+     "dy_ft": -74.0
+    },
+    {
+     "label": "4'",
+     "dx_ft": 315.6,
+     "dy_ft": 294.0
+    }
+   ],
+   "job_notes": [
+    "- SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+    "- ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE I"
+   ]
+  },
+  {
+   "sheet_number": 2,
+   "of": 6,
+   "phase_label": "PHASE II",
+   "scale": "1\" = 40'",
+   "work_points": [
+    "P.33",
+    "P.34",
+    "P.36"
+   ],
+   "approaches_on_main_road": {
+    "from_sheet_left": {
+     "advance_sequence_far_to_near": [
+      "W20-1",
+      "W9-2L"
+     ],
+     "positions_ft": [
+      {
+       "code": "W20-1",
+       "dx_ft": -386.8,
+       "dy_ft": -12.5
+      },
+      {
+       "code": "W9-2L",
+       "dx_ft": -288.5,
+       "dy_ft": -7.5
+      }
+     ],
+     "spacing_ft": [
+      98.3
+     ],
+     "end_signs": [
+      {
+       "code": "R2-11",
+       "dx_ft": -354.1,
+       "dy_ft": -52.5
+      }
+     ]
+    },
+    "from_sheet_right": {
+     "advance_sequence_far_to_near": [
+      "W20-1"
+     ],
+     "positions_ft": [
+      {
+       "code": "W20-1",
+       "dx_ft": 241.0,
+       "dy_ft": -44.7
+      }
+     ],
+     "spacing_ft": [],
+     "end_signs": [
+      {
+       "code": "R2-11",
+       "dx_ft": 228.2,
+       "dy_ft": -4.5
+      }
+     ]
+    }
+   },
+   "side_street_devices": [
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -159.9,
+     "dy_ft": -105.2
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -157.5,
+     "dy_ft": -153.9
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -135.9,
+     "dy_ft": -115.2
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -179.9,
+     "dy_ft": 66.8
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -154.6,
+     "dy_ft": 109.6
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -151.1,
+     "dy_ft": 60.6
+    }
+   ],
+   "all_devices_at_posts": [
+    {
+     "code": "W20-1",
+     "dx_ft": -386.8,
+     "dy_ft": -12.5
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -354.1,
+     "dy_ft": -52.5
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -338.1,
+     "dy_ft": -10.3
+    },
+    {
+     "code": "W9-2L",
+     "dx_ft": -288.5,
+     "dy_ft": -7.5
+    },
+    {
+     "code": "R3-7R",
+     "dx_ft": -239.1,
+     "dy_ft": -5.7
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -159.9,
+     "dy_ft": -105.2
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -157.5,
+     "dy_ft": -153.9
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -135.9,
+     "dy_ft": -115.2
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": 175.9,
+     "dy_ft": -45.9
+    },
+    {
+     "code": "R9-11R",
+     "dx_ft": 197.7,
+     "dy_ft": -1.1
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": 228.2,
+     "dy_ft": -4.5
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 241.0,
+     "dy_ft": -44.7
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -179.9,
+     "dy_ft": 66.8
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -154.6,
+     "dy_ft": 109.6
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -151.1,
+     "dy_ft": 60.6
+    },
+    {
+     "code": "R9-11L",
+     "dx_ft": -142.8,
+     "dy_ft": 2.7
+    }
+   ],
+   "device_counts": {
+    "R2-11": 4,
+    "R3-7R": 1,
+    "R9-11L": 1,
+    "R9-11R": 1,
+    "RI-27.1.1": 4,
+    "W20-1": 4,
+    "W9-2L": 1
+   },
+   "callout_codes": [
+    "R2-11",
+    "R3-7R",
+    "R9-11L",
+    "R9-11R",
+    "W20-1",
+    "W9-2L"
+   ],
+   "arrow_board": true,
+   "dimension_labels": [
+    {
+     "label": "100'",
+     "dx_ft": -346.2,
+     "dy_ft": 8.3
+    },
+    {
+     "label": "100'",
+     "dx_ft": -246.0,
+     "dy_ft": 13.4
+    },
+    {
+     "label": "100'",
+     "dx_ft": -181.7,
+     "dy_ft": -110.2
+    },
+    {
+     "label": "100'",
+     "dx_ft": -128.7,
+     "dy_ft": 65.4
+    },
+    {
+     "label": "10'",
+     "dx_ft": 38.0,
+     "dy_ft": -4.3
+    },
+    {
+     "label": "100'",
+     "dx_ft": 199.0,
+     "dy_ft": -70.2
+    },
+    {
+     "label": "4'",
+     "dx_ft": 400.3,
+     "dy_ft": 275.8
+    }
+   ],
+   "job_notes": [
+    "- SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+    "- ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE II"
+   ]
+  },
+  {
+   "sheet_number": 3,
+   "of": 6,
+   "phase_label": "PHASE III",
+   "scale": "1\" = 50'",
+   "work_points": [
+    "P.37",
+    "P.38",
+    "P.38-50"
+   ],
+   "approaches_on_main_road": {
+    "from_sheet_left": {
+     "advance_sequence_far_to_near": [
+      "W20-1",
+      "W4-2R"
+     ],
+     "positions_ft": [
+      {
+       "code": "W20-1",
+       "dx_ft": -534.0,
+       "dy_ft": 54.6
+      },
+      {
+       "code": "W4-2R",
+       "dx_ft": -422.0,
+       "dy_ft": -48.9
+      }
+     ],
+     "spacing_ft": [
+      112.0
+     ],
+     "end_signs": [
+      {
+       "code": "R2-11",
+       "dx_ft": -554.3,
+       "dy_ft": 11.5
+      }
+     ]
+    },
+    "from_sheet_right": {
+     "advance_sequence_far_to_near": [
+      "W20-1"
+     ],
+     "positions_ft": [
+      {
+       "code": "W20-1",
+       "dx_ft": 197.4,
+       "dy_ft": -58.0
+      }
+     ],
+     "spacing_ft": [],
+     "end_signs": [
+      {
+       "code": "R2-11",
+       "dx_ft": 163.2,
+       "dy_ft": -13.5
+      }
+     ]
+    }
+   },
+   "side_street_devices": [
+    {
+     "code": "W20-1",
+     "dx_ft": -653.7,
+     "dy_ft": -76.3
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -615.5,
+     "dy_ft": -110.5
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -605.7,
+     "dy_ft": -69.5
+    },
+    {
+     "code": "W20-5R",
+     "dx_ft": -555.3,
+     "dy_ft": -60.3
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -521.2,
+     "dy_ft": -160.1
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -511.6,
+     "dy_ft": -208.2
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -494.1,
+     "dy_ft": -168.2
+    }
+   ],
+   "all_devices_at_posts": [
+    {
+     "code": "W20-1",
+     "dx_ft": -653.7,
+     "dy_ft": -76.3
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -615.5,
+     "dy_ft": -110.5
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -605.7,
+     "dy_ft": -69.5
+    },
+    {
+     "code": "W20-5R",
+     "dx_ft": -555.3,
+     "dy_ft": -60.3
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -521.2,
+     "dy_ft": -160.1
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -511.6,
+     "dy_ft": -208.2
+    },
+    {
+     "code": "R9-11L",
+     "dx_ft": -495.1,
+     "dy_ft": -53.0
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -494.1,
+     "dy_ft": -168.2
+    },
+    {
+     "code": "W4-2R",
+     "dx_ft": -422.0,
+     "dy_ft": -48.9
+    },
+    {
+     "code": "R9-9",
+     "dx_ft": -114.4,
+     "dy_ft": -18.3
+    },
+    {
+     "code": "R9-9",
+     "dx_ft": -82.2,
+     "dy_ft": -15.0
+    },
+    {
+     "code": "R9-9",
+     "dx_ft": -4.8,
+     "dy_ft": -9.0
+    },
+    {
+     "code": "R9-9",
+     "dx_ft": 28.4,
+     "dy_ft": -9.5
+    },
+    {
+     "code": "R9-9",
+     "dx_ft": 83.6,
+     "dy_ft": -10.2
+    },
+    {
+     "code": "R9-9",
+     "dx_ft": 116.7,
+     "dy_ft": -10.6
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": 147.3,
+     "dy_ft": -55.9
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": 163.2,
+     "dy_ft": -13.5
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 197.4,
+     "dy_ft": -58.0
+    },
+    {
+     "code": "R9-11R",
+     "dx_ft": 292.6,
+     "dy_ft": -20.1
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -554.3,
+     "dy_ft": 11.5
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -534.0,
+     "dy_ft": 54.6
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -527.2,
+     "dy_ft": 7.2
+    }
+   ],
+   "device_counts": {
+    "R2-11": 4,
+    "R9-11L": 1,
+    "R9-11R": 1,
+    "R9-9": 6,
+    "RI-27.1.1": 4,
+    "W20-1": 4,
+    "W20-5R": 1,
+    "W4-2R": 1
+   },
+   "callout_codes": [
+    "R2-11",
+    "R9-11L",
+    "R9-11R",
+    "R9-9",
+    "W20-1",
+    "W20-5R",
+    "W4-2R"
+   ],
+   "arrow_board": false,
+   "dimension_labels": [
+    {
+     "label": "100'",
+     "dx_ft": -614.3,
+     "dy_ft": -58.2
+    },
+    {
+     "label": "100'",
+     "dx_ft": -546.0,
+     "dy_ft": -168.5
+    },
+    {
+     "label": "100'",
+     "dx_ft": -509.4,
+     "dy_ft": 12.0
+    },
+    {
+     "label": "135'",
+     "dx_ft": -497.4,
+     "dy_ft": -44.2
+    },
+    {
+     "label": "100'",
+     "dx_ft": -380.5,
+     "dy_ft": -32.7
+    },
+    {
+     "label": "115'",
+     "dx_ft": -273.3,
+     "dy_ft": -23.5
+    },
+    {
+     "label": "50'",
+     "dx_ft": -191.1,
+     "dy_ft": -16.6
+    },
+    {
+     "label": "10'",
+     "dx_ft": -39.7,
+     "dy_ft": -18.0
+    },
+    {
+     "label": "100'",
+     "dx_ft": 154.5,
+     "dy_ft": -75.5
+    },
+    {
+     "label": "4'",
+     "dx_ft": 417.5,
+     "dy_ft": 261.4
+    }
+   ],
+   "job_notes": [
+    "- SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+    "- ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE III"
+   ]
+  },
+  {
+   "sheet_number": 4,
+   "of": 6,
+   "phase_label": "PHASE IV",
+   "scale": "1\" = 40'",
+   "work_points": [
+    "P.39"
+   ],
+   "approaches_on_main_road": {
+    "from_sheet_left": {
+     "advance_sequence_far_to_near": [
+      "W20-1",
+      "W20-5R",
+      "W4-2R"
+     ],
+     "positions_ft": [
+      {
+       "code": "W20-1",
+       "dx_ft": -529.1,
+       "dy_ft": -37.4
+      },
+      {
+       "code": "W20-5R",
+       "dx_ft": -440.0,
+       "dy_ft": -29.7
+      },
+      {
+       "code": "W4-2R",
+       "dx_ft": -340.7,
+       "dy_ft": -22.4
+      }
+     ],
+     "spacing_ft": [
+      89.1,
+      99.3
+     ],
+     "end_signs": []
+    },
+    "from_sheet_right": {
+     "advance_sequence_far_to_near": [],
+     "positions_ft": [],
+     "spacing_ft": [],
+     "end_signs": [
+      {
+       "code": "R2-11",
+       "dx_ft": 53.1,
+       "dy_ft": -17.7
+      }
+     ]
+    }
+   },
+   "side_street_devices": [
+    {
+     "code": "R2-11",
+     "dx_ft": -465.8,
+     "dy_ft": -74.8
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 83.7,
+     "dy_ft": -61.2
+    }
+   ],
+   "all_devices_at_posts": [
+    {
+     "code": "W20-1",
+     "dx_ft": -529.1,
+     "dy_ft": -37.4
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -492.6,
+     "dy_ft": -34.3
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -465.8,
+     "dy_ft": -74.8
+    },
+    {
+     "code": "W20-5R",
+     "dx_ft": -440.0,
+     "dy_ft": -29.7
+    },
+    {
+     "code": "W4-2R",
+     "dx_ft": -340.7,
+     "dy_ft": -22.4
+    },
+    {
+     "code": "R9-9",
+     "dx_ft": -15.3,
+     "dy_ft": -12.5
+    },
+    {
+     "code": "R9-9",
+     "dx_ft": 18.7,
+     "dy_ft": -13.5
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": 35.9,
+     "dy_ft": -59.2
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": 53.1,
+     "dy_ft": -17.7
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 83.7,
+     "dy_ft": -61.2
+    },
+    {
+     "code": "R9-11R",
+     "dx_ft": 91.7,
+     "dy_ft": -17.8
+    }
+   ],
+   "device_counts": {
+    "R2-11": 2,
+    "R9-11R": 1,
+    "R9-9": 2,
+    "RI-27.1.1": 2,
+    "W20-1": 2,
+    "W20-5R": 1,
+    "W4-2R": 1
+   },
+   "callout_codes": [
+    "R2-11",
+    "R9-11R",
+    "R9-9",
+    "W20-1",
+    "W20-5R",
+    "W4-2R"
+   ],
+   "arrow_board": false,
+   "dimension_labels": [
+    {
+     "label": "90'",
+     "dx_ft": -493.9,
+     "dy_ft": -16.8
+    },
+    {
+     "label": "100'",
+     "dx_ft": -399.1,
+     "dy_ft": -9.7
+    },
+    {
+     "label": "100'",
+     "dx_ft": -299.8,
+     "dy_ft": -1.9
+    },
+    {
+     "label": "115'",
+     "dx_ft": -191.4,
+     "dy_ft": 4.3
+    },
+    {
+     "label": "10'",
+     "dx_ft": -118.0,
+     "dy_ft": -15.9
+    },
+    {
+     "label": "110'",
+     "dx_ft": -77.8,
+     "dy_ft": 4.3
+    },
+    {
+     "label": "90'",
+     "dx_ft": 46.2,
+     "dy_ft": -77.3
+    },
+    {
+     "label": "4'",
+     "dx_ft": 318.8,
+     "dy_ft": 261.9
+    }
+   ],
+   "job_notes": [
+    "- SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+    "- ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE IV"
+   ]
+  },
+  {
+   "sheet_number": 5,
+   "of": 6,
+   "phase_label": "PHASE V",
+   "scale": "1\" = 50'",
+   "work_points": [
+    "P.40",
+    "P.41",
+    "P.42"
+   ],
+   "approaches_on_main_road": {
+    "from_sheet_left": {
+     "advance_sequence_far_to_near": [],
+     "positions_ft": [],
+     "spacing_ft": [],
+     "end_signs": [
+      {
+       "code": "R2-11",
+       "dx_ft": -143.0,
+       "dy_ft": -47.1
+      },
+      {
+       "code": "R2-11",
+       "dx_ft": -266.9,
+       "dy_ft": 21.7
+      }
+     ]
+    },
+    "from_sheet_right": {
+     "advance_sequence_far_to_near": [
+      "W20-4"
+     ],
+     "positions_ft": [
+      {
+       "code": "W20-4",
+       "dx_ft": 437.1,
+       "dy_ft": 56.5
+      }
+     ],
+     "spacing_ft": [],
+     "end_signs": []
+    }
+   },
+   "side_street_devices": [
+    {
+     "code": "W20-1",
+     "dx_ft": -181.3,
+     "dy_ft": -86.2
+    },
+    {
+     "code": "M4-9L",
+     "dx_ft": 97.2,
+     "dy_ft": -98.3
+    },
+    {
+     "code": "M4-9AL",
+     "dx_ft": 160.0,
+     "dy_ft": -101.8
+    },
+    {
+     "code": "W4-2R",
+     "dx_ft": 527.1,
+     "dy_ft": -93.1
+    },
+    {
+     "code": "W20-5R",
+     "dx_ft": 612.1,
+     "dy_ft": -121.3
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": 621.9,
+     "dy_ft": -191.3
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 623.4,
+     "dy_ft": -243.5
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": 652.1,
+     "dy_ft": -200.8
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": 661.2,
+     "dy_ft": -139.9
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 706.0,
+     "dy_ft": -154.5
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": 738.6,
+     "dy_ft": -121.0
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -284.0,
+     "dy_ft": 64.6
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -234.4,
+     "dy_ft": 62.6
+    },
+    {
+     "code": "R9-11L",
+     "dx_ft": -123.0,
+     "dy_ft": 66.3
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": 486.9,
+     "dy_ft": 73.0
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": 492.0,
+     "dy_ft": 113.2
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 531.2,
+     "dy_ft": 88.4
+    }
+   ],
+   "all_devices_at_posts": [
+    {
+     "code": "W20-1",
+     "dx_ft": -181.3,
+     "dy_ft": -86.2
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -179.6,
+     "dy_ft": -38.0
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -143.0,
+     "dy_ft": -47.1
+    },
+    {
+     "code": "M4-9L",
+     "dx_ft": 97.2,
+     "dy_ft": -98.3
+    },
+    {
+     "code": "M4-9AL",
+     "dx_ft": 160.0,
+     "dy_ft": -101.8
+    },
+    {
+     "code": "M4-9R",
+     "dx_ft": 173.1,
+     "dy_ft": -16.6
+    },
+    {
+     "code": "R9-10L",
+     "dx_ft": 259.6,
+     "dy_ft": -19.6
+    },
+    {
+     "code": "R9-3BR",
+     "dx_ft": 273.6,
+     "dy_ft": -24.2
+    },
+    {
+     "code": "R9-11L",
+     "dx_ft": 320.9,
+     "dy_ft": -27.0
+    },
+    {
+     "code": "W4-2R",
+     "dx_ft": 527.1,
+     "dy_ft": -93.1
+    },
+    {
+     "code": "W20-5R",
+     "dx_ft": 612.1,
+     "dy_ft": -121.3
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": 621.9,
+     "dy_ft": -191.3
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 623.4,
+     "dy_ft": -243.5
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": 652.1,
+     "dy_ft": -200.8
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": 661.2,
+     "dy_ft": -139.9
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 706.0,
+     "dy_ft": -154.5
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": 738.6,
+     "dy_ft": -121.0
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -284.0,
+     "dy_ft": 64.6
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -266.9,
+     "dy_ft": 21.7
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -234.4,
+     "dy_ft": 62.6
+    },
+    {
+     "code": "R9-11L",
+     "dx_ft": -188.7,
+     "dy_ft": 13.0
+    },
+    {
+     "code": "R9-11L",
+     "dx_ft": -123.0,
+     "dy_ft": 66.3
+    },
+    {
+     "code": "M4-9L",
+     "dx_ft": -110.6,
+     "dy_ft": 1.6
+    },
+    {
+     "code": "M4-A8",
+     "dx_ft": 86.4,
+     "dy_ft": 2.1
+    },
+    {
+     "code": "W20-4",
+     "dx_ft": 437.1,
+     "dy_ft": 56.5
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": 486.9,
+     "dy_ft": 73.0
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": 492.0,
+     "dy_ft": 113.2
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 531.2,
+     "dy_ft": 88.4
+    }
+   ],
+   "device_counts": {
+    "M4-9AL": 1,
+    "M4-9L": 2,
+    "M4-9R": 1,
+    "M4-A8": 1,
+    "R2-11": 5,
+    "R9-10L": 1,
+    "R9-11L": 3,
+    "R9-3BR": 1,
+    "RI-27.1.1": 5,
+    "W20-1": 5,
+    "W20-4": 1,
+    "W20-5R": 1,
+    "W4-2R": 1
+   },
+   "callout_codes": [
+    "M4-9AL",
+    "M4-9L",
+    "M4-9R",
+    "M4-A8",
+    "R2-11",
+    "R9-10L",
+    "R9-11L",
+    "R9-3BR",
+    "W20-1",
+    "W20-4",
+    "W20-5R",
+    "W4-2R"
+   ],
+   "arrow_board": true,
+   "dimension_labels": [
+    {
+     "label": "100'",
+     "dx_ft": -240.8,
+     "dy_ft": 79.5
+    },
+    {
+     "label": "100'",
+     "dx_ft": -204.0,
+     "dy_ft": -39.7
+    },
+    {
+     "label": "100'",
+     "dx_ft": -118.0,
+     "dy_ft": 136.5
+    },
+    {
+     "label": "40'",
+     "dx_ft": -14.0,
+     "dy_ft": -18.7
+    },
+    {
+     "label": "10'",
+     "dx_ft": 218.3,
+     "dy_ft": 16.0
+    },
+    {
+     "label": "55'",
+     "dx_ft": 368.4,
+     "dy_ft": -60.8
+    },
+    {
+     "label": "95'",
+     "dx_ft": 408.8,
+     "dy_ft": 24.5
+    },
+    {
+     "label": "40'",
+     "dx_ft": 414.0,
+     "dy_ft": -76.8
+    },
+    {
+     "label": "100'",
+     "dx_ft": 479.9,
+     "dy_ft": -99.2
+    },
+    {
+     "label": "100'",
+     "dx_ft": 497.5,
+     "dy_ft": 58.5
+    },
+    {
+     "label": "90'",
+     "dx_ft": 570.5,
+     "dy_ft": -129.5
+    },
+    {
+     "label": "105'",
+     "dx_ft": 603.0,
+     "dy_ft": -196.0
+    },
+    {
+     "label": "100'",
+     "dx_ft": 660.1,
+     "dy_ft": -159.5
+    },
+    {
+     "label": "4'",
+     "dx_ft": 833.8,
+     "dy_ft": 303.2
+    }
+   ],
+   "job_notes": [
+    "- SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+    "- ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE V"
+   ]
+  },
+  {
+   "sheet_number": 6,
+   "of": 6,
+   "phase_label": "PHASE VI",
+   "scale": "1\" = 40'",
+   "work_points": [
+    "P.42-2"
+   ],
+   "approaches_on_main_road": {
+    "from_sheet_left": {
+     "advance_sequence_far_to_near": [
+      "W20-1",
+      "W20-5R",
+      "W4-2R"
+     ],
+     "positions_ft": [
+      {
+       "code": "W20-1",
+       "dx_ft": -424.2,
+       "dy_ft": 1.9
+      },
+      {
+       "code": "W20-5R",
+       "dx_ft": -324.8,
+       "dy_ft": -3.4
+      },
+      {
+       "code": "W4-2R",
+       "dx_ft": -210.6,
+       "dy_ft": -8.8
+      }
+     ],
+     "spacing_ft": [
+      99.4,
+      114.2
+     ],
+     "end_signs": [
+      {
+       "code": "R2-11",
+       "dx_ft": -395.6,
+       "dy_ft": -41.9
+      }
+     ]
+    },
+    "from_sheet_right": {
+     "advance_sequence_far_to_near": [],
+     "positions_ft": [],
+     "spacing_ft": [],
+     "end_signs": [
+      {
+       "code": "R2-11",
+       "dx_ft": 65.4,
+       "dy_ft": -21.8
+      }
+     ]
+    }
+   },
+   "side_street_devices": [
+    {
+     "code": "W20-1",
+     "dx_ft": -321.4,
+     "dy_ft": -151.0
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -319.6,
+     "dy_ft": -99.9
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -285.2,
+     "dy_ft": -107.2
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": 44.9,
+     "dy_ft": -62.6
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 93.2,
+     "dy_ft": -68.8
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -323.6,
+     "dy_ft": 76.8
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -289.9,
+     "dy_ft": 114.9
+    }
+   ],
+   "all_devices_at_posts": [
+    {
+     "code": "R2-11",
+     "dx_ft": -395.6,
+     "dy_ft": -41.9
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -374.5,
+     "dy_ft": -0.7
+    },
+    {
+     "code": "W20-5R",
+     "dx_ft": -324.8,
+     "dy_ft": -3.4
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -321.4,
+     "dy_ft": -151.0
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -319.6,
+     "dy_ft": -99.9
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -285.2,
+     "dy_ft": -107.2
+    },
+    {
+     "code": "W4-2R",
+     "dx_ft": -210.6,
+     "dy_ft": -8.8
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": 44.9,
+     "dy_ft": -62.6
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": 65.4,
+     "dy_ft": -21.8
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": 93.2,
+     "dy_ft": -68.8
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -424.2,
+     "dy_ft": 1.9
+    },
+    {
+     "code": "R2-11",
+     "dx_ft": -323.6,
+     "dy_ft": 76.8
+    },
+    {
+     "code": "W20-1",
+     "dx_ft": -289.9,
+     "dy_ft": 114.9
+    },
+    {
+     "code": "RI-27.1.1",
+     "dx_ft": -288.4,
+     "dy_ft": 58.6
+    }
+   ],
+   "device_counts": {
+    "R2-11": 4,
+    "RI-27.1.1": 4,
+    "W20-1": 4,
+    "W20-5R": 1,
+    "W4-2R": 1
+   },
+   "callout_codes": [
+    "R2-11",
+    "W20-1",
+    "W20-5R",
+    "W4-2R"
+   ],
+   "arrow_board": false,
+   "dimension_labels": [
+    {
+     "label": "100'",
+     "dx_ft": -382.0,
+     "dy_ft": 15.0
+    },
+    {
+     "label": "100'",
+     "dx_ft": -341.7,
+     "dy_ft": -104.1
+    },
+    {
+     "label": "115'",
+     "dx_ft": -274.6,
+     "dy_ft": 9.7
+    },
+    {
+     "label": "100'",
+     "dx_ft": -263.3,
+     "dy_ft": 72.0
+    },
+    {
+     "label": "100'",
+     "dx_ft": -167.2,
+     "dy_ft": 4.1
+    },
+    {
+     "label": "40'",
+     "dx_ft": -97.2,
+     "dy_ft": 0.3
+    },
+    {
+     "label": "10'",
+     "dx_ft": -58.4,
+     "dy_ft": -34.3
+    },
+    {
+     "label": "50'",
+     "dx_ft": -52.2,
+     "dy_ft": -1.8
+    },
+    {
+     "label": "100'",
+     "dx_ft": 49.0,
+     "dy_ft": -89.5
+    },
+    {
+     "label": "4'",
+     "dx_ft": 361.7,
+     "dy_ft": 275.2
+    }
+   ],
+   "job_notes": [
+    "- SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+    "- ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE VI"
+   ]
+  }
+ ]
+}
