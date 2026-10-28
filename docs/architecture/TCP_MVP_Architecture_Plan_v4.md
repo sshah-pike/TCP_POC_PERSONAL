@@ -1,12 +1,12 @@
 # TCP Multi-Work-Location Architecture: Plan, ADRs and Verification Prompt
 
-*Prepared for Sahil (approver). Developer: VS Code Claude. Version 4, October 26, 2026. Adds TA-1 to the MVP, the symbol library, the golden set from your drafts, a case-based grouping rule, and the full slice plan (separate file: TCP_MVP_Development_Slices.md). Items marked Approved in Section 15 are decided. Everything else is PROPOSED or OPEN.*
+*Prepared for Sahil (approver). Developer: VS Code Claude. Version 4.1, October 28, 2026 (paths updated after slice S0a). Version 4, October 26, 2026. Adds TA-1 to the MVP, the symbol library, the golden set from your drafts, a case-based grouping rule, and the full slice plan (separate file: TCP_MVP_Development_Slices.md). Items marked Approved in Section 15 are decided. Everything else is PROPOSED or OPEN.*
 
 This is the handover for letting the TCP tool read a KML with any number of work points, choose the right Typical Application (TA) for each, and produce draft plans whose every value traces to a source. Every stage below has a diagram, a plain explanation and an example. Section 15 shows what is approved, proposed and open, and explains every open question with an example.
 
 ## 1. Start here: what this change is about
 
-This change lets the tool take a KML with any number of work points, decide the right Typical Application (TA) for each stretch of work, and produce draft plans with a full audit trail. The old POC handled one work point and one TA (TA-1) \[S2\]\[S3\]. This is now the MVP: you backed up the POC, and the MVP is built on a new branch `TCP-MVP` with one pipeline that every TA follows, with no separate old TA-1 path (D-41). TA-1 is part of the MVP as an ordinary TA (D-47).
+This change lets the tool take a KML with any number of work points, decide the right Typical Application (TA) for each stretch of work, and produce draft plans with a full audit trail. The old POC handled one work point and one TA (TA-1) \[S2\]\[S3\]. This is now the MVP: you backed up the POC, and the MVP is built on a new branch `tcp-mvp/base` with one pipeline that every TA follows, with no separate old TA-1 path (D-41). TA-1 is part of the MVP as an ordinary TA (D-47).
 
 |  | Today | After this change |
 | --- | --- | --- |
@@ -975,7 +975,8 @@ The slices are specified in full, with scope, contracts, acceptance criteria, te
 
 | Slice | Scope | Depends on |
 | --- | --- | --- |
-| S0 | Branch `TCP-MVP`, repo verification report (Section 18), fixture harness, golden set imported | none |
+| S0a | Done: production layout (`src/tcp_planner/`, `apps/web/`, `config/`, `rule_pack/`, `assets/`, `var/`, `backup/orphans/`), behavior unchanged, report in `docs/reports/S0a_restructure_report.md` | none |
+| S0 | Repo verification report (Section 18), fixture harness, schema spike, the two S0a follow-ups (protected-run test, Foundry default) | S0a |
 | S1 | Domain model and KML intake for all geometry types (coordinates only; custom KML keys are future scope) | S0 |
 | S2 | Storage interfaces with local adapters, artifact references, project store | S0 |
 | S3 | Project orchestrator, one child run per zone, engine input extended, location list in the UI | S1, S2 |
@@ -1100,7 +1101,7 @@ Approved means you said yes in this conversation \[S5\]. Proposed means it is in
 | D-22 | KML `tcp:` keys and legacy `selected_ta` | Future scope (D-66) | 4 |
 | D-23 | The engine input may change freely, because there is no legacy path | Approved | 12 |
 | D-24 | Adjustment bands. A sign may move to a nearby available space. Taper and buffer are never in the pre-approved list. The SME may still move them by hand as a one-off exception (my reading, to confirm). Band values come from sources. Who holds the approver role is not set | Partly decided | 7, 10 |
-| D-25 | Cost estimates and caps, the reference-only toggle and cross-run cache are future scope. Only a max-zones cap in config now. Work happens on branch `TCP-MVP` | Approved | 4, 13 |
+| D-25 | Cost estimates and caps, the reference-only toggle and cross-run cache are future scope. Only a max-zones cap in config now. Work happens on branch `tcp-mvp/base` | Approved | 4, 13 |
 | D-26 | Grouping and sheet packing: case table, per-TA settings, ordering, two-TA sheets | **Open** (proposal in 4A, D-49) | 4A |
 | D-27 | Hybrid crops: crop in code first, fetch higher zoom only when pixels are insufficient. Images resized in code to the model limit | Approved | 5 |
 | D-28 | A permanent deviation is proposed by the SME and approved by a named approver role | Approved | 7, 12 |
@@ -1116,7 +1117,7 @@ Approved means you said yes in this conversation \[S5\]. Proposed means it is in
 | D-38 | Road width stored with an uncertainty; a threshold inside the interval becomes UNKNOWN and asks the SME | Approved | 5 |
 | D-39 | A plan that uses a `SOURCE_REVIEW_REQUIRED` rule is forced to REVIEW\_REQUIRED, with the item in the audit trail | Approved (option A) | 10 |
 | D-40 | The cloud move is out of the MVP. Storage is local | Approved | 12, 16 |
-| D-41 | The POC is backed up. The MVP is built on branch `TCP-MVP` with one pipeline for all TAs, and no TA-1 goldens | Approved | 1, 13 |
+| D-41 | The POC is backed up. The MVP is built on branch `tcp-mvp/base` with one pipeline for all TAs, and no TA-1 goldens | Approved | 1, 13 |
 | D-42 | Rule source: MUTCD 11th Edition, Chapter 6, December 2023 revision. References: E Second St for TA-6, Colorado St for TA-10, Granite St for TA-33 | Approved | 10, 4A |
 | D-43 | Live Azure Maps and AI calls only in the final full-pipeline test, not in unit or integration tests | Approved | 13, 14 |
 | D-44 | Device symbols: your template first, then the MUTCD, then online, marked `PLACEHOLDER_ASSET` until your real library arrives | Approved | 10 |
@@ -1148,6 +1149,12 @@ Approved means you said yes in this conversation \[S5\]. Proposed means it is in
 | D-71 | Title-block location uses the road name the POC already prints; the SME does not type an address | Approved | 4A |
 | D-72 | Placemark names used as display labels on the sheet | Approved | 4 |
 | D-73 | "Select TA" dropdown in the UI (Auto, TA-1, TA-6, TA-10, TA-33), per project and per point | Approved | 4B |
+| D-74 | Slice S0a done: production layout, one package `src/tcp_planner`, UI in `apps/web`, data in `config/`, `rule_pack/`, `assets/`, run data in `var/`, 16 files in `backup/orphans/2026-10-28/` with a manifest and restore script. Behavior unchanged (all suites, 13 offline scenarios and 36 saved-run replays identical) | Done | 13 |
+| D-75 | Branches: base `tcp-mvp/base`, one branch per slice `tcp-mvp/sNN-short-name` (the `TCP-MVP` name collides with `tcp-mvp/` on Windows) | Approved | 13 |
+| D-76 | Editable install required once per environment: `pip install -e . --no-build-isolation` | Approved | 13 |
+| D-77 | `runs/` moved to `var/runs/`; old POC runs stay tracked but cannot be resumed, because they store absolute paths. Store run paths relative to the runs folder in S2 | Approved | 12 |
+| D-78 | Default AI provider becomes Foundry in S0 (today the code falls back to the direct Anthropic provider when `TCP_AI_PROVIDER` is unset); the direct provider module moves to backup in S15 | Proposed | 5 |
+| D-79 | The pre-existing failing test `test_protected_run_dir_untouched` is fixed in S0 to check that the run folder is tracked and unchanged, which is its real intent | Proposed | 14 |
 | D-67 | New fields added to the schema: work side, work type, work length, lane width, direction of travel, bike lane, accessible route, detours, work-zone speed, add-on triggers, title-block fields, median work, and the TA-10 and TA-33 fields | Approved | 4B |
 
 ### Open questions (version 9)
@@ -1174,6 +1181,8 @@ Slices S0 to S5 can start now. Each item has a default so no slice is blocked.
 | 16 | Taper and buffer: my reading of your clarification | S10 | As written in Section 7 |
 | 17 | Which RIDOT and MassDOT documents apply | Later | MUTCD plus client layer |
 | 18 | SME confirmation that the Section 4B schema misses nothing | S6 | Built as written |
+| 19 | Push and merge S0a: push `tcp-mvp/s00a-restructure`, review it, merge into `tcp-mvp/base` | Before S0 | Push now, merge after review |
+| 20 | Approve D-78 (Foundry as the default provider) and D-79 (fix the protected-run test) | S0 | Both done in S0 |
 
 **Closed this round:** traffic control method not a start field, flaggers by default, police after the draft (D-68); lengths by code (D-64); JSON only, no TOON (D-61); work side suggested by AI and confirmed (D-69); grade-crossing notification dropped (D-70); title block uses the POC road name (D-71); placemark names as labels (D-72); Select TA dropdown (D-73).
 
@@ -1336,7 +1345,7 @@ Each record states status, context, decision, consequences and what was rejected
 
 ### ADR-030: No separate TA-1 path; one pipeline for every TA
 
-**Status:** Accepted. **Context:** TA-1 was the basic POC. You backed it up and want every TA to follow one pipeline \[S5\]. **Decision:** The MVP is built on `TCP-MVP` with one pipeline. TA-1 has no special handling and is built in the MVP as an ordinary entry from Figure 6P-1. This replaces the earlier plan to migrate TA-1 later. **Consequences:** Simpler, with no old goldens. The POC code is not a regression oracle. **Rejected:** Keeping TA-1 separate; migrating it later.
+**Status:** Accepted. **Context:** TA-1 was the basic POC. You backed it up and want every TA to follow one pipeline \[S5\]. **Decision:** The MVP is built on `tcp-mvp/base` with one pipeline. TA-1 has no special handling and is built in the MVP as an ordinary entry from Figure 6P-1. This replaces the earlier plan to migrate TA-1 later. **Consequences:** Simpler, with no old goldens. The POC code is not a regression oracle. **Rejected:** Keeping TA-1 separate; migrating it later.
 
 ### ADR-031: Fused geometry is low confidence; imagery decides
 
@@ -1430,7 +1439,7 @@ CONTEXT
 Every KML work point is processed, grouped into work zones, and each
 zone runs through the existing pipeline as a child run. A single
 point is a one-zone project. There is no legacy TA-1 path: the POC
-is backed up and the MVP (branch TCP-MVP) has one pipeline for every
+is backed up and the MVP (branch tcp-mvp/base) has one pipeline for every
 TA, so the engine input may change freely. A deterministic router chooses the TA from
 site facts; AI only observes (call 1 common facts, call 2 TA fields
 with crops). Conflicts follow a ladder: move within a sourced band,
@@ -1471,8 +1480,8 @@ STEP 1 - VERIFY THESE ASSUMPTIONS
     how much new code?
  6. Imagery extent for a long zone, mosaic behavior and
     MAP_EXTENT_INSUFFICIENT triggers.
- 7. Every raw file-path read or write in tcp_poc, tcp_ui and
-    tcp_assistant. Estimate the work for ArtifactStore/StateStore.
+ 7. Every raw file-path read or write in src/tcp_planner (run
+    store, evidence, assistant). Estimate the work for ArtifactStore/StateStore.
  8. versions.move_head compare-and-set and locks: can they map to a
     database transaction?
  9. relations._dependency_changes and evidence signatures: what
@@ -1517,7 +1526,7 @@ STEP 1 - VERIFY THESE ASSUMPTIONS
     others) and how their confidence is set.
 25. KML CONTENT: confirm the intake can read coordinates only and
     ignore all ExtendedData; note any code that reads selected_ta.
-26. RULE PACK: how rule_pack.py loads files, where EXPECTED_TA is
+26. RULE PACK: how src/tcp_planner/rules/rule_pack_loader.py loads files, where EXPECTED_TA is
     used, and whether a RulePackStore can wrap the loader.
 27. EXISTING TESTS: which suites still apply to the MVP and which
     depend on TA-1 or the legacy path? Do not run live calls.
@@ -1574,6 +1583,7 @@ for me. Then STOP and wait for my decisions.
 | Tag | Source | Trust level |
 | --- | --- | --- |
 | \[S1\] | Your Multi-TA expansion brief (phases 0 to 15, rule-pack separation, test requirements) | Your instruction |
+| Note | File names in \[S2\] to \[S4\] are POC names (`tcp_poc/...`, `tcp_ui/...`). Their new locations are in `docs/reports/S0a_restructure_plan.md`, section 2 | |
 | \[S2\] | VS Code Claude's multi-work-location architecture plan: facts about `kml_input.py`, `app.py`, `evidence.py`, `relations.py`, the map and OSM fetch, artifact layout and the places that assume one work point | VS Code Claude's reading of the repo. Not independently verified |
 | \[S3\] | VS Code Claude's router analysis: `ta_schema_router.json`, `EXPECTED_TA = "TA-1"` in `rule_pack.py`, the deciding fields, the out-of-scope TAs, real KML point counts and spacings | VS Code Claude's reading. Not independently verified |
 | \[S4\] | VS Code Claude's conflict and exception analysis: obstruction handling in `site_fusion.py` and `validators.py`, `sme_disposition.py`, `exception_tools.py` | VS Code Claude's reading. Not independently verified |

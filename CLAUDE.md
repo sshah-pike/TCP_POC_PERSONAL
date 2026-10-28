@@ -7,7 +7,8 @@ Read this file at the start of every session. It applies to every slice.
 The tool takes a KML of work locations and produces draft traffic control plans (TCPs): PDF sheets with imagery, signs, tapers, buffers and dimensions, plus a full audit trail. An SME reviews and approves every plan.
 
 - **MVP scope:** TA-1, TA-6, TA-10 and TA-33 only. Anything else returns `NO_TA_MATCH`.
-- **Branch:** `tcp-mvp/base`. The old POC is backed up and is not a regression oracle. There is no separate legacy TA-1 path.
+- **Branches:** base `tcp-mvp/base`; one branch per slice, `tcp-mvp/sNN-short-name`. The old POC is backed up and is not a regression oracle. There is no separate legacy TA-1 path.
+- **Setup, once per environment:** `pip install -e . --no-build-isolation` inside `.venv`.
 
 ## Documents (source of truth)
 
@@ -16,23 +17,23 @@ The tool takes a KML of work locations and produces draft traffic control plans 
 | `docs/architecture/TCP_MVP_Architecture_Plan_v4.md` | The plan, decisions (D-xx) and ADRs |
 | `docs/slices/TCP_MVP_Development_Slices.md` | Slice specs S0 to S15: scope, acceptance criteria, tests |
 | `docs/slices/schema_spike_prompt.md` | AI output-format spike, run in S0 |
+| `docs/reports/` | Slice reports (S0a done; S0 next) |
 | `docs/sources/` | MUTCD 11th Edition, Chapter 6, December 2023 revision |
-| `docs/references/` | The three reference TMP PDFs; their three KMLs (plus TA-6/10/33 examples) in `docs/references/kml/` |
+| `docs/references/` | The three reference TMP PDFs; KMLs in `docs/references/kml/` |
 | `tests/golden/` | Golden set v0.1 extracted from the reference drafts |
 | `assets/symbols/` | Device catalog and placeholder symbols v0.1 |
-| `docs/reports/` | Slice reports (S0a restructure plan, baseline, report); `poc/` holds POC-era notes |
 
-## Repository layout and setup
+## Where code lives
 
-- Python package `tcp_planner` lives in `src/tcp_planner/`; the web UI in `apps/web/`.
-- Data outside code: `config/` (settings JSON), `rule_pack/`, `assets/`. Paths resolve through
-  `tcp_planner.config.settings`; never build paths from `__file__` elsewhere.
-- `var/` holds run outputs, labels, assistant data and debug dumps (gitignored; `var/runs/` keeps the
-  tracked POC-era runs). `backup/orphans/<date>/` holds moved-out files with a `MANIFEST.json`.
-- Setup once per environment: `pip install -r requirements.txt`, then `pip install -e . --no-build-isolation`
-  (editable install; needs `setuptools` in the venv). Without it `tcp_planner` is not importable outside pytest.
-- Tests: `python -m pytest tests/integration/pipeline`, `tests/integration/web_api`,
-  `tests/integration/review_assistant`, `tests/unit` (run suites separately); UI: `cd apps/web && npm test`.
+| Area | Folder |
+| --- | --- |
+| Pipeline package | `src/tcp_planner/` (paths resolved only through `src/tcp_planner/config/settings.py`) |
+| UI | `apps/web/` |
+| Config, rule pack, assets | `config/`, `rule_pack/`, `assets/` |
+| Tests | `tests/unit/`, `tests/integration/...`, `tests/golden/` |
+| Run data | `var/` (new runs are not tracked) |
+| Backups | `backup/orphans/<date>/` with `MANIFEST.json`; `scripts/restore_backup.py` restores them |
+| Experiments | `spikes/` (never imported by `src/`) |
 
 If code and plan disagree, **stop and report**. Do not silently follow either one.
 
