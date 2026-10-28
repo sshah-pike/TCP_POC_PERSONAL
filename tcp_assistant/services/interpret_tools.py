@@ -383,7 +383,7 @@ def _interpret_tool(tctx, ctx, cid, text, message):
 
 def _cost(model, usage):
     try:
-        from tcp_ui.store import load_pricing, _priced
+        from tcp_planner.storage.run_store import load_pricing, _priced
         v, _ = _priced(model, usage or {}, load_pricing(), "foundry")
         return round(v, 6) if v is not None else "N/A"
     except Exception:

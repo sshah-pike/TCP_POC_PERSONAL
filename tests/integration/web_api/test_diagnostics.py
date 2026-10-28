@@ -9,7 +9,9 @@ import requests
 from requests import exceptions as rx
 
 from tcp_planner.orchestration import pipeline as app
-from tcp_ui import runner, store, diagnostics
+from tcp_planner.orchestration import run_worker as runner
+from tcp_planner.storage import run_store as store
+from tcp_planner.audit import provider_diagnostics as diagnostics
 
 SECRET = "SECRET_TEST_VALUE"
 DRAFT = {"plan.json", "tcp_sheet.png", "tcp_sheet.pdf", "debug_plan.png", "debug_plan.pdf", "plan.dxf", "plan.dwg"}

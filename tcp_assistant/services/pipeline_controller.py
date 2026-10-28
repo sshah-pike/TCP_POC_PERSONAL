@@ -1,4 +1,4 @@
-"""Safe pipeline regeneration for a confirmed plan version: a strict-replay revision run via tcp_ui.relations.
+"""Safe pipeline regeneration for a confirmed plan version: a strict-replay revision run via tcp_planner.orchestration.run_relations.
 
 Each attempt is a new immutable resume-attempt record. finalize() verifies the finished run against the reviewed
 revision (revision hash, machine site model, proposed objects, plan status) before the version becomes a draft.
@@ -23,7 +23,7 @@ def c():
 
 
 def _default_launcher(run_id, rdir):
-    from tcp_ui import server
+    from tcp_planner.web_api import server
     server.launch(run_id, rdir)
 
 
@@ -31,7 +31,7 @@ LAUNCHER = _default_launcher   # tests inject an in-process runner
 
 
 def start(ident, cid, pv_id, resume_stage="fusion"):
-    from tcp_ui import relations
+    from tcp_planner.orchestration import run_relations as relations
     pv = c().store.get("versions", pv_id)
     if not pv: raise AssistantError("NOT_FOUND", "Plan version not found.", 404)
     if V.status(pv) in V.SUCCESS: raise AssistantError("ALREADY_GENERATED", "This version was already generated.", 409)
@@ -66,7 +66,7 @@ def start(ident, cid, pv_id, resume_stage="fusion"):
 
 def finalize_pending(ident=None):
     """Verify finished attempts (idempotent). Returns [(pv_id, status)] newly finalized."""
-    from tcp_ui import store
+    from tcp_planner.storage import run_store as store
     done = []
     with _LOCK:
         for ra in c().store.list("resume-attempts"):
@@ -87,7 +87,7 @@ def finalize_pending(ident=None):
 
 
 def _verify(ra, st):
-    from tcp_ui import store
+    from tcp_planner.storage import run_store as store
     out = store.run_path(ra["run_id"], "output")
     read = lambda n: _read(os.path.join(out, n))
     pv = c().store.get("versions", ra["plan_version_id"])
@@ -109,7 +109,7 @@ def _verify(ra, st):
 def _live_ids():
     """Runs the UI server is currently executing (same process). Empty when no server is loaded (tests run in-process)."""
     import sys
-    srv = sys.modules.get("tcp_ui.server")
+    srv = sys.modules.get("tcp_planner.web_api.server")
     try: return srv.live_ids() if srv else set()
     except Exception: return set()
 

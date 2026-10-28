@@ -1,4 +1,4 @@
-"""HTTP routes for /api/assistant/* (mounted by tcp_ui/server.py). Returns (status, kind, body); kind = json | file.
+"""HTTP routes for /api/assistant/* (mounted by src/tcp_planner/web_api/server.py). Returns (status, kind, body); kind = json | file.
 
 Feature flag off: only GET /api/assistant/status answers (enabled=false); every other route is unavailable and no
 assistant storage is created.

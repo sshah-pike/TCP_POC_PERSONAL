@@ -8,10 +8,14 @@ from tcp_planner.ai import grounded_vision as G
 from tcp_planner.ai import foundry_provider as fp
 from tcp_planner.contracts import ProviderError
 from tcp_planner.ai.vision_provider import OBSERVATION_SCHEMA
-from tcp_ui import store, relations, labels, evaluation, runner
-from tcp_ui.evidence import load_manifest
-from tcp_ui.tests import inproc
-from tcp_ui.tests.inproc import FakeHttp, FAKE_AZURE_KEY
+from tcp_planner.storage import run_store as store
+from tcp_planner.orchestration import run_relations as relations
+from tcp_planner.evaluation import ground_truth_labels as labels
+from tcp_planner.evaluation import comparison_scoring as evaluation
+from tcp_planner.orchestration import run_worker as runner
+from tcp_planner.storage.evidence_store import load_manifest
+from tests.integration.web_api import inproc
+from tests.integration.web_api.inproc import FakeHttp, FAKE_AZURE_KEY
 
 SC = offline.build("supported")
 OBS = SC["vision_provider"].observation

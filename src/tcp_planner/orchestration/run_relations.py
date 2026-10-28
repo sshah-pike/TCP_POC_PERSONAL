@@ -1,14 +1,15 @@
 """Resumed runs and model comparisons (new runs linked to an immutable source run).
 
 A resumed run re-executes the unchanged pipeline (tcp_planner.orchestration.pipeline.main) with the parent's input. Only external
-evidence (map imagery, OSM elements, AI result) can be reused, through verified replay (tcp_ui/evidence.py);
+evidence (map imagery, OSM elements, AI result) can be reused, through verified replay (src/tcp_planner/storage/evidence_store.py);
 every other stage re-runs. A comparison is a set of resumed runs from the AI stage, one per Foundry profile,
 all reusing the same source imagery and OSM evidence.
 """
 import json, os, shutil
 
-from . import store
-from .evidence import ANALYSIS_SPANS, KIND_STAGE, load_manifest, resolve, verify_file, sha256_file
+from tcp_planner.storage import run_store as store
+from tcp_planner.storage.evidence_store import (ANALYSIS_SPANS, KIND_STAGE, load_manifest, resolve, verify_file,
+                                                sha256_file)
 
 STAGE_ORDER = [s[0] for s in store.STAGES]  # input .. render
 REUSE_ORDER = ["map", "osm", "ai"]

@@ -8,7 +8,7 @@ from .conftest import call, login, tree_hash
 @pytest.fixture
 def inproc_launch(monkeypatch):
     from tcp_assistant.services import pipeline_controller
-    from tcp_ui.tests import inproc
+    from tests.integration.web_api import inproc
     launched = []
 
     def launch(rid, rdir):
@@ -183,8 +183,8 @@ def test_pipeline_rejects_revision_when_disabled_or_tampered(aenv, runs, monkeyp
     r = review(t, cid)
     st, _, res = confirm(t, cid, r, "SAVE_PROPOSED_REVISION")
     from tcp_assistant.services.container import container
-    from tcp_ui import relations
-    from tcp_ui.tests import inproc
+    from tcp_planner.orchestration import run_relations as relations
+    from tests.integration.web_api import inproc
     store = container().store
     with open(store.blob_path("versions", res["plan_version_id"], "sme_revision.json"), encoding="utf-8") as f: rev = json.load(f)
     bad = dict(rev, decisions={"facts": [], "features": [], "sidewalks": []})
@@ -198,8 +198,8 @@ def test_pipeline_rejects_revision_when_disabled_or_tampered(aenv, runs, monkeyp
 
 
 def test_strict_replay_fails_closed_instead_of_calling_provider(aenv, runs):
-    from tcp_ui import relations
-    from tcp_ui.tests import inproc
+    from tcp_planner.orchestration import run_relations as relations
+    from tests.integration.web_api import inproc
     parent = runs["supported"]
     man = json.loads((aenv / "runs" / parent / "evidence" / "manifest.json").read_text())
     ai = next(e for e in man["artifacts"] if e["kind"] == "ai")
@@ -228,14 +228,14 @@ def test_running_regeneration_is_not_finalized(aenv, runs, monkeypatch):
     st, _, res = call("POST", f"conversations/{cid}/confirm", {"review_sha256": r["review_sha256"], "mode": "CONFIRM_AND_REGENERATE"}, token=t)
     rid, rdir = started[0]
     fake = types.SimpleNamespace(live_ids=lambda: {rid})
-    monkeypatch.setitem(sys.modules, "tcp_ui.server", fake)
+    monkeypatch.setitem(sys.modules, "tcp_planner.web_api.server", fake)
     call("GET", f"conversations/{cid}", token=t)
     assert call("GET", f"plan-versions/{res['plan_version_id']}", token=t)[2]["current_status"] == "REGENERATING"
     st2, _, dup = call("POST", f"plan-versions/{res['plan_version_id']}/regenerate", {"conversation_id": cid}, token=t)
     assert st2 == 409                                  # no second attempt while one is running
-    from tcp_ui.tests import inproc
+    from tests.integration.web_api import inproc
     inproc.run(rdir)                                  # the run finishes
-    monkeypatch.setitem(sys.modules, "tcp_ui.server", types.SimpleNamespace(live_ids=lambda: set()))
+    monkeypatch.setitem(sys.modules, "tcp_planner.web_api.server", types.SimpleNamespace(live_ids=lambda: set()))
     call("GET", f"conversations/{cid}", token=t)
     assert call("GET", f"plan-versions/{res['plan_version_id']}", token=t)[2]["current_status"] == "DRAFT_COMPLIANT"
     assert r["review"]["versions"]["new_site_evidence_version"].endswith("-v2")   # review matches what confirm creates

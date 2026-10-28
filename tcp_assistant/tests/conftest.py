@@ -46,8 +46,8 @@ def run_library(tmp_path_factory):
     root = tmp_path_factory.mktemp("runlib")
     old = os.environ.get("TCP_UI_RUNS_DIR"); os.environ["TCP_UI_RUNS_DIR"] = str(root)
     from tcp_planner.orchestration import offline_scenarios as offline
-    from tcp_ui import store
-    from tcp_ui.tests import inproc
+    from tcp_planner.storage import run_store as store
+    from tests.integration.web_api import inproc
     ids = {}
     try:
         for sc in SCENARIOS:

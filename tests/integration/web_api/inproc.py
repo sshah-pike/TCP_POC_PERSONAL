@@ -32,7 +32,7 @@ def isolated():
 
 
 def run(rdir):
-    from tcp_ui import runner
+    from tcp_planner.orchestration import run_worker as runner
     with isolated():
         return runner.main([rdir])
 

@@ -9,7 +9,8 @@ import requests
 from requests import exceptions as rx
 
 from tcp_planner.orchestration import pipeline as app
-from tcp_ui import runner, store
+from tcp_planner.orchestration import run_worker as runner
+from tcp_planner.storage import run_store as store
 
 FAKE_KEY = "AZURE-TEST-KEY-0123456789-SENTINEL"
 SECRET = "SECRET_TEST_VALUE"

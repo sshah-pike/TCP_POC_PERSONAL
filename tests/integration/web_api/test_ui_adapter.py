@@ -1,13 +1,14 @@
 """The UI layer must report exactly what the existing pipeline decided (offline, no network, no API keys).
 
-Run from the project root:  python -m pytest tcp_ui/tests -q
+Run from the project root:  python -m pytest tests/integration/web_api -q
 """
 import base64, json, os, threading, time, urllib.error, urllib.request
 import pytest
 
 from tcp_planner.orchestration import offline_scenarios as offline
 from tcp_planner.orchestration.pipeline import run_pipeline, DWT_CONFIG_PATH, EXIT
-from tcp_ui import server, store
+from tcp_planner.web_api import server
+from tcp_planner.storage import run_store as store
 
 DRAFT_FILES = {"plan.json", "aerial_image.jpg", "debug_plan.png", "debug_plan.pdf", "tcp_sheet.png", "tcp_sheet.pdf",
                "plan.dxf", "plan.dwg"}
@@ -173,7 +174,7 @@ def test_cost_is_estimated_only_from_configured_prices():
 
 def test_anthropic_usage_recorder_observes_only(tmp_path, monkeypatch):
     anthropic = pytest.importorskip("anthropic")
-    from tcp_ui import runner
+    from tcp_planner.orchestration import run_worker as runner
     from anthropic.resources.messages import Messages
 
     class Resp:

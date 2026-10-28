@@ -1,4 +1,4 @@
-// Shapes returned by tcp_ui/server.py (see tcp_ui/store.py). Display-only.
+// Shapes returned by src/tcp_planner/web_api/server.py (see src/tcp_planner/storage/run_store.py). Display-only.
 
 export type StageStatus =
   | "WAITING" | "RUNNING" | "COMPLETED" | "WARNING" | "REVIEW" | "ERROR" | "FAILED" | "UNSUPPORTED" | "NOT_RUN";

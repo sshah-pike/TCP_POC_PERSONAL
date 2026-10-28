@@ -1,6 +1,6 @@
 """Local HTTP API + static host for the TCP POC Runner UI (standard library only).
 
-    python -m tcp_ui.server [--port 8765]        ->  http://127.0.0.1:8765
+    python -m tcp_planner.web_api.server [--port 8765]        ->  http://127.0.0.1:8765
 
 Binds to 127.0.0.1 only. Never reads or returns .env contents or credentials; the pipeline child
 process loads .env itself exactly as the CLI does.
@@ -18,9 +18,9 @@ import argparse, json, mimetypes, os, shutil, subprocess, sys, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit, parse_qs, unquote
 
-from . import store
+from tcp_planner.storage import run_store as store
 
-WEB_DIST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web", "dist")
+WEB_DIST = os.path.join(store.PROJECT_ROOT, "tcp_ui", "web", "dist")
 MAX_BODY = 10 * 1024 * 1024
 ASSISTANT_MAX_BODY = 64 * 1024  # assistant requests are small structured JSON
 ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
@@ -59,7 +59,7 @@ def _ai_choice(payload):
 
 
 def start_resume(parent_id, payload):
-    from . import relations
+    from tcp_planner.orchestration import run_relations as relations
     prov, prof = _ai_choice(payload)
     run_id, rdir = relations.create_resume_run(parent_id, str(payload.get("stage") or ""), prof, prov,
                                                evidence_mode=str(payload.get("evidence_mode") or "single"),
@@ -70,7 +70,7 @@ def start_resume(parent_id, payload):
 
 
 def start_comparison(payload):
-    from . import relations
+    from tcp_planner.orchestration import run_relations as relations
     profiles = payload.get("profiles") or []
     if not isinstance(profiles, list): raise store.BadRequest("profiles must be a list")
     modes = payload.get("modes") or ["single"]
@@ -85,7 +85,8 @@ def start_comparison(payload):
         doc = store._read_json(store.run_path(cid, "ui", "comparison.json"))
         if doc.get("needs_views"):
             with open(store.run_path(cid, "ui", "prep.log"), "w", encoding="utf-8") as log:
-                subprocess.call([sys.executable, "-m", "tcp_ui.runner", "--prepare-views", store.run_path(cid)],
+                subprocess.call([sys.executable, "-m", "tcp_planner.orchestration.run_worker", "--prepare-views",
+                                 store.run_path(cid)],
                                 cwd=store.PROJECT_ROOT, stdout=log, stderr=subprocess.STDOUT,
                                 env=dict(os.environ, PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8"))
         for rid in relations.create_children(cid): launch(rid, store.run_path(rid))
@@ -109,8 +110,8 @@ def stop_run(run_id):
 def launch(run_id, rdir):
     log = open(os.path.join(rdir, "ui", "stdout.log"), "w", encoding="utf-8")
     env = dict(os.environ, PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8")
-    proc = subprocess.Popen([sys.executable, "-m", "tcp_ui.runner", rdir], cwd=store.PROJECT_ROOT,
-                            stdout=log, stderr=subprocess.STDOUT, env=env)
+    proc = subprocess.Popen([sys.executable, "-m", "tcp_planner.orchestration.run_worker", rdir],
+                            cwd=store.PROJECT_ROOT, stdout=log, stderr=subprocess.STDOUT, env=env)
     with LIVE_LOCK: LIVE[run_id] = proc
 
     def reap():
@@ -202,32 +203,32 @@ class Handler(BaseHTTPRequestHandler):
                     st = store.build_state(parts[2], live_ids())
                     return self._json(st) if st else self._json({"error": "run not found"}, 404)
                 if len(parts) == 4 and parts[1] == "runs" and parts[3] == "resume-preview":
-                    from . import relations
+                    from tcp_planner.orchestration import run_relations as relations
                     q = parse_qs(url.query)
                     prov, prof = _ai_choice({"ai_provider": (q.get("ai_provider") or [None])[0],
                                              "ai_profile": (q.get("ai_profile") or [None])[0]})
                     return self._json(relations.resume_preview(parts[2], (q.get("stage") or [""])[0], prof, prov,
                                                                (q.get("evidence_mode") or ["single"])[0]))
                 if parts == ["api", "labels"]:
-                    from . import labels
+                    from tcp_planner.evaluation import ground_truth_labels as labels
                     return self._json(labels.list_labels())
                 if len(parts) == 3 and parts[1] == "labels":
-                    from . import labels
+                    from tcp_planner.evaluation import ground_truth_labels as labels
                     doc = labels.get(parts[2])
                     return self._json(doc) if doc else self._json({"error": "label not found"}, 404)
                 if len(parts) == 4 and parts[1] == "comparisons" and parts[3] == "evaluation":
-                    from . import evaluation
+                    from tcp_planner.evaluation import comparison_scoring as evaluation
                     rep = evaluation.evaluate_comparison(parts[2])
                     return self._json(rep) if rep else self._json({"error": "comparison not found"}, 404)
                 if parts == ["api", "comparisons"]:
-                    from . import relations
+                    from tcp_planner.orchestration import run_relations as relations
                     return self._json(relations.list_comparisons())
                 if len(parts) == 3 and parts[1] == "comparisons":
-                    from . import relations
+                    from tcp_planner.orchestration import run_relations as relations
                     rep = relations.comparison_state(parts[2], live_ids())
                     return self._json(rep) if rep else self._json({"error": "comparison not found"}, 404)
                 if len(parts) == 5 and parts[1] == "runs" and parts[3] == "evidence":
-                    from .evidence import load_manifest
+                    from tcp_planner.storage.evidence_store import load_manifest
                     name = parts[4]; rdir = store.run_path(parts[2])
                     saved = {e["file"] for e in load_manifest(rdir) if e.get("mode") == "saved"}
                     path = os.path.join(rdir, "evidence", name)
@@ -277,7 +278,7 @@ class Handler(BaseHTTPRequestHandler):
             if route == "stop": return self._json(stop_run(parts[2]))
             if route == "comparison": return self._json({"comparison_id": start_comparison(payload)}, 201)
             if route in ("label_confirm", "label_revoke"):
-                from . import labels
+                from tcp_planner.evaluation import ground_truth_labels as labels
                 if route == "label_revoke":
                     return self._json(labels.revoke(parts[2], payload.get("reviewer"), payload.get("reason")))
                 edits = payload.get("edits") or {}

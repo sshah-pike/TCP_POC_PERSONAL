@@ -7,7 +7,7 @@ appended to the label's history with a timestamp. No credentials or URLs are sto
 """
 import datetime, json, os, re
 
-from . import store
+from tcp_planner.storage import run_store as store
 
 FIELDS = {  # label field -> (type, allowed values) ; compared against the pipeline's resolved site facts
     "road.lane_count": (int, None),
@@ -32,7 +32,7 @@ def _now():
 
 
 def site_id_for(project_geometry):
-    from .evidence import geometry_hash
+    from tcp_planner.storage.evidence_store import geometry_hash
     return geometry_hash(project_geometry)[:16]
 
 

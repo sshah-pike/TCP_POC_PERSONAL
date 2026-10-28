@@ -8,7 +8,7 @@ the TCP sheet and the DWT output are exactly what the pipeline produces.
 
 ```
 pip install -r requirements.txt            # existing pipeline dependencies; the UI server adds none
-python -m tcp_ui.server                     # API + built UI on http://127.0.0.1:8765
+python -m tcp_planner.web_api.server                     # API + built UI on http://127.0.0.1:8765
 ```
 
 Build the UI once (needs Node.js 20+):
@@ -16,10 +16,10 @@ Build the UI once (needs Node.js 20+):
 ```
 cd tcp_ui/web
 npm install
-npm run build                               # served by tcp_ui.server from tcp_ui/web/dist
+npm run build                               # served by tcp_planner.web_api.server from tcp_ui/web/dist
 ```
 
-UI development with hot reload: keep `python -m tcp_ui.server` running, then `npm run dev` in
+UI development with hot reload: keep `python -m tcp_planner.web_api.server` running, then `npm run dev` in
 `tcp_ui/web` and open http://127.0.0.1:5173 (`/api` is proxied to the Python server).
 
 Credentials stay where they are today (`.env` / environment, read by the pipeline process). The
@@ -39,11 +39,11 @@ Set `TCP_UI_RUNS_DIR` to store runs elsewhere.
 ## Cost
 
 AI token usage is recorded from the Anthropic API response. A cost is shown only as an *estimate*
-and only when per-token prices are entered in `tcp_ui/pricing.json` (shipped empty). Imagery and OSM
+and only when per-token prices are entered in `config/pricing.json` (shipped empty). Imagery and OSM
 providers do not report cost to the pipeline, so they show "Not Available".
 
 ## Tests
 
 ```
-python -m pytest tcp_ui/tests -q            # offline; compares UI-reported results with direct pipeline runs
+python -m pytest tests/integration/web_api -q            # offline; compares UI-reported results with direct pipeline runs
 ```

@@ -9,10 +9,11 @@ import requests
 from tcp_planner.orchestration import offline_scenarios as offline
 from tcp_planner.ai import foundry_provider as fp
 from tcp_planner.imagery.map_provider import AzureMapsProvider
-from tcp_ui import store, relations
-from tcp_ui.evidence import load_manifest, sha256_file
-from tcp_ui.tests import inproc
-from tcp_ui.tests.inproc import FakeHttp, FakeResponse, FAKE_AZURE_KEY
+from tcp_planner.storage import run_store as store
+from tcp_planner.orchestration import run_relations as relations
+from tcp_planner.storage.evidence_store import load_manifest, sha256_file
+from tests.integration.web_api import inproc
+from tests.integration.web_api.inproc import FakeHttp, FakeResponse, FAKE_AZURE_KEY
 
 SC = offline.build("supported")
 LAT, LON = SC["lat"], SC["lon"]
@@ -281,7 +282,7 @@ def test_azure_non_image_response_fails_closed_as_map_failure(env, monkeypatch, 
 # ---------------------------------------------------------------- API surface (what the browser receives)
 def test_api_endpoints_and_no_credentials(env, monkeypatch):
     import threading, urllib.request, urllib.error
-    from tcp_ui import server
+    from tcp_planner.web_api import server
     http(monkeypatch); source, _ = azure_run()
     cid = relations.create_comparison(source, ["fake-a", "fake-fail"])
     children = relations.create_children(cid)
@@ -335,7 +336,7 @@ def test_fully_reused_run_reports_zero_provider_calls(env, monkeypatch):
 
 # ---------------------------------------------------------------- multi-resolution evidence
 def prep(cid):
-    from tcp_ui import runner
+    from tcp_planner.orchestration import run_worker as runner
     with inproc.isolated():
         return runner.prepare_views(store.run_path(cid))
 

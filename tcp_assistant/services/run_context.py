@@ -25,9 +25,9 @@ def not_eligible(reasons):
 
 def eligibility(run_id):
     """(context dict | None, reasons[])."""
-    from tcp_ui import store
-    from tcp_ui.evidence import load_manifest, resolve, verify_file, sha256_file
-    from tcp_ui.relations import evidence_compat
+    from tcp_planner.storage import run_store as store
+    from tcp_planner.storage.evidence_store import load_manifest, resolve, verify_file, sha256_file
+    from tcp_planner.orchestration.run_relations import evidence_compat
     from tcp_planner.rules.rule_pack_loader import load_rule_pack
     from tcp_planner.orchestration.pipeline import CONFIG_PATH
     reasons = []
@@ -71,7 +71,7 @@ def eligibility(run_id):
             r = resolve(store.runs_dir(), run_id, e)
             if r is not None and verify_file(r) is None: crops.append(r)
     pg = _read(os.path.join(out, "project_geometry.json"))
-    from tcp_ui.labels import site_id_for
+    from tcp_planner.evaluation.ground_truth_labels import site_id_for
     ctx = {"run_id": run_id, "run_state": {k: st.get(k) for k in ("decision", "reason_codes", "message", "draft_generated")},
            "request": st.get("request"), "project_geometry": pg, "site_model": site,
            "machine_site_model": _read(os.path.join(out, "machine_site_model.json")) or site,

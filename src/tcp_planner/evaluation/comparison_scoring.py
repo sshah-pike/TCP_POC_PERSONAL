@@ -6,7 +6,9 @@ CONFIRMED; with a DRAFT label every row is shown but marked "not scored". A mode
 """
 import json
 
-from . import store, labels, relations
+from tcp_planner.storage import run_store as store
+from tcp_planner.evaluation import ground_truth_labels as labels
+from tcp_planner.orchestration import run_relations as relations
 
 EVIDENCE_KEY = {"road.lane_count": "lane_count", "road.two_way": "two_way", "road.divided": "divided",
                 "road.traveled_way_width_m": "road_edges", "work.side": "work_side", "work.location": "work_location",

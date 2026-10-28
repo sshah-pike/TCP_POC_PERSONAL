@@ -161,7 +161,7 @@ def test_tool_registry_allow_list_permission_and_audit_fail_closed(aenv):
 
 def test_server_mount_disabled_and_existing_routes_unaffected(tmp_path, monkeypatch):
     import threading, urllib.request
-    from tcp_ui import server
+    from tcp_planner.web_api import server
     monkeypatch.setenv("TCP_SME_ASSISTANT_ENABLED", "false")
     monkeypatch.setenv("TCP_UI_RUNS_DIR", str(tmp_path))
     srv = server.make_server(0); port = srv.server_address[1]

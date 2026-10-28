@@ -95,7 +95,7 @@ def test_review_flow_makes_no_ai_or_external_calls(aenv, runs, monkeypatch):
 
 def test_http_server_enabled_session_and_artifact(aenv, runs):
     import threading, urllib.request
-    from tcp_ui import server
+    from tcp_planner.web_api import server
     srv = server.make_server(0); port = srv.server_address[1]
     threading.Thread(target=srv.serve_forever, daemon=True).start()
 

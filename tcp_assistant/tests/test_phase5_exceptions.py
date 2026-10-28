@@ -39,7 +39,7 @@ def test_rule_conflict_exception_end_to_end(aenv, runs, inproc_launch, monkeypat
     assert plan["sme_dispositions"]["active_exceptions"][0]["exception_id"] == ex["exception_id"]
     assert val["geometry_validation"]["status"] == "FAIL"                                   # validator output unchanged
     assert next(c for c in val["geometry_validation"]["checks"] if c["id"] == "GEO-DRIVEWAY-INTERSECTION-CONFLICT")["status"] == "FAIL"
-    from tcp_ui import store
+    from tcp_planner.storage import run_store as store
     st_ = store.build_state(child)
     assert st_["decision"] == "DRAFT_WITH_ENGINEERING_EXCEPTION" and st_["draft_generated"] and st_["exit_code"] == 5
     assert os.path.exists(aenv / "runs" / child / "output" / "tcp_sheet.png")

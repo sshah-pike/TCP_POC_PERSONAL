@@ -1,8 +1,8 @@
-"""Execute ONE pipeline run for the UI, in its own process:   python -m tcp_ui.runner <run_dir>
+"""Execute ONE pipeline run for the UI, in its own process:   python -m tcp_planner.orchestration.run_worker <run_dir>
 
 The run is the unmodified CLI entry point `tcp_planner.orchestration.pipeline.main(argv)` with the argv stored in
 <run_dir>/ui/request.json, so argument handling, .env loading, TLS setup, offline scenarios, outputs
-and exit codes are exactly those of `python tcp_demo.py ...`.
+and exit codes are exactly those of `python -m tcp_planner.cli ...`.
 
 Observation only (installed in this child process, nothing in tcp_planner is edited):
   - Telemetry subclass: the existing spans, additionally streamed to ui/events.jsonl as they start/end
@@ -120,7 +120,7 @@ def install_observers(rec, run=None):
 
     app.load_rule_pack = observed_load_rule_pack
 
-    # TLS: run the CLI's own trust-store setup first, exactly as `python tcp_demo.py` does, and only then
+    # TLS: run the CLI's own trust-store setup first, exactly as `python -m tcp_planner.cli` does, and only then
     # import the Anthropic SDK - so no HTTP library is loaded before truststore is injected.
     orig_trust = app.use_os_trust_store
 
@@ -152,7 +152,7 @@ def install_observers(rec, run=None):
 
 def _record(rec, error, provider, t0):
     try:
-        from tcp_ui.diagnostics import describe
+        from tcp_planner.audit.provider_diagnostics import describe
         rec.add_diagnostic(describe(error, provider, round((time.perf_counter() - t0) * 1000, 1)))
     except Exception:
         pass
@@ -173,14 +173,15 @@ class _Evidence:
         self.osm_elements = None  # OSM elements the pipeline used (fetched or replayed)
         self._osm_geo = None
         if run:
-            from tcp_ui.evidence import EvidenceStore
+            from tcp_planner.storage.evidence_store import EvidenceStore
             self.store = EvidenceStore(run["run_dir"], run["run_id"], rec.event)
             self.replay = run.get("replay")
 
     def views(self, context):
         """The fixed multi-resolution view set for this site: reused when a verified copy exists, else acquired."""
         from PIL import Image
-        from tcp_ui import evidence as E, views as V
+        from tcp_planner.storage import evidence_store as E
+        from tcp_planner.imagery import evidence_views as V
         from tcp_planner.contracts import ProviderError
         if self.analysis is None:
             raise ProviderError("AI_EVIDENCE_UNAVAILABLE", "no analysis imagery to plan multi-resolution views from")
@@ -312,7 +313,7 @@ class EvidenceMapProvider:
         return getattr(self._inner, item)
 
     def fetch_context(self, project_geometry, half_extent_m, size_px):
-        from tcp_ui import evidence as E
+        from tcp_planner.storage import evidence_store as E
         ev, inner = self._ev, self._inner
         if ev.rec.span() == E.ANALYSIS_SPANS["map"]:
             ev.analysis = (inner, project_geometry, half_extent_m)
@@ -353,7 +354,7 @@ class EvidenceMapProvider:
     def fetch_view(self, lat, lon, zoom, size_px):
         """Agent crop (and its sharpness-check companion): persisted at acquisition, reused on resume when the exact
         request matches a verified saved crop, recorded as a map call of the vision stage."""
-        from tcp_ui import evidence as E
+        from tcp_planner.storage import evidence_store as E
         ev, inner = self._ev, self._inner
         name = getattr(inner, "name", None)
         sig = ({"kind": "map_crop", "provider": name, "scale_model": getattr(inner, "SCALE_MODEL", None),
@@ -393,7 +394,7 @@ class EvidenceOsmSource:
         self._fetch = fetch; self._ev = ev; self._source = source
 
     def __call__(self, lat, lon, radius_m):
-        from tcp_ui import evidence as E
+        from tcp_planner.storage import evidence_store as E
         ev = self._ev
         sig = E.osm_signature(self._source, lat, lon, radius_m) if ev.store else None
         found = ev.try_reuse("osm", sig) if sig else None
@@ -432,8 +433,8 @@ class EvidenceVisionProvider:
         return getattr(self._inner, item)
 
     def analyze(self, image, context, views=None, grounding=None):
-        from tcp_ui import evidence as E
-        from tcp_ui.diagnostics import sanitize, sanitize_obj
+        from tcp_planner.storage import evidence_store as E
+        from tcp_planner.audit.provider_diagnostics import sanitize, sanitize_obj
         from tcp_planner.ai.vision_provider import validate_observation
         from tcp_planner.contracts import ProviderError
         ev = self._ev
@@ -552,7 +553,7 @@ def _install_anthropic_usage(rec):
 
 def _run_context(run_dir, req, rec):
     """Evidence context for this run; resumed runs (ui/resume.json) also get a verified replay source."""
-    from tcp_ui.evidence import ReplaySource, sha256_file
+    from tcp_planner.storage.evidence_store import ReplaySource, sha256_file
     adv = (req.get("request") or {}).get("advanced") or {}
     ctx = {"run_dir": run_dir, "run_id": req.get("run_id") or os.path.basename(run_dir), "replay": None,
            "ai_provider": None, "evidence_mode": adv.get("evidence_mode") or "single",
@@ -586,8 +587,8 @@ def prepare_views(comparison_dir):
     from tcp_planner.data_sources import osm_overpass as osm_adapter
     from tcp_planner.orchestration import offline_scenarios as offline
     from tcp_planner.site_model.fusion import reference_bearing
-    from tcp_ui import evidence as E
-    from tcp_ui.diagnostics import sanitize
+    from tcp_planner.storage import evidence_store as E
+    from tcp_planner.audit.provider_diagnostics import sanitize
     cdir = os.path.abspath(comparison_dir); ui = os.path.join(cdir, "ui"); rec = Recorder(ui)
     with open(os.path.join(ui, "comparison.json"), encoding="utf-8") as f: doc = json.load(f)
     src = doc["source_run_id"]; root = os.path.dirname(cdir); src_dir = os.path.join(root, src)
@@ -616,7 +617,7 @@ def prepare_views(comparison_dir):
         for k in ("scale_model", "api_version"):
             if getattr(provider, k.upper(), None) != m["signature"].get(k):
                 raise RuntimeError("source imagery %s differs from the current provider (legacy/incompatible evidence)" % k)
-        from tcp_ui.relations import evidence_holders
+        from tcp_planner.orchestration.run_relations import evidence_holders
         others = [c for c in evidence_holders(src) if c != os.path.basename(cdir)]
         ev = _Evidence(rec, {"run_dir": cdir, "run_id": os.path.basename(cdir), "evidence_mode": "multi",
                              "replay": E.ReplaySource(root, src, ["map_view"], others)})
@@ -648,12 +649,12 @@ def main(argv=None):
     try:
         install_observers(rec, _run_context(run_dir, req, rec))
         from tcp_planner.orchestration import pipeline as app
-        sys.argv[0] = "tcp_demo.py"  # argparse names the program from argv[0]; match the CLI in its messages
+        sys.argv[0] = "cli.py"  # argparse names the program from argv[0]; match the CLI in its messages
         exit_code = app.main(req["argv"])
     except SystemExit as e:  # argparse usage errors exit here, exactly as on the CLI
         exit_code = 0 if e.code is None else e.code if isinstance(e.code, int) else 1
     except BaseException as e:  # an unhandled exception ends the CLI with exit code 1; same here
-        from tcp_ui.diagnostics import sanitize
+        from tcp_planner.audit.provider_diagnostics import sanitize
         for line in traceback.format_exc().splitlines():  # stdout.log is shown in the UI: no URLs/queries/keys
             print(sanitize(line))
         exit_code, unhandled = 1, {"error_code": "UNHANDLED_EXCEPTION", "message": sanitize(f"{type(e).__name__}: {e}")}

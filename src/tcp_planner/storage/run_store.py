@@ -10,8 +10,9 @@ and exit code). Nothing is inferred, defaulted or re-decided.
 """
 import base64, datetime, json, os, re, secrets
 
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PRICING_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pricing.json")
+from tcp_planner.config.settings import PROJECT_ROOT, CONFIG_DIR
+
+PRICING_PATH = os.path.join(CONFIG_DIR, "pricing.json")
 RUN_ID_RE = re.compile(r"^\d{8}-\d{6}-[0-9a-f]{6}$")
 OPTION_KEY_RE = re.compile(r"^[A-Za-z0-9_.]+$")
 MAX_KML_UPLOAD_BYTES = 6 * 1024 * 1024  # above the pipeline's own 5 MB limit, so it rejects oversize files itself
@@ -208,7 +209,7 @@ def _spans(events):
 
 
 def _log_lines(ui):
-    from .diagnostics import sanitize
+    from tcp_planner.audit.provider_diagnostics import sanitize
     try:
         with open(os.path.join(ui, "stdout.log"), encoding="utf-8", errors="replace") as f:
             return [sanitize(ln) for ln in f.read().splitlines()]
@@ -382,13 +383,13 @@ def _sme_revision(ui, rdir, plan_status):
 
 def _compat(run_id, partial_state):
     """partial_state carries the stages already built here, so evidence_compat never re-enters build_state."""
-    from .relations import evidence_compat
+    from tcp_planner.orchestration.run_relations import evidence_compat
     try: return evidence_compat(run_id, partial_state)
     except Exception: return None
 
 
 def _evidence_list(rdir):
-    from .evidence import load_manifest
+    from tcp_planner.storage.evidence_store import load_manifest
     return [{k: e.get(k) for k in ("artifact_id", "kind", "mode", "file", "sha256", "size_bytes", "producer_span",
                                    "produced_by_run", "source_run", "source_artifact_id", "created_at")}
             for e in load_manifest(rdir)]
@@ -397,7 +398,7 @@ def _evidence_list(rdir):
 def _lineage(run_id, ui, ev_events, done):
     resume = _read_json(os.path.join(ui, "resume.json"))
     if not resume: return None
-    from .relations import actual_stage
+    from tcp_planner.orchestration.run_relations import actual_stage
     parent = build_state(resume["parent_run_id"], with_lineage=False) if os.path.isdir(run_path(resume["parent_run_id"])) else None
     return {**{k: resume.get(k) for k in ("parent_run_id", "requested_stage", "reuse_kinds", "ai_provider", "ai_profile",
                                          "comparison_id", "preview")},

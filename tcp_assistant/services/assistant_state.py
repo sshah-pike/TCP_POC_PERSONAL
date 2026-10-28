@@ -106,7 +106,7 @@ def attention(fnd, staged=None, preview=None, review_blocking=None, versions_sta
 
 def run_summary(ident, run_id):
     """Launcher data for the run open in RunView. Never creates a conversation."""
-    from tcp_ui import store
+    from tcp_planner.storage import run_store as store
     st = store.build_state(run_id, with_lineage=False, live_ids=_live())
     if st is None: raise AssistantError("NOT_FOUND", "Run not found.", 404)
     convs = conversations_for_run(ident, run_id)
@@ -134,7 +134,7 @@ def conversations_for_run(ident, run_id):
 
 def _live():
     import sys
-    srv = sys.modules.get("tcp_ui.server")
+    srv = sys.modules.get("tcp_planner.web_api.server")
     try: return srv.live_ids() if srv else set()
     except Exception: return set()
 
@@ -217,7 +217,7 @@ def answer(ident, cid, ctx, qid, target_id=None):
     if qid == "VERSION_DIFF":
         plan = ctx.get("plan") or {}; rev = plan.get("revision") or {}
         if not rev: return "The active draft is the original automated plan; there is no earlier SME version to compare."
-        parent = run_context._read(__import__("os").path.join(__import__("tcp_ui.store", fromlist=["x"]).run_path(rev["parent_run_id"], "output"), "plan.json")) or {}
+        parent = run_context._read(__import__("os").path.join(__import__("tcp_planner.storage.run_store", fromlist=["x"]).run_path(rev["parent_run_id"], "output"), "plan.json")) or {}
         a = {o["object_id"]: o["placement"].get("station_m") for o in parent.get("objects", [])}
         b = {o["object_id"]: o["placement"].get("station_m") for o in plan.get("objects", [])}
         ch = [f"{k}: {a.get(k)} -> {b.get(k)} m" for k in sorted(set(a) | set(b)) if a.get(k) != b.get(k)]

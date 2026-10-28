@@ -171,7 +171,7 @@ def test_attention_ui_state_and_run_scoped_conversations(aenv, runs):
 def test_accepted_exceptions_are_not_blocking_after_regeneration(aenv, runs, monkeypatch):
     """A regenerated DRAFT_WITH_ENGINEERING_EXCEPTION must not show its accepted conflicts as new blocking items."""
     from tcp_assistant.services import pipeline_controller
-    from tcp_ui.tests import inproc
+    from tests.integration.web_api import inproc
     monkeypatch.setattr(pipeline_controller, "LAUNCHER", lambda rid, rdir: inproc.run(rdir))
     t, cid = conv(runs, "supported")
     mv = {"object_id": "S1", "direction": "UPSTREAM", "distance": 10, "unit": "FT"}

@@ -49,7 +49,7 @@ def revision_extra(ctx, cid):
 
 # ---------------------------------------------------------------- final review
 def _resume_plan(ctx):
-    from tcp_ui import relations
+    from tcp_planner.orchestration import run_relations as relations
     try:
         pv = relations.resume_preview(ctx["run_id"], RESUME_STAGE)
     except Exception as e:
@@ -158,7 +158,7 @@ def _base_run(cid):
 
 
 def _config_sha():
-    from tcp_ui.evidence import sha256_file
+    from tcp_planner.storage.evidence_store import sha256_file
     from tcp_planner.orchestration.pipeline import CONFIG_PATH
     return sha256_file(CONFIG_PATH)
 
