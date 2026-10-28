@@ -40,6 +40,25 @@ def validate_key(key):
     return key
 
 
+_MEDIA_TYPES = {".json": "application/json", ".jsonl": "application/x-ndjson", ".png": "image/png", ".jpg": "image/jpeg",
+                ".jpeg": "image/jpeg", ".pdf": "application/pdf", ".dxf": "image/vnd.dxf", ".dwg": "image/vnd.dwg",
+                ".kml": "application/vnd.google-earth.kml+xml", ".txt": "text/plain", ".log": "text/plain"}
+DEFAULT_MEDIA_TYPE = "application/octet-stream"
+
+
+def media_type_for_key(key):
+    """The media type a key's extension stands for. It is derived, not stored, so it moves with the file."""
+    dot = key.rfind(".")
+    return _MEDIA_TYPES.get(key[dot:].lower(), DEFAULT_MEDIA_TYPE) if dot > key.rfind("/") else DEFAULT_MEDIA_TYPE
+
+
+def checked_media_type(key, media_type):
+    expected = media_type_for_key(key)
+    if media_type != expected:
+        raise InvalidKey(f"media_type {media_type!r} does not match key {key!r} (expected {expected!r})")
+    return expected
+
+
 @dataclass(frozen=True)
 class ArtifactRef:
     uri: str
