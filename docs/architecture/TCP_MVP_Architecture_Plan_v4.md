@@ -955,7 +955,7 @@ A project is SUPPORTED\_AUTO only if every zone is, the cross-zone check passes,
 
 **Storage rules for the MVP (the cloud itself is deferred)**
 
-1. All reads and writes go through `ArtifactStore` (blobs) and `StateStore` (index, events, heads). First implementations: local filesystem and SQLite.
+1. All reads and writes go through `ArtifactStore` (blobs) and `StateStore` (index, events, heads). First implementations: local filesystem, files only: blobs as files, state as one file per record and one append-only file per event stream (D-84).
 2. Persisted data never holds a raw path. It holds an artifact reference `{uri, sha256, size, media_type}`.
 3. Artifacts are write-once and content-addressed. A change creates a new artifact with a new hash.
 4. Mutable state (SME heads, selection events, project status) uses versioned compare-and-set writes.
@@ -1159,6 +1159,7 @@ Approved means you said yes in this conversation \[S5\]. Proposed means it is in
 | D-81 | Rule pack v1 (S4) covers TA-1, TA-6, TA-10 and TA-33 and replaces the POC pack. Until then `rule_pack/` holds only `APPROVED_TWO_LANE_POC_RULE_PACK.json` | Approved | 10 |
 | D-82 | The SME lineage key is a composite of the project and the zone geometry hash (`lineage_key(project_id, zone_geometry_hash)`, added in S1). Clean break: POC-era runs are not migrated. In S3 both `site_id_for` and the ground-truth label files switch to it; the one existing label file (`var/labels/771bbc3d0913044a.json`) is re-keyed by hand | Approved | 8, 9 |
 | D-83 | The S0a check that replays the 36 saved runs is dropped. The recorded fixtures and the stored expected outputs of the offline scenarios are the regression proof. A config change, such as S1's `input.duplicate_distance_m`, changes the config hash that check depends on | Approved | 14 |
+| D-84 | State is stored in files only in the MVP (records as `<key>.state.json`, events as `<stream>.events.jsonl`, written under lock files with an ownership re-check). A database adapter is future scope, together with the cloud move. Supersedes the SQLite adapter first built in S2, which moved to `backup/orphans/2026-10-28/` | Approved | 12 |
 | D-67 | New fields added to the schema: work side, work type, work length, lane width, direction of travel, bike lane, accessible route, detours, work-zone speed, add-on triggers, title-block fields, median work, and the TA-10 and TA-33 fields | Approved | 4B |
 
 ### Open questions (version 9)
@@ -1253,7 +1254,7 @@ Each record states status, context, decision, consequences and what was rejected
 
 ### ADR-006: Thin storage interfaces; cloud deferred
 
-**Status:** Accepted. **Context:** The cloud move is out of the MVP (D-40). **Decision:** Keep `ArtifactStore`, `StateStore` and `RulePackStore` as thin interfaces with local adapters only. **Consequences:** A later cloud move is an adapter swap. No cloud adapters, migration tool or client-limit questions now. **Rejected:** Building cloud adapters now.
+**Status:** Accepted. **Context:** The cloud move is out of the MVP (D-40). **Decision:** Keep `ArtifactStore`, `StateStore` and `RulePackStore` as thin interfaces with local adapters only. The MVP adapters are files only (D-84); a database adapter is deferred together with the cloud. **Consequences:** A later cloud move is an adapter swap. No cloud adapters, migration tool or client-limit questions now. **Rejected:** Building cloud adapters now.
 
 ### ADR-007: Immutable, key-addressed artifacts and artifact references
 

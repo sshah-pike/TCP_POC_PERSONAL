@@ -277,6 +277,22 @@
       "moved_in_commit": "cd373ca",
       "commit_before_move": "dfb496e",
       "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"tcp_ui/check_usgs.py\""
+    },
+    {
+      "original_path": "src/tcp_planner/storage/sqlite_state.py",
+      "new_path": "backup/orphans/2026-10-28/src/tcp_planner/storage/sqlite_state.py",
+      "label": "SUPERSEDED_BY_DECISION",
+      "reason": "MVP is files only; database is future scope",
+      "evidence": [
+        "decision D-84 (owner, S2): state is stored in files only; replaced by src/tcp_planner/storage/file_state.py",
+        "committed in 6f569d7 as the first StateStore adapter; never used by run data"
+      ],
+      "sha256": "4ffb747de2f75658e908d7005949edbf1cb4b70566a562c12d9035176e4cddfa",
+      "git_blob": "954b8fef8ca1cc67f5f67ecc692aa9e8bdc8d6cc",
+      "size": 4611,
+      "moved_in_commit": "49e4a1a",
+      "commit_before_move": "05ec999",
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"src/tcp_planner/storage/sqlite_state.py\""
     }
   ]
 }

@@ -147,9 +147,9 @@ Follow-ups carried into later slices:
 
 **Depends on.** S0.
 
-**In scope.** `ArtifactStore` (blobs), `StateStore` (index, events, heads, compare-and-set) and `RulePackStore` (interface only, implemented in S4). Local filesystem and SQLite adapters. Artifact references, schema versions and migrations. A project store.
+**In scope.** `ArtifactStore` (blobs), `StateStore` (index, events, heads, compare-and-set) and `RulePackStore` (interface only, implemented in S4). Local filesystem adapters only, files only (D-84): artifacts as files, state as one `.state.json` file per record and one `.events.jsonl` file per stream, each run's state inside its own run folder. Artifact references, schema versions and migrations. A project store.
 
-**Out of scope.** Cloud adapters and the migration tool (deferred, D-40).
+**Out of scope.** Cloud adapters and the migration tool (deferred, D-40). A database adapter (future scope, D-84).
 
 **Acceptance criteria.**
 - No raw path in any persisted JSON (checked by a test that scans outputs).
