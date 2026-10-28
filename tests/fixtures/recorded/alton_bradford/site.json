@@ -1,0 +1,13 @@
+{
+ "ai_profile": "gpt-5.6-sol",
+ "kml_file": "demo) RI-91 Alton Bradford Rd - single point (demo, not a real pole).kml",
+ "name": "alton_bradford",
+ "operator": {
+  "options": {},
+  "requires_lane_closure": false,
+  "road_type": "RURAL",
+  "speed_mph": null
+ },
+ "schema_version": 1,
+ "source": "seeded from saved run 20261020-181906-d7f8fc"
+}

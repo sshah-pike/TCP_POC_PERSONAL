@@ -1,0 +1,13 @@
+{
+ "ai_profile": "gpt-5.6-sol",
+ "kml_file": "4a) AI IMPORT - 1A8G8FM WPI 3159540 - P30 single point.kml",
+ "name": "granite_p30",
+ "operator": {
+  "options": {},
+  "requires_lane_closure": false,
+  "road_type": "RURAL",
+  "speed_mph": null
+ },
+ "schema_version": 1,
+ "source": "seeded from saved run 20261019-174212-8a0c8f"
+}

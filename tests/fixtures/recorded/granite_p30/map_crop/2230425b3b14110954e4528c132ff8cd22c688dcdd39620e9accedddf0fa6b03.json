@@ -1,0 +1,48 @@
+{
+ "fingerprint": "2230425b3b14110954e4528c132ff8cd22c688dcdd39620e9accedddf0fa6b03",
+ "image": {
+  "media_type": "image/png",
+  "sha256": "f37a4f3238487646c44bf8dd24981bd58993c7fbb3fa3125e8fa0154a36de8dc",
+  "size": 876357
+ },
+ "kind": "map_crop",
+ "meta": {
+  "api_version": "2024-04-01",
+  "bounding_box": {
+   "max_latitude": 41.3721802,
+   "max_longitude": -71.8197595,
+   "min_latitude": 41.3711496,
+   "min_longitude": -71.8211327
+  },
+  "center": {
+   "latitude": 41.3716649,
+   "longitude": -71.8204461
+  },
+  "georeference_model": "LOCAL_TANGENT_PLANE_AT_CENTER",
+  "ground_extent_m": {
+   "height": 114.723,
+   "width": 114.723
+  },
+  "height_pixels": 1024,
+  "metres_per_pixel": 0.112034,
+  "orientation": "NORTH_UP",
+  "provider": "AZURE_MAPS",
+  "request_tiles": 1,
+  "retrieved_at": "2026-10-19T12:14:32+00:00",
+  "scale_model": "azure-static-512px-v2",
+  "tileset": "microsoft.imagery",
+  "width_pixels": 1024,
+  "zoom": 19
+ },
+ "request": {
+  "api_version": "2024-04-01",
+  "kind": "map_crop",
+  "lat": 41.3716649,
+  "lon": -71.8204461,
+  "provider": "azure_maps",
+  "scale_model": "azure-static-512px-v2",
+  "size_px": 1024,
+  "zoom": 19
+ },
+ "schema_version": 1
+}
