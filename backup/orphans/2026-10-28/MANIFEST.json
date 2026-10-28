@@ -1,0 +1,282 @@
+{
+  "schema_version": "1.0",
+  "slice": "S0a",
+  "date": "2026-10-28",
+  "note": "Moved with git mv, never deleted. sha256/size are of the committed blob; restore verifies git_blob (line-ending independent). Symbol-level cuts (USGS/Esri providers, Anthropic usage wrapper) wait for S15.",
+  "entries": [
+    {
+      "original_path": "docs/architecture/TCP_Two_Pipeline_Architecture_v2.png",
+      "new_path": "backup/orphans/2026-10-28/docs/architecture/TCP_Two_Pipeline_Architecture_v2.png",
+      "label": "CONFIRMED_ORPHAN",
+      "reason": "POC-era document superseded by the MVP plan; not used by code",
+      "evidence": [
+        "string search: no reference from code, config or tests (git grep of the file name over src/, tests/, scripts/, config/, apps/ returns nothing)",
+        "superseded: you moved it out of docs/ by hand before S0a (an identical copy sits in the untracked backup/final|reference|architecture); duplicates exist in backup/archive/duplicates for flow.pdf and the Proposal docx",
+        "decision: S0a plan section 0.2 option A, approved 2026-10-28"
+      ],
+      "sha256": "cca1cefb8be3e35f161336e808bd36a1c1868a40454a6d58bbd2606e73e8e49a",
+      "git_blob": "7ca552b49b61426aac37226a760d63490c6601ee",
+      "size": 501380,
+      "moved_in_commit": "ce8feea",
+      "commit_before_move": "b94fafd",
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"docs/architecture/TCP_Two_Pipeline_Architecture_v2.png\""
+    },
+    {
+      "original_path": "docs/architecture/TCP_Two_Pipeline_Architecture_v2.svg",
+      "new_path": "backup/orphans/2026-10-28/docs/architecture/TCP_Two_Pipeline_Architecture_v2.svg",
+      "label": "CONFIRMED_ORPHAN",
+      "reason": "POC-era document superseded by the MVP plan; not used by code",
+      "evidence": [
+        "string search: no reference from code, config or tests (git grep of the file name over src/, tests/, scripts/, config/, apps/ returns nothing)",
+        "superseded: you moved it out of docs/ by hand before S0a (an identical copy sits in the untracked backup/final|reference|architecture); duplicates exist in backup/archive/duplicates for flow.pdf and the Proposal docx",
+        "decision: S0a plan section 0.2 option A, approved 2026-10-28"
+      ],
+      "sha256": "ec6a5de1763235249abb11f33bfb20bf5be6d40f1db2d809ad9af854c6ab3861",
+      "git_blob": "da36ff709c82684d1f2fc6d43d26f3ba56bcad5a",
+      "size": 428616,
+      "moved_in_commit": "ce8feea",
+      "commit_before_move": "b94fafd",
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"docs/architecture/TCP_Two_Pipeline_Architecture_v2.svg\""
+    },
+    {
+      "original_path": "docs/architecture/make_architecture_v2.py",
+      "new_path": "backup/orphans/2026-10-28/docs/architecture/make_architecture_v2.py",
+      "label": "CONFIRMED_ORPHAN",
+      "reason": "POC-era document superseded by the MVP plan; not used by code",
+      "evidence": [
+        "string search: no reference from code, config or tests (git grep of the file name over src/, tests/, scripts/, config/, apps/ returns nothing)",
+        "superseded: you moved it out of docs/ by hand before S0a (an identical copy sits in the untracked backup/final|reference|architecture); duplicates exist in backup/archive/duplicates for flow.pdf and the Proposal docx",
+        "decision: S0a plan section 0.2 option A, approved 2026-10-28"
+      ],
+      "sha256": "df790e5b5cc20082d57cb5975f717eff6282785c8f1d49b0eb4b8fc7ff99576a",
+      "git_blob": "8613e684be463cbd5b404bd9930362114d75478b",
+      "size": 11861,
+      "moved_in_commit": "ce8feea",
+      "commit_before_move": "b94fafd",
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"docs/architecture/make_architecture_v2.py\""
+    },
+    {
+      "original_path": "docs/final/Diagram Explanation.docx",
+      "new_path": "backup/orphans/2026-10-28/docs/final/Diagram Explanation.docx",
+      "label": "CONFIRMED_ORPHAN",
+      "reason": "POC-era document superseded by the MVP plan; not used by code",
+      "evidence": [
+        "string search: no reference from code, config or tests (git grep of the file name over src/, tests/, scripts/, config/, apps/ returns nothing)",
+        "superseded: you moved it out of docs/ by hand before S0a (an identical copy sits in the untracked backup/final|reference|architecture); duplicates exist in backup/archive/duplicates for flow.pdf and the Proposal docx",
+        "decision: S0a plan section 0.2 option A, approved 2026-10-28"
+      ],
+      "sha256": "4b94396a33d9b866e96a30daacb5ce6f569b71f69b40f2fb24b66e92c8166380",
+      "git_blob": "b0036780e02fde0414a8e3a0b6d06bf9319e665a",
+      "size": 659544,
+      "moved_in_commit": "ce8feea",
+      "commit_before_move": "b94fafd",
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"docs/final/Diagram Explanation.docx\""
+    },
+    {
+      "original_path": "docs/final/TCP_AI_Traffic_Control_Plan_Proposal.docx",
+      "new_path": "backup/orphans/2026-10-28/docs/final/TCP_AI_Traffic_Control_Plan_Proposal.docx",
+      "label": "CONFIRMED_ORPHAN",
+      "reason": "POC-era document superseded by the MVP plan; not used by code",
+      "evidence": [
+        "string search: no reference from code, config or tests (git grep of the file name over src/, tests/, scripts/, config/, apps/ returns nothing)",
+        "superseded: you moved it out of docs/ by hand before S0a (an identical copy sits in the untracked backup/final|reference|architecture); duplicates exist in backup/archive/duplicates for flow.pdf and the Proposal docx",
+        "decision: S0a plan section 0.2 option A, approved 2026-10-28"
+      ],
+      "sha256": "82e37be3b23d705a8c1fc165016594b8bf6bfe8458a18b90c3f7cccbde2e1ca3",
+      "git_blob": "c6bb3d7c06be358a0ef152038d406548ef8a5fce",
+      "size": 58749,
+      "moved_in_commit": "ce8feea",
+      "commit_before_move": "b94fafd",
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"docs/final/TCP_AI_Traffic_Control_Plan_Proposal.docx\""
+    },
+    {
+      "original_path": "docs/final/TCP_Full_Flow_Diagram.png",
+      "new_path": "backup/orphans/2026-10-28/docs/final/TCP_Full_Flow_Diagram.png",
+      "label": "CONFIRMED_ORPHAN",
+      "reason": "POC-era document superseded by the MVP plan; not used by code",
+      "evidence": [
+        "string search: no reference from code, config or tests (git grep of the file name over src/, tests/, scripts/, config/, apps/ returns nothing)",
+        "superseded: you moved it out of docs/ by hand before S0a (an identical copy sits in the untracked backup/final|reference|architecture); duplicates exist in backup/archive/duplicates for flow.pdf and the Proposal docx",
+        "decision: S0a plan section 0.2 option A, approved 2026-10-28"
+      ],
+      "sha256": "dfc951bb1b6311bc87da0f68695fa4b607ac1005de77fc9dc4a18c49f8551729",
+      "git_blob": "13ae53453f62af9d01676ec5b8d7d76c6b8c7956",
+      "size": 491113,
+      "moved_in_commit": "ce8feea",
+      "commit_before_move": "b94fafd",
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"docs/final/TCP_Full_Flow_Diagram.png\""
+    },
+    {
+      "original_path": "docs/final/TCP_Full_Flow_Diagram.svg",
+      "new_path": "backup/orphans/2026-10-28/docs/final/TCP_Full_Flow_Diagram.svg",
+      "label": "CONFIRMED_ORPHAN",
+      "reason": "POC-era document superseded by the MVP plan; not used by code",
+      "evidence": [
+        "string search: no reference from code, config or tests (git grep of the file name over src/, tests/, scripts/, config/, apps/ returns nothing)",
+        "superseded: you moved it out of docs/ by hand before S0a (an identical copy sits in the untracked backup/final|reference|architecture); duplicates exist in backup/archive/duplicates for flow.pdf and the Proposal docx",
+        "decision: S0a plan section 0.2 option A, approved 2026-10-28"
+      ],
+      "sha256": "93b72d796bedf505cde1b6fd6036b3e07fe9de7d3022aa4176f5f7d8fad8e8ea",
+      "git_blob": "e97c654f6e78df96d9b0e35787712938406a1352",
+      "size": 55462,
+      "moved_in_commit": "ce8feea",
+      "commit_before_move": "b94fafd",
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"docs/final/TCP_Full_Flow_Diagram.svg\""
+    },
+    {
+      "original_path": "docs/final/flow.pdf",
+      "new_path": "backup/orphans/2026-10-28/docs/final/flow.pdf",
+      "label": "CONFIRMED_ORPHAN",
+      "reason": "POC-era document superseded by the MVP plan; not used by code",
+      "evidence": [
+        "string search: no reference from code, config or tests (git grep of the file name over src/, tests/, scripts/, config/, apps/ returns nothing)",
+        "superseded: you moved it out of docs/ by hand before S0a (an identical copy sits in the untracked backup/final|reference|architecture); duplicates exist in backup/archive/duplicates for flow.pdf and the Proposal docx",
+        "decision: S0a plan section 0.2 option A, approved 2026-10-28"
+      ],
+      "sha256": "302fe6033569b8ec52a6d329fe39cb85dcad8cad07e8dbc46973379900f4fdd9",
+      "git_blob": "54983edd9a8f7c04cb42428f4a3407b2d87c2f83",
+      "size": 531397,
+      "moved_in_commit": "ce8feea",
+      "commit_before_move": "b94fafd",
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"docs/final/flow.pdf\""
+    },
+    {
+      "original_path": "docs/reference/TCP_Automation_Handover_v2 (1).docx",
+      "new_path": "backup/orphans/2026-10-28/docs/reference/TCP_Automation_Handover_v2 (1).docx",
+      "label": "CONFIRMED_ORPHAN",
+      "reason": "POC-era document superseded by the MVP plan; not used by code",
+      "evidence": [
+        "string search: no reference from code, config or tests (git grep of the file name over src/, tests/, scripts/, config/, apps/ returns nothing)",
+        "superseded: you moved it out of docs/ by hand before S0a (an identical copy sits in the untracked backup/final|reference|architecture); duplicates exist in backup/archive/duplicates for flow.pdf and the Proposal docx",
+        "decision: S0a plan section 0.2 option A, approved 2026-10-28"
+      ],
+      "sha256": "358d68c266efe1d95a86704bc0b633c6d8db490d12f245fb7567c6c7f05fbd00",
+      "git_blob": "dab23dd6d09a3c7b07e9ea06140e9de5e05cd75b",
+      "size": 619169,
+      "moved_in_commit": "ce8feea",
+      "commit_before_move": "b94fafd",
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"docs/reference/TCP_Automation_Handover_v2 (1).docx\""
+    },
+    {
+      "original_path": "docs/reference/TCP_Full_Flow_Diagram.png",
+      "new_path": "backup/orphans/2026-10-28/docs/reference/TCP_Full_Flow_Diagram.png",
+      "label": "CONFIRMED_ORPHAN",
+      "reason": "POC-era document superseded by the MVP plan; not used by code",
+      "evidence": [
+        "string search: no reference from code, config or tests (git grep of the file name over src/, tests/, scripts/, config/, apps/ returns nothing)",
+        "superseded: you moved it out of docs/ by hand before S0a (an identical copy sits in the untracked backup/final|reference|architecture); duplicates exist in backup/archive/duplicates for flow.pdf and the Proposal docx",
+        "decision: S0a plan section 0.2 option A, approved 2026-10-28"
+      ],
+      "sha256": "dfc951bb1b6311bc87da0f68695fa4b607ac1005de77fc9dc4a18c49f8551729",
+      "git_blob": "13ae53453f62af9d01676ec5b8d7d76c6b8c7956",
+      "size": 491113,
+      "moved_in_commit": "ce8feea",
+      "commit_before_move": "b94fafd",
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"docs/reference/TCP_Full_Flow_Diagram.png\""
+    },
+    {
+      "original_path": "docs/reference/TCP_Full_Flow_Diagram.svg",
+      "new_path": "backup/orphans/2026-10-28/docs/reference/TCP_Full_Flow_Diagram.svg",
+      "label": "CONFIRMED_ORPHAN",
+      "reason": "POC-era document superseded by the MVP plan; not used by code",
+      "evidence": [
+        "string search: no reference from code, config or tests (git grep of the file name over src/, tests/, scripts/, config/, apps/ returns nothing)",
+        "superseded: you moved it out of docs/ by hand before S0a (an identical copy sits in the untracked backup/final|reference|architecture); duplicates exist in backup/archive/duplicates for flow.pdf and the Proposal docx",
+        "decision: S0a plan section 0.2 option A, approved 2026-10-28"
+      ],
+      "sha256": "93b72d796bedf505cde1b6fd6036b3e07fe9de7d3022aa4176f5f7d8fad8e8ea",
+      "git_blob": "e97c654f6e78df96d9b0e35787712938406a1352",
+      "size": 55462,
+      "moved_in_commit": "ce8feea",
+      "commit_before_move": "b94fafd",
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"docs/reference/TCP_Full_Flow_Diagram.svg\""
+    },
+    {
+      "original_path": "docs/reference/Traffic Control Plans - BRD and Discussion Notes.docx",
+      "new_path": "backup/orphans/2026-10-28/docs/reference/Traffic Control Plans - BRD and Discussion Notes.docx",
+      "label": "CONFIRMED_ORPHAN",
+      "reason": "POC-era document superseded by the MVP plan; not used by code",
+      "evidence": [
+        "string search: no reference from code, config or tests (git grep of the file name over src/, tests/, scripts/, config/, apps/ returns nothing)",
+        "superseded: you moved it out of docs/ by hand before S0a (an identical copy sits in the untracked backup/final|reference|architecture); duplicates exist in backup/archive/duplicates for flow.pdf and the Proposal docx",
+        "decision: S0a plan section 0.2 option A, approved 2026-10-28"
+      ],
+      "sha256": "4190cf66bc05814a48e7fa294441dea2a688285b41d74cbd4935233b02945b65",
+      "git_blob": "25ee6eb70661db78e16e351ae704a3614417b326",
+      "size": 660433,
+      "moved_in_commit": "ce8feea",
+      "commit_before_move": "b94fafd",
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"docs/reference/Traffic Control Plans - BRD and Discussion Notes.docx\""
+    },
+    {
+      "original_path": "docs/reference/sample_easy_plan.json",
+      "new_path": "backup/orphans/2026-10-28/docs/reference/sample_easy_plan.json",
+      "label": "CONFIRMED_ORPHAN",
+      "reason": "POC-era document superseded by the MVP plan; not used by code",
+      "evidence": [
+        "string search: no reference from code, config or tests (git grep of the file name over src/, tests/, scripts/, config/, apps/ returns nothing)",
+        "superseded: you moved it out of docs/ by hand before S0a (an identical copy sits in the untracked backup/final|reference|architecture); duplicates exist in backup/archive/duplicates for flow.pdf and the Proposal docx",
+        "decision: S0a plan section 0.2 option A, approved 2026-10-28"
+      ],
+      "sha256": "bad62ff796b91f21e8814f13741cf8ec92acf673ba4e81d672e621cfb5570a99",
+      "git_blob": "4e9f58b366497bb551f0a1948aa8815a90cd0566",
+      "size": 2133,
+      "moved_in_commit": "ce8feea",
+      "commit_before_move": "b94fafd",
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"docs/reference/sample_easy_plan.json\""
+    },
+    {
+      "original_path": "docs/reference/sample_easy_plan.png",
+      "new_path": "backup/orphans/2026-10-28/docs/reference/sample_easy_plan.png",
+      "label": "CONFIRMED_ORPHAN",
+      "reason": "POC-era document superseded by the MVP plan; not used by code",
+      "evidence": [
+        "string search: no reference from code, config or tests (git grep of the file name over src/, tests/, scripts/, config/, apps/ returns nothing)",
+        "superseded: you moved it out of docs/ by hand before S0a (an identical copy sits in the untracked backup/final|reference|architecture); duplicates exist in backup/archive/duplicates for flow.pdf and the Proposal docx",
+        "decision: S0a plan section 0.2 option A, approved 2026-10-28"
+      ],
+      "sha256": "5c38366830af329b3a8bfe518311b17805eb6cc43cf6309640c00f02f44a29da",
+      "git_blob": "d8c4e4688048b15ffe96d3f8a2843826200cd5f0",
+      "size": 148994,
+      "moved_in_commit": "ce8feea",
+      "commit_before_move": "b94fafd",
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"docs/reference/sample_easy_plan.png\""
+    },
+    {
+      "original_path": "docs/reference/sample_hard_plan.png",
+      "new_path": "backup/orphans/2026-10-28/docs/reference/sample_hard_plan.png",
+      "label": "CONFIRMED_ORPHAN",
+      "reason": "POC-era document superseded by the MVP plan; not used by code",
+      "evidence": [
+        "string search: no reference from code, config or tests (git grep of the file name over src/, tests/, scripts/, config/, apps/ returns nothing)",
+        "superseded: you moved it out of docs/ by hand before S0a (an identical copy sits in the untracked backup/final|reference|architecture); duplicates exist in backup/archive/duplicates for flow.pdf and the Proposal docx",
+        "decision: S0a plan section 0.2 option A, approved 2026-10-28"
+      ],
+      "sha256": "341c710bc8dc4b30770cc4fc2def50ae0de06a7c652cc60cb7f33e08a5eac648",
+      "git_blob": "5909ae9edc7588e070fb20de2d73a299d0c29fa7",
+      "size": 156290,
+      "moved_in_commit": "ce8feea",
+      "commit_before_move": "b94fafd",
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"docs/reference/sample_hard_plan.png\""
+    },
+    {
+      "original_path": "tcp_ui/check_usgs.py",
+      "new_path": "backup/orphans/2026-10-28/tcp_ui/check_usgs.py",
+      "label": "CONFIRMED_ORPHAN",
+      "reason": "Live USGS NAIP connectivity check for an imagery provider that is not used (Azure Maps is the only imagery provider; USGS NAIP imagery is not an allowed source under D-53)",
+      "evidence": [
+        "import graph: no module imports tcp_ui.check_usgs (AST graph over every entry point and test)",
+        "string search: referenced only in its own docstring and docs/reports/poc/REDUNDANT_CODE.md section 1",
+        "config/CI: no CI exists; the UI hides usgs_naip (UI_MAP_PROVIDERS in storage/run_store.py)",
+        "git history: added in 1d5aa36 (POC V1), unchanged until S0a",
+        "imports were updated to tcp_planner in commit d5ce8c8 before the move, so a restore imports cleanly"
+      ],
+      "sha256": "0e201562489571f3bc1430ba15d29042069d326d7312548b65d31bc87a67a9d7",
+      "git_blob": "5332282a1587f274d889a16adf2091fd7670fe05",
+      "size": 3699,
+      "moved_in_commit": "cd373ca",
+      "commit_before_move": "dfb496e",
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-28 --apply --only \"tcp_ui/check_usgs.py\""
+    }
+  ]
+}

@@ -30,3 +30,15 @@ where = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src", "."]
 norecursedirs = ["backup", "spikes", "var", "runs", "node_modules", ".venv", ".git"]
+
+# backup/, spikes/ and var/ are never imported, packaged, linted, type-checked or measured
+# (tests/unit/test_no_backup_imports.py enforces the import rule).
+[tool.ruff]
+extend-exclude = ["backup", "spikes", "var", "apps/web/node_modules"]
+
+[tool.mypy]
+exclude = ["^backup/", "^spikes/", "^var/"]
+
+[tool.coverage.run]
+source = ["src/tcp_planner"]
+omit = ["backup/*", "spikes/*", "var/*"]
