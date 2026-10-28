@@ -249,6 +249,25 @@ def test_selected_by_name(env, monkeypatch):
     assert isinstance(p, FoundryVisionProvider) and p.deployment == "gpt-dep" and p.api == "openai_responses"
 
 
+def test_unset_provider_selects_foundry(env, monkeypatch):
+    """D-78: with TCP_AI_PROVIDER unset the default is Foundry; an explicit 'anthropic' still works."""
+    monkeypatch.delenv("TCP_AI_PROVIDER", raising=False)
+    assert isinstance(get_vision_provider(), FoundryVisionProvider)
+    monkeypatch.setenv("TCP_AI_PROVIDER", "anthropic")
+    assert get_vision_provider().name != "foundry"
+
+
+def test_default_foundry_not_configured_fails_clearly(env, monkeypatch):
+    from tcp_planner.contracts import ProviderError
+    monkeypatch.delenv("TCP_AI_PROVIDER", raising=False)
+    monkeypatch.delenv("TCP_FOUNDRY_API_KEY")
+    with pytest.raises(ProviderError) as e:
+        get_vision_provider()
+    assert e.value.code == "AI_CREDENTIALS_MISSING"
+    assert "TCP_AI_PROVIDER is not set" in e.value.message and "Foundry is the default" in e.value.message
+    assert "TCP_FOUNDRY_API_KEY" in e.value.message
+
+
 def to_call1_wire(obs):
     """What a compliant model returns in agent call 1 (metres, IMAGE_1 positions, extras, no osm_conflicts)."""
     mpp = 2 * offline.HALF / offline.SIZE

@@ -158,12 +158,23 @@ class StaticVisionProvider(VisionProvider):
         return {"model": self.model, "profile": None, "mode": (grounding or {}).get("mode") or "baseline"}
 
 
+DEFAULT_PROVIDER = "foundry"   # D-78: Foundry is the default when TCP_AI_PROVIDER is unset
+
+
 def get_vision_provider(name=None):
-    name = (name or os.environ.get("TCP_AI_PROVIDER") or "anthropic").strip().lower()
+    chosen = name or os.environ.get("TCP_AI_PROVIDER")
+    name = (chosen or DEFAULT_PROVIDER).strip().lower()
     if name == "anthropic":
         from tcp_planner.ai.anthropic_direct_provider import AnthropicVisionProvider
         return AnthropicVisionProvider()
     if name == "foundry":
-        from .foundry_provider import FoundryVisionProvider
+        from .foundry_provider import FoundryVisionProvider, foundry_connection
+        try:
+            foundry_connection()
+        except ProviderError as e:
+            how = "TCP_AI_PROVIDER is not set, so Foundry is the default" if not chosen else "Foundry is selected"
+            raise ProviderError(e.code, f"{how}, but Foundry is not configured: {e.message}. Set the Foundry "
+                                        "connection in .env (TCP_FOUNDRY_ENDPOINT and TCP_FOUNDRY_API_KEY, or "
+                                        "ANTHROPIC_FOUNDRY_BASE_URL and ANTHROPIC_FOUNDRY_API_KEY)", e.details)
         return FoundryVisionProvider()
     raise ProviderError("AI_PROVIDER_UNKNOWN", f"unknown AI provider {name!r}")
