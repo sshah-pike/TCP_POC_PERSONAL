@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
@@ -27,6 +28,8 @@ tcp-planner = "tcp_planner.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+=======
+>>>>>>> a72ad06221670e92c295600c9b7e780330c73e68
 [tool.pytest.ini_options]
 pythonpath = ["src", "."]
 norecursedirs = ["backup", "spikes", "var", "runs", "node_modules", ".venv", ".git"]

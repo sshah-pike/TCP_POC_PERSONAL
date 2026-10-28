@@ -18,11 +18,18 @@ import argparse, json, mimetypes, os, shutil, subprocess, sys, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit, parse_qs, unquote
 
+from tcp_planner.config.settings import SRC_DIR
 from . import store
 
 WEB_DIST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web", "dist")
 MAX_BODY = 10 * 1024 * 1024
 ASSISTANT_MAX_BODY = 64 * 1024  # assistant requests are small structured JSON
+
+
+def child_env():
+    """Environment for runner subprocesses: the package source is importable whether or not it is installed."""
+    path = os.pathsep.join(p for p in (SRC_DIR, os.environ.get("PYTHONPATH")) if p)
+    return dict(os.environ, PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8", PYTHONPATH=path)
 ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
 CONTENT_TYPES = {".json": "application/json", ".txt": "text/plain; charset=utf-8", ".png": "image/png",
                  ".jpg": "image/jpeg", ".pdf": "application/pdf", ".dxf": "application/dxf",
@@ -87,7 +94,7 @@ def start_comparison(payload):
             with open(store.run_path(cid, "ui", "prep.log"), "w", encoding="utf-8") as log:
                 subprocess.call([sys.executable, "-m", "tcp_ui.runner", "--prepare-views", store.run_path(cid)],
                                 cwd=store.PROJECT_ROOT, stdout=log, stderr=subprocess.STDOUT,
-                                env=dict(os.environ, PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8"))
+                                env=child_env())
         for rid in relations.create_children(cid): launch(rid, store.run_path(rid))
 
     threading.Thread(target=run, daemon=True).start()
@@ -108,9 +115,8 @@ def stop_run(run_id):
 
 def launch(run_id, rdir):
     log = open(os.path.join(rdir, "ui", "stdout.log"), "w", encoding="utf-8")
-    env = dict(os.environ, PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8")
     proc = subprocess.Popen([sys.executable, "-m", "tcp_ui.runner", rdir], cwd=store.PROJECT_ROOT,
-                            stdout=log, stderr=subprocess.STDOUT, env=env)
+                            stdout=log, stderr=subprocess.STDOUT, env=child_env())
     with LIVE_LOCK: LIVE[run_id] = proc
 
     def reap():
