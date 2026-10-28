@@ -39,7 +39,7 @@ def test_map_replay_missing_is_error(tmp_path):
 
 
 def test_network_is_blocked_in_tests():
-    from conftest import NetworkBlockedError
+    from tests.support.netblock import NetworkBlockedError
     with pytest.raises(NetworkBlockedError):
         socket.create_connection(("example.com", 443), timeout=1)
     with pytest.raises(NetworkBlockedError):

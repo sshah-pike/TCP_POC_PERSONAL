@@ -8,6 +8,8 @@ Only the volatile timestamps (generated_at, retrieved_at) are masked; every othe
 """
 import json, os, re, subprocess, sys, tempfile
 
+from tests.support import netblock
+
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 EXPECTED = os.path.join(ROOT, "tests", "fixtures", "expected", "offline")
 VOLATILE = re.compile(rb'"(generated_at|retrieved_at)": "[^"]*"')
@@ -20,6 +22,7 @@ def run_offline(out, sc, flag="false", extra=()):
     env = {k: v for k, v in os.environ.items() if not k.startswith(("TCP_", "AZURE", "ANTHROPIC"))}
     env["TCP_SME_ASSISTANT_ENABLED"] = flag; env["PYTHONIOENCODING"] = "utf-8"
     env["PYTHONPATH"] = os.path.join(ROOT, "src")
+    env = netblock.subprocess_env(env)  # the clean env must still carry the network block
     r = subprocess.run([sys.executable, "-m", "tcp_planner.orchestration.pipeline", "--offline", sc, "--no-dwt",
                         "--out", str(out), *extra], cwd=ROOT, env=env, capture_output=True, text=True)
     return r.returncode

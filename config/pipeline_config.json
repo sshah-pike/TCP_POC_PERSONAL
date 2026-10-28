@@ -96,7 +96,8 @@
     "node_attach_distance_m": 15.0
   },
   "input": {
-    "max_work_path_m": 150.0
+    "max_work_path_m": 150.0,
+    "duplicate_distance_m": 1.0
   },
   "fusion": {
     "min_critical_confidence": 0.7,
