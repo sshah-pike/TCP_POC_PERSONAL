@@ -8,7 +8,7 @@ Each slice below is written so a Claude Code prompt can be generated from it dir
 
 1. Run S0 first. Its report fixes file names and any wrong assumption.
 2. For each later slice, build the Claude Code prompt as: the common preamble below, then the slice's prompt seed, then its acceptance criteria and tests copied verbatim.
-3. One branch per slice off `tcp-mvp/base`, named `tcp-mvp/sNN-short-name`. Merge only when the gate passes.
+3. One branch per slice off the previous slice (`tcp-mvp/base` for the first), named `tcp-mvp/sNN-short-name`. Merge only when the gate passes.
 4. Setup once per environment: `pip install -e . --no-build-isolation` inside `.venv`.
 
 ## Common preamble for every Claude Code prompt

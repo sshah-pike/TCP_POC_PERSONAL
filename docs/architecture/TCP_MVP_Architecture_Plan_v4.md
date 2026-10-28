@@ -1255,9 +1255,9 @@ Each record states status, context, decision, consequences and what was rejected
 
 **Status:** Accepted. **Context:** The cloud move is out of the MVP (D-40). **Decision:** Keep `ArtifactStore`, `StateStore` and `RulePackStore` as thin interfaces with local adapters only. **Consequences:** A later cloud move is an adapter swap. No cloud adapters, migration tool or client-limit questions now. **Rejected:** Building cloud adapters now.
 
-### ADR-007: Immutable, content-addressed artifacts and artifact references
+### ADR-007: Immutable, key-addressed artifacts and artifact references
 
-**Status:** Proposed. **Context:** Audit and replay need artifacts that never change. **Decision:** Artifacts are write-once and referenced by `{uri, sha256, size, media_type}`. No raw paths in persisted data. **Consequences:** Cheap verification, and migration can verify hashes. **Rejected:** Mutable files addressed by path.
+**Status:** Accepted (S2, decision 1 option A). **Context:** Audit and replay need artifacts that never change, and existing outputs keep their human file names. **Decision:** Artifacts are write-once and addressed by a store-relative key such as `<run_id>/output/plan.json`. They are referenced by `{uri, sha256, size, media_type}`, where `uri` is that key, and the sha256 is verified on every read. Writing the same bytes to a key is idempotent; writing different bytes fails. A change creates a new artifact at a new key. No raw paths in persisted data. `schema_version` lives in the index and reference records, not inside output files. **Consequences:** Output names and bytes stay unchanged; migration can verify hashes. No deduplication by content. **Rejected:** Mutable files addressed by path; a hash-named blob store with a name index (renames every output).
 
 ### ADR-008: Zone-level reuse keys
 
