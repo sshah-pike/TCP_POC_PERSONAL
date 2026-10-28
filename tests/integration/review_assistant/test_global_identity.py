@@ -1,5 +1,5 @@
 """Global protection tests: no-revision pipeline output is byte-identical to the committed (pre-assistant) pipeline,
-with the assistant flag off and on; validators / rule pack untouched; protected untracked run directory untouched."""
+with the assistant flag off and on; validators / rule pack untouched; protected run directory tracked and unchanged."""
 import hashlib, io, os, re, subprocess, sys, tarfile
 
 import pytest
@@ -65,11 +65,12 @@ def test_validators_rule_pack_and_core_rules_unchanged():
     assert r.stdout.strip() == ""
 
 
-def test_protected_untracked_run_directory_untouched():
-    """The pre-existing untracked run directory still has exactly the files recorded before implementation."""
+def test_protected_run_directory_tracked_and_unchanged():
+    """The protected run directory is tracked (since b94fafd) and still equals HEAD (the 16 files committed in
+    b94fafd; the rest of the folder is gitignored under var/) (D-79)."""
     d = os.path.join(ROOT, PROTECTED)
     if not os.path.isdir(d): pytest.skip("protected run directory not present on this machine")
-    files = sorted(os.path.relpath(os.path.join(a, n), d).replace("\\", "/") for a, _, ns in os.walk(d) for n in ns)
-    assert len(files) == 27 and "output/plan.json" in files
+    tracked = subprocess.run(["git", "ls-files", "--", PROTECTED], cwd=ROOT, capture_output=True, text=True).stdout.splitlines()
+    assert len(tracked) == 16 and all(os.path.isfile(os.path.join(ROOT, t)) for t in tracked)   # none deleted
     r = subprocess.run(["git", "status", "--porcelain", "--", PROTECTED], cwd=ROOT, capture_output=True, text=True)
-    assert r.stdout.strip().startswith("??")
+    assert r.stdout.strip() == ""   # no tracked file modified or deleted, nothing staged
