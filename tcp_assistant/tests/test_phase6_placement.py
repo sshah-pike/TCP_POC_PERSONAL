@@ -2,7 +2,7 @@ import math
 
 import pytest
 
-from tcp_poc.models import FT
+from tcp_planner.contracts import FT
 from .conftest import call, login
 from .test_phase3_decisions import no_external  # noqa: F401
 from .test_phase4_versions import inproc_launch, conv, review, confirm, out  # noqa: F401
@@ -31,7 +31,7 @@ def test_movement_along_alignment_and_offset_preserved(aenv, runs, no_external):
     assert m["straight_line_m"] <= m["path_length_at_offset_m"] + 1e-3
     assert m["proposed"]["offset_m"] == m["current"]["offset_m"] and m["lateral_offset_preserved"]
     # proposed coordinate lies on the saved alignment at the computed station/offset (not a lat/lon delta)
-    from tcp_poc.geometry import SiteFrame, signed_lateral
+    from tcp_planner.geometry.local_frame import SiteFrame, signed_lateral
     ctx = _ctx_site(runs, "supported"); frame = SiteFrame(ctx["site_model"])
     d, s, lat = signed_lateral(frame.centerline, frame.enu(m["proposed"]["latitude"], m["proposed"]["longitude"]))
     assert s == pytest.approx(m["proposed"]["station_m"], abs=0.05) and lat == pytest.approx(m["proposed"]["offset_m"], abs=0.05)

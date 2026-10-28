@@ -109,7 +109,7 @@ def test_audit_chain_and_secret_scrubbing(aenv):
 
 
 def test_policy_hash_verified_and_master_switch(tmp_path):
-    from tcp_poc import sme_policy as P
+    from tcp_planner.review import action_policy as P
     pol = P.load_policy()
     assert pol.allowed("override_rule_conflict", ["SME_REVIEWER"])[0]
     assert not pol.allowed("override_rule_conflict", ["AUDITOR"])[0]
@@ -183,7 +183,7 @@ def test_audit_chain_valid_with_concurrent_processes(tmp_path):
     import subprocess, sys, textwrap
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     code = textwrap.dedent(f"""
-        import sys; sys.path.insert(0, {root!r})
+        import sys; sys.path[:0] = [{root!r}, {os.path.join(root, 'src')!r}]
         from tcp_assistant.core.audit import AuditService
         a = AuditService({str(tmp_path)!r})
         for i in range(40): a.write("PING", stream="conv-shared", n=i, writer=sys.argv[1])

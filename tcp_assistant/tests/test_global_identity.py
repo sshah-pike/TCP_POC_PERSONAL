@@ -12,15 +12,17 @@ PROTECTED = "runs/20261020-214203-7f7232"
 
 
 def _head_tree(dest):
-    data = subprocess.run(["git", "archive", "--format=tar", "HEAD", "tcp_poc"], cwd=ROOT, capture_output=True, check=True).stdout
+    data = subprocess.run(["git", "archive", "--format=tar", "HEAD", "src", "config", "rule_pack", "assets"], cwd=ROOT,
+                          capture_output=True, check=True).stdout
     with tarfile.open(fileobj=io.BytesIO(data)) as t: t.extractall(dest, filter="data")
 
 
 def _run(cwd, out, sc, flag, extra=()):
     env = {k: v for k, v in os.environ.items() if not k.startswith(("TCP_", "AZURE", "ANTHROPIC"))}
     env["TCP_SME_ASSISTANT_ENABLED"] = flag; env["PYTHONIOENCODING"] = "utf-8"
-    r = subprocess.run([sys.executable, "-m", "tcp_poc.app", "--offline", sc, "--no-dwt", "--out", str(out), *extra],
-                       cwd=cwd, env=env, capture_output=True, text=True)
+    env["PYTHONPATH"] = os.path.join(str(cwd), "src")  # the tree under test, never an installed copy
+    r = subprocess.run([sys.executable, "-m", "tcp_planner.orchestration.pipeline", "--offline", sc, "--no-dwt",
+                        "--out", str(out), *extra], cwd=cwd, env=env, capture_output=True, text=True)
     return r.returncode
 
 
@@ -56,9 +58,10 @@ def test_kml_input_byte_identical(head_root, tmp_path):
 
 
 def test_validators_rule_pack_and_core_rules_unchanged():
-    r = subprocess.run(["git", "diff", "--name-only", "HEAD", "--", "tcp_poc/validators.py", "tcp_poc/rule_engine.py",
-                        "tcp_poc/geometry.py", "tcp_poc/site_fusion.py", "tcp_poc/APPROVED_TWO_LANE_POC_RULE_PACK.json",
-                        "tcp_poc/poc_config.json"], cwd=ROOT, capture_output=True, text=True)
+    r = subprocess.run(["git", "diff", "--name-only", "HEAD", "--", "src/tcp_planner/validation/validators.py",
+                        "src/tcp_planner/layout/rule_engine.py", "src/tcp_planner/geometry/local_frame.py",
+                        "src/tcp_planner/site_model/fusion.py", "rule_pack/APPROVED_TWO_LANE_POC_RULE_PACK.json",
+                        "config/pipeline_config.json"], cwd=ROOT, capture_output=True, text=True)
     assert r.stdout.strip() == ""
 
 

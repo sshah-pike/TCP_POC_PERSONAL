@@ -40,7 +40,7 @@ def _prepare_environment():
     """The UI server process does not load .env (only pipeline child processes do). Load it here exactly as the CLI
     does (os.environ.setdefault: real environment variables win) and use the OS trust store for TLS, once."""
     if _ENV["done"]: return
-    from tcp_poc.app import load_env_file, use_os_trust_store
+    from tcp_planner.orchestration.pipeline import load_env_file, use_os_trust_store
     load_env_file(); use_os_trust_store()
     _ENV["done"] = True
 

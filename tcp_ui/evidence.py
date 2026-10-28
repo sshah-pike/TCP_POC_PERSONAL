@@ -13,7 +13,7 @@ provider is called and the reason is recorded. The pipeline's own logic runs unc
 """
 import datetime, hashlib, io, json, os, threading
 
-from tcp_poc.models import canonical_json, sha256_hex
+from tcp_planner.contracts import canonical_json, sha256_hex
 
 MANIFEST = "manifest.json"
 ANALYSIS_SPANS = {"map": "tcp.map.retrieve", "osm": "tcp.osm.resolve", "ai": "tcp.vision.analyze"}

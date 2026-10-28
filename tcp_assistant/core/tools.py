@@ -4,7 +4,7 @@ fields). Mutating tools write a consequential TOOL_STARTED audit event first; if
 """
 import time
 
-from tcp_poc.models import canonical_json, sha256_hex
+from tcp_planner.contracts import canonical_json, sha256_hex
 from . import authz
 from .canonical import now_iso
 from .errors import AssistantError

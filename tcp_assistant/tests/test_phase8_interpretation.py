@@ -122,7 +122,7 @@ def test_model_out_of_scope_and_malformed_output(aenv, runs, model):
 
 
 def test_model_cannot_bypass_policy_or_role(aenv, runs, model, tmp_path, monkeypatch):
-    from tcp_poc import sme_policy as P
+    from tcp_planner.review import action_policy as P
     doc = json.load(open(P.POLICY_PATH, encoding="utf-8")); doc["actions"]["remove_device"]["enabled"] = False
     doc["content_sha256"] = P.policy_hash(doc); pth = tmp_path / "p.json"; pth.write_text(json.dumps(doc))
     monkeypatch.setenv("TCP_SME_ACTION_POLICY", str(pth))
@@ -160,8 +160,8 @@ def test_limits(aenv, runs, model):
 
 
 def test_foundry_text_provider_path_one_call_no_secret_leak(aenv, runs, monkeypatch):
-    from tcp_poc import foundry_provider as fp
-    from tcp_poc.foundry_provider import Reply
+    from tcp_planner.ai import foundry_provider as fp
+    from tcp_planner.ai.foundry_provider import Reply
     from tcp_assistant.model import provider as MP
     sent = []
 

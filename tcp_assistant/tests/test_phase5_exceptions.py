@@ -44,7 +44,7 @@ def test_rule_conflict_exception_end_to_end(aenv, runs, inproc_launch, monkeypat
     assert st_["decision"] == "DRAFT_WITH_ENGINEERING_EXCEPTION" and st_["draft_generated"] and st_["exit_code"] == 5
     assert os.path.exists(aenv / "runs" / child / "output" / "tcp_sheet.png")
     assert os.path.exists(aenv / "runs" / child / "output" / "debug_plan.png")
-    from tcp_poc.sme_render import exception_lines
+    from tcp_planner.sheets.sme_exception_text import exception_lines
     assert any("SELF-CONFIRMED" in x for x in exception_lines(plan))
     # exceptions are this-version-only: not carried into the next proposal
     assert call("GET", f"conversations/{cid}/preview", token=t)[2]["preview"]["plan_outcome"]["status"] == "BLOCKED"
@@ -62,7 +62,7 @@ def test_exception_requires_reason_confirmation_role_and_policy(aenv, runs, tmp_
     st, _, r = exc(aud, cid, type="RULE_CONFLICT", check_id="GEO-DRIVEWAY-INTERSECTION-CONFLICT", reason="x", confirm_exception=True)
     assert st == 403
     # master switch off -> exceptions unavailable; normal corrections still allowed
-    from tcp_poc import sme_policy as P
+    from tcp_planner.review import action_policy as P
     doc = json.load(open(P.POLICY_PATH, encoding="utf-8")); doc["sme_exceptions_enabled"] = False
     doc["content_sha256"] = P.policy_hash(doc); pth = tmp_path / "pol.json"; pth.write_text(json.dumps(doc))
     monkeypatch.setenv("TCP_SME_ACTION_POLICY", str(pth))
@@ -116,8 +116,8 @@ def test_ta_exception_never_bypasses_unresolved_facts(aenv, runs):
 
 
 def test_pipeline_disposition_rejects_unauthorized_exception():
-    from tcp_poc import sme_disposition as SD
-    from tcp_poc.sme_policy import load_policy
+    from tcp_planner.conflicts import sme_disposition as SD
+    from tcp_planner.review.action_policy import load_policy
     val = {"rule_validation": {"checks": []}, "geometry_validation": {"checks": [
         {"id": "GEO-DRIVEWAY-INTERSECTION-CONFLICT", "status": "FAIL", "detail": {"conflicts": [{"object": "S2"}]}},
         {"id": "GEO-IMAGE-EXTENT", "status": "FAIL", "detail": {"objects": ["S1"]}}]}}

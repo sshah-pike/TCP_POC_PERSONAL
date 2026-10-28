@@ -7,7 +7,7 @@ pipeline does not have is listed as NOT_ASSESSED and never drawn. Output is dete
 """
 import io, math
 
-from tcp_poc.geometry import enu, inv, at, cum, offset_point
+from tcp_planner.geometry.local_frame import enu, inv, at, cum, offset_point
 from . import findings as F
 
 RENDERER_VERSION = "annotated-site-image-v1"

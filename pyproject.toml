@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tcp-planner"
+version = "0.2.0"
+description = "Draft traffic control plans (TA-1, TA-6, TA-10, TA-33) from KML work locations, for SME review"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+    "pillow",
+    "matplotlib",
+    "requests",
+    "anthropic>=1.13",
+    "ezdxf>=1.4",
+    "truststore",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+tools = ["pymupdf"]
+
+[project.scripts]
+tcp-planner = "tcp_planner.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]
+norecursedirs = ["backup", "spikes", "var", "runs", "node_modules", ".venv", ".git"]

@@ -39,7 +39,7 @@ def live_ids():
 
 
 def start_run(payload):
-    from tcp_poc import offline
+    from tcp_planner.orchestration import offline_scenarios as offline
     adv = payload.get("advanced") or {} if isinstance(payload, dict) else {}
     if adv.get("ai_profile"): _ai_choice({"ai_profile": adv["ai_profile"]})  # must be a configured, available profile
     run_id, rdir = store.create_run(payload, set(offline.SCENARIOS) | set(offline.ALIASES))
@@ -48,7 +48,7 @@ def start_run(payload):
 
 def _ai_choice(payload):
     """Validate a requested AI provider / Foundry profile against what is configured (no free text)."""
-    from tcp_poc.foundry_provider import profile_catalog
+    from tcp_planner.ai.foundry_provider import profile_catalog
     prov, prof = payload.get("ai_provider") or None, payload.get("ai_profile") or None
     if prov and prov not in store.AI_PROVIDERS: raise store.BadRequest("unknown AI provider")
     if prof:
@@ -130,11 +130,11 @@ def launch(run_id, rdir):
 
 
 def meta():
-    from tcp_poc import offline
-    from tcp_poc.app import load_config, DWT_CONFIG_PATH
-    from tcp_poc.dwt_renderer import MODES
-    from tcp_poc.models import APP_VERSION
-    from tcp_poc.rule_pack import load_rule_pack
+    from tcp_planner.orchestration import offline_scenarios as offline
+    from tcp_planner.orchestration.pipeline import load_config, DWT_CONFIG_PATH
+    from tcp_planner.sheets.dwt_renderer import MODES
+    from tcp_planner.contracts import APP_VERSION
+    from tcp_planner.rules.rule_pack_loader import load_rule_pack
     out = {"app_version": APP_VERSION, "offline_scenarios": list(offline.SCENARIOS), "offline_aliases": offline.ALIASES,
            "map_providers": list(store.UI_MAP_PROVIDERS), "ai_providers": list(store.UI_AI_PROVIDERS),
            "dwt_modes": list(MODES), "dwt_config_present": os.path.isfile(DWT_CONFIG_PATH),
@@ -142,7 +142,7 @@ def meta():
            "pricing_source": store.load_pricing().get("source"), "foundry_profiles": [],
            "resume_stages": [s[0] for s in store.STAGES]}
     try:
-        from tcp_poc.foundry_provider import profile_catalog
+        from tcp_planner.ai.foundry_provider import profile_catalog
         out["foundry_profiles"] = profile_catalog()
     except Exception as e:
         out["foundry_profiles_error"] = type(e).__name__

@@ -8,4 +8,4 @@ pytest
 truststore            # TLS via OS certificate store (corporate proxy)
 # optional: opentelemetry-api (spans are also emitted through OTel when installed)
 # external, optional: ODA File Converter (free) - needed to read the .dwt and write .dwg
-pymupdf              # only for re-extracting the sheet frame: python -m tcp_poc.sheet_template <CADD.pdf>
+pymupdf              # only for re-extracting the sheet frame: python scripts/build_sheet_frame.py <CADD.pdf>

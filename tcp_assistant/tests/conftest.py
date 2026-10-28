@@ -45,7 +45,7 @@ def run_library(tmp_path_factory):
     """Offline UI-created runs (real runner -> pipeline, evidence saved), built once: scenario -> run_id."""
     root = tmp_path_factory.mktemp("runlib")
     old = os.environ.get("TCP_UI_RUNS_DIR"); os.environ["TCP_UI_RUNS_DIR"] = str(root)
-    from tcp_poc import offline
+    from tcp_planner.orchestration import offline_scenarios as offline
     from tcp_ui import store
     from tcp_ui.tests import inproc
     ids = {}

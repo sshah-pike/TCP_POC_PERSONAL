@@ -3,7 +3,7 @@
 Nothing is written to versions before the SME confirms the exact review hash. Confirmation recomputes the review;
 any difference (staged items, heads, policy, rule pack, evidence) -> STALE_REVIEW.
 """
-from tcp_poc.models import content_hash
+from tcp_planner.contracts import content_hash
 from ..core.canonical import now_iso, obj_hash
 from ..core.errors import AssistantError
 from ..core.ids import new_id
@@ -80,7 +80,7 @@ def build(ident, cid, ctx):
     if pv is None and ctx["plan"] and ctx["run_id"] == _base_run(cid): n_pv = 2  # v1 = the automated baseline plan
     if se is None: n_se = 2  # confirmation first records the machine result as the immutable baseline v1
     resume = _resume_plan(ctx)
-    from tcp_poc.sme_policy import load_policy
+    from tcp_planner.review.action_policy import load_policy
     pol = load_policy()
     outcome = p["plan_outcome"]
     parent_decisions_sha = (se or {}).get("decisions_sha256") or content_hash(D.to_doc(D.base_decisions(ctx)))
@@ -159,7 +159,7 @@ def _base_run(cid):
 
 def _config_sha():
     from tcp_ui.evidence import sha256_file
-    from tcp_poc.app import CONFIG_PATH
+    from tcp_planner.orchestration.pipeline import CONFIG_PATH
     return sha256_file(CONFIG_PATH)
 
 
@@ -274,7 +274,7 @@ def _json(obj):
 
 
 def _revision(ident, ctx, cs_id, pv_id, pv_head, n_pv, se_id, p, extra, rv):
-    from tcp_poc.sme_revision import SCHEMA, revision_hash
+    from tcp_planner.review.sme_revision import SCHEMA, revision_hash
     new_plan = p["_new_derived"]["plan"]
     exp = sorted((o["object_id"], o["placement"].get("station_m"), o["placement"].get("latitude"), o["placement"].get("longitude"))
                  for o in (new_plan or {}).get("objects", []))
@@ -296,7 +296,7 @@ def _revision(ident, ctx, cs_id, pv_id, pv_head, n_pv, se_id, p, extra, rv):
 def _resolutions(ident, ctx, p):
     """For each still-blocked validator check: can the SME resolve it with a plan-specific exception (deterministic policy
     check), and did the previous plan version already carry an exception for it (exceptions never carry over)."""
-    from tcp_poc.sme_policy import load_policy
+    from tcp_planner.review.action_policy import load_policy
     try: pol = load_policy()
     except Exception: pol = None
     prev = {}

@@ -29,9 +29,9 @@ def head_context(cid, conv, tctx):
     """Review context for the lineage head: the run of the latest generated plan version (else the base run); when a
     newer site-evidence version was saved without regeneration, its decisions are overlaid on the machine model."""
     from . import versions, run_context
-    from tcp_poc import sme_overlay
-    from tcp_poc.eligibility import evaluate
-    from tcp_poc.models import content_hash
+    from tcp_planner.review import decision_overlay as sme_overlay
+    from tcp_planner.routing.eligibility import evaluate
+    from tcp_planner.contracts import content_hash
     head_run = versions.head_run(conv) or conv["run_id"]
     ctx = c().tools.invoke(tctx, "load_run_context", run_id=head_run)["ctx"]
     se = versions.se_head(conv["lineage_key"])

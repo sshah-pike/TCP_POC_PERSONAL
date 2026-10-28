@@ -1,7 +1,7 @@
 # TCP POC Runner (local UI)
 
 A thin local UI around the existing pipeline. Each run is the unmodified CLI entry point
-`tcp_poc.app.main(argv)`, executed in its own process; the UI only observes it. Decisions, outputs,
+`tcp_planner.orchestration.pipeline.main(argv)`, executed in its own process; the UI only observes it. Decisions, outputs,
 the TCP sheet and the DWT output are exactly what the pipeline produces.
 
 ## Run

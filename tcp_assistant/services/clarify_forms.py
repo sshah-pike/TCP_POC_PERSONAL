@@ -9,7 +9,7 @@ import math
 
 from ..core.canonical import now_iso
 from ..core.errors import AssistantError
-from tcp_poc.sme_overlay import FACT_TYPES
+from tcp_planner.review.decision_overlay import FACT_TYPES
 from . import findings as F, object_tools as O
 
 CREATE_PREFIX = "__CREATE__:"

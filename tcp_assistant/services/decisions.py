@@ -6,8 +6,8 @@ overridden by the staged decisions with the same key.
 """
 import math
 
-from tcp_poc.sme_overlay import FACT_TYPES, FEATURE_KINDS
-from tcp_poc.sme_policy import load_policy, PolicyError
+from tcp_planner.review.decision_overlay import FACT_TYPES, FEATURE_KINDS
+from tcp_planner.review.action_policy import load_policy, PolicyError
 from ..core.canonical import now_iso
 from ..core.errors import AssistantError
 from ..core.ids import new_id

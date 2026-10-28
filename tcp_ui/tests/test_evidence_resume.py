@@ -1,13 +1,14 @@
 """Evidence persistence, resume/reuse and model comparison (no network, no real credentials).
 
-Runs execute the real runner -> tcp_poc.app.main -> run_pipeline in-process; HTTP is a fake.
+Runs execute the real runner -> tcp_planner.orchestration.pipeline.main -> run_pipeline in-process; HTTP is a fake.
 """
 import base64, json, math, os
 import pytest
 import requests
 
-from tcp_poc import offline, foundry_provider as fp
-from tcp_poc.map_provider import AzureMapsProvider
+from tcp_planner.orchestration import offline_scenarios as offline
+from tcp_planner.ai import foundry_provider as fp
+from tcp_planner.imagery.map_provider import AzureMapsProvider
 from tcp_ui import store, relations
 from tcp_ui.evidence import load_manifest, sha256_file
 from tcp_ui.tests import inproc
@@ -236,7 +237,7 @@ def test_comparison_rejects_unavailable_profiles(env, monkeypatch):
 def test_azure_scale_uses_512px_grid(monkeypatch):
     monkeypatch.setenv("AZURE_MAPS_KEY", FAKE_AZURE_KEY)
     h = FakeHttp(); monkeypatch.setattr(requests, "get", h)
-    from tcp_poc import kml_input
+    from tcp_planner.intake import kml_reader as kml_input
     img, meta = AzureMapsProvider().fetch_context(kml_input.from_coordinates(LAT, LON), 212.4, 1280)
     z = meta["zoom"]
     assert meta["metres_per_pixel"] == pytest.approx(2 * math.pi * 6378137.0 * math.cos(math.radians(LAT)) / (512 * 2 ** z), rel=1e-6)
@@ -247,7 +248,7 @@ def test_azure_sheet_mosaic_within_limits_and_georeferenced(monkeypatch):
     import numpy as np
     monkeypatch.setenv("AZURE_MAPS_KEY", FAKE_AZURE_KEY)
     h = FakeHttp(); monkeypatch.setattr(requests, "get", h)
-    from tcp_poc import kml_input
+    from tcp_planner.intake import kml_reader as kml_input
     img, meta = AzureMapsProvider().fetch_context(kml_input.from_coordinates(LAT, LON), 424.0, 2560)
     assert img.size == (2560, 2560) and meta["request_tiles"] == 4 and h.count("atlas.microsoft.com") == 4
     assert all(c[1]["params"]["width"] <= 2000 and c[1]["params"]["height"] <= 1500 for c in h.calls)

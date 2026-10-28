@@ -105,7 +105,7 @@ def test_taper_zone_cones_in_lane_and_personnel(aenv, runs, no_external):
 
 
 def test_policy_can_disable_object_types_and_removal(aenv, runs, tmp_path, monkeypatch, no_external):
-    from tcp_poc import sme_policy as P
+    from tcp_planner.review import action_policy as P
     doc = json.load(open(P.POLICY_PATH, encoding="utf-8")); doc["actions"]["create_taper"]["enabled"] = False
     doc["content_sha256"] = P.policy_hash(doc); pth = tmp_path / "pol.json"; pth.write_text(json.dumps(doc))
     monkeypatch.setenv("TCP_SME_ACTION_POLICY", str(pth))

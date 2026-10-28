@@ -8,7 +8,7 @@ an explicit SME exception (policy action per category) covering the validator VA
 """
 import re
 
-from tcp_poc.models import FT, r
+from tcp_planner.contracts import FT, r
 from ..core.canonical import now_iso
 from ..core.errors import AssistantError
 from ..core.ids import new_id
