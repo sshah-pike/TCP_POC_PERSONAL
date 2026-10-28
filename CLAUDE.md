@@ -7,19 +7,32 @@ Read this file at the start of every session. It applies to every slice.
 The tool takes a KML of work locations and produces draft traffic control plans (TCPs): PDF sheets with imagery, signs, tapers, buffers and dimensions, plus a full audit trail. An SME reviews and approves every plan.
 
 - **MVP scope:** TA-1, TA-6, TA-10 and TA-33 only. Anything else returns `NO_TA_MATCH`.
-- **Branch:** `TCP-MVP`. The old POC is backed up and is not a regression oracle. There is no separate legacy TA-1 path.
+- **Branch:** `tcp-mvp/base`. The old POC is backed up and is not a regression oracle. There is no separate legacy TA-1 path.
 
 ## Documents (source of truth)
 
 | File | Use |
 | --- | --- |
-| `docs/TCP_MVP_Architecture_Plan_v4.md` | The plan, decisions (D-xx) and ADRs |
-| `docs/TCP_MVP_Development_Slices.md` | Slice specs S0 to S15: scope, acceptance criteria, tests |
-| `docs/schema_spike_prompt.md` | AI output-format spike, run in S0 |
+| `docs/architecture/TCP_MVP_Architecture_Plan_v4.md` | The plan, decisions (D-xx) and ADRs |
+| `docs/slices/TCP_MVP_Development_Slices.md` | Slice specs S0 to S15: scope, acceptance criteria, tests |
+| `docs/slices/schema_spike_prompt.md` | AI output-format spike, run in S0 |
 | `docs/sources/` | MUTCD 11th Edition, Chapter 6, December 2023 revision |
-| `docs/references/` | The three reference TMP PDFs and three KMLs |
+| `docs/references/` | The three reference TMP PDFs; their three KMLs (plus TA-6/10/33 examples) in `docs/references/kml/` |
 | `tests/golden/` | Golden set v0.1 extracted from the reference drafts |
 | `assets/symbols/` | Device catalog and placeholder symbols v0.1 |
+| `docs/reports/` | Slice reports (S0a restructure plan, baseline, report); `poc/` holds POC-era notes |
+
+## Repository layout and setup
+
+- Python package `tcp_planner` lives in `src/tcp_planner/`; the web UI in `apps/web/`.
+- Data outside code: `config/` (settings JSON), `rule_pack/`, `assets/`. Paths resolve through
+  `tcp_planner.config.settings`; never build paths from `__file__` elsewhere.
+- `var/` holds run outputs, labels, assistant data and debug dumps (gitignored; `var/runs/` keeps the
+  tracked POC-era runs). `backup/orphans/<date>/` holds moved-out files with a `MANIFEST.json`.
+- Setup once per environment: `pip install -r requirements.txt`, then `pip install -e . --no-build-isolation`
+  (editable install; needs `setuptools` in the venv). Without it `tcp_planner` is not importable outside pytest.
+- Tests: `python -m pytest tests/integration/pipeline`, `tests/integration/web_api`,
+  `tests/integration/review_assistant`, `tests/unit` (run suites separately); UI: `cd apps/web && npm test`.
 
 If code and plan disagree, **stop and report**. Do not silently follow either one.
 
@@ -98,14 +111,14 @@ If code and plan disagree, **stop and report**. Do not silently follow either on
 
 ## How to work
 
-1. **One slice per session.** Branch: `tcp-mvp/sNN-short-name`, off `TCP-MVP`.
+1. **One slice per session.** Branch: `tcp-mvp/sNN-short-name`, off `tcp-mvp/base`.
 2. **Plan first.** Before writing code, show the plan for the slice against its acceptance criteria, and wait for approval.
 3. **Stop and ask** when:
    - the repo differs from the plan;
    - a value has no source;
    - a decision is not covered by the docs.
    List options with trade-offs and a recommendation.
-4. **Never delete files.** Unused code goes to `backup/` with a manifest, and only in slice S15 after approval.
+4. **Never delete files.** Unused code goes to `backup/orphans/<date>/` with a manifest, and only in slice S15 after approval.
 5. **Finish every session with:**
    - files changed;
    - tests added;
