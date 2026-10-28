@@ -1,0 +1,121 @@
+{
+  "geometry_validation": {
+    "checks": [
+      {
+        "id": "GEO-TRAVELED-WAY",
+        "rule_pack_validation_id": "VAL-LANE",
+        "severity": "BLOCK",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "note": "no work-vehicle object generated for TA-1 POC"
+        },
+        "id": "GEO-WORK-VEHICLE",
+        "rule_pack_validation_id": "VAL-LANE",
+        "severity": "BLOCK",
+        "status": "PASS"
+      },
+      {
+        "id": "GEO-SIGN-SIDE",
+        "severity": "BLOCK",
+        "status": "PASS"
+      },
+      {
+        "id": "GEO-ANALYZED-GEOMETRY",
+        "severity": "BLOCK",
+        "status": "PASS"
+      },
+      {
+        "id": "GEO-STATION",
+        "rule_pack_validation_id": "VAL-SPACING",
+        "severity": "BLOCK",
+        "status": "PASS"
+      },
+      {
+        "id": "GEO-DRIVEWAY-INTERSECTION-CONFLICT",
+        "rule_pack_validation_id": "VAL-CONFLICT",
+        "severity": "BLOCK",
+        "status": "PASS"
+      },
+      {
+        "id": "GEO-PEDESTRIAN-CONFLICT",
+        "rule_pack_validation_id": "VAL-PED",
+        "severity": "BLOCK",
+        "status": "PASS"
+      },
+      {
+        "id": "GEO-IMAGE-EXTENT",
+        "severity": "BLOCK",
+        "status": "PASS"
+      }
+    ],
+    "status": "PASS"
+  },
+  "plan_ref": {
+    "plan_hash": "b071326a849159b3fd2bff96162ff3289fe345d0835263b1889566bb9bfd6ded",
+    "plan_id": "TCP-B071326A849159B3"
+  },
+  "rule_validation": {
+    "checks": [
+      {
+        "id": "VAL-ELIGIBILITY",
+        "rule_pack_validation_id": "VAL-ELIGIBILITY",
+        "severity": "BLOCK",
+        "status": "PASS"
+      },
+      {
+        "id": "VAL-TA",
+        "rule_pack_validation_id": "VAL-TA",
+        "severity": "BLOCK",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "approaches_with_sign": [
+            "DECREASING_STATION",
+            "INCREASING_STATION"
+          ]
+        },
+        "id": "VAL-SIGN",
+        "rule_pack_validation_id": "VAL-SIGN",
+        "severity": "BLOCK",
+        "status": "PASS"
+      },
+      {
+        "id": "VAL-SIGN-CATALOG",
+        "rule_pack_validation_id": "VAL-SIGN",
+        "severity": "BLOCK",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "expected_ft": 500,
+          "objects": []
+        },
+        "id": "VAL-SPACING",
+        "rule_pack_validation_id": "VAL-SPACING",
+        "severity": "BLOCK",
+        "status": "PASS"
+      },
+      {
+        "id": "VAL-PROHIBITED-OBJECTS",
+        "severity": "BLOCK",
+        "status": "PASS"
+      },
+      {
+        "id": "VAL-TRACE",
+        "rule_pack_validation_id": "VAL-TRACE",
+        "severity": "BLOCK",
+        "status": "PASS"
+      },
+      {
+        "id": "VAL-PED",
+        "rule_pack_validation_id": "VAL-PED",
+        "severity": "BLOCK",
+        "status": "PASS"
+      }
+    ],
+    "status": "PASS"
+  }
+}

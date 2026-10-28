@@ -1,60 +1,30 @@
-"""Global protection tests: no-revision pipeline output is byte-identical to the committed (pre-assistant) pipeline,
-with the assistant flag off and on; validators / rule pack untouched; protected run directory tracked and unchanged."""
-import hashlib, io, os, re, subprocess, sys, tarfile
+"""Global protection tests: no-revision pipeline output is byte-identical to the stored expected output of the 13 offline
+scenarios (pre-assistant pipeline), with the assistant flag off and on; validators / rule pack untouched; protected run directory tracked and unchanged."""
+import os, subprocess
 
 import pytest
 
+from tests.support.make_expected import SCENARIOS, json_files, run_offline, stored
+
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-VOLATILE = re.compile(rb'"(generated_at|retrieved_at)": "[^"]*"')
-SCENARIOS = ("supported", "four_lane", "one_way", "missing_lane_count", "missing_road_type", "lane_conflict", "poor_image",
-             "encroach", "lane_closure", "intersection", "sidewalk", "ai_unavailable", "driveway_at_sign")
 PROTECTED = "var/runs/20261020-214203-7f7232"
 
 
-def _head_tree(dest):
-    data = subprocess.run(["git", "archive", "--format=tar", "HEAD", "src", "config", "rule_pack", "assets"], cwd=ROOT,
-                          capture_output=True, check=True).stdout
-    with tarfile.open(fileobj=io.BytesIO(data)) as t: t.extractall(dest, filter="data")
-
-
-def _run(cwd, out, sc, flag, extra=()):
-    env = {k: v for k, v in os.environ.items() if not k.startswith(("TCP_", "AZURE", "ANTHROPIC"))}
-    env["TCP_SME_ASSISTANT_ENABLED"] = flag; env["PYTHONIOENCODING"] = "utf-8"
-    env["PYTHONPATH"] = os.path.join(str(cwd), "src")  # the tree under test, never an installed copy
-    r = subprocess.run([sys.executable, "-m", "tcp_planner.orchestration.pipeline", "--offline", sc, "--no-dwt",
-                        "--out", str(out), *extra], cwd=cwd, env=env, capture_output=True, text=True)
-    return r.returncode
-
-
-def _json_files(d):
-    out = {}
-    for n in sorted(os.listdir(d)):
-        if n.endswith(".json"):
-            with open(os.path.join(d, n), "rb") as f: out[n] = VOLATILE.sub(rb'"\1": "<volatile>"', f.read())
-    return out
-
-
-@pytest.fixture(scope="module")
-def head_root(tmp_path_factory):
-    d = tmp_path_factory.mktemp("head"); _head_tree(d)
-    return d
-
-
 @pytest.mark.parametrize("sc", SCENARIOS)
-def test_no_revision_outputs_byte_identical_to_head(head_root, tmp_path, sc):
-    codes = {}
-    for label, cwd, flag in (("head", head_root, "false"), ("off", ROOT, "false"), ("on", ROOT, "true")):
-        codes[label] = _run(cwd, tmp_path / label, sc, flag)
-    assert codes["head"] == codes["off"] == codes["on"]
-    head = _json_files(tmp_path / "head")
-    assert head and head == _json_files(tmp_path / "off") == _json_files(tmp_path / "on")
+def test_no_revision_outputs_match_stored_expected(tmp_path, sc):
+    """Assistant flag off and on both reproduce the stored expected output (tests/fixtures/expected/offline/)."""
+    code, files = stored(sc)
+    for label, flag in (("off", "false"), ("on", "true")):
+        assert run_offline(tmp_path / label, sc, flag) == code
+        got = json_files(tmp_path / label)
+        assert got == files
     assert not (tmp_path / "on" / "machine_site_model.json").exists()
 
 
-def test_kml_input_byte_identical(head_root, tmp_path):
-    for label, cwd in (("head", head_root), ("now", ROOT)):
-        _run(cwd, tmp_path / label, "supported", "true", ("--offline-input", "kml"))
-    assert _json_files(tmp_path / "head") == _json_files(tmp_path / "now")
+def test_kml_input_matches_stored_expected(tmp_path):
+    code, files = stored("supported_kml")
+    assert run_offline(tmp_path / "now", "supported", "true", ("--offline-input", "kml")) == code
+    assert json_files(tmp_path / "now") == files
 
 
 def test_validators_rule_pack_and_core_rules_unchanged():

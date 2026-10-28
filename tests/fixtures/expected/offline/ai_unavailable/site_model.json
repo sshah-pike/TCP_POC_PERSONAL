@@ -1,0 +1,673 @@
+{
+  "audit": [
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "UNRESOLVED",
+      "field": "road.lane_count",
+      "group": "lane_count",
+      "model_confidence": null,
+      "model_value": null,
+      "note": "AI observation missing; OSM alone is not sufficient",
+      "osm": {
+        "age_years": null,
+        "agreement_eligible": false,
+        "edit_date": null,
+        "max_age_years": 5,
+        "not_eligible_because": "OSM way edit date unknown",
+        "tags": {
+          "lanes": "2"
+        }
+      },
+      "path": null,
+      "source_call": "CALL_1",
+      "value": null
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "UNRESOLVED",
+      "field": "road.two_way",
+      "group": "two_way",
+      "model_confidence": null,
+      "model_value": null,
+      "note": "AI observation missing; OSM alone is not sufficient",
+      "osm": {
+        "age_years": null,
+        "agreement_eligible": false,
+        "edit_date": null,
+        "max_age_years": 5,
+        "not_eligible_because": "no explicit OSM tag on the target way",
+        "tags": {}
+      },
+      "path": null,
+      "source_call": "CALL_1",
+      "value": null
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "UNRESOLVED",
+      "field": "road.divided",
+      "group": "divided",
+      "model_confidence": null,
+      "model_value": null,
+      "note": "no observation",
+      "path": null,
+      "source_call": "CALL_1",
+      "value": null
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "UNRESOLVED",
+      "field": "road.road_edges",
+      "group": "road_edges",
+      "model_confidence": null,
+      "model_value": null,
+      "note": "edges not visible / width not measured",
+      "path": null,
+      "source_call": "CALL_1",
+      "value": null
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "UNRESOLVED",
+      "field": "work.side",
+      "group": "work_side",
+      "image_resolvable": true,
+      "model_confidence": null,
+      "model_value": null,
+      "note": "AI observation missing",
+      "path": null,
+      "source_call": "CALL_1",
+      "value": null
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "config_geometry": {
+        "centerline_error_allowance_m": 2.5,
+        "encroachment_tolerance_m": 1.5,
+        "lane_width_plausible_m": [
+          2.4,
+          5.5
+        ]
+      },
+      "decision": "UNRESOLVED",
+      "distance_to_centerline_m": 8.931,
+      "field": "work.encroaches_traveled_way",
+      "group": "work_location",
+      "model_confidence": null,
+      "model_value": null,
+      "note": "traveled-way limit unknown: width missing",
+      "outer_limit_m": null,
+      "path": null,
+      "source_call": "CALL_1",
+      "value": null
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "UNRESOLVED",
+      "field": "work.location",
+      "group": "work_location",
+      "model_confidence": null,
+      "model_value": null,
+      "path": null,
+      "source_call": "CALL_1",
+      "value": null
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "UNRESOLVED",
+      "derived_from": "operator declaration / work.encroaches_traveled_way",
+      "field": "work.requires_lane_closure",
+      "group": null,
+      "model_confidence": null,
+      "model_value": null,
+      "path": null,
+      "source_call": null,
+      "value": null
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "UNRESOLVED",
+      "derived_from": "operator declaration / work.encroaches_traveled_way",
+      "field": "work.requires_alternating_one_lane_traffic",
+      "group": null,
+      "model_confidence": null,
+      "model_value": null,
+      "note": "closing a lane of a two-lane two-way road requires alternating one-lane operation",
+      "path": null,
+      "source_call": null,
+      "value": null
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "UNRESOLVED",
+      "field": "work.affects_pedestrian_route",
+      "group": "pedestrian",
+      "model_confidence": null,
+      "model_value": null,
+      "osm": {
+        "age_years": null,
+        "agreement_eligible": false,
+        "edit_date": null,
+        "max_age_years": 5,
+        "not_eligible_because": "no explicit OSM tag on the target way",
+        "tags": {}
+      },
+      "path": null,
+      "source_call": "CALL_1",
+      "value": null
+    }
+  ],
+  "critical_conflicts": [],
+  "critical_field_status": {
+    "road.centerline_status": "RESOLVED",
+    "road.divided": "UNRESOLVED",
+    "road.facility_type": "UNRESOLVED",
+    "road.lane_count": "UNRESOLVED",
+    "road.road_edges": "UNRESOLVED",
+    "road.road_type": "RESOLVED",
+    "road.two_way": "UNRESOLVED",
+    "work.affects_pedestrian_route": "UNRESOLVED",
+    "work.encroaches_traveled_way": "UNRESOLVED",
+    "work.location": "UNRESOLVED",
+    "work.requires_alternating_one_lane_traffic": "UNRESOLVED",
+    "work.requires_lane_closure": "UNRESOLVED",
+    "work.side": "UNRESOLVED"
+  },
+  "eligibility_inputs_complete": false,
+  "escalations": [],
+  "evidence": {
+    "ai": {
+      "agent": {
+        "calls": [
+          {
+            "call": 1,
+            "error_code": "AI_UNAVAILABLE",
+            "error_text": "no simulated observation configured",
+            "images": 1,
+            "mode": "agent_call1",
+            "status": "ERROR",
+            "usage": null
+          }
+        ],
+        "checks": {},
+        "consistency": [],
+        "crops": [],
+        "crops_dropped": [],
+        "group_source": {},
+        "unresolved_after_call1": {}
+      },
+      "available": false,
+      "error_code": "AI_UNAVAILABLE",
+      "error_message": "no simulated observation configured",
+      "model": null,
+      "observation": null,
+      "provider": null
+    },
+    "osm": {
+      "centerline_length_m": 601.98,
+      "chain_tag_variation": [],
+      "divider_tag": null,
+      "dual_carriageway_tag": null,
+      "facility_type": "CONVENTIONAL_ROAD",
+      "features": {
+        "crosswalks": [],
+        "driveways": [
+          {
+            "highway": "service",
+            "name": null,
+            "side": "RIGHT",
+            "source": "OSM",
+            "station_m": 250.61,
+            "way_id": "3"
+          }
+        ],
+        "intersections": [
+          {
+            "highway": "residential",
+            "name": "Side St",
+            "side": "BOTH",
+            "source": "OSM",
+            "station_m": 526.96,
+            "way_id": "2"
+          }
+        ],
+        "ramps": [],
+        "roundabouts": []
+      },
+      "highway": "secondary",
+      "lanes_tag": 2,
+      "maxspeed_mph": 45,
+      "maxspeed_raw": "45 mph",
+      "maxspeed_unit": "mph",
+      "name": "Demo Road",
+      "oneway_tag": null,
+      "sidewalks": {
+        "left": null,
+        "right": null
+      },
+      "target_way": {
+        "explicit_tags": {
+          "lanes": "2"
+        },
+        "id": "1",
+        "tag_is_explicit": {
+          "divider": false,
+          "dual_carriageway": false,
+          "lanes": true,
+          "oneway": false,
+          "sidewalk": false,
+          "sidewalk:left": false,
+          "sidewalk:right": false,
+          "width": false
+        },
+        "timestamp": null,
+        "version": null
+      },
+      "target_way_ids": [
+        "1"
+      ],
+      "width_m": null
+    }
+  },
+  "extras": [],
+  "feature_confidence": {
+    "intersection_conflict": null,
+    "pedestrian_impact": null
+  },
+  "features": {
+    "crosswalks": [],
+    "driveways": [
+      {
+        "highway": "service",
+        "name": null,
+        "side": "RIGHT",
+        "source": "OSM",
+        "station_m": 250.61,
+        "way_id": "3"
+      }
+    ],
+    "intersections": [
+      {
+        "highway": "residential",
+        "name": "Side St",
+        "side": "BOTH",
+        "source": "OSM",
+        "station_m": 526.96,
+        "way_id": "2"
+      }
+    ],
+    "obstructions": [],
+    "ramps": [],
+    "roundabouts": [],
+    "sidewalks": [
+      {
+        "present": null,
+        "side": "LEFT",
+        "source": "OSM"
+      },
+      {
+        "present": null,
+        "side": "RIGHT",
+        "source": "OSM"
+      }
+    ]
+  },
+  "imagery": {
+    "ai_image_px": 1280,
+    "ai_metres_per_pixel": 0.390625,
+    "metadata": {
+      "bounding_box": {
+        "max_latitude": 33.0022458,
+        "max_longitude": -96.9973222,
+        "min_latitude": 32.9977542,
+        "min_longitude": -97.0026778
+      },
+      "center": {
+        "latitude": 33.0,
+        "longitude": -97.0
+      },
+      "georeference_model": "LOCAL_TANGENT_PLANE_AT_CENTER",
+      "ground_extent_m": {
+        "height": 500.0,
+        "width": 500.0
+      },
+      "height_pixels": 1280,
+      "metres_per_pixel": 0.390625,
+      "orientation": "NORTH_UP",
+      "provider": "OFFLINE_SYNTHETIC",
+      "retrieved_at": "<volatile>",
+      "width_pixels": 1280
+    },
+    "quality": null,
+    "reference_bearing_deg": 82.9
+  },
+  "project_geometry": {
+    "input_feature_count": 1,
+    "input_hash": "sha256:2ac5a76d2bf4511381534d73dd423fdf1082fc4d8cf1e50bdaeb2c8e4ca1c7f8",
+    "input_type": "COORDINATES",
+    "non_authoritative_metadata": {
+      "ignored_element_count": 0
+    },
+    "source_file": null,
+    "work_path": [],
+    "work_reference": {
+      "latitude": 33.0,
+      "longitude": -97.0
+    }
+  },
+  "road": {
+    "centerline": [
+      {
+        "latitude": 32.9997477,
+        "longitude": -97.0032134
+      },
+      {
+        "latitude": 32.9997415,
+        "longitude": -97.0029456
+      },
+      {
+        "latitude": 32.9997395,
+        "longitude": -97.0026778
+      },
+      {
+        "latitude": 32.9997419,
+        "longitude": -97.00241
+      },
+      {
+        "latitude": 32.9997487,
+        "longitude": -97.0021422
+      },
+      {
+        "latitude": 32.9997595,
+        "longitude": -97.0018745
+      },
+      {
+        "latitude": 32.9997743,
+        "longitude": -97.0016067
+      },
+      {
+        "latitude": 32.9997926,
+        "longitude": -97.0013389
+      },
+      {
+        "latitude": 32.999814,
+        "longitude": -97.0010711
+      },
+      {
+        "latitude": 32.999838,
+        "longitude": -97.0008033
+      },
+      {
+        "latitude": 32.9998639,
+        "longitude": -97.0005356
+      },
+      {
+        "latitude": 32.9998912,
+        "longitude": -97.0002678
+      },
+      {
+        "latitude": 32.9999192,
+        "longitude": -97.0
+      },
+      {
+        "latitude": 32.9999471,
+        "longitude": -96.9997322
+      },
+      {
+        "latitude": 32.9999744,
+        "longitude": -96.9994644
+      },
+      {
+        "latitude": 33.0000003,
+        "longitude": -96.9991967
+      },
+      {
+        "latitude": 33.0000243,
+        "longitude": -96.9989289
+      },
+      {
+        "latitude": 33.0000457,
+        "longitude": -96.9986611
+      },
+      {
+        "latitude": 33.000064,
+        "longitude": -96.9983933
+      },
+      {
+        "latitude": 33.0000788,
+        "longitude": -96.9981255
+      },
+      {
+        "latitude": 33.0000896,
+        "longitude": -96.9978578
+      },
+      {
+        "latitude": 33.0000964,
+        "longitude": -96.99759
+      },
+      {
+        "latitude": 33.0000988,
+        "longitude": -96.9973222
+      },
+      {
+        "latitude": 33.0000969,
+        "longitude": -96.9970544
+      },
+      {
+        "latitude": 33.0000906,
+        "longitude": -96.9967866
+      }
+    ],
+    "centerline_correction": {
+      "applied": false,
+      "measured": [],
+      "note": null
+    },
+    "centerline_length_m": 601.98,
+    "centerline_status": "RESOLVED",
+    "divided": {
+      "confidence": null,
+      "note": "no observation",
+      "observations": [],
+      "status": "UNRESOLVED",
+      "value": null
+    },
+    "facility_type": {
+      "confidence": null,
+      "note": "needs OSM class and an AI observation",
+      "observations": [
+        {
+          "detail": "highway=secondary",
+          "source": "OSM",
+          "value": "CONVENTIONAL_ROAD"
+        }
+      ],
+      "status": "UNRESOLVED",
+      "value": null
+    },
+    "lane_count": {
+      "confidence": null,
+      "note": "AI observation missing; OSM alone is not sufficient",
+      "observations": [
+        {
+          "confidence": 0.9,
+          "detail": "lanes tag",
+          "source": "OSM",
+          "value": 2
+        }
+      ],
+      "status": "UNRESOLVED",
+      "value": null
+    },
+    "name": "Demo Road",
+    "osm_way_ids": [
+      "1"
+    ],
+    "road_edges": {
+      "left_offset_m": null,
+      "model": "symmetric about OSM centerline",
+      "note": "edges not visible / width not measured",
+      "observations": [],
+      "right_offset_m": null,
+      "status": "UNRESOLVED",
+      "traveled_way_width_m": null
+    },
+    "road_type": {
+      "confidence": 1.0,
+      "observations": [
+        {
+          "source": "OPERATOR",
+          "value": "RURAL"
+        }
+      ],
+      "source": "OPERATOR",
+      "status": "RESOLVED",
+      "value": "RURAL"
+    },
+    "speed_mph": {
+      "note": "informational; TA-1 spacing in the approved pack is keyed by road type, not speed",
+      "required_by_selected_ta": false,
+      "source": "OSM",
+      "status": "RESOLVED",
+      "value": 45
+    },
+    "traffic_direction": {
+      "status": "UNRESOLVED",
+      "value": null
+    },
+    "two_way": {
+      "confidence": null,
+      "note": "AI observation missing; OSM alone is not sufficient",
+      "observations": [
+        {
+          "confidence": 0.6,
+          "detail": "implicit (no oneway tag)",
+          "source": "OSM",
+          "value": true
+        }
+      ],
+      "status": "UNRESOLVED",
+      "value": null
+    }
+  },
+  "site_model_id": "SITE-D659EE46033332FC",
+  "version": 1,
+  "work": {
+    "affects_pedestrian_route": {
+      "confidence": null,
+      "observations": [
+        {
+          "crosswalks_near_work": 0,
+          "source": "OSM",
+          "work_side_sidewalk": null
+        }
+      ],
+      "status": "UNRESOLVED",
+      "value": null
+    },
+    "distance_to_centerline_m": 8.931,
+    "encroaches_traveled_way": {
+      "confidence": null,
+      "note": "traveled-way limit unknown: width missing",
+      "observations": [
+        {
+          "detail": "work point/path vs bounded traveled-way limit",
+          "distance_to_centerline_m": 8.931,
+          "outer_limit_m": null,
+          "per_lane_width_m": null,
+          "source": "GEOMETRY",
+          "value": null,
+          "width_m": null
+        }
+      ],
+      "status": "UNRESOLVED",
+      "value": null
+    },
+    "lateral_offset_from_centerline_m": 8.931,
+    "location": {
+      "confidence": null,
+      "observations": [],
+      "status": "UNRESOLVED",
+      "value": null
+    },
+    "reference_point": {
+      "latitude": 33.0,
+      "longitude": -97.0
+    },
+    "reference_station_m": 302.1,
+    "requires_alternating_one_lane_traffic": {
+      "confidence": null,
+      "note": "closing a lane of a two-lane two-way road requires alternating one-lane operation",
+      "observations": [
+        {
+          "from": "work.requires_lane_closure",
+          "source": "DERIVED",
+          "value": null
+        }
+      ],
+      "status": "UNRESOLVED",
+      "value": null
+    },
+    "requires_lane_closure": {
+      "confidence": null,
+      "observations": [
+        {
+          "source": "OPERATOR",
+          "value": false
+        },
+        {
+          "from": "work.encroaches_traveled_way",
+          "source": "DERIVED",
+          "value": null
+        }
+      ],
+      "status": "UNRESOLVED",
+      "value": null
+    },
+    "side": {
+      "confidence": null,
+      "note": "AI observation missing",
+      "observations": [
+        {
+          "confidence": 1.0,
+          "detail": "KML/coordinate vs OSM centerline, 8.93 m > 3.0 m",
+          "source": "GEOMETRY",
+          "value": "LEFT"
+        }
+      ],
+      "status": "UNRESOLVED",
+      "value": null
+    },
+    "ta1_option_facts": {}
+  }
+}
