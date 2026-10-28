@@ -114,7 +114,7 @@ If code and plan disagree, **stop and report**. Do not silently follow either on
 
 ## How to work
 
-1. **One slice per session.** Branch: `tcp-mvp/sNN-short-name`, off `tcp-mvp/base`.
+1. **One slice per session.** Branch: `tcp-mvp/sNN-short-name`, off the previous slice (`tcp-mvp/base` for the first).
 2. **Plan first.** Before writing code, show the plan for the slice against its acceptance criteria, and wait for approval.
 3. **Stop and ask** when:
    - the repo differs from the plan;
