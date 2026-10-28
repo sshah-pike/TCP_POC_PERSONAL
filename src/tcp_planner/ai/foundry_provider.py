@@ -25,7 +25,7 @@ Configuration:
 
 Diagnostics:
   TCP_DEBUG_SENT=1          writes every request (exact image bytes, system + user prompt text, schema, meta.json with
-                            model, image sizes and SHA-256 per image) to ./debug_sent/ - request data only, never the
+                            model, image sizes and SHA-256 per image) to var/debug_sent/ - request data only, never the
                             response. Off by default; a warning is printed whenever it writes.
   API errors                keep the API's own error text (up to ERROR_TEXT_LIMIT characters, key-like strings
                             removed); billing / quota / credit errors get their own code (AI_BILLING_OR_QUOTA).
@@ -33,7 +33,7 @@ Diagnostics:
 import base64, copy, datetime, hashlib, io, json, os
 from urllib.parse import urlsplit
 from tcp_planner.contracts import ProviderError, redact, canonical_json, sha256_hex
-from tcp_planner.config.settings import PROJECT_ROOT, CONFIG_DIR
+from tcp_planner.config.settings import CONFIG_DIR, VAR_DIR
 from .vision_provider import (VisionProvider, OBSERVATION_SCHEMA, SYSTEM_PROMPT, build_prompt, api_schema,
                               validate_observation)
 
@@ -306,7 +306,7 @@ def build_parts(image, context, views=None):
 
 # ---------------------------------------------------------------- request debug dump (TCP_DEBUG_SENT=1)
 DEBUG_SENT_ENV = "TCP_DEBUG_SENT"
-DEBUG_SENT_DIR = os.path.join(PROJECT_ROOT, "debug_sent")
+DEBUG_SENT_DIR = os.path.join(VAR_DIR, "debug_sent")
 
 
 def debug_sent_enabled():

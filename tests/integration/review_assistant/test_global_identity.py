@@ -8,7 +8,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.a
 VOLATILE = re.compile(rb'"(generated_at|retrieved_at)": "[^"]*"')
 SCENARIOS = ("supported", "four_lane", "one_way", "missing_lane_count", "missing_road_type", "lane_conflict", "poor_image",
              "encroach", "lane_closure", "intersection", "sidewalk", "ai_unavailable", "driveway_at_sign")
-PROTECTED = "runs/20261020-214203-7f7232"
+PROTECTED = "var/runs/20261020-214203-7f7232"
 
 
 def _head_tree(dest):

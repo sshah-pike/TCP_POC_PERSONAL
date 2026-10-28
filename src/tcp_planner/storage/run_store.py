@@ -10,7 +10,7 @@ and exit code). Nothing is inferred, defaulted or re-decided.
 """
 import base64, datetime, json, os, re, secrets
 
-from tcp_planner.config.settings import PROJECT_ROOT, CONFIG_DIR
+from tcp_planner.config.settings import PROJECT_ROOT, CONFIG_DIR, VAR_DIR
 
 PRICING_PATH = os.path.join(CONFIG_DIR, "pricing.json")
 RUN_ID_RE = re.compile(r"^\d{8}-\d{6}-[0-9a-f]{6}$")
@@ -59,7 +59,7 @@ class BadRequest(Exception):
 
 
 def runs_dir():
-    return os.environ.get("TCP_UI_RUNS_DIR") or os.path.join(PROJECT_ROOT, "runs")
+    return os.environ.get("TCP_UI_RUNS_DIR") or os.path.join(VAR_DIR, "runs")
 
 
 def run_path(run_id, *parts):

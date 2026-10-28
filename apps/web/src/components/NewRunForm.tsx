@@ -115,7 +115,7 @@ export default function NewRunForm({ meta, onStarted }: Props) {
           {file && (
             <div className="small">
               <b>{file.name}</b> · {fmtBytes(file.size)}
-              <div className="muted">Saved under runs/&lt;run-id&gt;/input/ when the run starts.</div>
+              <div className="muted">Saved under var/runs/&lt;run-id&gt;/input/ when the run starts.</div>
             </div>
           )}
         </div>

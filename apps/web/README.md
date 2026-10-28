@@ -29,10 +29,10 @@ server never reads or returns them.
 ## Storage
 
 ```
-runs/<run-id>/input/    uploaded KML
-runs/<run-id>/output/   the pipeline --out directory (unchanged file names)
-runs/<run-id>/ui/       UI metadata: request.json, process.json, events.jsonl (telemetry spans),
-                        result.json, rule_pack.json, usage.json (Anthropic response.usage), stdout.log
+var/runs/<run-id>/input/    uploaded KML
+var/runs/<run-id>/output/   the pipeline --out directory (unchanged file names)
+var/runs/<run-id>/ui/       UI metadata: request.json, process.json, events.jsonl (telemetry spans),
+                            result.json, rule_pack.json, usage.json (Anthropic response.usage), stdout.log
 ```
 
 Set `TCP_UI_RUNS_DIR` to store runs elsewhere.

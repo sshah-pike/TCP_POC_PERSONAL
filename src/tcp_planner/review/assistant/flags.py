@@ -31,4 +31,4 @@ def enabled():
 
 
 def data_dir():
-    return os.environ.get("TCP_ASSISTANT_DATA_DIR") or os.path.join(PROJECT_ROOT, "assistant_data")
+    return os.environ.get("TCP_ASSISTANT_DATA_DIR") or os.path.join(settings.VAR_DIR, "assistant_data")

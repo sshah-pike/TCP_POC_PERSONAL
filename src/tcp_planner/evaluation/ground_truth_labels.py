@@ -7,6 +7,7 @@ appended to the label's history with a timestamp. No credentials or URLs are sto
 """
 import datetime, json, os, re
 
+from tcp_planner.config.settings import VAR_DIR
 from tcp_planner.storage import run_store as store
 
 FIELDS = {  # label field -> (type, allowed values) ; compared against the pipeline's resolved site facts
@@ -24,7 +25,7 @@ SITE_RE = re.compile(r"^[0-9a-f]{16}$")
 
 
 def labels_dir():
-    return os.environ.get("TCP_UI_LABELS_DIR") or os.path.join(store.PROJECT_ROOT, "labels")
+    return os.environ.get("TCP_UI_LABELS_DIR") or os.path.join(VAR_DIR, "labels")
 
 
 def _now():

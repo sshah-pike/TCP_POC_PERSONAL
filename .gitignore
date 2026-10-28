@@ -26,10 +26,9 @@ htmlcov/
 node_modules/
 dist/
 
-# Generated output / run artifacts
-labels/
-output/
-debug_sent/
+# Run outputs, labels, assistant data, debug dumps. var/runs/ holds the tracked POC-era runs;
+# new runs written there are ignored.
+var/*
 
 # OS / editor
 .DS_Store
@@ -41,6 +40,5 @@ desktop.ini
 # Claude Code local settings
 .claude/settings.local.json
 
-# SME Review Assistant: local identities and assistant data (sessions, conversations, versions, audits)
+# SME Review Assistant: local identities (assistant data lives under var/)
 config/assistant/users.local.json
-assistant_data/

@@ -14,7 +14,7 @@ from tcp_planner.contracts import (APP_VERSION, FT, SUPPORTED_AUTO, REVIEW_REQUI
 from tcp_planner.ai.foundry_provider import debug_sent_enabled, DEBUG_SENT_ENV, DEBUG_SENT_DIR, ERROR_TEXT_LIMIT
 from tcp_planner.audit.telemetry import Telemetry, confidence_band
 from tcp_planner.rules.rule_pack_loader import load_rule_pack
-from tcp_planner.config.settings import PROJECT_ROOT, CONFIG_DIR
+from tcp_planner.config.settings import PROJECT_ROOT, CONFIG_DIR, VAR_DIR
 from tcp_planner.imagery.map_provider import get_map_provider
 from tcp_planner.ai.vision_provider import get_vision_provider
 from tcp_planner.ai.vision_agent import Agent
@@ -463,7 +463,7 @@ def main(argv=None):
     ap.add_argument("--requires-lane-closure", action="store_true", help="operator declares the work needs a lane closure")
     ap.add_argument("--option", action="append", type=_parse_option, default=[],
                     help="confirmed TA-1 option fact, e.g. behind_barrier=true, distance_from_edge_of_roadway_ft=20")
-    ap.add_argument("--out", default="output"); ap.add_argument("--rule-pack"); ap.add_argument("--config")
+    ap.add_argument("--out", default=os.path.join(VAR_DIR, "output")); ap.add_argument("--rule-pack"); ap.add_argument("--config")
     ap.add_argument("--dwt-config", default=DWT_CONFIG_PATH if os.path.isfile(DWT_CONFIG_PATH) else None,
                     help="DWT renderer configuration JSON (default: config/dwt_config.json)")
     ap.add_argument("--dwt-mode", choices=["PLAN", "AERIAL_BASE"], default="PLAN",
