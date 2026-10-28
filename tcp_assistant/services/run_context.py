@@ -28,8 +28,8 @@ def eligibility(run_id):
     from tcp_ui import store
     from tcp_ui.evidence import load_manifest, resolve, verify_file, sha256_file
     from tcp_ui.relations import evidence_compat
-    from tcp_poc.rule_pack import load_rule_pack
-    from tcp_poc.app import CONFIG_PATH
+    from tcp_planner.rules.rule_pack_loader import load_rule_pack
+    from tcp_planner.orchestration.pipeline import CONFIG_PATH
     reasons = []
     try:
         rdir = store.run_path(run_id)
@@ -91,5 +91,5 @@ def load(run_id):
 
 
 def config():
-    from tcp_poc.app import load_config
+    from tcp_planner.orchestration.pipeline import load_config
     return load_config()

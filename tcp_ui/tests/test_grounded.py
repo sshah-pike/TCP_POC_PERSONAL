@@ -3,9 +3,11 @@ import copy, hashlib, json, math, os
 import pytest
 import requests
 
-from tcp_poc import offline, grounded as G, foundry_provider as fp
-from tcp_poc.models import ProviderError
-from tcp_poc.vision_provider import OBSERVATION_SCHEMA
+from tcp_planner.orchestration import offline_scenarios as offline
+from tcp_planner.ai import grounded_vision as G
+from tcp_planner.ai import foundry_provider as fp
+from tcp_planner.contracts import ProviderError
+from tcp_planner.ai.vision_provider import OBSERVATION_SCHEMA
 from tcp_ui import store, relations, labels, evaluation, runner
 from tcp_ui.evidence import load_manifest
 from tcp_ui.tests import inproc
@@ -256,8 +258,9 @@ def test_osm_claims_and_centerline_switches(env, monkeypatch):
     plans = {e["signature"]["plan"] for e in load_manifest(store.run_path(cid)) if e["kind"] == "map_view"}
     assert plans == {"views-v1", "views-cl-v1"}  # both view plans prepared once, separately
     # centerline corridor views sit on the OSM centerline
-    from tcp_poc import app, osm_adapter
-    from tcp_poc.geometry import signed_lateral
+    from tcp_planner.orchestration import pipeline as app
+    from tcp_planner.data_sources import osm_overpass as osm_adapter
+    from tcp_planner.geometry.local_frame import signed_lateral
     pg = store._read_json(store.run_path(src, "output", "project_geometry.json"))
     cl = osm_adapter.extract_evidence(SC["osm_elements"], pg, app.load_config())["centerline_enu"]
     for e in load_manifest(store.run_path(cid)):

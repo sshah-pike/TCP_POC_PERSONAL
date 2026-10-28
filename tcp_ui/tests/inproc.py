@@ -3,7 +3,7 @@ Azure Maps, the OSM API and Foundry model backends (no network, no real credenti
 import contextlib, hashlib, io, json, math, os, ssl, sys
 from urllib.parse import urlsplit
 
-from tcp_poc import app
+from tcp_planner.orchestration import pipeline as app
 
 FAKE_AZURE_KEY = "AZURE-TEST-KEY-0123456789-SENTINEL"
 PATCHED = ("Telemetry", "run_pipeline", "load_rule_pack", "use_os_trust_store", "get_map_provider",
@@ -126,8 +126,8 @@ SEEN = []  # (mode, image sha256 tuple, text sha256) for every fake model call
 
 def to_wire(value, schema=None):
     """Canonical observation -> tri-state wire form (what a compliant model returns)."""
-    from tcp_poc import foundry_provider as fp
-    from tcp_poc.vision_provider import OBSERVATION_SCHEMA
+    from tcp_planner.ai import foundry_provider as fp
+    from tcp_planner.ai.vision_provider import OBSERVATION_SCHEMA
     schema = schema or OBSERVATION_SCHEMA
     if fp._is_nullable_boolean(schema): return {True: "YES", False: "NO", None: "UNKNOWN"}[value]
     if isinstance(value, dict) and "properties" in schema:
@@ -142,8 +142,8 @@ class FakeAPI:
     CAPABILITIES = {"image_input": True, "structured_output": True, "usage_reporting": True, "verified": "test fake"}
 
     def send(self, endpoint, key, deployment, effort, parts, schema, system=None):
-        from tcp_poc import offline
-        from tcp_poc.foundry_provider import Reply
+        from tcp_planner.orchestration import offline_scenarios as offline
+        from tcp_planner.ai.foundry_provider import Reply
         mode = deployment.split("-")[-1]
         imgs = tuple(hashlib.sha256(v).hexdigest() for k, v in parts if k == "image")
         text = hashlib.sha256("".join(v for k, v in parts if k == "text").encode()).hexdigest()
@@ -189,7 +189,7 @@ def to_grounded_wire(obs, with_claims, mode="ok", width_in="IMAGE_1"):
 
 def to_call1_wire(obs, mpp=None, distance_m=5.35):
     """What a compliant model returns in agent call 1: metres, IMAGE_1 positions, extras, no osm_conflicts."""
-    from tcp_poc import offline
+    from tcp_planner.orchestration import offline_scenarios as offline
     mpp = mpp or 2 * offline.HALF / offline.SIZE
     w = to_wire(obs); w.pop("osm_conflicts")
     re = w["road_edges"]; px = re.pop("traveled_way_width_px")

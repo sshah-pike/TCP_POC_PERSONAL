@@ -10,7 +10,7 @@
 """
 import collections, hashlib, json, os, re, threading, time
 
-from tcp_poc.sme_overlay import FACT_TYPES
+from tcp_planner.review.decision_overlay import FACT_TYPES
 from ..core.canonical import now_iso, canonical_text, message_hash
 from ..core.errors import AssistantError
 from ..core.ids import new_id

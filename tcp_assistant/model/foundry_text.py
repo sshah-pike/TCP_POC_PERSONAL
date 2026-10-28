@@ -1,9 +1,9 @@
 """Microsoft Foundry text interpretation: reuses the existing Foundry connection, profile registry, API-family adapters
-(tcp_poc.foundry_provider.APIS, text parts only) and error classification. The key stays in the process environment and
+(tcp_planner.ai.foundry_provider.APIS, text parts only) and error classification. The key stays in the process environment and
 is never placed in prompts, logs, audit records or responses."""
 import threading
 
-from tcp_poc.models import ProviderError, redact
+from tcp_planner.contracts import ProviderError, redact
 from .provider import TextModelProvider, ModelError, record_call
 
 
@@ -11,7 +11,7 @@ class FoundryTextProvider(TextModelProvider):
     name = "foundry"
 
     def __init__(self, profile_name=None):
-        from tcp_poc import foundry_provider as fp
+        from tcp_planner.ai import foundry_provider as fp
         doc = fp.load_profiles()
         self.profile = profile_name or doc.get("default_profile")
         p = (doc.get("profiles") or {}).get(self.profile)

@@ -1,7 +1,7 @@
 """Identifiers. Record ids are unique (time + random); finding ids are stable (content-derived)."""
 import datetime, re, secrets
 
-from tcp_poc.models import sha256_hex
+from tcp_planner.contracts import sha256_hex
 
 ID_RE = re.compile(r"^[a-z]{2,8}-[0-9]{8}T[0-9]{6}-[0-9a-f]{8}$")
 STABLE_RE = re.compile(r"^[A-Z]{1,4}-[0-9A-F]{10}$")

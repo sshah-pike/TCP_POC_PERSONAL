@@ -82,7 +82,7 @@ def test_authorization_and_ownership(aenv, runs):
 
 def test_review_flow_makes_no_ai_or_external_calls(aenv, runs, monkeypatch):
     import requests
-    from tcp_poc import foundry_provider as fp
+    from tcp_planner.ai import foundry_provider as fp
     def boom(*a, **k): raise AssertionError("external call attempted")
     monkeypatch.setattr(requests, "get", boom); monkeypatch.setattr(requests, "post", boom)
     for k in list(fp.APIS): monkeypatch.setitem(fp.APIS, k, boom)

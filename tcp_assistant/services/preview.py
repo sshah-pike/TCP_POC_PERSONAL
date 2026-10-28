@@ -1,7 +1,8 @@
 """Complete deterministic impact preview: machine vs current vs proposed effective site model, dependent facts,
 eligibility, TA, unchanged validators, placement, plan outcome. No AI and no external calls."""
-from tcp_poc import sme_overlay, sme_pipeline
-from tcp_poc.models import content_hash, FT
+from tcp_planner.review import decision_overlay as sme_overlay
+from tcp_planner.review import revision_derivation as sme_pipeline
+from tcp_planner.contracts import content_hash, FT
 from . import findings as F, run_context, ta_eval
 
 RULE_STATUS = {"PASS": "COMPLIANT", "FAIL": "CONFLICT"}
@@ -10,7 +11,7 @@ RULE_STATUS = {"PASS": "COMPLIANT", "FAIL": "CONFLICT"}
 def derive_for(ctx, site, revision=None):
     ev = site.get("evidence", {}).get("ai", {})
     if revision is not None and "_policy" not in revision:
-        from tcp_poc.sme_policy import load_policy
+        from tcp_planner.review.action_policy import load_policy
         revision = dict(revision, _policy=load_policy())
     return sme_pipeline.derive(site, ctx["rule_pack"], run_context.config(), site["imagery"]["metadata"],
                                {"provider": ev.get("provider"), "model": ev.get("model")},
@@ -106,7 +107,7 @@ def plan_outcome(derived, dispositions=None):
 
 def compute(ctx, decisions, revision_extra=None):
     """Full impact of a proposed decision set (+ optional revision parts from later phases)."""
-    from tcp_poc.eligibility import intersection_conflict
+    from tcp_planner.routing.eligibility import intersection_conflict
     cfg = run_context.config()
     machine = ctx["machine_site_model"]
     cur_d = current_derivation(ctx)

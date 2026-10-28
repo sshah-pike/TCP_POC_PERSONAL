@@ -10,7 +10,7 @@ draft QA     deterministic answers about the active draft only (no model call).
 """
 import re
 
-from tcp_poc.models import canonical_json, sha256_hex
+from tcp_planner.contracts import canonical_json, sha256_hex
 from ..core.canonical import now_iso
 from ..core.errors import AssistantError
 from . import findings as F, run_context, versions as V

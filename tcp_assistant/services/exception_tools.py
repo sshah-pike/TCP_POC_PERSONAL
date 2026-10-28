@@ -6,7 +6,7 @@ TA_NOT_APPLICABLE   generate the TA-1 draft although TA-1 does not apply (procee
 Every exception requires: policy action enabled, master switch on, SME role, full impact shown (final review hash),
 explicit confirmation flag and a reason. Recorded as SELF_CONFIRMED_POC, independent_approval false.
 """
-from tcp_poc import sme_disposition as SD
+from tcp_planner.conflicts import sme_disposition as SD
 from ..core.canonical import now_iso
 from ..core.errors import AssistantError
 from ..core.ids import new_id

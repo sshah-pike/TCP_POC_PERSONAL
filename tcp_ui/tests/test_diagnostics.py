@@ -1,6 +1,6 @@
 """Provider failure diagnostics: same fail-closed decision, extra sanitized cause (no network).
 
-The real runner -> tcp_poc.app.main -> UsgsNaipProvider path runs in-process with requests.get replaced by
+The real runner -> tcp_planner.orchestration.pipeline.main -> UsgsNaipProvider path runs in-process with requests.get replaced by
 a fake that raises the exceptions the requests library raises. Only the diagnostic may differ per case.
 """
 import io, json, os, ssl, sys
@@ -8,7 +8,7 @@ import pytest
 import requests
 from requests import exceptions as rx
 
-from tcp_poc import app
+from tcp_planner.orchestration import pipeline as app
 from tcp_ui import runner, store, diagnostics
 
 SECRET = "SECRET_TEST_VALUE"

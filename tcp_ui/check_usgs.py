@@ -20,16 +20,17 @@ def main(argv=None):
     ap.add_argument("--lon", type=float)
     a = ap.parse_args(argv)
 
-    from tcp_poc import app, kml_input
-    from tcp_poc.models import FT
+    from tcp_planner.orchestration import pipeline as app
+    from tcp_planner.intake import kml_reader as kml_input
+    from tcp_planner.contracts import FT
     from tcp_ui.diagnostics import describe
-    app.load_env_file(); app.use_os_trust_store()  # identical initialisation to tcp_poc.app.main()
+    app.load_env_file(); app.use_os_trust_store()  # identical initialisation to tcp_planner.orchestration.pipeline.main()
     mod = ssl.SSLContext.__module__
     print(f"Trust store: {'Windows system store via truststore' if mod.startswith('truststore') else 'Python default (truststore NOT active)'}"
           f"  [ssl.SSLContext from {mod}]")
 
     import requests
-    from tcp_poc.map_provider import UsgsNaipProvider
+    from tcp_planner.imagery.map_provider import UsgsNaipProvider
     prov = UsgsNaipProvider()
     meta_url = prov.BASE.format(svc=prov.SERVICE).rsplit("/", 1)[0]  # ImageServer root (no query)
     t0 = time.perf_counter()

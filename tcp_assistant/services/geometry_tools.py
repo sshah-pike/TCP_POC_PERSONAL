@@ -2,8 +2,8 @@
 candidate positions, evaluation and staging. Pass/fail rule results come only from the unchanged validators."""
 import functools, json, math, os
 
-from tcp_poc.geometry import SiteFrame, offset_point, enu, cum
-from tcp_poc.models import FT, r
+from tcp_planner.geometry.local_frame import SiteFrame, offset_point, enu, cum
+from tcp_planner.contracts import FT, r
 from ..core.canonical import now_iso
 from ..core.errors import AssistantError
 from ..core.ids import new_id
@@ -93,7 +93,7 @@ def calculate(site, plan, object_id, direction=None, distance=None, unit="FT", p
         raise AssistantError("GEOMETRY_UNAVAILABLE", "No usable roadway alignment/edges; the position cannot be calculated.", 409, False)
     frame = SiteFrame(site); p = o["placement"]
     cur_xy = frame.enu(p["latitude"], p["longitude"])
-    from tcp_poc.geometry import signed_lateral
+    from tcp_planner.geometry.local_frame import signed_lateral
     d_snap, s_cur, lat_cur = signed_lateral(frame.centerline, cur_xy)
     trav = DIRECTION.get(o.get("approach"), 0)
     if station_m is not None:

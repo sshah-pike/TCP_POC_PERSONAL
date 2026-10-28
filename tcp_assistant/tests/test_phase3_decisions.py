@@ -23,7 +23,7 @@ def _fact(p, field):
 @pytest.fixture
 def no_external(monkeypatch):
     import requests
-    from tcp_poc import foundry_provider as fp
+    from tcp_planner.ai import foundry_provider as fp
     def boom(*a, **k): raise AssertionError("external / model call attempted")
     monkeypatch.setattr(requests, "get", boom); monkeypatch.setattr(requests, "post", boom)
     for k in list(fp.APIS): monkeypatch.setitem(fp.APIS, k, boom)
@@ -68,7 +68,7 @@ def test_dependent_facts_recalculated_and_shown(aenv, runs, no_external):
 
 
 def test_machine_site_model_is_never_modified(aenv, runs):
-    from tcp_poc import sme_overlay
+    from tcp_planner.review import decision_overlay as sme_overlay
     from tcp_assistant.services import run_context
     ctx = run_context.load(runs["lane_conflict"]); m = ctx["machine_site_model"]; before = copy.deepcopy(m)
     eff = sme_overlay.apply(m, {"facts": [{"field": "road.lane_count", "action": "CORRECT", "value": 2, "decision_id": "d1"}]},
@@ -149,8 +149,9 @@ def test_structured_actions_make_zero_llm_calls_and_unstage(aenv, runs, no_exter
 
 def test_validators_and_rule_pack_files_unchanged():
     import hashlib, subprocess
-    out = subprocess.run(["git", "diff", "--name-only", "HEAD", "--", "tcp_poc/validators.py",
-                          "tcp_poc/APPROVED_TWO_LANE_POC_RULE_PACK.json", "tcp_poc/rule_engine.py", "tcp_poc/geometry.py"],
+    out = subprocess.run(["git", "diff", "--name-only", "HEAD", "--", "src/tcp_planner/validation/validators.py",
+                          "rule_pack/APPROVED_TWO_LANE_POC_RULE_PACK.json", "src/tcp_planner/layout/rule_engine.py",
+                          "src/tcp_planner/geometry/local_frame.py"],
                          capture_output=True, text=True, cwd=__import__("os").path.dirname(__import__("os").path.dirname(
                              __import__("os").path.dirname(__file__))))
     assert out.stdout.strip() == ""

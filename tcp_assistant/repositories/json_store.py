@@ -7,7 +7,7 @@
 """
 import hashlib, json, os, re, threading
 
-from tcp_poc.models import canonical_json, sha256_hex
+from tcp_planner.contracts import canonical_json, sha256_hex
 from .base import RecordStore, ImmutableExists, IntegrityError
 
 SAFE = re.compile(r"^[A-Za-z0-9._-]{1,120}$")

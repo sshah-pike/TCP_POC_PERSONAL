@@ -5,8 +5,8 @@ Run from the project root:  python -m pytest tcp_ui/tests -q
 import base64, json, os, threading, time, urllib.error, urllib.request
 import pytest
 
-from tcp_poc import offline
-from tcp_poc.app import run_pipeline, DWT_CONFIG_PATH, EXIT
+from tcp_planner.orchestration import offline_scenarios as offline
+from tcp_planner.orchestration.pipeline import run_pipeline, DWT_CONFIG_PATH, EXIT
 from tcp_ui import server, store
 
 DRAFT_FILES = {"plan.json", "aerial_image.jpg", "debug_plan.png", "debug_plan.pdf", "tcp_sheet.png", "tcp_sheet.pdf",

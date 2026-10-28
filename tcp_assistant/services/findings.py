@@ -4,7 +4,7 @@ Finding ids are stable across versions of the same site (lineage key = work-refe
 F-<sha256(lineage | category | subject)[:10]>.
 """
 from ..core.ids import stable_id
-from tcp_poc.models import FT
+from tcp_planner.contracts import FT
 
 # visual states (colour + text glyph; never colour alone)
 DETERMINED, NEEDS_CONFIRMATION, CONFLICT, UNKNOWN, SME, EXCEPTION = (

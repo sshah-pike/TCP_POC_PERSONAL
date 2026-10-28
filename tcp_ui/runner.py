@@ -1,10 +1,10 @@
 """Execute ONE pipeline run for the UI, in its own process:   python -m tcp_ui.runner <run_dir>
 
-The run is the unmodified CLI entry point `tcp_poc.app.main(argv)` with the argv stored in
+The run is the unmodified CLI entry point `tcp_planner.orchestration.pipeline.main(argv)` with the argv stored in
 <run_dir>/ui/request.json, so argument handling, .env loading, TLS setup, offline scenarios, outputs
 and exit codes are exactly those of `python tcp_demo.py ...`.
 
-Observation only (installed in this child process, nothing in tcp_poc is edited):
+Observation only (installed in this child process, nothing in tcp_planner is edited):
   - Telemetry subclass: the existing spans, additionally streamed to ui/events.jsonl as they start/end
   - run_pipeline / load_rule_pack wrappers: record the returned result / rule-pack identity, return them unchanged
   - Anthropic client subclass: records response.usage and response.model of each Messages call
@@ -63,7 +63,8 @@ class Recorder:
 
 def install_observers(rec, run=None):
     """run: {"run_dir", "run_id", "replay": ReplaySource|None, "ai_provider": str|None} (None = no evidence)."""
-    from tcp_poc import app, telemetry
+    from tcp_planner.orchestration import pipeline as app
+    from tcp_planner.audit import telemetry
 
     base = telemetry.Telemetry
 
@@ -180,7 +181,7 @@ class _Evidence:
         """The fixed multi-resolution view set for this site: reused when a verified copy exists, else acquired."""
         from PIL import Image
         from tcp_ui import evidence as E, views as V
-        from tcp_poc.models import ProviderError
+        from tcp_planner.contracts import ProviderError
         if self.analysis is None:
             raise ProviderError("AI_EVIDENCE_UNAVAILABLE", "no analysis imagery to plan multi-resolution views from")
         inner, pg, half = self.analysis
@@ -227,8 +228,9 @@ class _Evidence:
     def osm_geometry(self, pg):
         """Centerline/station/lateral of the work reference from the OSM elements this run used (pure functions)."""
         if self._osm_geo is not None or self.osm_elements is None: return self._osm_geo
-        from tcp_poc import app, osm_adapter
-        from tcp_poc.geometry import signed_lateral
+        from tcp_planner.orchestration import pipeline as app
+        from tcp_planner.data_sources import osm_overpass as osm_adapter
+        from tcp_planner.geometry.local_frame import signed_lateral
         osm = osm_adapter.extract_evidence(self.osm_elements, pg, app.load_config())
         d, s0, lat = signed_lateral(osm["centerline_enu"], (0.0, 0.0))
         self._osm_geo = {"osm": osm, "centerline_enu": osm["centerline_enu"], "work_station_m": s0, "lateral_m": lat}
@@ -237,8 +239,8 @@ class _Evidence:
     def grounding(self, context):
         """Inputs for grounded_v2: deterministic work side (diagnostic C3 only) and optional OSM claims."""
         if self.vision_mode != "grounded_v2": return None
-        from tcp_poc import app
-        from tcp_poc.geometry import at
+        from tcp_planner.orchestration import pipeline as app
+        from tcp_planner.geometry.local_frame import at
         pg = self.analysis[1] if self.analysis else None
         geo = self.osm_geometry(pg) if pg else None
         g = {"mode": "grounded_v2", "geo_side": None, "claims": None,
@@ -328,7 +330,7 @@ class EvidenceMapProvider:
                 return img, dict(meta)
             except Exception as e:
                 ev.reject("map", f"saved map artifact failed validation ({e})")
-        from tcp_poc.models import MapProviderError
+        from tcp_planner.contracts import MapProviderError
         ev.strict_block("map", MapProviderError)
         t0 = time.perf_counter()
         try:
@@ -367,7 +369,7 @@ class EvidenceMapProvider:
                 return img, dict(found["metadata"]["meta"])
             except Exception as e:
                 ev.reject("map_crop", f"saved crop failed validation ({e})")
-        from tcp_poc.models import MapProviderError
+        from tcp_planner.contracts import MapProviderError
         ev.strict_block("map_crop", MapProviderError)
         t0 = time.perf_counter()
         try:
@@ -403,7 +405,7 @@ class EvidenceOsmSource:
                 return elements
             except Exception as e:
                 ev.reject("osm", f"saved OSM artifact failed validation ({e})")
-        from tcp_poc.models import OsmError
+        from tcp_planner.contracts import OsmError
         ev.strict_block("osm", OsmError)
         t0 = time.perf_counter()
         try:
@@ -432,8 +434,8 @@ class EvidenceVisionProvider:
     def analyze(self, image, context, views=None, grounding=None):
         from tcp_ui import evidence as E
         from tcp_ui.diagnostics import sanitize, sanitize_obj
-        from tcp_poc.vision_provider import validate_observation
-        from tcp_poc.models import ProviderError
+        from tcp_planner.ai.vision_provider import validate_observation
+        from tcp_planner.contracts import ProviderError
         ev = self._ev
         agent_call = str((grounding or {}).get("mode", "")).startswith("agent_")
         if not agent_call:  # legacy UI evidence modes; agent calls bring their own views and request from the pipeline
@@ -449,7 +451,7 @@ class EvidenceVisionProvider:
                                     % getattr(self._inner, "name", "?"))
         sig = E.ai_signature(image, context, views) if ev.store else None
         if sig and grounding and not agent_call:
-            from tcp_poc import grounded as G
+            from tcp_planner.ai import grounded_vision as G
             sig.update(vision_mode="grounded_v2", annotation=G.ANNOTATION,
                        claims_hash=E.signature_hash({"claims": grounding.get("claims")}))
         if sig and agent_call: sig["vision_mode"] = grounding["mode"]
@@ -558,7 +560,7 @@ def _run_context(run_dir, req, rec):
            "centerline_views": bool(adv.get("centerline_views"))}
     if adv.get("ai_profile"): os.environ["TCP_FOUNDRY_PROFILE"] = adv["ai_profile"]
     try:
-        from tcp_poc.app import CONFIG_PATH
+        from tcp_planner.orchestration.pipeline import CONFIG_PATH
         rec.write("deps.json", {"config_sha256": sha256_file(CONFIG_PATH)})
     except Exception:
         pass
@@ -580,8 +582,10 @@ def prepare_views(comparison_dir):
     """Acquire the fixed multi-resolution view set ONCE for a comparison, before any model runs, so every
     multi-resolution child reuses identical images. Uses the source run's verified analysis imagery request and
     OSM evidence (no new analysis-imagery or OSM call). Same .env / TLS initialisation as the CLI."""
-    from tcp_poc import app, osm_adapter, offline
-    from tcp_poc.site_fusion import reference_bearing
+    from tcp_planner.orchestration import pipeline as app
+    from tcp_planner.data_sources import osm_overpass as osm_adapter
+    from tcp_planner.orchestration import offline_scenarios as offline
+    from tcp_planner.site_model.fusion import reference_bearing
     from tcp_ui import evidence as E
     from tcp_ui.diagnostics import sanitize
     cdir = os.path.abspath(comparison_dir); ui = os.path.join(cdir, "ui"); rec = Recorder(ui)
@@ -643,7 +647,7 @@ def main(argv=None):
     exit_code, unhandled = None, None
     try:
         install_observers(rec, _run_context(run_dir, req, rec))
-        from tcp_poc import app
+        from tcp_planner.orchestration import pipeline as app
         sys.argv[0] = "tcp_demo.py"  # argparse names the program from argv[0]; match the CLI in its messages
         exit_code = app.main(req["argv"])
     except SystemExit as e:  # argparse usage errors exit here, exactly as on the CLI

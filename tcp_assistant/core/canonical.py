@@ -10,7 +10,7 @@ tcp-msg-canon-v1:
 """
 import datetime, unicodedata
 
-from tcp_poc.models import canonical_json, sha256_hex
+from tcp_planner.contracts import canonical_json, sha256_hex
 
 CANON_VERSION = "tcp-msg-canon-v1"
 

@@ -11,7 +11,7 @@ The model cannot request other views.
 """
 import math
 
-from tcp_poc.geometry import inv
+from tcp_planner.geometry.local_frame import inv
 
 PLAN_VERSION = "views-v1"
 VIEW_KIND = "map_view"
@@ -45,7 +45,7 @@ CENTERLINE_PLAN_VERSION = "views-cl-v1"
 def plan_views_centerline(work_reference, centerline_enu, work_station_m, half_extent_m):
     """Same three views, but corridor views centred ON the OSM centerline +/- half the half-extent along the road
     (follows curves). Requires the centerline in the work-reference local frame (metres)."""
-    from tcp_poc.geometry import at
+    from tcp_planner.geometry.local_frame import at
     lat0, lon0 = work_reference["latitude"], work_reference["longitude"]
     d = round(float(half_extent_m) / 2, 1)
     specs = [("work_area", "work-area close-up", 19, (0.0, 0.0))]

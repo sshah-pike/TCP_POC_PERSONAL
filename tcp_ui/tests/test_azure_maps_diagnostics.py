@@ -1,6 +1,6 @@
 """Azure Maps failure diagnostics: same fail-closed decision, extra sanitized cause (no network, no real key).
 
-The real runner -> tcp_poc.app.main -> AzureMapsProvider path runs in-process with requests.get replaced by a
+The real runner -> tcp_planner.orchestration.pipeline.main -> AzureMapsProvider path runs in-process with requests.get replaced by a
 fake. .env loading is disabled so no real credential enters the test; a fake key is set instead.
 """
 import io, json, os, ssl, sys
@@ -8,7 +8,7 @@ import pytest
 import requests
 from requests import exceptions as rx
 
-from tcp_poc import app
+from tcp_planner.orchestration import pipeline as app
 from tcp_ui import runner, store
 
 FAKE_KEY = "AZURE-TEST-KEY-0123456789-SENTINEL"

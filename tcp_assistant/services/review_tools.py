@@ -1,5 +1,5 @@
 """Phase 2 tools: run context, findings, annotated image, conversations with chat review cards (no AI)."""
-from tcp_poc.models import canonical_json, sha256_hex
+from tcp_planner.contracts import canonical_json, sha256_hex
 from ..core.canonical import now_iso
 from ..core.errors import AssistantError
 from ..core.ids import new_id

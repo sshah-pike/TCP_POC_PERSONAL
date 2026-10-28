@@ -109,7 +109,7 @@ def test_audit_chain_and_secret_scrubbing(aenv):
 
 
 def test_policy_hash_verified_and_master_switch(tmp_path):
-    from tcp_poc import sme_policy as P
+    from tcp_planner.review import action_policy as P
     pol = P.load_policy()
     assert pol.allowed("override_rule_conflict", ["SME_REVIEWER"])[0]
     assert not pol.allowed("override_rule_conflict", ["AUDITOR"])[0]

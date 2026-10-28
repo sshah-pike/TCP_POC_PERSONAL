@@ -18,11 +18,18 @@ import argparse, json, mimetypes, os, shutil, subprocess, sys, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit, parse_qs, unquote
 
+from tcp_planner.config.settings import SRC_DIR
 from . import store
 
 WEB_DIST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web", "dist")
 MAX_BODY = 10 * 1024 * 1024
 ASSISTANT_MAX_BODY = 64 * 1024  # assistant requests are small structured JSON
+
+
+def child_env():
+    """Environment for runner subprocesses: the package source is importable whether or not it is installed."""
+    path = os.pathsep.join(p for p in (SRC_DIR, os.environ.get("PYTHONPATH")) if p)
+    return dict(os.environ, PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8", PYTHONPATH=path)
 ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
 CONTENT_TYPES = {".json": "application/json", ".txt": "text/plain; charset=utf-8", ".png": "image/png",
                  ".jpg": "image/jpeg", ".pdf": "application/pdf", ".dxf": "application/dxf",
@@ -39,7 +46,7 @@ def live_ids():
 
 
 def start_run(payload):
-    from tcp_poc import offline
+    from tcp_planner.orchestration import offline_scenarios as offline
     adv = payload.get("advanced") or {} if isinstance(payload, dict) else {}
     if adv.get("ai_profile"): _ai_choice({"ai_profile": adv["ai_profile"]})  # must be a configured, available profile
     run_id, rdir = store.create_run(payload, set(offline.SCENARIOS) | set(offline.ALIASES))
@@ -48,7 +55,7 @@ def start_run(payload):
 
 def _ai_choice(payload):
     """Validate a requested AI provider / Foundry profile against what is configured (no free text)."""
-    from tcp_poc.foundry_provider import profile_catalog
+    from tcp_planner.ai.foundry_provider import profile_catalog
     prov, prof = payload.get("ai_provider") or None, payload.get("ai_profile") or None
     if prov and prov not in store.AI_PROVIDERS: raise store.BadRequest("unknown AI provider")
     if prof:
@@ -87,7 +94,7 @@ def start_comparison(payload):
             with open(store.run_path(cid, "ui", "prep.log"), "w", encoding="utf-8") as log:
                 subprocess.call([sys.executable, "-m", "tcp_ui.runner", "--prepare-views", store.run_path(cid)],
                                 cwd=store.PROJECT_ROOT, stdout=log, stderr=subprocess.STDOUT,
-                                env=dict(os.environ, PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8"))
+                                env=child_env())
         for rid in relations.create_children(cid): launch(rid, store.run_path(rid))
 
     threading.Thread(target=run, daemon=True).start()
@@ -108,9 +115,8 @@ def stop_run(run_id):
 
 def launch(run_id, rdir):
     log = open(os.path.join(rdir, "ui", "stdout.log"), "w", encoding="utf-8")
-    env = dict(os.environ, PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8")
     proc = subprocess.Popen([sys.executable, "-m", "tcp_ui.runner", rdir], cwd=store.PROJECT_ROOT,
-                            stdout=log, stderr=subprocess.STDOUT, env=env)
+                            stdout=log, stderr=subprocess.STDOUT, env=child_env())
     with LIVE_LOCK: LIVE[run_id] = proc
 
     def reap():
@@ -130,11 +136,11 @@ def launch(run_id, rdir):
 
 
 def meta():
-    from tcp_poc import offline
-    from tcp_poc.app import load_config, DWT_CONFIG_PATH
-    from tcp_poc.dwt_renderer import MODES
-    from tcp_poc.models import APP_VERSION
-    from tcp_poc.rule_pack import load_rule_pack
+    from tcp_planner.orchestration import offline_scenarios as offline
+    from tcp_planner.orchestration.pipeline import load_config, DWT_CONFIG_PATH
+    from tcp_planner.sheets.dwt_renderer import MODES
+    from tcp_planner.contracts import APP_VERSION
+    from tcp_planner.rules.rule_pack_loader import load_rule_pack
     out = {"app_version": APP_VERSION, "offline_scenarios": list(offline.SCENARIOS), "offline_aliases": offline.ALIASES,
            "map_providers": list(store.UI_MAP_PROVIDERS), "ai_providers": list(store.UI_AI_PROVIDERS),
            "dwt_modes": list(MODES), "dwt_config_present": os.path.isfile(DWT_CONFIG_PATH),
@@ -142,7 +148,7 @@ def meta():
            "pricing_source": store.load_pricing().get("source"), "foundry_profiles": [],
            "resume_stages": [s[0] for s in store.STAGES]}
     try:
-        from tcp_poc.foundry_provider import profile_catalog
+        from tcp_planner.ai.foundry_provider import profile_catalog
         out["foundry_profiles"] = profile_catalog()
     except Exception as e:
         out["foundry_profiles_error"] = type(e).__name__

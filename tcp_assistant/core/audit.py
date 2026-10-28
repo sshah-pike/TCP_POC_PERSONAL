@@ -7,7 +7,7 @@ Consequential events are fsync'd; a failed write raises AUDIT_WRITE_FAILED so th
 """
 import contextlib, datetime, json, os, re, threading, time
 
-from tcp_poc.models import canonical_json, sha256_hex, redact
+from tcp_planner.contracts import canonical_json, sha256_hex, redact
 from ..flags import data_dir
 from .canonical import now_iso, CANON_VERSION
 from .errors import AssistantError

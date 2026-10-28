@@ -16,7 +16,7 @@ RUN_ID_RE = re.compile(r"^\d{8}-\d{6}-[0-9a-f]{6}$")
 OPTION_KEY_RE = re.compile(r"^[A-Za-z0-9_.]+$")
 MAX_KML_UPLOAD_BYTES = 6 * 1024 * 1024  # above the pipeline's own 5 MB limit, so it rejects oversize files itself
 
-# Names accepted by tcp_poc.map_provider.get_map_provider / tcp_poc.vision_provider.get_vision_provider.
+# Names accepted by tcp_planner.imagery.map_provider.get_map_provider / tcp_planner.ai.vision_provider.get_vision_provider.
 MAP_PROVIDERS = ("azure_maps", "usgs_naip", "esri_demo")
 AI_PROVIDERS = ("anthropic", "foundry")
 # Offered in the UI form. USGS NAIP and the direct Anthropic API are not in use for this POC; their code stays

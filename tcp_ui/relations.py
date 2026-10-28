@@ -1,6 +1,6 @@
 """Resumed runs and model comparisons (new runs linked to an immutable source run).
 
-A resumed run re-executes the unchanged pipeline (tcp_poc.app.main) with the parent's input. Only external
+A resumed run re-executes the unchanged pipeline (tcp_planner.orchestration.pipeline.main) with the parent's input. Only external
 evidence (map imagery, OSM elements, AI result) can be reused, through verified replay (tcp_ui/evidence.py);
 every other stage re-runs. A comparison is a set of resumed runs from the AI stage, one per Foundry profile,
 all reusing the same source imagery and OSM evidence.
@@ -44,7 +44,7 @@ LEGACY = "LEGACY EVIDENCE"
 
 def evidence_compat(run_id, state=None):
     """Whether a run's imagery evidence may be reused: OK, LEGACY (pre-scale-fix / pre-evidence Azure imagery) or NONE."""
-    from tcp_poc.map_provider import AzureMapsProvider
+    from tcp_planner.imagery.map_provider import AzureMapsProvider
     maps = [e for e in load_manifest(store.run_path(run_id))
             if e.get("kind") == "map" and e.get("producer_span") == ANALYSIS_SPANS["map"]]
     for e in maps:
@@ -84,8 +84,8 @@ def _analysis_artifact(parent_id, kind):
 
 def _dependency_changes(parent_id, parent_state):
     """Inputs of the map/OSM requests that changed since the parent ran (conservative prediction)."""
-    from tcp_poc.app import CONFIG_PATH
-    from tcp_poc.rule_pack import load_rule_pack
+    from tcp_planner.orchestration.pipeline import CONFIG_PATH
+    from tcp_planner.rules.rule_pack_loader import load_rule_pack
     ui = store.run_path(parent_id, "ui"); changes = []
     deps = store._read_json(os.path.join(ui, "deps.json")) or {}
     if deps.get("config_sha256") and deps["config_sha256"] != sha256_file(CONFIG_PATH):
@@ -253,7 +253,7 @@ def variant_label(v):
 
 def create_comparison(source_id, profiles, modes=("single",), variants=None):
     """Plan a comparison. Children are created by create_children() after any evidence preparation."""
-    from tcp_poc.foundry_provider import profile_catalog
+    from tcp_planner.ai.foundry_provider import profile_catalog
     available = {p["name"]: p for p in profile_catalog() if p["available"]}
     modes = list(dict.fromkeys(modes or ["single"]))
     if not profiles: raise store.BadRequest("select at least one model profile")
@@ -314,7 +314,7 @@ def _flatten(obj, prefix=""):
 
 
 def comparison_state(cid, live_ids=()):
-    from tcp_poc.app import load_config
+    from tcp_planner.orchestration.pipeline import load_config
     doc = store._read_json(store.run_path(cid, "ui", "comparison.json"))
     if not doc: return None
     threshold = load_config()["fusion"]["min_critical_confidence"]

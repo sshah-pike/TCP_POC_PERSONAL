@@ -1,0 +1,29 @@
+{
+  "config_id": "TCP_DWT_RENDER_CONFIG",
+  "version": "0.1.0",
+  "regulatory_status": "NON_MUTCD_RENDERER_CONFIGURATION",
+  "dwt_path": "../assets/dwt/DCR-TMP-AERIAL IMAGE-TEMPLATE.dwt",
+  "dwt_version": "DCR-TMP-AERIAL IMAGE-TEMPLATE (supplied 2026-10-06)",
+  "dwt_format": "AC1032",
+  "dwt_sha256": "7ea1d82a145197e08bd3e2812fa2b86483c61d86afe04d375630763e478b9efd",
+  "drawing_units": "FEET",
+  "output_dwg_version": "R2018",
+  "oda_file_converter": null,
+  "image_filename": "aerial_image.jpg",
+  "rotation_correction_deg": 0.0,
+  "note_text_height": 4.0,
+  "layer_map": {},
+  "block_map": {
+    "REQUIRED_APPROVED_DWT_BLOCK_W20_1": {"template_block": null, "file": null, "sha256": null},
+    "REQUIRED_APPROVED_DWT_BLOCK_SHOULDER_WORK": {"template_block": null, "file": null, "sha256": null},
+    "REQUIRED_APPROVED_DWT_BLOCK_WORK_LOCATION": {"template_block": null, "file": null, "sha256": null},
+    "REQUIRED_APPROVED_DWT_BLOCK_WORK_VEHICLE": {"template_block": null, "file": null, "sha256": null}
+  },
+  "title_attribute_map": {},
+  "_notes": [
+    "layer_map: rule-pack layer name -> template layer name. Empty = rule-pack names must exist in the template.",
+    "block_map: rule-pack logical block -> approved block in the template (template_block) or an approved block file + sha256.",
+    "drawing_units must match the template $INSUNITS; verification fails closed otherwise.",
+    "title_attribute_map: required title field -> title-block attribute tag in the template."
+  ]
+}
