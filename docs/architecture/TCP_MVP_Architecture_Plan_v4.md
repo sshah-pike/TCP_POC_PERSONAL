@@ -477,7 +477,7 @@ Folding the TA fields into call 2 saves one AI call per zone and keeps the two-c
 - A fact that is missing or malformed becomes UNKNOWN.
 - Fallback on a 400 "too complex" error: retry once without strict mode and validate in code.
 
-JSON only (your decision). TOON is not used. None of this is built until a spike in slice S0 compares two variants on your three KMLs: the current per-property schema and the facts-list schema.
+JSON only (your decision). TOON is not used. The S0 spike compared the two variants (`spikes/schema_spike/REPORT.md` on branch `tcp-mvp/s00-schema-spike`): the current per-property schema was rejected by Foundry (23 union-type parameters; with the 18 call 1 fields added, 24; limit 16), and the facts list was accepted and schema-valid in 9 of 9 calls. D-61 is decided: the flat facts list. The spike findings that shape S6 and S7 are D-80.
 
 **Confidence thresholds.** The POC used 0.70 for common facts, and that carries over as a starting value. New TAs start at 0.80 for safety-critical facts \[S1\]. The router package suggests 0.85 for auto-routing \[S3\]. All of these are set per field in the registry, not hardcoded. The router's own starting values are in Section 6.
 
@@ -1073,7 +1073,7 @@ The comparator (slice S13) reports each difference with its cause, so every mism
 
 ## 15. Decision log
 
-Approved means you said yes in this conversation \[S5\]. Proposed means it is in this plan but still needs your approval. Open means no decision yet. Updated October 26, 2026.
+Approved means you said yes in this conversation \[S5\]. Proposed means it is in this plan but still needs your approval. Open means no decision yet. Updated October 28, 2026.
 
 | ID | Decision | Status | Section |
 | --- | --- | --- | --- |
@@ -1137,7 +1137,7 @@ Approved means you said yes in this conversation \[S5\]. Proposed means it is in
 | D-58 | Road type and speed prior from OSM and state tags | Future scope | 4C |
 | D-59 | Mandatory start fields, typed in the UI before Run: `road_type`, `posted_speed_mph`, `traffic_volume`, `lane_closure`. No code calculates them and no other source fills them in the MVP. A contradicting computed check raises a conflict, never a change | Approved | 4B |
 | D-60 | Routing decision tree and explicit eligibility: TA-6 needs a shoulder and a low-speed minor road; TA-33 is one OR'd rule; only TA-1, 6, 10 and 33 exist | Approved | 6 |
-| D-61 | AI output as a flat facts list in JSON (no TOON), tested in an S0 spike against the current schema before anything is built | Approved (test first) | 5 |
+| D-61 | AI output as a flat facts list in JSON (no TOON). Decided after the S0 spike: the current per-property schema is rejected by Foundry (HTTP 400, union-type limit), the facts list is accepted | Approved | 5 |
 | D-62 | Azure Maps is allowed alongside open data | Approved | 5 |
 | D-63 | Added sources: HPMS, Census urban areas, USGS 3DEP, MBTA/RIPTA GTFS, FRA crossings, with the full OSM tag list | Approved | 5 |
 | D-64 | The AI returns positions; code computes every length | Approved | 4B |
@@ -1153,8 +1153,10 @@ Approved means you said yes in this conversation \[S5\]. Proposed means it is in
 | D-75 | Branches: base `tcp-mvp/base`, one branch per slice `tcp-mvp/sNN-short-name` (the `TCP-MVP` name collides with `tcp-mvp/` on Windows) | Approved | 13 |
 | D-76 | Editable install required once per environment: `pip install -e . --no-build-isolation` | Approved | 13 |
 | D-77 | `runs/` moved to `var/runs/`; old POC runs stay tracked but cannot be resumed, because they store absolute paths. Store run paths relative to the runs folder in S2 | Approved | 12 |
-| D-78 | Default AI provider becomes Foundry in S0 (today the code falls back to the direct Anthropic provider when `TCP_AI_PROVIDER` is unset); the direct provider module moves to backup in S15 | Proposed | 5 |
-| D-79 | The pre-existing failing test `test_protected_run_dir_untouched` is fixed in S0 to check that the run folder is tracked and unchanged, which is its real intent | Proposed | 14 |
+| D-78 | Default AI provider becomes Foundry in S0 (the code used to fall back to the direct Anthropic provider when `TCP_AI_PROVIDER` is unset); with no Foundry configuration the error says so. The direct provider module moves to backup in S15 | Approved | 5 |
+| D-79 | The pre-existing failing protected-run test is fixed in S0 to check that the run folder is tracked and unchanged, which is its real intent | Approved | 14 |
+| D-80 | Spike findings are requirements for S6 and S7: (1) `lanes_per_direction` is unstable (Granite 2/1/1) and safety-critical: cross-check with OSM lanes and state data, a disagreement makes it UNKNOWN and raises an SME question, and call 2 re-asks it with a lane-marking crop. (2) Marks are weak (`lane_line`, `shoulder_edge`, `curb`): the deterministic `cross_section.py` is the primary width source and AI marks are secondary; an invalid or missing mark makes the width UNKNOWN; marks are requested again from call 2 crops. (3) `sidewalk_present` and `sidewalk_side` are often UNKNOWN on the wide image: resolve them in call 2 with a crop plus OSM sidewalk tags. (4) Call 1 output is about 2,300 tokens (about 700 of them thinking): cap each evidence string at 15 words and use a short fixed reason for UNKNOWN (see `docs/reports/S0_prompt_tuning_proposal.md`) | Approved | 5, 6 |
+| D-81 | Rule pack v1 (S4) covers TA-1, TA-6, TA-10 and TA-33 and replaces the POC pack. Until then `rule_pack/` holds only `APPROVED_TWO_LANE_POC_RULE_PACK.json` | Approved | 10 |
 | D-67 | New fields added to the schema: work side, work type, work length, lane width, direction of travel, bike lane, accessible route, detours, work-zone speed, add-on triggers, title-block fields, median work, and the TA-10 and TA-33 fields | Approved | 4B |
 
 ### Open questions (version 9)
@@ -1163,7 +1165,7 @@ Slices S0 to S5 can start now. Each item has a default so no slice is blocked.
 
 | # | Question | Needed by | Default if unanswered |
 | --- | --- | --- | --- |
-| 1 | Foundry error text and the S0 schema spike results (current schema against the facts list, JSON only) | S6 | Facts-list JSON if the spike passes |
+| 1 | ~~Foundry error text and the S0 schema spike results~~ Closed: spike done, facts list chosen (D-61, D-80) | S6 | Done |
 | 2 | Default `work_space_length_ft` per `work_type` for single points | S8 | Asked per point on the form |
 | 3 | Does the title block need city, state and ZIP as well as the road name the POC prints? | S12 | Road name only, as the POC does today |
 | 4 | My reading of "taper instead of police": the draft uses the standard TA-10 flagger layout with its tapers, and the SME switches to police after the draft | S7 | As written (D-68) |
@@ -1182,7 +1184,7 @@ Slices S0 to S5 can start now. Each item has a default so no slice is blocked.
 | 17 | Which RIDOT and MassDOT documents apply | Later | MUTCD plus client layer |
 | 18 | SME confirmation that the Section 4B schema misses nothing | S6 | Built as written |
 | 19 | Push and merge S0a: push `tcp-mvp/s00a-restructure`, review it, merge into `tcp-mvp/base` | Before S0 | Push now, merge after review |
-| 20 | Approve D-78 (Foundry as the default provider) and D-79 (fix the protected-run test) | S0 | Both done in S0 |
+| 20 | ~~Approve D-78 and D-79~~ Closed: approved and done in S0 | S0 | Done |
 
 **Closed this round:** traffic control method not a start field, flaggers by default, police after the draft (D-68); lengths by code (D-64); JSON only, no TOON (D-61); work side suggested by AI and confirmed (D-69); grade-crossing notification dropped (D-70); title block uses the POC road name (D-71); placemark names as labels (D-72); Select TA dropdown (D-73).
 
@@ -1393,7 +1395,7 @@ Each record states status, context, decision, consequences and what was rejected
 
 ### ADR-045: AI output format chosen by a spike
 
-**Status:** Accepted, test first (D-61). **Context:** A 15+ field per-property schema failed in Azure Foundry. **Decision:** JSON only. An S0 spike compares the current schema with a flat facts list before anything is built. TOON is not used. **Rejected:** Building on an untested schema; TOON.
+**Status:** Accepted (D-61). **Context:** A 15+ field per-property schema failed in Azure Foundry. **Decision:** JSON only, as a flat facts list. The S0 spike confirmed it: the per-property schema is rejected (union-type limit), the facts list is accepted and valid. TOON is not used. **Rejected:** Building on an untested schema; TOON; the per-property schema.
 
 ### ADR-046: SME approval gate
 

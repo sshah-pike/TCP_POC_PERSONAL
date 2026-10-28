@@ -101,7 +101,7 @@ Follow-ups carried into later slices:
 
 **Tasks.**
 1. Fixture recorder and replayer. Key fixtures by a request fingerprint. Replay mode is the default in tests and fails if a fixture is missing. Fixtures go in `tests/fixtures/`.
-2. Record fixtures for the three real KMLs once, with live calls run by you, not by CI.
+2. Seed fixtures from saved evidence (Granite single point P30, Alton Bradford and Exeter demos) with `python -m tests.support.record seed`. Recording the three real KMLs needs live calls and the pipeline cannot take them yet (it rejects more than one Point), so it moves to the post-S6 recording task in S6.
 3. Verification report: answer items 1 to 34 of the Section 18 prompt with file and line evidence.
 4. Fix `test_protected_run_dir_untouched` so it checks that `var/runs/20261020-214203-7f7232` is tracked and unchanged (D-79). After this, every suite is green.
 5. Make Foundry the default when `TCP_AI_PROVIDER` is unset, and fail with a clear message when Foundry is not configured (D-78). This is a deliberate behavior change in its own commit.
@@ -110,7 +110,7 @@ Follow-ups carried into later slices:
 
 **Acceptance criteria.**
 - `pytest` runs with no network access and no live calls, and every suite is green.
-- A replayed run of each real KML gives the same request fingerprints twice.
+- A replayed saved run gives the same request fingerprints twice.
 - The report lists every confirmed, refuted or unknown assumption, with file paths.
 - `spikes/schema_spike/REPORT.md` exists with results for the current schema and the facts list, and a recommendation.
 
@@ -187,6 +187,8 @@ Follow-ups carried into later slices:
 
 **Goal.** A composed, table-shaped rule pack for TA-1, TA-6, TA-10 and TA-33, built from the supplied MUTCD 11th Edition Chapter 6 (December 2023 revision), behind `RulePackStore`. Field names must match the general and per-TA input schema in plan Section 4B.
 
+**Replaces the POC pack (D-81).** Rule pack v1 replaces `rule_pack/APPROVED_TWO_LANE_POC_RULE_PACK.json`, which is the only pack in `rule_pack/` until then. The six KMLs in `docs/references/kml/` (the three real sites and the TA-6, TA-10 and TA-33 examples) are its test inputs.
+
 **Depends on.** S0. Can run in parallel with S1 to S3.
 
 **In scope.**
@@ -252,6 +254,7 @@ Follow-ups carried into later slices:
 - Data sources (D-53, D-62, D-63): Azure Maps, OSM via Overpass (the tag list in plan Section 5), MassGIS, RIGIS, HPMS, Census urban areas, USGS 3DEP, MBTA and RIPTA GTFS, FRA crossings. All fused values are low confidence, imagery decides, disagreements are recorded (D-37).
 - Width with uncertainty (D-38).
 - Every image resized in code to the model limit (from S0's report).
+- Spike requirements (D-80): `lanes_per_direction` is cross-checked against OSM lanes and state data, and a disagreement makes it UNKNOWN with an SME question; width comes from `cross_section.py` first and AI marks second, and an invalid or missing mark makes the width UNKNOWN; each evidence string is capped at 15 words and UNKNOWN facts carry a short fixed reason, per `docs/reports/S0_prompt_tuning_proposal.md` once approved.
 - Hybrid crops: code crop first, a higher-zoom fetch only when pixels are insufficient.
 - Pre-calculation per plan Section 4C: vehicle width and footprint (measured, else cited default flagged `DEFAULT_ASSUMED`), the remaining-width table, shadow vehicle, TMA suggestion and arrow board.
 
@@ -261,6 +264,8 @@ Follow-ups carried into later slices:
 - A higher-zoom fetch happens only when the pixel threshold fails, and it is recorded as evidence with a signature.
 
 **Tests.** Mandatory fields are never written by code; a computed remaining width that contradicts `lane_closure` creates a conflict, not a change; no length comes from the AI (a test fails if a length field appears in AI output); length computations against fixtures with known pixel scale; every observed field resolves to RESOLVED or UNKNOWN; fusion disagreement recorded; only the approved sources are called (a mock fails the test otherwise); the remaining-width table as a parametrized test; crop decision with mocked pixel counts.
+
+**Post-S6 recording task (run by the user, `TCP_LIVE=1`).** Record the three real KMLs (Granite, E Second St, Colorado) with `python -m tests.support.record live`, which calls `use_os_trust_store()` first. This is the third live-call exception in CLAUDE.md. Then add replay tests for them: the same request fingerprints twice.
 
 **Prompt seed.** "Extend call 1 and fusion per slice S6. Use only recorded fixtures in tests. Keep the two-AI-call budget per zone."
 
@@ -278,6 +283,7 @@ Follow-ups carried into later slices:
 - The routing tree and explicit eligibility (D-60): TA-6 requires `shoulder_present` and a low-speed minor road (note 2; cutoff `SOURCE_REVIEW_REQUIRED` until set) with width to the device face; TA-33 is one OR'd rule citing 6P-33 and 6N.11, so undivided four-lane roads such as Granite qualify.
 - `traffic_control_method` set by code to Flagger when TA-10 is chosen (D-68). Police details are not applied by the router.
 - Call 2 with crops for unresolved TA fields. It never overwrites a resolved fact, and safety-critical facts go through the cross-view check.
+- Spike requirements (D-80): call 2 re-asks `lanes_per_direction` with a lane-marking crop; it requests lane lines, shoulder edge and curb marks from crops; and it resolves `sidewalk_present` and `sidewalk_side` with a crop plus OSM sidewalk tags.
 
 **Acceptance criteria.**
 - On golden fixtures the router returns TA-10 for Colorado, TA-6 for E Second St and TA-33 for Granite, or a question when a deciding fact is unknown. It never returns a wrong TA silently.

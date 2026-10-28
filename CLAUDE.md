@@ -106,8 +106,10 @@ If code and plan disagree, **stop and report**. Do not silently follow either on
 - **Unit and integration tests make no live calls.** Use recorded fixtures and fakes. The network is blocked in tests, and a missing fixture is an error.
 - **Live Azure Maps and AI calls** are allowed only in:
   - the S13 full-pipeline test;
-  - the S0 schema spike.
-  Both run only when `TCP_LIVE=1` and only when the user runs them.
+  - the S0 schema spike;
+  - recording real-KML fixtures with `python -m tests.support.record live`, once, after S6.
+  All run only when `TCP_LIVE=1` and only when the user runs them.
+- **Every script that can make live calls** (the recorder, the spike, the S13 test) calls `use_os_trust_store()` first, as the pipeline CLI does. Certificate verification is never turned off.
 - **Gate for every slice:** applicable suites green, new slice tests green, replay deterministic. From S13 on, the golden comparator report must not get worse.
 
 ## How to work
@@ -119,7 +121,7 @@ If code and plan disagree, **stop and report**. Do not silently follow either on
    - a value has no source;
    - a decision is not covered by the docs.
    List options with trade-offs and a recommendation.
-4. **Never delete files.** Unused code goes to `backup/orphans/<date>/` with a manifest, and only in slice S15 after approval.
+4. **Never delete files.** Unused code goes to `backup/orphans/<date>/` with a manifest, and only in slice S15 after approval. S0a's 16 backups were an approved early exception to "only in S15".
 5. **Finish every session with:**
    - files changed;
    - tests added;
