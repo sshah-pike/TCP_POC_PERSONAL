@@ -11,7 +11,7 @@ POST /api/runs                          start a run (JSON body)
 POST /api/runs/<id>/stop                stop a running run (ends its runner process; recorded as STOPPED)
 GET  /api/runs/<id>                     run state (stages, decision, outputs, cost)
 GET  /api/runs/<id>/files/<name>        a file the pipeline wrote to runs/<id>/output/
-GET  /*                                 built UI from tcp_ui/web/dist
+GET  /*                                 built UI from apps/web/dist
 GET|POST /api/assistant/*               SME Review Assistant (tcp_planner.review.assistant.routes; off unless TCP_SME_ASSISTANT_ENABLED=true)
 """
 import argparse, json, mimetypes, os, shutil, subprocess, sys, threading
@@ -20,7 +20,7 @@ from urllib.parse import urlsplit, parse_qs, unquote
 
 from tcp_planner.storage import run_store as store
 
-WEB_DIST = os.path.join(store.PROJECT_ROOT, "tcp_ui", "web", "dist")
+WEB_DIST = os.path.join(store.PROJECT_ROOT, "apps", "web", "dist")
 MAX_BODY = 10 * 1024 * 1024
 ASSISTANT_MAX_BODY = 64 * 1024  # assistant requests are small structured JSON
 ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
@@ -303,7 +303,7 @@ class Handler(BaseHTTPRequestHandler):
     def _static(self, path):
         if not os.path.isdir(WEB_DIST):
             body = (b"<h3>TCP POC Runner UI is not built.</h3><p>Run <code>npm install</code> and "
-                    b"<code>npm run build</code> in <code>tcp_ui/web</code>, or use <code>npm run dev</code>.</p>")
+                    b"<code>npm run build</code> in <code>apps/web</code>, or use <code>npm run dev</code>.</p>")
             self.send_response(200); self.send_header("Content-Type", "text/html")
             self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
         root = os.path.realpath(WEB_DIST)

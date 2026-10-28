@@ -1,26 +1,27 @@
-# TCP POC Runner (local UI)
+# TCP Planner web UI (local)
 
-A thin local UI around the existing pipeline. Each run is the unmodified CLI entry point
-`tcp_planner.orchestration.pipeline.main(argv)`, executed in its own process; the UI only observes it. Decisions, outputs,
-the TCP sheet and the DWT output are exactly what the pipeline produces.
+A thin local UI around the pipeline. Each run is the unmodified CLI entry point
+`tcp_planner.orchestration.pipeline.main(argv)`, executed in its own process; the UI only observes it.
+Decisions, outputs, the TCP sheet and the DWT output are exactly what the pipeline produces.
 
 ## Run
 
 ```
-pip install -r requirements.txt            # existing pipeline dependencies; the UI server adds none
-python -m tcp_planner.web_api.server                     # API + built UI on http://127.0.0.1:8765
+pip install -r requirements.txt                 # pipeline dependencies; the UI server adds none
+pip install -e . --no-build-isolation           # makes tcp_planner importable (src/ layout)
+python -m tcp_planner.web_api.server            # API + built UI on http://127.0.0.1:8765
 ```
 
 Build the UI once (needs Node.js 20+):
 
 ```
-cd tcp_ui/web
+cd apps/web
 npm install
-npm run build                               # served by tcp_planner.web_api.server from tcp_ui/web/dist
+npm run build                                    # served by tcp_planner.web_api.server from apps/web/dist
 ```
 
 UI development with hot reload: keep `python -m tcp_planner.web_api.server` running, then `npm run dev` in
-`tcp_ui/web` and open http://127.0.0.1:5173 (`/api` is proxied to the Python server).
+`apps/web` and open http://127.0.0.1:5173 (`/api` is proxied to the Python server).
 
 Credentials stay where they are today (`.env` / environment, read by the pipeline process). The
 server never reads or returns them.
@@ -45,5 +46,6 @@ providers do not report cost to the pipeline, so they show "Not Available".
 ## Tests
 
 ```
-python -m pytest tests/integration/web_api -q            # offline; compares UI-reported results with direct pipeline runs
+python -m pytest tests/integration/web_api -q   # offline; compares UI-reported results with direct pipeline runs
+cd apps/web && npm test                         # UI unit tests (vitest)
 ```
