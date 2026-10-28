@@ -7,7 +7,7 @@ from tcp_planner.storage.interfaces import (ArtifactRef, ArtifactExists, Artifac
                                             StateExists, StateMissing, StaleHead, StorageError, ArtifactStore, StateStore)
 from tcp_planner.storage.local_fs import LocalFsArtifactStore
 from tcp_planner.storage.memory import InMemoryArtifactStore, InMemoryStateStore
-from tcp_planner.storage.sqlite_state import SqliteStateStore
+from tcp_planner.storage.file_state import FileStateStore
 
 JSON = "application/json"
 
@@ -17,9 +17,9 @@ def artifacts(request, tmp_path):
     return LocalFsArtifactStore(tmp_path / "store") if request.param == "local_fs" else InMemoryArtifactStore()
 
 
-@pytest.fixture(params=["sqlite", "memory"])
+@pytest.fixture(params=["file_state", "memory"])
 def state(request, tmp_path):
-    return SqliteStateStore(tmp_path / "state.db") if request.param == "sqlite" else InMemoryStateStore()
+    return FileStateStore(tmp_path / "state") if request.param == "file_state" else InMemoryStateStore()
 
 
 # ------------------------------------------------------------------ ArtifactStore
@@ -137,20 +137,20 @@ def test_cas_has_exactly_one_winner_among_threads(state):
     assert len(wins) == 1 and state.get("heads/race").value == {"w": wins[0]} and state.get("heads/race").version == 2
 
 
-# ------------------------------------------------------------------ SQLite across processes
+# ------------------------------------------------------------------ file state across processes
 def _cas_worker(path, i, q):
     try:
-        SqliteStateStore(path).compare_and_set("heads/p", 1, {"w": i}, 1); q.put("win")
+        FileStateStore(path).compare_and_set("heads/p", 1, {"w": i}, 1); q.put("win")
     except StaleHead:
         q.put("stale")
 
 
-def test_sqlite_cas_one_winner_across_processes(tmp_path):
-    path = str(tmp_path / "s.db")
-    SqliteStateStore(path).put_new("heads/p", {"w": None}, 1)
+def test_file_state_cas_one_winner_across_processes(tmp_path):
+    path = str(tmp_path / "state")
+    FileStateStore(path).put_new("heads/p", {"w": None}, 1)
     ctx = multiprocessing.get_context("spawn"); q = ctx.Queue()
     ps = [ctx.Process(target=_cas_worker, args=(path, i, q)) for i in range(4)]
     [p.start() for p in ps]; [p.join(60) for p in ps]
     got = sorted(q.get(timeout=10) for _ in ps)
     assert got == ["stale", "stale", "stale", "win"]
-    assert SqliteStateStore(path).get("heads/p").version == 2
+    assert FileStateStore(path).get("heads/p").version == 2

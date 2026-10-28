@@ -40,6 +40,18 @@ def validate_key(key):
     return key
 
 
+# Suffixes the file StateStore uses for its own files. An artifact key may not end in one, so the two stores can share
+# a folder without ever colliding.
+RESERVED_SUFFIXES = (".state.json", ".events.jsonl", ".lock")
+
+
+def validate_artifact_key(key):
+    validate_key(key)
+    if key.endswith(RESERVED_SUFFIXES):
+        raise InvalidKey(f"artifact key {key!r} ends in a suffix reserved for state files")
+    return key
+
+
 _MEDIA_TYPES = {".json": "application/json", ".jsonl": "application/x-ndjson", ".png": "image/png", ".jpg": "image/jpeg",
                 ".jpeg": "image/jpeg", ".pdf": "application/pdf", ".dxf": "image/vnd.dxf", ".dwg": "image/vnd.dwg",
                 ".kml": "application/vnd.google-earth.kml+xml", ".txt": "text/plain", ".log": "text/plain"}
@@ -71,12 +83,12 @@ class ArtifactRef:
 
     @classmethod
     def from_dict(cls, d):
-        try: return cls(uri=validate_key(d["uri"]), sha256=d["sha256"], size=int(d["size"]), media_type=d["media_type"])
+        try: return cls(uri=validate_artifact_key(d["uri"]), sha256=d["sha256"], size=int(d["size"]), media_type=d["media_type"])
         except (KeyError, TypeError, ValueError) as e: raise StorageError(f"malformed artifact reference: {e}") from e
 
 
 def _uri(ref_or_uri):
-    return validate_key(ref_or_uri.uri if isinstance(ref_or_uri, ArtifactRef) else ref_or_uri)
+    return validate_artifact_key(ref_or_uri.uri if isinstance(ref_or_uri, ArtifactRef) else ref_or_uri)
 
 
 class ArtifactStore(abc.ABC):

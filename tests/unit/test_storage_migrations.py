@@ -3,7 +3,7 @@ import pytest
 from tcp_planner.storage import migrations as M
 from tcp_planner.storage.interfaces import SchemaVersionError
 from tcp_planner.storage.memory import InMemoryStateStore
-from tcp_planner.storage.sqlite_state import SqliteStateStore
+from tcp_planner.storage.file_state import FileStateStore
 
 KIND = "test_widget"
 
@@ -39,7 +39,7 @@ def test_duplicate_registration_rejected():
     with pytest.raises(SchemaVersionError): M.register(KIND, 1)(lambda v: v)
 
 
-@pytest.mark.parametrize("make", [lambda p: InMemoryStateStore(), lambda p: SqliteStateStore(p / "s.db")])
+@pytest.mark.parametrize("make", [lambda p: InMemoryStateStore(), lambda p: FileStateStore(p / "state")])
 def test_round_trip_through_a_state_store(tmp_path, make):
     st = make(tmp_path)
     st.put_new("w/1", {"name": "a", "tags": ["z", "b"]}, 1)

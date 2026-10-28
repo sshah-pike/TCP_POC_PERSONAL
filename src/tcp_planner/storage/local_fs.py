@@ -2,7 +2,7 @@
 import hashlib, io, os, tempfile
 
 from tcp_planner.storage.interfaces import (ArtifactStore, ArtifactRef, ArtifactExists, ArtifactMissing, IntegrityError,
-                                            validate_key, media_type_for_key, checked_media_type, _uri)
+                                            validate_key, validate_artifact_key, RESERVED_SUFFIXES, media_type_for_key, checked_media_type, _uri)
 
 TMP_PREFIX = ".tmp-"
 
@@ -17,14 +17,14 @@ class LocalFsArtifactStore(ArtifactStore):
         os.makedirs(self.root, exist_ok=True)
 
     def _path(self, key):
-        return os.path.join(self.root, *validate_key(key).split("/"))
+        return os.path.join(self.root, *validate_artifact_key(key).split("/"))
 
     def _ref(self, key, data):
         return ArtifactRef(key, _sha(data), len(data), media_type_for_key(key))
 
     def put(self, key, data, media_type):
         data = bytes(data)
-        checked_media_type(validate_key(key), media_type)
+        checked_media_type(validate_artifact_key(key), media_type)
         path = self._path(key)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path), prefix=TMP_PREFIX)
@@ -67,7 +67,8 @@ class LocalFsArtifactStore(ArtifactStore):
         files = [base] if os.path.isfile(base) else [os.path.join(d, n) for d, _s, ns in os.walk(base) for n in ns]
         out = []
         for p in files:
-            if os.path.basename(p).startswith(TMP_PREFIX): continue
+            name = os.path.basename(p)
+            if name.startswith(TMP_PREFIX) or name.endswith(RESERVED_SUFFIXES) or ".lock.stale-" in name: continue
             key = os.path.relpath(p, self.root).replace(os.sep, "/")
             with open(p, "rb") as f: out.append(self._ref(key, f.read()))
         return sorted(out, key=lambda r: r.uri)

@@ -3,7 +3,7 @@ import hashlib, io, json, threading
 
 from tcp_planner.storage.interfaces import (ArtifactStore, ArtifactRef, ArtifactExists, ArtifactMissing, IntegrityError,
                                             StateStore, StateRecord, StateExists, StateMissing, StaleHead, StorageError,
-                                            validate_key, media_type_for_key, checked_media_type, _uri)
+                                            validate_key, validate_artifact_key, media_type_for_key, checked_media_type, _uri)
 
 
 def _under(key, prefix):
@@ -14,7 +14,7 @@ class InMemoryArtifactStore(ArtifactStore):
     def __init__(self): self._d = {}; self._lock = threading.Lock()
 
     def put(self, key, data, media_type):
-        data = bytes(data); checked_media_type(validate_key(key), media_type)
+        data = bytes(data); checked_media_type(validate_artifact_key(key), media_type)
         with self._lock:
             if key in self._d and self._d[key] != data: raise ArtifactExists(f"{key} already holds different bytes")
             self._d.setdefault(key, data)
@@ -31,7 +31,7 @@ class InMemoryArtifactStore(ArtifactStore):
     def open(self, ref_or_uri): return io.BytesIO(self.get(ref_or_uri))
 
     def stat(self, key):
-        d = self._d.get(validate_key(key))
+        d = self._d.get(validate_artifact_key(key))
         return None if d is None else ArtifactRef(key, hashlib.sha256(d).hexdigest(), len(d), media_type_for_key(key))
 
     def list(self, prefix=""):
