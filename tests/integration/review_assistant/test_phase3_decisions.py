@@ -69,7 +69,7 @@ def test_dependent_facts_recalculated_and_shown(aenv, runs, no_external):
 
 def test_machine_site_model_is_never_modified(aenv, runs):
     from tcp_planner.review import decision_overlay as sme_overlay
-    from tcp_assistant.services import run_context
+    from tcp_planner.review.assistant.services import run_context
     ctx = run_context.load(runs["lane_conflict"]); m = ctx["machine_site_model"]; before = copy.deepcopy(m)
     eff = sme_overlay.apply(m, {"facts": [{"field": "road.lane_count", "action": "CORRECT", "value": 2, "decision_id": "d1"}]},
                             run_context.config())
@@ -142,7 +142,7 @@ def test_structured_actions_make_zero_llm_calls_and_unstage(aenv, runs, no_exter
     key = r["staged"][0]["key"]
     st, _, r = call("POST", f"conversations/{cid}/decisions/remove", {"key": key}, token=t)
     assert r["staged"] == [] and r["preview"]["eligibility"]["proposed"]["decision"] == "REVIEW_REQUIRED"
-    from tcp_assistant.services.container import container
+    from tcp_planner.review.assistant.services.container import container
     evs = [e for e in container().audit.read() if e["event_type"] == "TOOL_INVOCATION"]
     assert all(e["model_deployment"] == "N/A" and not e["external_call"] for e in evs)
 
@@ -153,5 +153,5 @@ def test_validators_and_rule_pack_files_unchanged():
                           "rule_pack/APPROVED_TWO_LANE_POC_RULE_PACK.json", "src/tcp_planner/layout/rule_engine.py",
                           "src/tcp_planner/geometry/local_frame.py"],
                          capture_output=True, text=True, cwd=__import__("os").path.dirname(__import__("os").path.dirname(
-                             __import__("os").path.dirname(__file__))))
+                             __import__("os").path.dirname(__import__("os").path.dirname(__file__)))))
     assert out.stdout.strip() == ""

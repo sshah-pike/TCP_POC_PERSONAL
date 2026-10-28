@@ -16,7 +16,7 @@ def test_disabled_flag_exposes_only_status_and_creates_no_storage(tmp_path, monk
 
 
 def test_flag_default_is_off(monkeypatch):
-    from tcp_assistant import flags
+    from tcp_planner.review.assistant import flags
     monkeypatch.delenv("TCP_SME_ASSISTANT_ENABLED", raising=False)
     monkeypatch.setattr(flags, "_env_file_value", lambda k: None)
     assert flags.enabled() is False
@@ -56,8 +56,8 @@ def test_session_end(aenv):
 
 
 def test_role_permissions():
-    from tcp_assistant.core import authz
-    from tcp_assistant.core.identity import Identity
+    from tcp_planner.review.assistant.core import authz
+    from tcp_planner.review.assistant.core.identity import Identity
     aud = Identity(subject_id="a", roles=["AUDITOR"])
     assert authz.has(aud, "audit:read") and not authz.has(aud, "review:decide")
     with pytest.raises(Exception) as e: authz.require(aud, "changeset:confirm")
@@ -69,7 +69,7 @@ def test_role_permissions():
 
 
 def test_canonicalization_v1():
-    from tcp_assistant.core.canonical import canonical_text, message_hash
+    from tcp_planner.review.assistant.core.canonical import canonical_text, message_hash
     assert canonical_text("  a\r\nb\rc  \n") == "a\nb\nc"
     assert canonical_text("x  y") == "x  y"  # inner whitespace preserved
     assert canonical_text("é") == "é"  # NFC
@@ -79,8 +79,8 @@ def test_canonicalization_v1():
 
 
 def test_json_store_is_create_only_and_tamper_evident(tmp_path):
-    from tcp_assistant.repositories.json_store import JsonStore
-    from tcp_assistant.repositories.base import ImmutableExists, IntegrityError
+    from tcp_planner.review.assistant.repositories.json_store import JsonStore
+    from tcp_planner.review.assistant.repositories.base import ImmutableExists, IntegrityError
     s = JsonStore(str(tmp_path))
     s.create("versions", "v1", {"a": 1})
     with pytest.raises(ImmutableExists): s.create("versions", "v1", {"a": 2})
@@ -96,7 +96,7 @@ def test_json_store_is_create_only_and_tamper_evident(tmp_path):
 
 
 def test_audit_chain_and_secret_scrubbing(aenv):
-    from tcp_assistant.services.container import container
+    from tcp_planner.review.assistant.services.container import container
     a = container().audit
     a.write("X", None, stream="s1", api_key="SHOULD-NOT-APPEAR", note="Bearer abcdefghijklmnop")
     a.write("Y", None, stream="s1", consequential=True)
@@ -128,7 +128,7 @@ def test_policy_hash_verified_and_master_switch(tmp_path):
 
 
 def test_reserved_profiles_disabled():
-    from tcp_assistant.core.profile import load_profile
+    from tcp_planner.review.assistant.core.profile import load_profile
     assert load_profile("sme_review")["prompt_version"]
     for name in ("tcp_knowledge", "document_revision"):
         with pytest.raises(Exception) as e: load_profile(name)
@@ -136,10 +136,10 @@ def test_reserved_profiles_disabled():
 
 
 def test_tool_registry_allow_list_permission_and_audit_fail_closed(aenv):
-    from tcp_assistant.core.tools import Tool, ToolContext, ToolRegistry
-    from tcp_assistant.core.identity import Identity
-    from tcp_assistant.core.audit import AuditService
-    from tcp_assistant.core.errors import AssistantError
+    from tcp_planner.review.assistant.core.tools import Tool, ToolContext, ToolRegistry
+    from tcp_planner.review.assistant.core.identity import Identity
+    from tcp_planner.review.assistant.core.audit import AuditService
+    from tcp_planner.review.assistant.core.errors import AssistantError
     reg = ToolRegistry(); ran = []
     reg.register(Tool("create_change_set", lambda ctx, **k: ran.append(1) or {"ok": 1}, permission="changeset:create", mutates=True))
     prof = {"allowed_tools": ["create_change_set"], "max_authorized_actions_per_conversation": 10}
@@ -181,16 +181,16 @@ def test_server_mount_disabled_and_existing_routes_unaffected(tmp_path, monkeypa
 def test_audit_chain_valid_with_concurrent_processes(tmp_path):
     """Two server processes writing the same conversation stream must still produce one valid hash chain."""
     import subprocess, sys, textwrap
-    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
     code = textwrap.dedent(f"""
         import sys; sys.path[:0] = [{root!r}, {os.path.join(root, 'src')!r}]
-        from tcp_assistant.core.audit import AuditService
+        from tcp_planner.review.assistant.core.audit import AuditService
         a = AuditService({str(tmp_path)!r})
         for i in range(40): a.write("PING", stream="conv-shared", n=i, writer=sys.argv[1])
     """)
     procs = [subprocess.Popen([sys.executable, "-c", code, w]) for w in ("A", "B")]
     assert all(p.wait(timeout=120) == 0 for p in procs)
-    from tcp_assistant.core.audit import AuditService
+    from tcp_planner.review.assistant.core.audit import AuditService
     evs = AuditService(str(tmp_path)).read("conv-shared")
     assert len(evs) == 80 and {e["writer"] for e in evs} == {"A", "B"}
     assert AuditService.verify_chain(evs)

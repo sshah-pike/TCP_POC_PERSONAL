@@ -12,7 +12,7 @@ POST /api/runs/<id>/stop                stop a running run (ends its runner proc
 GET  /api/runs/<id>                     run state (stages, decision, outputs, cost)
 GET  /api/runs/<id>/files/<name>        a file the pipeline wrote to runs/<id>/output/
 GET  /*                                 built UI from tcp_ui/web/dist
-GET|POST /api/assistant/*               SME Review Assistant (tcp_assistant.api; off unless TCP_SME_ASSISTANT_ENABLED=true)
+GET|POST /api/assistant/*               SME Review Assistant (tcp_planner.review.assistant.routes; off unless TCP_SME_ASSISTANT_ENABLED=true)
 """
 import argparse, json, mimetypes, os, shutil, subprocess, sys, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -292,8 +292,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"error": str(e)}, 400)
 
     def _assistant(self, method, parts, query, payload):
-        """SME Review Assistant routes (tcp_assistant.api); unavailable unless TCP_SME_ASSISTANT_ENABLED=true."""
-        from tcp_assistant import api as assistant_api
+        """SME Review Assistant routes (tcp_planner.review.assistant.routes); unavailable unless TCP_SME_ASSISTANT_ENABLED=true."""
+        from tcp_planner.review.assistant import routes as assistant_api
         status, kind, body = assistant_api.dispatch(method, parts, parse_qs(query or ""), payload,
                                                     {"X-TCP-Session": self.headers.get("X-TCP-Session")})
         if kind == "file":

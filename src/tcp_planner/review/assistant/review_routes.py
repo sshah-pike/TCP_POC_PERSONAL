@@ -1,5 +1,5 @@
 """Review routes (registered on import by api.py). All authorization is enforced here, in the backend."""
-from .api import route
+from tcp_planner.review.assistant.routes import route
 from .core import authz
 from .core.errors import AssistantError
 

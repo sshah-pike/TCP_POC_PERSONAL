@@ -2,7 +2,7 @@ import json, os, sys
 
 import pytest
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
 
 USERS = {"users": [{"subject_id": "sme.1", "display_name": "SME One", "roles": ["SME_REVIEWER"]},
                    {"subject_id": "aud.1", "display_name": "Auditor One", "roles": ["AUDITOR"]},
@@ -19,14 +19,14 @@ def aenv(tmp_path, monkeypatch):
     monkeypatch.setenv("TCP_ASSISTANT_USERS_FILE", str(users))
     monkeypatch.setenv("TCP_UI_RUNS_DIR", str(tmp_path / "runs"))
     (tmp_path / "runs").mkdir()
-    from tcp_assistant.services import container
+    from tcp_planner.review.assistant.services import container
     container.reset()
     yield tmp_path
     container.reset()
 
 
 def call(method, path, payload=None, token=None):
-    from tcp_assistant import api
+    from tcp_planner.review.assistant import routes as api
     parts = [p for p in path.strip("/").split("/") if p]
     return api.dispatch(method, parts, {}, payload, {"X-TCP-Session": token})
 

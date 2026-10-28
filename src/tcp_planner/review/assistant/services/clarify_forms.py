@@ -162,7 +162,7 @@ def submit(ident, cid, ctx, tctx, interpretation_id, op_index, values):
         add_message(cid, "assistant", "DETERMINISTIC_RESULT", {"title": "Removal staged", "text": f"Removal of {data['object_id']} staged (not committed)."})
         return {"staged": r.get("key"), "model_call": False}
     if tgt == "explain":
-        fnd = F.derive(ctx, __import__("tcp_assistant.services.run_context", fromlist=["x"]).config())
+        fnd = F.derive(ctx, __import__("tcp_planner.review.assistant.services.run_context", fromlist=["x"]).config())
         txt = I.explain(ctx, fnd, _objects(ctx), data["target_id"])
         add_message(cid, "assistant", "DETERMINISTIC_RESULT", {"title": "Explanation (from saved data)", "text": txt})
         return {"explanation": txt, "model_call": False}

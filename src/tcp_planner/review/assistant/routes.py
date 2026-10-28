@@ -62,7 +62,7 @@ def status(**_):
 def identities(**_):
     ids = idn.provider().list_identities()
     return {"identity_provider": idn.provider().name, "identities": ids,
-            "configured": bool(ids), "note": None if ids else "Create tcp_assistant/config/users.local.json from users.example.json."}
+            "configured": bool(ids), "note": None if ids else "Create config/assistant/users.local.json from users.example.json."}
 
 
 @route("POST", "sessions", auth=False)
@@ -85,4 +85,4 @@ def end_session(ident, token, **_):
     return {"ended": True}
 
 
-from . import api_review  # noqa: E402,F401  (registers review routes)
+from tcp_planner.review.assistant import review_routes as api_review  # noqa: E402,F401  (registers review routes)

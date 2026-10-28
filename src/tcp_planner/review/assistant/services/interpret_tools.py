@@ -16,7 +16,7 @@ from ..core.errors import AssistantError
 from ..core.ids import new_id
 from ..core.tools import Tool
 from ..flags import CONFIG_DIR, PACKAGE_DIR
-from ..model import provider as MP
+from tcp_planner.review.assistant.text_model import provider as MP
 from . import decisions as D, findings as F, object_tools as O
 
 PROMPT_ID = "sme_intent_v1"
@@ -340,7 +340,7 @@ def explain(ctx, fnd, objects, tid):
 def _interpret_tool(tctx, ctx, cid, text, message):
     ident = tctx.identity; prof = tctx.profile; mcfg = prof["model"]
     from .conversations import _objects
-    fnd = F.derive(ctx, __import__("tcp_assistant.services.run_context", fromlist=["x"]).config())
+    fnd = F.derive(ctx, __import__("tcp_planner.review.assistant.services.run_context", fromlist=["x"]).config())
     objects = _objects(ctx)
     sysmsg, prompt_sha = prompt()
     payload = {"active_context": context_for_model(ctx, fnd, objects)}

@@ -42,5 +42,5 @@ desktop.ini
 .claude/settings.local.json
 
 # SME Review Assistant: local identities and assistant data (sessions, conversations, versions, audits)
-tcp_assistant/config/users.local.json
+config/assistant/users.local.json
 assistant_data/

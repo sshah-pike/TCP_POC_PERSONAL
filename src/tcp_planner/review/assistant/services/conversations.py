@@ -142,7 +142,7 @@ def view(ident, cid):
             "plan": _plan_summary(ctx), "lineage": versions.lineage(conv["lineage_key"]),
             "site_evidence_only": ctx.get("site_evidence_only"),
             "rule_pack": ctx["rule_pack_ref"], "objects": _objects(ctx),
-            "context": __import__("tcp_assistant.services.assistant_state", fromlist=["x"]).context_of(conv, ctx)}
+            "context": __import__("tcp_planner.review.assistant.services.assistant_state", fromlist=["x"]).context_of(conv, ctx)}
 
 
 def _plan_summary(ctx):

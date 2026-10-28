@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from tcp_assistant.core import entity_resolution as ER
+from tcp_planner.review.assistant.core import entity_resolution as ER
 from .conftest import call, login
 from .test_phase4_versions import conv
 from .test_phase8_interpretation import intent, model, msg, op  # noqa: F401  (fixture re-export)
@@ -31,8 +31,8 @@ def test_resolver_no_punctuation_folding_and_collisions():
 
 # ---------------------------------------------------------------- NL: "Move s1 100ft" -> S1, form for direction, no 2nd call
 def test_move_lowercase_id_resolves_and_form_completes_without_model_call(aenv, runs, model):
-    from tcp_assistant.model import provider as MP
-    from tcp_assistant.services.container import container
+    from tcp_planner.review.assistant.text_model import provider as MP
+    from tcp_planner.review.assistant.services.container import container
     t, cid = conv(runs, "supported")
     model["response"] = intent([op("MOVE_DEVICE", "s1", distance=100, unit="FT")], needs_clarification=True,
                                missing_information=["direction"])
@@ -76,7 +76,7 @@ def test_button_path_resolves_case_insensitively(aenv, runs):
 
 
 def test_unknown_object_form_offers_create_and_never_auto_maps(aenv, runs, model):
-    from tcp_assistant.model import provider as MP
+    from tcp_planner.review.assistant.text_model import provider as MP
     t, cid = conv(runs, "supported")
     model["response"] = intent([op("MOVE_DEVICE", "s3", direction="UPSTREAM", distance=50, unit="FT")])
     r = msg(t, cid, "Move s3 50 ft upstream")[2]
@@ -90,7 +90,7 @@ def test_unknown_object_form_offers_create_and_never_auto_maps(aenv, runs, model
 
 
 def test_relative_and_fact_forms(aenv, runs, model):
-    from tcp_assistant.model import provider as MP
+    from tcp_planner.review.assistant.text_model import provider as MP
     t, cid = conv(runs, "missing_road_type")
     model["response"] = intent([op("SET_SITE_FACT", "road.road_type", value_text="the county kind")])
     r = msg(t, cid, "set the road type")[2]
@@ -126,7 +126,7 @@ def test_context_validation(aenv, runs):
 
 # ---------------------------------------------------------------- deterministic draft QA
 def test_draft_qa_is_deterministic(aenv, runs, model):
-    from tcp_assistant.model import provider as MP
+    from tcp_planner.review.assistant.text_model import provider as MP
     t, cid = conv(runs, "driveway_at_sign")
     for qid in ("WHY_BLOCKING", "WHAT_RERUNS", "AZURE_CALLED", "ARTIFACTS_REUSED", "VALIDATOR_RESULT", "VERSION_DIFF", "TA_STATUS"):
         st, _, r = call("POST", f"conversations/{cid}/ask", {"question_id": qid}, token=t)
@@ -142,7 +142,7 @@ def test_draft_qa_is_deterministic(aenv, runs, model):
 
 # ---------------------------------------------------------------- launcher summary / attention / ui state
 def test_run_summary_does_not_create_conversation(aenv, runs):
-    from tcp_assistant.services.container import container
+    from tcp_planner.review.assistant.services.container import container
     t = login()
     s = call("GET", f"runs/{runs['driveway_at_sign']}/assistant-summary", token=t)[2]
     assert s["eligible"] and s["latest_conversation_id"] is None and container().store.list("conversations") == []
@@ -163,14 +163,14 @@ def test_attention_ui_state_and_run_scoped_conversations(aenv, runs):
     st, _, u = call("POST", f"conversations/{cid}/ui-state", {"acknowledged_blocking": a["blocking_ids"]}, token=t)
     assert call("GET", f"conversations/{cid}/attention", token=t)[2]["ui_state"]["acknowledged_blocking"] == a["blocking_ids"]
     assert [c["conversation_id"] for c in call("GET", "conversations", token=t, ) [2]["conversations"]] == [cid]
-    from tcp_assistant import api
+    from tcp_planner.review.assistant import routes as api
     st, _, lst = api.dispatch("GET", ["conversations"], {"run_id": [runs["four_lane"]]}, None, {"X-TCP-Session": t})
     assert lst["conversations"] == []                                     # another run's conversation is never applied
 
 
 def test_accepted_exceptions_are_not_blocking_after_regeneration(aenv, runs, monkeypatch):
     """A regenerated DRAFT_WITH_ENGINEERING_EXCEPTION must not show its accepted conflicts as new blocking items."""
-    from tcp_assistant.services import pipeline_controller
+    from tcp_planner.review.assistant.services import pipeline_controller
     from tests.integration.web_api import inproc
     monkeypatch.setattr(pipeline_controller, "LAUNCHER", lambda rid, rdir: inproc.run(rdir))
     t, cid = conv(runs, "supported")
@@ -194,7 +194,7 @@ def test_accepted_exceptions_are_not_blocking_after_regeneration(aenv, runs, mon
 
 
 def test_delete_session_archives_without_erasing(aenv, runs):
-    from tcp_assistant.services.container import container
+    from tcp_planner.review.assistant.services.container import container
     t, cid = conv(runs, "supported")
     call("POST", f"conversations/{cid}/placements", {"object_id": "S1", "direction": "UPSTREAM", "distance": 10, "unit": "FT", "reason": "x"}, token=t)
     t2, cid2 = conv(runs, "supported")

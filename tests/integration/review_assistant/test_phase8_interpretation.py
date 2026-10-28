@@ -22,8 +22,8 @@ def intent(ops, **kw):
 
 @pytest.fixture
 def model():
-    from tcp_assistant.model import provider as MP
-    from tcp_assistant.model.fake import FakeTextProvider
+    from tcp_planner.review.assistant.text_model import provider as MP
+    from tcp_planner.review.assistant.text_model.fake import FakeTextProvider
     state = {"response": None, "raw": None, "error": None}
     MP.set_factory(lambda prof: FakeTextProvider(state["response"], state["error"], state["raw"]))
     FakeTextProvider.REQUESTS.clear(); MP.CALLS.clear()
@@ -40,8 +40,8 @@ def staged(t, cid):
 
 
 def test_move_instruction_one_call_then_structured_apply(aenv, runs, model):
-    from tcp_assistant.model import provider as MP
-    from tcp_assistant.model.fake import FakeTextProvider
+    from tcp_planner.review.assistant.text_model import provider as MP
+    from tcp_planner.review.assistant.text_model.fake import FakeTextProvider
     t, cid = conv(runs, "supported")
     model["response"] = intent([op("MOVE_DEVICE", "S2", direction="UPSTREAM", distance=100, unit="FT")])
     st, _, r = msg(t, cid, "Move S2 100 ft upstream")
@@ -62,7 +62,7 @@ def test_move_instruction_one_call_then_structured_apply(aenv, runs, model):
     rv = review(t, cid)["review"]
     m = rv["request"]["messages"][0]
     assert m["message_id"] == r["message"]["message_id"] and len(m["message_sha256"]) == 64
-    from tcp_assistant.services.container import container
+    from tcp_planner.review.assistant.services.container import container
     evs = container().audit.read(cid)
     assert any(e["event_type"] == "INTERPRETATION" and e["model_call"] for e in evs)
     assert "Move S2 100 ft upstream" not in json.dumps(evs)               # full text only in the conversation
@@ -95,7 +95,7 @@ def test_s3_never_silently_mapped(aenv, runs, model):
     ("Tell me a joke", "OUT_OF_SCOPE"),
 ])
 def test_screening_rejects_without_model_call(aenv, runs, model, text, status):
-    from tcp_assistant.model import provider as MP
+    from tcp_planner.review.assistant.text_model import provider as MP
     t, cid = conv(runs, "supported")
     r = msg(t, cid, text)[2]
     assert r["status"] == status and r["model_call"] is False and MP.CALLS == []
@@ -103,7 +103,7 @@ def test_screening_rejects_without_model_call(aenv, runs, model, text, status):
 
 
 def test_model_out_of_scope_and_malformed_output(aenv, runs, model):
-    from tcp_assistant.model import provider as MP
+    from tcp_planner.review.assistant.text_model import provider as MP
     t, cid = conv(runs, "supported")
     model["response"] = intent([], intent="OUT_OF_SCOPE", in_scope=False)
     r = msg(t, cid, "Can you help me plan my vacation route along this road?")[2]
@@ -162,7 +162,7 @@ def test_limits(aenv, runs, model):
 def test_foundry_text_provider_path_one_call_no_secret_leak(aenv, runs, monkeypatch):
     from tcp_planner.ai import foundry_provider as fp
     from tcp_planner.ai.foundry_provider import Reply
-    from tcp_assistant.model import provider as MP
+    from tcp_planner.review.assistant.text_model import provider as MP
     sent = []
 
     class FakeAPI:
@@ -178,6 +178,6 @@ def test_foundry_text_provider_path_one_call_no_secret_leak(aenv, runs, monkeypa
     r = msg(t, cid, "Move S1 5 m downstream")[2]
     assert r["status"] == "READY" and len(sent) == 1 and len(MP.CALLS) == 1
     assert all(k == "text" for k, _ in sent[0]["parts"])                       # text only, no images
-    from tcp_assistant.services.container import container
+    from tcp_planner.review.assistant.services.container import container
     blob = json.dumps(container().audit.read()) + json.dumps(container().store.list("interpretations"))
     assert "FOUNDRY-SECRET-KEY-SENTINEL" not in blob and "FOUNDRY-SECRET-KEY-SENTINEL" not in json.dumps(sent[0]["parts"])

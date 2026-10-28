@@ -8,9 +8,9 @@ plan-specific SME exception. Editing the file requires recomputing content_sha25
 import json, os, sys
 
 from tcp_planner.contracts import canonical_json, sha256_hex, TcpError
-from tcp_planner.config.settings import PROJECT_ROOT
+from tcp_planner.config.settings import CONFIG_DIR
 
-POLICY_PATH = os.path.join(PROJECT_ROOT, "tcp_assistant", "config", "SME_ACTION_POLICY.json")
+POLICY_PATH = os.path.join(CONFIG_DIR, "assistant", "SME_ACTION_POLICY.json")
 ACCEPTED_STATUS = ("POC_CONFIGURATION",)
 ACTIONS = ("correct_site_fact", "confirm_site_fact", "mark_site_fact_unresolved", "reject_site_feature",
            "confirm_site_feature", "add_site_feature", "modify_site_feature", "move_existing_device",

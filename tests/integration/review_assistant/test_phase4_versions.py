@@ -7,7 +7,7 @@ from .conftest import call, login, tree_hash
 
 @pytest.fixture
 def inproc_launch(monkeypatch):
-    from tcp_assistant.services import pipeline_controller
+    from tcp_planner.review.assistant.services import pipeline_controller
     from tests.integration.web_api import inproc
     launched = []
 
@@ -131,7 +131,7 @@ def test_save_proposed_revision_then_regenerate_and_roles(aenv, runs, inproc_lau
 
 
 def test_failed_regeneration_keeps_parent_and_allows_retry(aenv, runs, monkeypatch):
-    from tcp_assistant.services import pipeline_controller
+    from tcp_planner.review.assistant.services import pipeline_controller
 
     def boom(rid, rdir): raise RuntimeError("cannot start")
     monkeypatch.setattr(pipeline_controller, "LAUNCHER", boom)
@@ -146,8 +146,8 @@ def test_failed_regeneration_keeps_parent_and_allows_retry(aenv, runs, monkeypat
 
 
 def test_audit_failure_blocks_commit(aenv, runs, monkeypatch):
-    from tcp_assistant.services.container import container
-    from tcp_assistant.core.errors import AssistantError
+    from tcp_planner.review.assistant.services.container import container
+    from tcp_planner.review.assistant.core.errors import AssistantError
     t, cid = conv(runs, "missing_road_type")
     stage_fact(t, cid, "road.road_type", "CORRECT", "RURAL")
     r = review(t, cid)
@@ -163,8 +163,8 @@ def test_audit_failure_blocks_commit(aenv, runs, monkeypatch):
 
 
 def test_version_write_failure_fails_closed(aenv, runs, monkeypatch):
-    from tcp_assistant.services import versions as V
-    from tcp_assistant.core.errors import AssistantError
+    from tcp_planner.review.assistant.services import versions as V
+    from tcp_planner.review.assistant.core.errors import AssistantError
     t, cid = conv(runs, "missing_road_type")
     stage_fact(t, cid, "road.road_type", "CORRECT", "RURAL")
     r = review(t, cid)
@@ -173,7 +173,7 @@ def test_version_write_failure_fails_closed(aenv, runs, monkeypatch):
     monkeypatch.setattr(V, "move_head", boom)
     st, _, res = confirm(t, cid, r, "SAVE_PROPOSED_REVISION")
     assert st == 409 and res["error_code"] == "VERSION_CONFLICT"
-    from tcp_assistant.services.container import container
+    from tcp_planner.review.assistant.services.container import container
     assert any(e["event_type"] == "COMMIT_FAILED" for e in container().audit.read())
 
 
@@ -182,7 +182,7 @@ def test_pipeline_rejects_revision_when_disabled_or_tampered(aenv, runs, monkeyp
     stage_fact(t, cid, "road.road_type", "CORRECT", "RURAL")
     r = review(t, cid)
     st, _, res = confirm(t, cid, r, "SAVE_PROPOSED_REVISION")
-    from tcp_assistant.services.container import container
+    from tcp_planner.review.assistant.services.container import container
     from tcp_planner.orchestration import run_relations as relations
     from tests.integration.web_api import inproc
     store = container().store
@@ -218,7 +218,7 @@ def test_strict_replay_fails_closed_instead_of_calling_provider(aenv, runs):
 def test_running_regeneration_is_not_finalized(aenv, runs, monkeypatch):
     """A regeneration run the UI server is still executing must not be judged (was: RUN_INTERRUPTED -> FAILED)."""
     import sys, types
-    from tcp_assistant.services import pipeline_controller
+    from tcp_planner.review.assistant.services import pipeline_controller
     started = []
     monkeypatch.setattr(pipeline_controller, "LAUNCHER", lambda rid, rdir: started.append((rid, rdir)))  # launched, not finished
     t, cid = conv(runs, "missing_road_type")

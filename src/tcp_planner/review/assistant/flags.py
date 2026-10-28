@@ -1,10 +1,12 @@
 """Feature flag and storage location. Reading the flag never creates assistant storage."""
 import os
 
+from tcp_planner.config import settings
+
 FLAG = "TCP_SME_ASSISTANT_ENABLED"
-PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(PACKAGE_DIR)
-CONFIG_DIR = os.path.join(PACKAGE_DIR, "config")
+PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))  # package data: prompts/
+PROJECT_ROOT = settings.PROJECT_ROOT
+CONFIG_DIR = os.path.join(settings.CONFIG_DIR, "assistant")
 
 
 def _env_file_value(key):

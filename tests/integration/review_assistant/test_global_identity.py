@@ -4,7 +4,7 @@ import hashlib, io, os, re, subprocess, sys, tarfile
 
 import pytest
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 VOLATILE = re.compile(rb'"(generated_at|retrieved_at)": "[^"]*"')
 SCENARIOS = ("supported", "four_lane", "one_way", "missing_lane_count", "missing_road_type", "lane_conflict", "poor_image",
              "encroach", "lane_closure", "intersection", "sidewalk", "ai_unavailable", "driveway_at_sign")

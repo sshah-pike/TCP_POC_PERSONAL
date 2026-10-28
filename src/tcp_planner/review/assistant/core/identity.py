@@ -46,7 +46,7 @@ def users_file():
 
 
 class LocalIdentityProvider(IdentityProvider):
-    """Reads tcp_assistant/config/users.local.json (not committed). Contains no credentials."""
+    """Reads config/assistant/users.local.json (not committed). Contains no credentials."""
     name = "LOCAL_POC"
 
     def _load(self):

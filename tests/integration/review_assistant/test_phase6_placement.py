@@ -17,7 +17,7 @@ def stage(t, cid, **p):
 
 
 def _ctx_site(runs, sc):
-    from tcp_assistant.services import run_context
+    from tcp_planner.review.assistant.services import run_context
     return run_context.load(runs[sc])
 
 

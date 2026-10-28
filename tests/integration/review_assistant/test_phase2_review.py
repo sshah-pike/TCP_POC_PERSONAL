@@ -88,7 +88,7 @@ def test_review_flow_makes_no_ai_or_external_calls(aenv, runs, monkeypatch):
     for k in list(fp.APIS): monkeypatch.setitem(fp.APIS, k, boom)
     t, v = _start(runs, "intersection")
     assert v["findings"]
-    evs = [e for e in __import__("tcp_assistant.services.container", fromlist=["x"]).container().audit.read()
+    evs = [e for e in __import__("tcp_planner.review.assistant.services.container", fromlist=["x"]).container().audit.read()
            if e["event_type"] == "TOOL_INVOCATION"]
     assert evs and all(e["external_call"] is False and e["model_deployment"] == "N/A" for e in evs)
 
