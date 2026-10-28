@@ -4,6 +4,7 @@ import os, subprocess
 
 import pytest
 
+from tests.support.guard_baseline import unapproved_changes
 from tests.support.make_expected import SCENARIOS, json_files, run_offline, stored
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -28,11 +29,10 @@ def test_kml_input_matches_stored_expected(tmp_path):
 
 
 def test_validators_rule_pack_and_core_rules_unchanged():
-    r = subprocess.run(["git", "diff", "--name-only", "HEAD", "--", "src/tcp_planner/validation/validators.py",
-                        "src/tcp_planner/layout/rule_engine.py", "src/tcp_planner/geometry/local_frame.py",
-                        "src/tcp_planner/site_model/fusion.py", "rule_pack/APPROVED_TWO_LANE_POC_RULE_PACK.json",
-                        "config/pipeline_config.json"], cwd=ROOT, capture_output=True, text=True)
-    assert r.stdout.strip() == ""
+    """Compared with the previous slice's last commit, not HEAD (tests/support/guard_baseline.py)."""
+    assert unapproved_changes(["src/tcp_planner/validation/validators.py", "src/tcp_planner/layout/rule_engine.py",
+                               "src/tcp_planner/geometry/local_frame.py", "src/tcp_planner/site_model/fusion.py",
+                               "rule_pack/APPROVED_TWO_LANE_POC_RULE_PACK.json", "config/pipeline_config.json"]) == []
 
 
 def test_protected_run_directory_tracked_and_unchanged():

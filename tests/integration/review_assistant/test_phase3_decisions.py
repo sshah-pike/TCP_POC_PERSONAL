@@ -148,10 +148,7 @@ def test_structured_actions_make_zero_llm_calls_and_unstage(aenv, runs, no_exter
 
 
 def test_validators_and_rule_pack_files_unchanged():
-    import hashlib, subprocess
-    out = subprocess.run(["git", "diff", "--name-only", "HEAD", "--", "src/tcp_planner/validation/validators.py",
-                          "rule_pack/APPROVED_TWO_LANE_POC_RULE_PACK.json", "src/tcp_planner/layout/rule_engine.py",
-                          "src/tcp_planner/geometry/local_frame.py"],
-                         capture_output=True, text=True, cwd=__import__("os").path.dirname(__import__("os").path.dirname(
-                             __import__("os").path.dirname(__import__("os").path.dirname(__file__)))))
-    assert out.stdout.strip() == ""
+    from tests.support.guard_baseline import unapproved_changes
+    assert unapproved_changes(["src/tcp_planner/validation/validators.py",
+                               "rule_pack/APPROVED_TWO_LANE_POC_RULE_PACK.json", "src/tcp_planner/layout/rule_engine.py",
+                               "src/tcp_planner/geometry/local_frame.py"]) == []
