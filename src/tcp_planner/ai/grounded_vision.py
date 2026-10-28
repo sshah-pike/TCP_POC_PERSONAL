@@ -212,7 +212,7 @@ def _downgrade(obs, conf_key):
 
 def check(obs, info, geo_side=None, claims=None, lane_width_plausible_m=None):
     """Apply the checks to the CANONICAL observation in place. Returns check records. Values may only become
-    UNKNOWN/null and confidences may only decrease. lane_width_plausible_m: (min, max) from poc_config
+    UNKNOWN/null and confidences may only decrease. lane_width_plausible_m: (min, max) from pipeline_config
     fusion.lane_width_plausible_m (the module default is kept only for callers without a config)."""
     out = []; m = info["measurements"]; wr = obs["work_reference"]; re = obs["road_edges"]
     lo, hi = lane_width_plausible_m or LANE_WIDTH_PLAUSIBLE_M

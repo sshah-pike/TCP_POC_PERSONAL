@@ -13,7 +13,7 @@ from tcp_planner.imagery.map_provider import StaticMapProvider
 LAT0, LON0 = 33.0, -97.0
 HALF = 250.0          # synthetic image half-extent, metres
 SIZE = 1280
-AI_PX = SIZE          # the model receives the native wide image (poc_config imagery.wide_image_px)
+AI_PX = SIZE          # the model receives the native wide image (pipeline_config imagery.wide_image_px)
 LANE_PIX_W = 3.65     # drawing only (synthetic picture), never used for decisions
 EDGE_LINE_W = 0.15    # drawing only
 

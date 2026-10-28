@@ -2,7 +2,7 @@
 
 Rules of fusion (fail closed):
 - Every source observation is preserved next to the resolved value.
-- A model-read critical field resolves on one of these paths (poc_config "agent" / "fusion"):
+- A model-read critical field resolves on one of these paths (pipeline_config "agent" / "fusion"):
     AGREEMENT  the field is in agent.agreement_fields, the target OSM way carries the tag EXPLICITLY, the way was
                last edited within agent.agreement_osm_max_age_years, the model value equals the OSM value and the
                model confidence >= agent.agreement_floor. Call-1 answers only (agent); source "AI+OSM_AGREEMENT".

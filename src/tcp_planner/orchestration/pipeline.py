@@ -1,4 +1,4 @@
-"""TCP POC - Pipeline 2: KML/coordinates -> SiteModel -> eligibility -> TA-1 plan -> validation -> render.
+"""TCP Planner - Pipeline 2: KML/coordinates -> SiteModel -> eligibility -> TA-1 plan -> validation -> render.
 
 Exit codes: 0 draft exported | 3 REVIEW_REQUIRED | 4 UNSUPPORTED_POC | 2 configuration/rule-pack failure.
 """

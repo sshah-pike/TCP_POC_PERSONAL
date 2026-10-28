@@ -7,7 +7,7 @@ WATERMARK = "AUTOMATED DRAFT - NOT APPROVED FOR FIELD USE"
 
 
 class DebugRenderer:
-    """Matplotlib PNG/PDF for POC debugging."""
+    """Matplotlib PNG/PDF for pipeline debugging."""
 
     def render(self, plan, image, png_path, pdf_path):
         import matplotlib; matplotlib.use("Agg")

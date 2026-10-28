@@ -1,4 +1,4 @@
-"""Offline contract tests for the TCP POC (no network, no API keys).
+"""Offline contract tests for the pipeline (no network, no API keys).
 
 Run from the project root:  python -m pytest tests/integration/pipeline -q
 """

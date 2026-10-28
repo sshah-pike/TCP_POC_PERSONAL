@@ -1,4 +1,4 @@
-"""Local HTTP API + static host for the TCP POC Runner UI (standard library only).
+"""Local HTTP API + static host for the TCP Planner web UI (standard library only).
 
     python -m tcp_planner.web_api.server [--port 8765]        ->  http://127.0.0.1:8765
 

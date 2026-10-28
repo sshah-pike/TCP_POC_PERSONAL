@@ -1,6 +1,6 @@
 """Deterministic road cross-section from a close-view image (no model involved).
 
-At a station of the OSM centreline the image is sampled along lines perpendicular to the road (poc_config
+At a station of the OSM centreline the image is sampled along lines perpendicular to the road (pipeline_config
 "cross_section"): several sections a few metres apart, each a brightness profile +/- profile_half_length_m around the
 OSM centreline point. Painted lines are bright, narrow runs above the profile's own median (white = low chroma,
 yellow = red-minus-blue). On each section the measurement looks for two EDGE lines whose spacing fits the lane count
