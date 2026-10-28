@@ -174,7 +174,7 @@ class _Evidence:
         self._osm_geo = None
         if run:
             from tcp_planner.storage.evidence_store import EvidenceStore
-            self.store = EvidenceStore(run["run_dir"], run["run_id"], rec.event)
+            self.store = EvidenceStore(run["run_id"], rec.event)
             self.replay = run.get("replay")
 
     def views(self, context):
@@ -200,7 +200,7 @@ class _Evidence:
             found = self.try_reuse(V.VIEW_KIND, sig) if self.store else None
             if found is not None:
                 try:
-                    with Image.open(found["path"]) as im: img = im.convert("RGB")
+                    with Image.open(io.BytesIO(E.read_bytes(found))) as im: img = im.convert("RGB")
                     if E.pixel_hash(img) != found["metadata"].get("pixel_sha256"): raise ValueError("pixel hash mismatch")
                     self.accept(found)
                     out.append({**spec, "image": img, "meta": found["metadata"]["meta"]}); continue
@@ -322,7 +322,7 @@ class EvidenceMapProvider:
         if found is not None:
             try:
                 from PIL import Image
-                with Image.open(found["path"]) as im: img = im.convert("RGB")
+                with Image.open(io.BytesIO(E.read_bytes(found))) as im: img = im.convert("RGB")
                 meta = found["metadata"]["meta"]
                 if img.size != (int(size_px), int(size_px)) or any(k not in meta for k in E.MAP_META_REQUIRED) \
                         or E.pixel_hash(img) != found["metadata"].get("pixel_sha256"):
@@ -364,7 +364,7 @@ class EvidenceMapProvider:
         if found is not None:
             try:
                 from PIL import Image
-                with Image.open(found["path"]) as im: img = im.convert("RGB")
+                with Image.open(io.BytesIO(E.read_bytes(found))) as im: img = im.convert("RGB")
                 if E.pixel_hash(img) != found["metadata"].get("pixel_sha256"): raise ValueError("pixel hash mismatch")
                 ev.accept(found); self.last_reused = True
                 return img, dict(found["metadata"]["meta"])
@@ -400,7 +400,7 @@ class EvidenceOsmSource:
         found = ev.try_reuse("osm", sig) if sig else None
         if found is not None:
             try:
-                with open(found["path"], encoding="utf-8") as f: elements = json.load(f)
+                elements = json.loads(E.read_bytes(found).decode("utf-8"))
                 if not isinstance(elements, list): raise ValueError("not a list of OSM elements")
                 ev.accept(found); ev.osm_elements = elements
                 return elements
@@ -464,7 +464,7 @@ class EvidenceVisionProvider:
         found = ev.try_reuse("ai", sig) if sig else None
         if found is not None:
             try:
-                with open(found["path"], encoding="utf-8") as f: doc = json.load(f)
+                doc = json.loads(E.read_bytes(found).decode("utf-8"))
                 if doc.get("status") != "OK": raise ValueError("saved AI result is a failure")
                 result = doc["result"]; validate_observation(result["observation"])
                 ev.accept(found)
@@ -568,7 +568,7 @@ def _run_context(run_dir, req, rec):
     resume_path = os.path.join(run_dir, "ui", "resume.json")
     if os.path.isfile(resume_path):
         with open(resume_path, encoding="utf-8") as f: resume = json.load(f)
-        ctx["replay"] = ReplaySource(os.path.dirname(run_dir), resume["parent_run_id"], resume.get("reuse_kinds", []),
+        ctx["replay"] = ReplaySource(resume["parent_run_id"], resume.get("reuse_kinds", []),
                                      resume.get("extra_sources", []))
         ctx["ai_provider"] = resume.get("ai_provider")
         ctx["evidence_mode"] = resume.get("evidence_mode") or ctx["evidence_mode"]
@@ -597,16 +597,16 @@ def prepare_views(comparison_dir):
         app.load_env_file(); app.use_os_trust_store()
 
         def analysis(kind):
-            cands = [e for e in E.load_manifest(src_dir) if e.get("kind") == kind
+            cands = [e for e in E.load_manifest(src) if e.get("kind") == kind
                      and e.get("producer_span") == E.ANALYSIS_SPANS[kind]]
-            r = E.resolve(root, src, cands[-1]) if cands else None
+            r = E.resolve(src, cands[-1]) if cands else None
             problem = E.verify_file(r) if cands else "no saved %s artifact" % kind
             if problem: raise RuntimeError("source %s evidence: %s" % (kind, problem))
             return r
         m, o = analysis("map"), analysis("osm")
         with open(os.path.join(src_dir, "output", "project_geometry.json"), encoding="utf-8") as f: pg = json.load(f)
         if E.geometry_hash(pg) != m["signature"]["geometry_hash"]: raise RuntimeError("source geometry hash mismatch")
-        with open(o["path"], encoding="utf-8") as f: elements = json.load(f)
+        elements = json.loads(E.read_bytes(o).decode("utf-8"))
         bearing = round(reference_bearing(osm_adapter.extract_evidence(elements, pg, app.load_config())), 1)
         name = m["signature"]["provider"]
         if name == "offline_synthetic":
@@ -620,7 +620,7 @@ def prepare_views(comparison_dir):
         from tcp_planner.orchestration.run_relations import evidence_holders
         others = [c for c in evidence_holders(src) if c != os.path.basename(cdir)]
         ev = _Evidence(rec, {"run_dir": cdir, "run_id": os.path.basename(cdir), "evidence_mode": "multi",
-                             "replay": E.ReplaySource(root, src, ["map_view"], others)})
+                             "replay": E.ReplaySource(src, ["map_view"], others)})
         ev.analysis = (provider, pg, m["signature"]["half_extent_m"]); ev.osm_elements = elements
         rec.open_spans.append("tcp.prep.views")
         views = []

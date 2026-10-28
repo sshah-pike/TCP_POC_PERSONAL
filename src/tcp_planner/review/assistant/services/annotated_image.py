@@ -124,7 +124,8 @@ def render(ctx, site, findings, plan=None, extra_items=()):
     """-> (png bytes, items, crop box)."""
     from PIL import Image, ImageDraw
     ev = ctx["evidence"]["map"]
-    with Image.open(ev["path"]) as im: base = im.convert("RGB")
+    from tcp_planner.storage.evidence_store import read_bytes
+    with Image.open(io.BytesIO(read_bytes(ev))) as im: base = im.convert("RGB")
     meta = ev["metadata"]["meta"]
     cv = Canvas(base, meta, site)
     items = build_items(ctx, site, findings, plan, extra_items)

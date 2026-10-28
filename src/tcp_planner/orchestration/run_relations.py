@@ -9,7 +9,8 @@ import json, os, shutil
 
 from tcp_planner.storage import run_store as store
 from tcp_planner.storage.evidence_store import (ANALYSIS_SPANS, KIND_STAGE, load_manifest, resolve, verify_file,
-                                                sha256_file)
+                                                sha256_file, read_bytes)
+from tcp_planner.storage.interfaces import StorageError
 
 STAGE_ORDER = [s[0] for s in store.STAGES]  # input .. render
 REUSE_ORDER = ["map", "osm", "ai"]
@@ -46,7 +47,7 @@ LEGACY = "LEGACY EVIDENCE"
 def evidence_compat(run_id, state=None):
     """Whether a run's imagery evidence may be reused: OK, LEGACY (pre-scale-fix / pre-evidence Azure imagery) or NONE."""
     from tcp_planner.imagery.map_provider import AzureMapsProvider
-    maps = [e for e in load_manifest(store.run_path(run_id))
+    maps = [e for e in load_manifest(run_id)
             if e.get("kind") == "map" and e.get("producer_span") == ANALYSIS_SPANS["map"]]
     for e in maps:
         sig = e.get("signature") or {}
@@ -69,16 +70,16 @@ def _analysis_artifact(parent_id, kind):
     if kind == "map":
         compat = evidence_compat(parent_id)
         if compat["status"] == "LEGACY": return None, compat["reason"]
-    cands = [e for e in load_manifest(rdir) if e.get("kind") == kind and e.get("producer_span") == ANALYSIS_SPANS[kind]]
+    cands = [e for e in load_manifest(parent_id) if e.get("kind") == kind and e.get("producer_span") == ANALYSIS_SPANS[kind]]
     if not cands: return None, f"source run has no saved {kind} artifact from {STAGE_TITLE[KIND_STAGE[kind]]}"
-    r = resolve(store.runs_dir(), parent_id, cands[-1])
+    r = resolve(parent_id, cands[-1])
     problem = verify_file(r)
     if problem: return None, problem
     if kind == "ai":
         try:
-            with open(r["path"], encoding="utf-8") as f:
-                if json.load(f).get("status") != "OK": return None, "source AI result is a failure, nothing to reuse"
-        except (OSError, ValueError):
+            if json.loads(read_bytes(r).decode("utf-8")).get("status") != "OK":
+                return None, "source AI result is a failure, nothing to reuse"
+        except (StorageError, ValueError):
             return None, "source AI artifact cannot be read"
     return r, None
 
@@ -132,9 +133,9 @@ def resume_preview(parent_id, stage, ai_profile=None, ai_provider=None, evidence
                        "source_run": r["origin_run"], "artifact": r["origin_artifact_id"], "file": r["origin_file"],
                        "sha256": r["sha256"], "api_call": False})
     if usable.get("map"):  # a saved sheet aerial is reused too when the render request matches it
-        for e in load_manifest(store.run_path(parent_id)):
+        for e in load_manifest(parent_id):
             if e.get("kind") == "map" and e.get("producer_span") == "tcp.sheet.render":
-                r = resolve(store.runs_dir(), parent_id, e)
+                r = resolve(parent_id, e)
                 if verify_file(r) is None:
                     reused.append({"stage": "render", "title": "Render / Export (sheet aerial)", "kind": "map",
                                    "source_run": r["origin_run"], "artifact": r["origin_artifact_id"],
@@ -159,7 +160,7 @@ def resume_preview(parent_id, stage, ai_profile=None, ai_provider=None, evidence
             rerun.append({"stage": key, "title": STAGE_TITLE[key], "external_call": ext, "reason": reason})
     if evidence_mode == "multi" and "map" in kinds:
         kinds = kinds + ["map_view"]
-        saved = [e for e in load_manifest(store.run_path(parent_id)) if e.get("kind") == "map_view"]
+        saved = [e for e in load_manifest(parent_id) if e.get("kind") == "map_view"]
         for x in rerun:
             if x["stage"] == "vision":
                 x["external_call"] = (x["external_call"] or "") + ("; multi-resolution views reused if verified" if saved
@@ -299,9 +300,11 @@ def create_children(cid):
 
 
 def _ai_doc(run_id):
-    for e in reversed(load_manifest(store.run_path(run_id))):
+    for e in reversed(load_manifest(run_id)):
         if e.get("kind") == "ai" and e.get("mode") == "saved":
-            return store._read_json(store.run_path(run_id, "evidence", e["file"])), e
+            r = resolve(run_id, e)
+            try: return json.loads(read_bytes(r).decode("utf-8")), e
+            except (StorageError, ValueError, TypeError): return None, e
     return None, None
 
 

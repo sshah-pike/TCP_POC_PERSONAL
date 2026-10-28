@@ -18,7 +18,8 @@ import argparse, json, mimetypes, os, shutil, subprocess, sys, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit, parse_qs, unquote
 
-from tcp_planner.storage import run_store as store
+from tcp_planner.storage import run_store as store, stores
+from tcp_planner.storage.interfaces import ArtifactMissing
 
 WEB_DIST = os.path.join(store.PROJECT_ROOT, "apps", "web", "dist")
 MAX_BODY = 10 * 1024 * 1024
@@ -178,16 +179,24 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.end_headers(); self.wfile.write(body)
 
-    def _file(self, path, download=False):
-        ext = os.path.splitext(path)[1].lower()
-        ctype = CONTENT_TYPES.get(ext) or mimetypes.guess_type(path)[0] or "application/octet-stream"
+    def _send(self, name, data, download=False):
+        ext = os.path.splitext(name)[1].lower()
+        ctype = CONTENT_TYPES.get(ext) or mimetypes.guess_type(name)[0] or "application/octet-stream"
         self.send_response(200)
-        self.send_header("Content-Type", ctype); self.send_header("Content-Length", str(os.path.getsize(path)))
+        self.send_header("Content-Type", ctype); self.send_header("Content-Length", str(len(data)))
         self.send_header("Cache-Control", "no-store"); self.send_header("X-Content-Type-Options", "nosniff")
         if download or ext in ATTACHMENT_EXT:
-            self.send_header("Content-Disposition", f'attachment; filename="{os.path.basename(path)}"')
+            self.send_header("Content-Disposition", f'attachment; filename="{os.path.basename(name)}"')
         self.end_headers()
-        with open(path, "rb") as f: shutil.copyfileobj(f, self.wfile)
+        self.wfile.write(data)
+
+    def _file(self, path, download=False):
+        with open(path, "rb") as f: data = f.read()
+        return self._send(path, data, download)
+
+    def _artifact(self, uri, download=False):
+        """Serve a stored artifact by key, hash-free (the manifest check happens in the caller)."""
+        return self._send(uri, stores.artifacts().get(uri), download)
 
     # ---------------- routes ----------------
     def do_GET(self):
@@ -228,12 +237,12 @@ class Handler(BaseHTTPRequestHandler):
                     rep = relations.comparison_state(parts[2], live_ids())
                     return self._json(rep) if rep else self._json({"error": "comparison not found"}, 404)
                 if len(parts) == 5 and parts[1] == "runs" and parts[3] == "evidence":
-                    from tcp_planner.storage.evidence_store import load_manifest
-                    name = parts[4]; rdir = store.run_path(parts[2])
-                    saved = {e["file"] for e in load_manifest(rdir) if e.get("mode") == "saved"}
-                    path = os.path.join(rdir, "evidence", name)
-                    if name in saved and os.path.isfile(path):  # only files this run's manifest lists
-                        return self._file(path, "download" in parse_qs(url.query))
+                    from tcp_planner.storage.evidence_store import load_manifest, evidence_key
+                    name = parts[4]; store.run_path(parts[2])  # validates the run id
+                    saved = {e["file"] for e in load_manifest(parts[2]) if e.get("mode") == "saved"}
+                    if name in saved:  # only files this run's manifest lists
+                        try: return self._artifact(evidence_key(parts[2], name), "download" in parse_qs(url.query))
+                        except ArtifactMissing: pass
                     return self._json({"error": "file not found"}, 404)
                 if len(parts) == 5 and parts[1] == "runs" and parts[3] == "files":
                     out_dir = store.run_path(parts[2], "output"); name = parts[4]

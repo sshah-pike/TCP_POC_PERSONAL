@@ -201,8 +201,8 @@ def test_strict_replay_fails_closed_instead_of_calling_provider(aenv, runs):
     from tcp_planner.orchestration import run_relations as relations
     from tests.integration.web_api import inproc
     parent = runs["supported"]
-    man = json.loads((aenv / "runs" / parent / "evidence" / "manifest.json").read_text())
-    ai = next(e for e in man["artifacts"] if e["kind"] == "ai")
+    from tcp_planner.storage.evidence_store import load_manifest
+    ai = next(e for e in load_manifest(parent) if e["kind"] == "ai")
     os.remove(aenv / "runs" / parent / "evidence" / ai["file"])
     rid, rdir = relations.create_resume_run(parent, "fusion", strict_replay=True)
     inproc.run(rdir)

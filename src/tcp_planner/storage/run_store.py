@@ -366,7 +366,7 @@ def build_state(run_id, live_ids=(), with_lineage=True):
         "draft_generated": draft, "outputs": outputs, "log": lines,
         "tls": _read_json(os.path.join(ui, "tls.json")),
         "cost": cost_summary(req, spans, _read_json(os.path.join(ui, "usage.json"), []), have, calls, ev_events),
-        "evidence": _evidence_list(rdir),
+        "evidence": _evidence_list(run_id),
         "evidence_compat": _compat(run_id, {"stages": stages}),
         "lineage": _lineage(run_id, ui, ev_events, done) if with_lineage else None,
         "sme_revision": _sme_revision(ui, rdir, plan_status),
@@ -388,11 +388,11 @@ def _compat(run_id, partial_state):
     except Exception: return None
 
 
-def _evidence_list(rdir):
+def _evidence_list(run_id):
     from tcp_planner.storage.evidence_store import load_manifest
     return [{k: e.get(k) for k in ("artifact_id", "kind", "mode", "file", "sha256", "size_bytes", "producer_span",
                                    "produced_by_run", "source_run", "source_artifact_id", "created_at")}
-            for e in load_manifest(rdir)]
+            for e in load_manifest(run_id)]
 
 
 def _lineage(run_id, ui, ev_events, done):

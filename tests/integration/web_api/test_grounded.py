@@ -259,7 +259,7 @@ def test_osm_claims_and_centerline_switches(env, monkeypatch):
     # explicitly (here road_edges, and the fake OSM way has no width tag -> no claims)
     assert not with_claims["grounding"]["claims"]
     assert {x["id"]: x for x in with_claims["grounding"]["checks"]}["C4_JUNCTIONS_VS_OSM"]["result"] in ("PASS", "NOT_APPLICABLE")
-    plans = {e["signature"]["plan"] for e in load_manifest(store.run_path(cid)) if e["kind"] == "map_view"}
+    plans = {e["signature"]["plan"] for e in load_manifest(cid) if e["kind"] == "map_view"}
     assert plans == {"views-v1", "views-cl-v1"}  # both view plans prepared once, separately
     # centerline corridor views sit on the OSM centerline
     from tcp_planner.orchestration import pipeline as app
@@ -267,7 +267,7 @@ def test_osm_claims_and_centerline_switches(env, monkeypatch):
     from tcp_planner.geometry.local_frame import signed_lateral
     pg = store._read_json(store.run_path(src, "output", "project_geometry.json"))
     cl = osm_adapter.extract_evidence(SC["osm_elements"], pg, app.load_config())["centerline_enu"]
-    for e in load_manifest(store.run_path(cid)):
+    for e in load_manifest(cid):
         if e["kind"] == "map_view" and e["signature"]["plan"] == "views-cl-v1" and e["metadata"]["role"] != "work_area":
             assert signed_lateral(cl, tuple(e["metadata"]["offset_m"]))[0] < 0.5
 

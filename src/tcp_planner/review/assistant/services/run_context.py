@@ -39,7 +39,7 @@ def eligibility(run_id):
     if st is None: raise AssistantError("NOT_FOUND", "Run not found.", 404)
     add = lambda code, msg: reasons.append({"code": code, "message": msg})
     if st["state"] != "FINISHED": add("RUN_NOT_FINISHED", "the run has not finished")
-    manifest = load_manifest(rdir)
+    manifest = load_manifest(run_id)
     if not manifest: add("EVIDENCE_MANIFEST_MISSING", "no saved evidence manifest (CLI or pre-evidence runs are not eligible)")
     compat = evidence_compat(run_id, st)
     if compat["status"] == "LEGACY": add("EVIDENCE_LEGACY", compat["reason"])
@@ -49,7 +49,7 @@ def eligibility(run_id):
         if not cands:
             if manifest: add("EVIDENCE_MISSING", f"no saved {kind} evidence"); continue
             continue
-        r = resolve(store.runs_dir(), run_id, cands[-1]); problem = verify_file(r)
+        r = resolve(run_id, cands[-1]); problem = verify_file(r)
         if problem: add("EVIDENCE_CORRUPT_OR_MISSING", f"{kind} evidence: {problem}"); continue
         resolved[kind] = r
     out = os.path.join(rdir, "output")
@@ -68,7 +68,7 @@ def eligibility(run_id):
     crops = []
     for e in manifest:
         if e.get("kind") == "map_crop":
-            r = resolve(store.runs_dir(), run_id, e)
+            r = resolve(run_id, e)
             if r is not None and verify_file(r) is None: crops.append(r)
     pg = _read(os.path.join(out, "project_geometry.json"))
     from tcp_planner.evaluation.ground_truth_labels import site_id_for
