@@ -686,7 +686,7 @@ def prepare_views(comparison_id):
         return False
 
 
-PATH_FLAGS = ("--out", "--kml", "--sme-revision")
+PATH_FLAGS = ("--out", "--kml", "--sme-revision", "--zone")
 
 
 def resolve_argv(argv):

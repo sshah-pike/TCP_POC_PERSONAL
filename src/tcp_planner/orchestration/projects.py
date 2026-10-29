@@ -207,6 +207,19 @@ def build_zones(record, project_id):
     return zones
 
 
+def zone_engine_input(record, zone, project_id):
+    """The write-once engine input of one zone run (<run_id>/input/zone_input.json). kml_reader.from_zone turns it
+    into the pipeline's ProjectGeometry; project_id and lineage_key are carried for the run record only."""
+    if zone["status"] == ZONE_NOT_SUPPORTED: raise ProjectInputError("ZONE_NOT_RUNNABLE", f"zone {zone['zone_id']} does not run in S3")
+    by_id = {d["location_id"]: d for d in record["locations"]}
+    return {"schema_version": SCHEMA_VERSION, "project_id": project_id, "lineage_key": zone["lineage_key"],
+            "zone": {k: zone[k] for k in ("zone_id", "version", "sheet_label", "engine_geometry_hash")}
+                    | {"ta_hypothesis": zone["inputs"]["ta_hypothesis"]},
+            "locations": [by_id[i] for i in zone["location_ids"]],
+            "start_fields": {f: zone["inputs"][f] for f in START_FIELDS},
+            "advanced": zone["inputs"]["advanced"]}
+
+
 def runnable_zones(zones):
     return [z for z in zones if z["status"] != ZONE_NOT_SUPPORTED]
 

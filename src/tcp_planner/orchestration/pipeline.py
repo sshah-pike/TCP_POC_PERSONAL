@@ -115,11 +115,25 @@ class Run:
         return f"{lat:.{nd}f}, {lon:.{nd}f}" + ("" if self.exact else " (rounded)")
 
 
-def run_pipeline(*, out_dir, kml=None, lat=None, lon=None, operator=None, map_provider=None, vision_provider=None,
-                 osm_source=None, rule_pack_path=None, config_path=None, dwt_config=None, dwt_mode="PLAN",
-                 exact_coords=False, sme_revision=None, overwrite=False):
+def _read_zone(path):
+    with open(path, encoding="utf-8") as f: return json.load(f)
+
+
+def zone_operator(zone_input, options=None):
+    """The operator inputs of a zone run: the SME's start fields from the zone input, nothing else (D-59). traffic
+    volume and the TA selection are carried for the router (S7); this version records them and does not use them."""
+    sf = zone_input["start_fields"]
+    return {"road_type": sf["road_type"], "speed_mph": sf["posted_speed_mph"],
+            "requires_lane_closure": sf["lane_closure"] is True, "traffic_volume": sf["traffic_volume"],
+            "ta_hypothesis": zone_input["zone"]["ta_hypothesis"], "options": dict(options or {})}
+
+
+def run_pipeline(*, out_dir, kml=None, lat=None, lon=None, zone=None, operator=None, map_provider=None,
+                 vision_provider=None, osm_source=None, rule_pack_path=None, config_path=None, dwt_config=None,
+                 dwt_mode="PLAN", exact_coords=False, sme_revision=None, overwrite=False):
     """Run Pipeline 2 end-to-end. Returns a result dict; never raises for site-level outcomes.
 
+    zone: optional path of a zone engine input (S3 project runs); it replaces kml / lat / lon.
     sme_revision: optional path of an SME revision (src/tcp_planner/review/sme_revision.py; SME Review Assistant only). When None
     the pipeline runs exactly as before."""
     run = Run(out_dir, exact_coords, overwrite); tel = run.tel
@@ -130,9 +144,11 @@ def run_pipeline(*, out_dir, kml=None, lat=None, lon=None, operator=None, map_pr
         config = load_config(config_path)
 
         # ---- input ----
-        with tel.span("tcp.input.parse", input_type="KML" if kml else "COORDINATES") as sp:
+        with tel.span("tcp.input.parse", input_type="ZONE" if zone else "KML" if kml else "COORDINATES") as sp:
             try:
-                pg = kml_input.parse_kml(kml, config["input"]["max_work_path_m"]) if kml else kml_input.from_coordinates(lat, lon)
+                if zone: pg = kml_input.from_zone(_read_zone(zone))
+                elif kml: pg = kml_input.parse_kml(kml, config["input"]["max_work_path_m"], config["input"]["duplicate_distance_m"])
+                else: pg = kml_input.from_coordinates(lat, lon)
             except InputRejected as e:
                 tel.set(sp, decision=UNSUPPORTED_POC, reason_codes=e.reason_codes)
                 elig = _blocked(UNSUPPORTED_POC, e.reason_codes, f"Input rejected: {e.message}. {UNSUPPORTED_MESSAGE}", e.details)
@@ -143,6 +159,11 @@ def run_pipeline(*, out_dir, kml=None, lat=None, lon=None, operator=None, map_pr
         ref = pg["work_reference"]
         run.say(f"1 Input: {pg['input_type']}  work reference {run.where(ref['latitude'], ref['longitude'])}  "
                 f"path points {len(pg['work_path'])}")
+        if zone:
+            z = pg["zone"]; sf = z["start_fields"]
+            run.say(f"   Zone {z['zone_id']} v{z['version']}  Select TA {z['ta_hypothesis']} (recorded; checked from S7)  "
+                    f"start fields: road type {sf['road_type']}, {sf['posted_speed_mph']} mph, volume {sf['traffic_volume']}, "
+                    f"lane closure {'yes' if sf['lane_closure'] else 'no'}")
 
         # ---- approved rule pack (fail closed) ----
         with tel.span("tcp.rulepack.load") as sp:
@@ -503,34 +524,47 @@ def main(argv=None):
     ap.add_argument("--log-exact-coordinates", action="store_true")
     ap.add_argument("--sme-revision", help="SME revision JSON from the SME Review Assistant (requires "
                                            "TCP_SME_ASSISTANT_ENABLED=true); omit for the normal pipeline")
+    ap.add_argument("--zone", help="zone engine input JSON written by the project orchestrator (one zone of a project); "
+                                   "its start fields are the only source of road type, speed, volume and lane closure")
     a = ap.parse_args(argv)
+    if a.zone and (a.kml or a.lat is not None or a.lon is not None):
+        ap.error("--zone takes its location from the zone input; do not add --kml, --lat or --lon")
+    if a.zone and (a.road_type or a.speed is not None or a.requires_lane_closure):
+        ap.error("--zone carries the SME's start fields; --road-type, --speed and --requires-lane-closure are not allowed")
     try: check_out_dir(a.out, a.overwrite)
     except TcpError as e:
         print(f"error: {e.message}", file=sys.stderr); return 2
 
     operator = {"road_type": a.road_type, "speed_mph": a.speed, "requires_lane_closure": a.requires_lane_closure,
                 "options": dict(a.option)}
+    if a.zone:
+        try: operator = zone_operator(_read_zone(a.zone), dict(a.option))
+        except (OSError, ValueError, KeyError) as e:
+            print(f"error: cannot read the zone input ({type(e).__name__})", file=sys.stderr); return 2
     kw = dict(out_dir=a.out, overwrite=a.overwrite, rule_pack_path=a.rule_pack, config_path=a.config,
               dwt_config=None if a.no_dwt else a.dwt_config, dwt_mode=a.dwt_mode,
               exact_coords=a.log_exact_coordinates)
     if a.offline:
         sc = offline.build(a.offline)
-        op = dict(sc["operator"]); op.update({k: v for k, v in operator.items() if v not in (None, False, {})})
+        if a.zone:  # an offline project: the scenario's simulated providers, the zone's location and start fields only
+            op = operator; kw["zone"] = a.zone
+        else:
+            op = dict(sc["operator"]); op.update({k: v for k, v in operator.items() if v not in (None, False, {})})
         kw.update(operator=op, map_provider=sc["map_provider"], vision_provider=sc["vision_provider"],
                   osm_source=lambda lat, lon, radius: sc["osm_elements"])
-        if a.offline_input == "kml":
+        if not a.zone and a.offline_input == "kml":
             kw["kml"] = offline.write_kml(os.path.join(tempfile.mkdtemp(), "offline_work_point.kml"), sc["lat"], sc["lon"])
-        else:
+        elif not a.zone:
             kw.update(lat=sc["lat"], lon=sc["lon"])
         print(f"OFFLINE scenario '{sc['name']}' - simulated road, imagery, OSM and AI observation (not real data)")
     else:
-        if not a.kml and (a.lat is None or a.lon is None):
-            ap.error("give --kml PATH, or --lat and --lon, or --offline SCENARIO")
+        if not a.zone and not a.kml and (a.lat is None or a.lon is None):
+            ap.error("give --kml PATH, or --lat and --lon, or --offline SCENARIO, or --zone ZONE_INPUT")
         if a.ai_provider:
             try: kw["vision_provider"] = get_vision_provider(a.ai_provider)
             except ProviderError as e: kw["vision_provider"] = e
         if a.map_provider: kw["map_provider"] = get_map_provider(a.map_provider)
-        kw.update(operator=operator, kml=a.kml, lat=a.lat, lon=a.lon)
+        kw.update(operator=operator, kml=a.kml, lat=a.lat, lon=a.lon, zone=a.zone)
     if a.sme_revision: kw["sme_revision"] = a.sme_revision
     res = run_pipeline(**kw)
     if res.get("error"): return 2

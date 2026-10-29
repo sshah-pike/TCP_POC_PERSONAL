@@ -160,6 +160,7 @@ def test_multiple_kml_points(tmp_path):
     res = run_pipeline(out_dir=str(out), kml=kml)
     assert res["decision"] == UNSUPPORTED_POC and "MULTIPLE_WORK_POINTS" in res["reason_codes"]
     assert set(os.listdir(out)) == {"eligibility_result.json", "run_report.txt"}
+    assert "tcp_planner.cli project" in e.value.message   # S3 Q11-B: --kml is single-location; several points run as a project
 
 
 @pytest.mark.parametrize("body,code", [

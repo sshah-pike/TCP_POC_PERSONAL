@@ -50,6 +50,30 @@ def from_coordinates(lat, lon):
             "non_authoritative_metadata": {"ignored_element_count": 0}}
 
 
+def from_zone(zone_input):
+    """One zone's engine input (orchestration/projects.zone_engine_input) -> ProjectGeometry for the pipeline (S3).
+
+    The zone block (zone id and version, TA selection, sheet label, start fields) is part of the geometry, so it is in
+    the site-model hash; project_id and lineage_key are not (S3 Q8-A): they live in the run's request record. File name,
+    file hash and placemark names are left out too, so the same zone gives the same site model in any upload."""
+    from tcp_planner.orchestration import projects
+    if zone_input.get("schema_version") != projects.SCHEMA_VERSION:
+        raise InputRejected(["INVALID_ZONE_INPUT"], f"unsupported zone input schema_version {zone_input.get('schema_version')!r}")
+    locs = [wl.WorkLocation.from_dict(d) for d in zone_input["locations"]]
+    points = [l for l in locs if l.usable and l.geometry["type"] == wl.POINT]
+    if len(points) != 1 or len(locs) != 1:  # S3 runs one Point per zone; grouping (S9) and lines (S14) come later
+        raise InputRejected(["UNSUPPORTED_ZONE_GEOMETRY"], "a zone runs exactly one work Point in this version",
+                            {"locations": len(locs), "points": len(points)})
+    lat, lon = points[0].geometry["coords"]
+    z = zone_input["zone"]
+    return {"input_type": "ZONE", "source_file": None,
+            "work_reference": {"latitude": r(lat, 7), "longitude": r(lon, 7)}, "work_path": [],
+            "input_feature_count": 1, "input_hash": z["engine_geometry_hash"],
+            "non_authoritative_metadata": {"ignored_element_count": 0},
+            "zone": {"zone_id": z["zone_id"], "version": z["version"], "ta_hypothesis": z["ta_hypothesis"],
+                     "sheet_label": z["sheet_label"], "start_fields": dict(zone_input["start_fields"])}}
+
+
 def location_from_coordinates(lat, lon):
     """A latitude/longitude pair -> one POINT WorkLocation (coordinates and offline projects, S3). Same checks as
     from_coordinates; the id and hash come from the geometry only, exactly as for a KML Point."""
@@ -202,14 +226,23 @@ def parse_all(source, *, duplicate_distance_m, file_name=None):
 
 
 # ---------------------------------------------------------------- legacy adapter (until S3)
-def parse_kml(path, max_work_path_m):
-    """One work Point and at most one LineString -> ProjectGeometry, built on the same scan as parse_all."""
+MULTIPLE_POINTS_MESSAGE = ("--kml runs one work location; this KML has {n} usable work Points. Run it as a project, "
+                           "one run per zone: python -m tcp_planner.cli project --kml FILE (or use the web UI)")
+
+
+def parse_kml(path, max_work_path_m, duplicate_distance_m=None):
+    """One work Point and at most one LineString -> ProjectGeometry, built on the same scan as parse_all (the single
+    location CLI path, S3 Q11-B). With duplicate_distance_m, a Point that duplicates another is not counted, so only
+    usable Points count; a KML with more than one is refused with a message that points to the project command."""
     raw, root, file_name = _load(path)
     ignored = sum(1 for el in root.iter() if _local(el.tag) in METADATA_TAGS)
     points, lines, unsupported = [], [], []
-    for l, tag in _scan(raw, root, file_name):  # duplicates are not marked: this path counts every Point
+    scanned = _scan(raw, root, file_name)
+    if duplicate_distance_m is not None: _mark_duplicates([l for l, _ in scanned], duplicate_distance_m)
+    for l, tag in scanned:
         if tag == "Polygon" or tag in UNSUPPORTED_TAGS - {"LinearRing"}: unsupported.append(tag)
         elif tag in ("Point", "LineString"):
+            if any(x.startswith(wl.DUPLICATE_OF) for x in l.reject_reasons): continue
             if l.reject_reasons: raise InputRejected(["INVALID_COORDINATES"], f"{tag} has invalid coordinates")
             if tag == "Point": points.append(tuple(l.geometry["coords"]))
             else: lines.append([tuple(c) for c in l.geometry["coords"]])
@@ -221,7 +254,9 @@ def parse_kml(path, max_work_path_m):
     if len(lines) > 1: reasons.append("MULTIPLE_WORK_AREAS")
     if not points: reasons.append("NO_WORK_REFERENCE_POINT")
     if reasons:
-        raise InputRejected(reasons, "KML must contain exactly one work Point and at most one LineString work path",
+        message = ("KML must contain exactly one work Point and at most one LineString work path"
+                   if reasons != ["MULTIPLE_WORK_POINTS"] else MULTIPLE_POINTS_MESSAGE.format(n=len(points)))
+        raise InputRejected(reasons, message,
                             {"points": len(points), "line_strings": len(lines), "unsupported": sorted(set(unsupported))})
 
     lat, lon = points[0]
