@@ -32,7 +32,7 @@ def _parts():
                        "values": {"A": 100, "B": 100, "C": 100}, "status": "SOURCED", "sme_question": None,
                        "interpretation": None, "source_ref_ids": ["SR-1"]}],
         "rule": [{"id": "R-CUTOFF", "layer": "FEDERAL", "ta_id": "TA-1", "jurisdiction": None, "topic": "cutoff",
-                  "strength": "GUIDANCE", "text": "low speed", "condition": None, "value": None, "value_max": None,
+                  "strength": "GUIDANCE", "text": "low speed", "condition": None, "action": None, "value": None, "value_max": None,
                   "unit": "mph", "qualifier": None, "status": "SOURCE_REVIEW_REQUIRED", "sme_question": "What cutoff?",
                   "interpretation": None, "source_ref_ids": ["SR-1"]}],
     }}
@@ -156,7 +156,16 @@ def test_interpretation_allows_a_number_and_is_reported(tmp_path):
     parts = _parts(); row = parts["base/core.json"]["tables"]["table_row"][0]
     row["values"]["C"] = 150; row["interpretation"] = "owner-approved reading"
     rep = validate(_pack(tmp_path, parts))
-    assert rep.ok and rep.interpretations == [{"id": "T1-R1", "table": "table_row", "interpretation": "owner-approved reading"}]
+    assert rep.ok and rep.interpretations == [{"id": "T1-R1", "table": "table_row", "status": "SOURCED",
+                                               "interpretation": "owner-approved reading"}]
+
+
+def test_interpretation_on_an_unsourced_record_exempts_nothing(tmp_path):
+    parts = _parts(); r = parts["base/core.json"]["tables"]["rule"][0]
+    r.update(interpretation="proposed reading", condition={"field": "posted_speed_mph", "op": "LE", "value": 30})
+    rep = validate(_pack(tmp_path, parts))
+    assert any("SOURCE_REVIEW_REQUIRED record holds numbers [30]" in e for e in rep.errors)
+    assert rep.interpretations[0]["status"] == "SOURCE_REVIEW_REQUIRED"
 
 
 def test_unsourced_record_cannot_hold_a_value(tmp_path):

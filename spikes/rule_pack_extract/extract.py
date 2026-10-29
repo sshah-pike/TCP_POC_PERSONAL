@@ -21,7 +21,8 @@ SCHEMA_VERSION = "1"
 MUTCD = "docs/sources/CHAPTER 6 - DEC 2023 MUTCD REVISION.pdf"
 DOCS = {
     "SD-MUTCD11-CH6-2023-12": (MUTCD, {
-        9: "6B.06 paras 01-14 (buffer option para 11); Table 6B-1",
+        7: "6B.04 (advance warning area; para 07: Table 6B-1 distances are approximate, guidance only)",
+        9:"6B.06 paras 01-14 (buffer option para 11); Table 6B-1",
         11: "6B.06 para 15, 6B.07, 6B.08 paras 01-05; Tables 6B-2, 6B-3, 6B-4",
         12: "6B.08 paras 06-15 (shifting 1/2 L, shoulder 1/3 L, downstream and one-lane two-way tapers, ~20 ft spacing)",
         31: "6G.08 paras 01-02 (higher fines signs R2-10, R2-11)",

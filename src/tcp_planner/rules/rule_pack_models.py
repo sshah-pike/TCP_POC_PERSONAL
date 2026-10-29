@@ -156,7 +156,7 @@ class _Valued(_Rec):
     """A record whose value may be unsourced. Unsourced means no value plus an SME question."""
     status: Status
     sme_question: Optional[str]
-    interpretation: Optional[str]    # an owner-approved reading of the source text (e.g. "four-lane" = 2 each way)
+    interpretation: Optional[str]    # a reading of the source text; it counts as approved only on a SOURCED record
 
     @model_validator(mode="after")
     def _status(self):
@@ -191,9 +191,10 @@ class Rule(_Valued):
     ta_id: Optional[str]           # None: shared by every TA
     jurisdiction: Optional[str]
     topic: str
-    strength: Strength
+    strength: Optional[Strength]   # None only for UNKNOWN records (no source, so no strength)
     text: str                      # plain-language summary; the authority is the source quote
     condition: Optional[Expr]
+    action: Optional[str]          # code the engine acts on when the condition holds, e.g. LANE_CLOSURE_NEEDED
     value: Optional[Union[int, float]]
     value_max: Optional[Union[int, float]]
     unit: Optional[Unit]
@@ -205,21 +206,26 @@ class Rule(_Valued):
         has = self.value is not None or self.value_max is not None
         _check(not (has and self.unit is None), "a numeric value needs a unit")
         if self.status != Status.SOURCED: _check(not has, f"{self.status.value} records carry no value")
-        if self.status != Status.UNKNOWN: _check(self.source_ref_ids, "a rule needs a source_ref unless it is UNKNOWN")
+        if self.status != Status.UNKNOWN:
+            _check(self.source_ref_ids, "a rule needs a source_ref unless it is UNKNOWN")
+            _check(self.strength is not None, "a sourced or source-review rule needs the strength of its source")
         return self
 
 
 class FormulaCase(_Rec):
-    when: Expr
+    when: Optional[Expr]           # None: the case always applies
     expression: str                # arithmetic over the formula's variables; evaluated by a whitelisted parser
 
 
 class Formula(_Valued):
     id: str
     name: str
-    variables: dict[str, str]      # symbol -> registry field it binds to
+    strength: Strength
+    qualifier: Literal["AT_LEAST", "AT_MOST", "APPROXIMATE", "EXACT"]
+    role: Literal["COMPUTE", "CITED_ONLY"]   # CITED_ONLY: kept for the record, never used to compute (owner decision)
+    variables: dict[str, str]      # symbol -> registry_field id, or the id of another formula whose result it uses
     result_unit: Unit
-    cases: list[FormulaCase]
+    cases: list[FormulaCase] = Field(min_length=1)
     source_ref_ids: list[str] = Field(min_length=1)
 
 
