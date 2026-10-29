@@ -106,6 +106,13 @@ Source: `orchestration/pipeline.py`, `run_relations.py`, `run_worker.py`; `stora
 | `tests/unit/test_recorder.py` (7) | state records written, failure line once per distinct error, final record retry and raise, durable flag, `out_key` |
 | `tests/integration/web_api/test_run_records.py` (2) | no absolute path in records of a new run and a resumed run; moved-runs-folder resume (D-77) |
 | `tests/integration/web_api/test_legacy_runs.py` (6) | protected run: list and open leave every byte and every file as it was; resume, comparison and every write path refused; worker refuses |
+| `tests/unit/test_storage_contract.py` (+4) | `keys`, `streams`, `append_event_after` on both adapters; three-process chain does not fork |
+| `tests/unit/test_assistant_json_store.py` (7) | records write-once, blobs return a key, tamper, events, pre-S2 stream read-only, heads and carry-over |
+| `tests/unit/test_assistant_audit.py` (6) | chain, fsync only when consequential, failure code, pre-S2 chain continues, ordering, three-process chain |
+| `tests/unit/test_assistant_sessions_labels.py` (4) | session record and ending, label versions, pre-S2 label carried over, id checks |
+| `tests/unit/test_project_store.py` (12) | project create/get/list/update, refusals, inputs, `_shared` location, `RulePackStore` interface, raw-path finder |
+| `tests/integration/review_assistant/test_no_raw_paths.py` (2) | scan of one tree with every kind of persisted data; the scan catches a raw path |
+| `tests/unit/test_recorder.py` (+2) | observers report once per distinct error; no silent `except` left |
 
 Tests changed to read through `run_records` instead of `ui/*.json`: `test_phase4_versions.py`, `test_evidence_resume.py`,
 `test_ui_adapter.py`, `tests/support/record.py` (reads state records and old files). `test_foundry_provider.py` now runs
@@ -118,7 +125,7 @@ into an empty sub-folder (its fixture put `profiles.json` in the `--out` folder)
 
 ## Test results
 
-Full suite, once at the end of 5c (commit b5e83ed): **428 passed, 11 skipped** (402 passed, 11 skipped before this work; 26 new tests). The 11 skips are the existing live-call tests that need `TCP_LIVE=1`. Replay is deterministic: `test_global_identity` and the fixture-replay tests pass unchanged.
+Full suite, once at the end of commit 7 (`dd5e1ff`): **468 passed, 11 skipped** (402 passed, 11 skipped before the continuation of S2 at `341539e`; 66 new tests). The 11 skips are the existing live-call tests that need `TCP_LIVE=1`. Replay is deterministic: `test_global_identity` and the fixture-replay tests pass unchanged. Affected suites were run after each commit (5a, 5b, 5c, 6a, 6b/6c).
 
 ## Contradictions with the plan and deviations
 
