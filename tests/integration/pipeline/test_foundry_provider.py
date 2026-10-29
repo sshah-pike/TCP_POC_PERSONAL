@@ -334,6 +334,6 @@ def test_canonical_validation_still_applies(env, monkeypatch, mutate):
 
 def test_failure_gives_review_and_no_plan(env, monkeypatch, tmp_path):
     fake_messages(monkeypatch, AResp("", stop="refusal"), {})
-    res = run(FoundryVisionProvider("claude"), tmp_path)
+    res = run(FoundryVisionProvider("claude"), tmp_path / "out")  # not tmp_path: it holds profiles.json (--out must be empty)
     assert res["decision"] == REVIEW_REQUIRED and "AI_OBSERVATION_UNAVAILABLE" in res["reason_codes"]
-    assert not (tmp_path / "plan.json").exists()
+    assert not (tmp_path / "out" / "plan.json").exists()

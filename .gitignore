@@ -42,3 +42,7 @@ desktop.ini
 
 # SME Review Assistant: local identities (assistant data lives under var/)
 config/assistant/users.local.json
+
+# S2 state/artifact store temp and lock files (OneDrive may sync them; never commit)
+*.lock.stale-*
+.tmp-*

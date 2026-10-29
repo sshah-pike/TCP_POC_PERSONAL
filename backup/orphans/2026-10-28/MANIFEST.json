@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "slice": "S0a",
   "date": "2026-10-28",
-  "note": "Moved with git mv, never deleted. sha256/size are of the committed blob; restore verifies git_blob (line-ending independent). Symbol-level cuts (USGS/Esri providers, Anthropic usage wrapper) wait for S15.",
+  "note": "Written in S0a; extended in S2 (the SQLite adapter and its test, moved when the state store became files only, D-84). Moved with git mv, never deleted. sha256/size are of the committed blob; restore verifies git_blob (line-ending independent). Symbol-level cuts (USGS/Esri providers, Anthropic usage wrapper) wait for S15.",
   "entries": [
     {
       "original_path": "docs/architecture/TCP_Two_Pipeline_Architecture_v2.png",
