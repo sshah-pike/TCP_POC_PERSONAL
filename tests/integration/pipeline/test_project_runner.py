@@ -204,6 +204,41 @@ def test_two_concurrent_run_calls_make_one_set_of_runs(runs_env):
     assert all(len(z["run_ids"]) == 1 for z in r.projects.get(pid)["zones"])
 
 
+def test_a_run_keeps_the_exact_start_values_it_used(runs_env):
+    """Run saves what was typed first. Each run's request record and its write-once zone input hold the values used; a later
+    change makes new runs and leaves these records byte for byte as they were."""
+    import hashlib
+    fl = FakeLauncher(auto=OK); r = runner_for(fl)
+    pid = make(r, kml(pts(2)))
+    lid = r.projects.get(pid)["locations"][1]["location_id"]
+    r.set_inputs(pid, per_location={lid: {"posted_speed_mph": 40, "lane_closure": True}}, ta_project="TA-6", ta_per_location={lid: "TA-10"})
+    first = r.run(pid, background=False)
+
+    def facts(view):
+        out = []
+        for z in view["zones"]:
+            rid = z["current_run_id"]; req_path = os.path.join(store.run_path(rid, "ui"), "request.state.json")
+            argv = records.read(rid, "request")["argv"]
+            zpath = resolve_argv(argv)[1]
+            out.append({"rid": rid, "request": records.read(rid, "request")["request"], "zone_input": json.load(open(zpath, encoding="utf-8")),
+                        "sha": (hashlib.sha256(open(req_path, "rb").read()).hexdigest(), hashlib.sha256(open(zpath, "rb").read()).hexdigest())})
+        return out
+    a = facts(first)
+    want = [(25, False, "TA-6"), (40, True, "TA-10")]
+    for f, (speed, closure, ta) in zip(a, want):
+        assert f["request"]["operator"] == {"road_type": "RURAL", "speed": speed, "requires_lane_closure": closure,
+                                            "traffic_volume": "LOW", "ta_hypothesis": ta, "options": []}
+        assert f["zone_input"]["start_fields"] == {"road_type": "RURAL", "posted_speed_mph": speed, "traffic_volume": "LOW", "lane_closure": closure}
+        assert f["zone_input"]["zone"]["ta_hypothesis"] == ta
+    r.set_inputs(pid, project={"posted_speed_mph": 35}, apply_to_all=True)        # typed again after the first run
+    second = r.run(pid, background=False)
+    b = facts(second)
+    assert [f["rid"] for f in b] != [f["rid"] for f in a] and all(z["version"] == 2 for z in second["zones"])
+    assert [f["request"]["operator"]["speed"] for f in b] == [35, 35]
+    for old in a:                                                                  # the first runs did not change
+        assert facts({"zones": [{"current_run_id": old["rid"]}]})[0]["sha"] == old["sha"]
+
+
 def test_changed_inputs_give_a_new_version_and_a_new_run_only_for_that_zone(runs_env):
     fl = FakeLauncher(auto=OK); r = runner_for(fl)
     pid = make(r, kml(pts(3)))

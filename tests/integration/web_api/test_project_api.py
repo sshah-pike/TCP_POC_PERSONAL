@@ -209,6 +209,15 @@ def test_offline_project_end_to_end_with_the_output_index(web, monkeypatch):
         data = open(os.path.join(out, x["name"]), "rb").read()
         assert x["uri"] == f"{rid}/output/{x['name']}" and x["sha256"] == hashlib.sha256(data).hexdigest() and x["size"] == len(data)
         assert x["media_type"] == media_type_for_key(x["name"])
+    # the run record keeps the exact start values that were used (typed -> request record -> zone input -> geometry)
+    req = records.read(rid, "request")
+    assert req["request"]["operator"] == {"road_type": "RURAL", "speed": 25, "requires_lane_closure": False, "traffic_volume": "LOW",
+                                          "ta_hypothesis": "AUTO", "options": []}
+    zi = json.load(open(records.resolve(req["argv"][1]), encoding="utf-8"))
+    assert zi["start_fields"] == FIELDS
+    assert json.load(open(os.path.join(out, "project_geometry.json"), encoding="utf-8"))["zone"]["start_fields"] == FIELDS
+    sm = json.load(open(os.path.join(out, "site_model.json"), encoding="utf-8"))
+    assert sm["road"]["road_type"]["value"] == "RURAL" and sm["road"]["road_type"]["source"] == "OPERATOR"
     assert "output_refs" not in result and "out_dir" not in result and not find_raw_paths(result)
     st, run = call("GET", f"/api/runs/{rid}")
     assert {o["name"]: o["sha256"] for o in run["outputs"]} == {x["name"]: x["sha256"] for x in index}   # shown with the files
