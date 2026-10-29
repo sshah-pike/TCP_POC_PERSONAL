@@ -6,7 +6,10 @@ dependency.
 | Script | What it does |
 | --- | --- |
 | `survey.py` | Text-layer survey of the four source PDFs: sha256, page count, low-text pages |
-| `extract.py` | Writes `tests/fixtures/rule_pack_sources/cited_pages.json`, the normalised text of every page the pack cites; `--check` re-extracts and compares |
+| `extract.py` | Writes `tests/fixtures/rule_pack_sources/cited_pages.json`, the normalised text of every MUTCD page the pack cites; `--check` re-extracts and compares |
+
+Rules come from the MUTCD only. The three reference TMP drafts are comparison material, not rule sources: the survey
+checks their text layer, but they are not snapshotted.
 
 Tests check every rule-pack quote against the snapshot, so they need neither PyMuPDF nor the PDFs.
 

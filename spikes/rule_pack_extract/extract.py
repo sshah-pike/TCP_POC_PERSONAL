@@ -1,4 +1,4 @@
-"""Page-text snapshot of every PDF page that rule pack v1 cites (S4 commit 1; dev-time spike, never imported by src/).
+"""Page-text snapshot of every MUTCD page that rule pack v1 cites (S4; dev-time spike, never imported by src/).
 
 Writes tests/fixtures/rule_pack_sources/cited_pages.json. Tests check rule-pack quotes against this snapshot, so
 they need neither PyMuPDF nor the PDFs. Each document is pinned by sha256; a different file fails --check.
@@ -39,10 +39,8 @@ DOCS = {
         160: "Notes for Figure 6P-33 (TA-33)",
         161: "Figure 6P-33 drawing (labels are vector graphics, not text)",
     }),
-    "SD-TMP-COLORADO-3168057": ("docs/references/WPI 3168057 - 130 COLORADO ST - MATTAPAN - TMP.pdf", None),
-    "SD-TMP-ESECOND-3171586": ("docs/references/1A8J1KB WPI 3171586, E Second St, South Boston, MA - TMP.pdf", None),
-    "SD-TMP-GRANITE-3178233": ("docs/references/1A8L6XS WPI 3178233 - 125-165 GRANITE ST (US-1), WESTERLY, RI - TMP.pdf", None),
 }
+# The reference TMP drafts are comparison material, not rule sources (S4 scope change), so they are not snapshotted.
 FIGURE_PAGES = {97, 107, 115, 161}
 
 
@@ -63,13 +61,12 @@ def build():
     for key, (rel, pages) in DOCS.items():
         path = os.path.join(ROOT, *rel.split("/"))
         pdf = pymupdf.open(path)
-        wanted = pages or {i + 1: "client drawing sheet (all sheets)" for i in range(pdf.page_count)}
         out_pages = []
-        for n, why in sorted(wanted.items()):
+        for n, why in sorted(pages.items()):
             raw = pdf[n - 1].get_text("text")
-            m = re.search(r"Page (\d{3})", raw) if key.startswith("SD-MUTCD") else None
+            m = re.search(r"Page (\d{3})", raw)
             out_pages.append({"pdf_page": n, "printed_page": m.group(1) if m else None, "cited_for": why,
-                              "figure_labels_in_text_layer": False if n in FIGURE_PAGES and key.startswith("SD-MUTCD") else None,
+                              "figure_labels_in_text_layer": False if n in FIGURE_PAGES else None,
                               "text": normalize(raw)})
         docs.append({"source_document_id": key,
                      "artifact": {"uri": rel, "sha256": _sha256(path), "size": os.path.getsize(path),
