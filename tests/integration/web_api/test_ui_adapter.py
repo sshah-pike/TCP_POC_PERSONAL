@@ -33,9 +33,10 @@ def api(tmp_path, monkeypatch):
             return e.code, e.read()
 
     def run(payload, timeout=180):
-        code, body = call("POST", "/api/runs", payload)
-        assert code == 201, body
-        rid = json.loads(body)["run_id"]; t0 = time.time()
+        """A single run created and launched directly: POST /api/runs is closed (only a project starts runs, S3), but
+        these tests check that the UI reports exactly what the pipeline decided for a single location."""
+        rid, _ = store.create_run(payload, set(offline.SCENARIOS) | set(offline.ALIASES))
+        server.launch(rid); t0 = time.time()
         while True:
             code, body = call("GET", f"/api/runs/{rid}")
             st = json.loads(body)
@@ -112,16 +113,15 @@ def test_ui_supported_with_tcp_sheet(api, monkeypatch):
     assert st["dwt"] == {"status": "SKIPPED"}
 
 
-def test_invalid_kml_is_unsupported_at_input(api):
-    _, run = api
-    st = run({"input_type": "kml", "kml": {"filename": "bad.kml",
-                                           "content_base64": base64.b64encode(b"<notkml/>").decode()}})
-    assert st["decision"] == "UNSUPPORTED_POC" and st["exit_code"] == 4 and "INVALID_KML" in st["reason_codes"]
-    stages = {s["key"]: s for s in st["stages"]}
-    assert stages["input"]["status"] == "UNSUPPORTED"
-    assert "eligibility_result.json" in stages["input"]["artifacts"]
-    assert all(s["status"] == "NOT_RUN" for k, s in stages.items() if k != "input")
-    assert os.path.isfile(records.resolve(st["request"]["kml_key"]))  # a run-relative key (D-77) and not st["draft_generated"]
+def test_invalid_kml_makes_no_project(api):
+    """A KML that cannot be read is refused at the project route: NO_USABLE_LOCATION with the file's reason, no project and
+    no run (it used to start a run that ended UNSUPPORTED_POC at input)."""
+    call, _ = api
+    code, body = call("POST", "/api/projects", {"input_type": "kml", "kml": {"filename": "bad.kml",
+                                                "content_base64": base64.b64encode(b"<notkml/>").decode()}})
+    out = json.loads(body)
+    assert code == 422 and out["error_code"] == "NO_USABLE_LOCATION" and out["file_reasons"] == ["INVALID_KML"]
+    assert out["locations"] == [] and call("GET", "/api/projects") == (200, b"[]") and call("GET", "/api/runs") == (200, b"[]")
 
 
 def test_out_of_range_coordinates_rejected_by_pipeline(api):
@@ -153,12 +153,23 @@ def test_no_secrets_and_no_path_escape(api):
     assert call("GET", "/api/meta", headers={"Host": "evil.example"})[0] == 403
 
 
-def test_bad_requests_rejected_before_running(api):
+def test_only_a_project_starts_runs(api):
+    """POST /api/runs is closed for every input type: the four start fields are typed per project before Run (D-59)."""
     call, _ = api
-    assert call("POST", "/api/runs", {"input_type": "offline", "offline_scenario": "nope"})[0] == 400
-    assert call("POST", "/api/runs", {"input_type": "coordinates", "lat": "", "lon": "1"})[0] == 400
-    assert call("POST", "/api/runs", {"input_type": "offline", "offline_scenario": "supported",
-                                      "operator": {"options": [{"key": "a b", "value": "1"}]}})[0] == 400
+    for payload in ({"input_type": "offline", "offline_scenario": "supported"},
+                    {"input_type": "coordinates", "lat": "41.4", "lon": "-71.7", "operator": {"road_type": "RURAL"}},
+                    {"input_type": "kml", "kml": {"filename": "a.kml", "content_base64": base64.b64encode(b"<kml/>").decode()}},
+                    {"input_type": "offline", "offline_scenario": "nope"}):
+        code, body = call("POST", "/api/runs", payload)
+        assert code == 400 and b"POST /api/projects" in body
+    assert call("GET", "/api/runs") == (200, b"[]")
+
+
+def test_bad_run_payloads_are_rejected_before_running(api):
+    """The internal run creation (used for resume and tests) still validates its payload."""
+    for payload in ({"input_type": "offline", "offline_scenario": "nope"}, {"input_type": "coordinates", "lat": "", "lon": "1"},
+                    {"input_type": "offline", "offline_scenario": "supported", "operator": {"options": [{"key": "a b", "value": "1"}]}}):
+        with pytest.raises(store.BadRequest): store.create_run(payload, set(offline.SCENARIOS))
 
 
 def test_cost_is_estimated_only_from_configured_prices():

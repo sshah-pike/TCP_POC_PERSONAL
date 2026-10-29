@@ -96,15 +96,23 @@ def test_one_failed_zone_gives_partial_and_keeps_the_other_drafts(runs_env):
     view = r.run(pid, background=False)
     assert view["status"] == P.PARTIAL
     states = [view["zone_runs"][z["current_run_id"]] for z in view["zones"]]
-    assert [s["drafted"] for s in states] == [True, False, True]
+    assert [s["draft_available"] for s in states] == [True, False, True]
     for z, s in zip(view["zones"], states):
-        assert os.path.isfile(store.run_path(z["current_run_id"], "output", "plan.json")) == s["drafted"]
+        assert os.path.isfile(store.run_path(z["current_run_id"], "output", "plan.json")) == s["draft_available"]
 
 
-@pytest.mark.parametrize("outcome,status", [(REVIEW, P.FAILED), (CRASH, P.FAILED)])
-def test_no_draft_in_any_zone_is_failed(runs_env, outcome, status):
+@pytest.mark.parametrize("outcome,status", [(REVIEW, P.REVIEW_REQUIRED), (CRASH, P.FAILED)])
+def test_zones_with_no_draft(runs_env, outcome, status):
+    """REVIEW_REQUIRED zones (no draft yet) count toward project REVIEW_REQUIRED; FAILED is every zone errored or never ran."""
     r = runner_for(FakeLauncher(auto=outcome)); pid = make(r, kml(pts(2)))
-    assert r.run(pid, background=False)["status"] == status
+    view = r.run(pid, background=False)
+    assert view["status"] == status
+    assert all(not s["draft_available"] for s in view["zone_runs"].values())   # the draft flag stays separate
+
+
+def test_a_review_zone_and_an_errored_zone_is_partial(runs_env):
+    r = runner_for(FakeLauncher(auto=[REVIEW, CRASH])); pid = make(r, kml(pts(2)))
+    assert r.run(pid, background=False)["status"] == P.PARTIAL
 
 
 def test_point_and_line_runs_the_point_only(runs_env):

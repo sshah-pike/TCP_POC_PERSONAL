@@ -7,7 +7,7 @@ process loads .env itself exactly as the CLI does.
 
 GET  /api/meta                          form choices (from the rule pack, config and offline module)
 GET  /api/runs                          run history
-POST /api/runs                          start a single run (JSON body); a project starts its zone runs itself
+POST /api/runs                          refused (400): only a project starts runs
 GET|POST /api/projects[/...]            projects: one run per zone (tcp_planner.web_api.project_routes)
 POST /api/runs/<id>/stop                stop a running run (ends its runner process; recorded as STOPPED)
 GET  /api/runs/<id>                     run state (stages, decision, outputs, cost)
@@ -65,11 +65,10 @@ def _check_ai_profile(adv):
 
 
 def start_run(payload):
-    from tcp_planner.orchestration import offline_scenarios as offline
-    adv = payload.get("advanced") or {} if isinstance(payload, dict) else {}
-    if adv.get("ai_profile"): _ai_choice({"ai_profile": adv["ai_profile"]})  # must be a configured, available profile
-    run_id, rdir = store.create_run(payload, set(offline.SCENARIOS) | set(offline.ALIASES))
-    return launch(run_id)
+    """Only a project starts runs (S3, D-59): road type, speed, traffic volume and lane closure are typed per project and
+    Run stays closed until every one is. Resume and comparison runs start from an existing run, not from here."""
+    raise store.BadRequest("runs start from a project: POST /api/projects with the KML, point or offline scenario, type the "
+                           "four start fields with POST /api/projects/<id>/inputs, then POST /api/projects/<id>/run")
 
 
 def _ai_choice(payload):

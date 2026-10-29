@@ -171,7 +171,8 @@ class ProjectRunner:
                 if not P.cap_exceeded(cur.get("zones") or [], self.max_zones):
                     raise P.ProjectInputError("CAP_NOT_EXCEEDED", "the project is within the zone cap")
                 cur["cap_approval"] = {"zone_count": len(P.runnable_zones(cur["zones"])), "approved_at": _now(),
-                                       "actor": actor or "UI click"}
+                                       "approved_by": actor or "UI click",
+                                       "verified": False}  # typed text, not an identity: S10's approver role replaces it
                 return cur
             self.projects.update(project_id, apply)
             self._event(project_id, event="cap_approved", actor=actor or "UI click")
@@ -261,12 +262,12 @@ class ProjectRunner:
         for z in P.runnable_zones(rec.get("zones") or []):
             rid = z["current_run_id"]
             if rid is None: continue
-            if records.read(rid, "request") is None: out[rid] = {"state": P.QUEUED, "drafted": False, "decision": None}; continue
+            if records.read(rid, "request") is None: out[rid] = {"state": P.QUEUED, "draft_available": False, "decision": None}; continue
             s = self._classify(rid, live)
-            if s != P.FINISHED: out[rid] = {"state": s, "drafted": False, "decision": None}; continue
+            if s != P.FINISHED: out[rid] = {"state": s, "draft_available": False, "decision": None}; continue
             st = store.build_state(rid, with_lineage=False) or {}
-            out[rid] = {"state": P.FINISHED, "drafted": bool(st.get("draft_generated")), "decision": st.get("decision"),
-                        "service_error": st.get("service_error")}
+            out[rid] = {"state": P.FINISHED, "draft_available": bool(st.get("draft_generated")),
+                        "decision": st.get("decision"), "service_error": st.get("service_error")}
         return out
 
     def _store_status(self, project_id):

@@ -5,7 +5,8 @@ POST /api/projects                          one KML, point or offline scenario -
 GET  /api/projects/<id>                     the project: locations, labels, start fields, Select TA, zones, runs, status
 POST /api/projects/<id>/inputs              the SME's typed start fields and Select TA (never filled by the server)
 POST /api/projects/<id>/run                 start the zone runs; 409 START_FIELDS_MISSING until every field is typed
-POST /api/projects/<id>/approve-cap         one click: run more zones than project.max_zones
+POST /api/projects/<id>/approve-cap         one click: run more zones than project.max_zones; approved_by is the typed
+                                            name or "UI click" and is recorded as unverified (no user model before S10)
 
 Errors: {"error": message, "error_code": code, ...details}. A KML with no usable location creates no project and answers
 422 NO_USABLE_LOCATION with every location's rejection reasons.
@@ -22,6 +23,12 @@ from tcp_planner.storage.interfaces import StorageError
 STATUS_BY_CODE = {"START_FIELDS_MISSING": 409, "CAP_NOT_EXCEEDED": 409, "NO_RUNNABLE_ZONE": 409,
                   "NO_USABLE_LOCATION": 422}  # anything else a ProjectInputError raises is a 400
 ADVANCED_KEYS = ("map_provider", "ai_provider", "ai_profile", "evidence_mode", "dwt_mode", "no_dwt")
+
+
+class NoUsableLocation(Exception):
+    """The file itself was rejected (not XML, not KML, too large): there is nothing to list per location."""
+    def __init__(self, reason_codes, message):
+        super().__init__(message); self.reason_codes = list(reason_codes); self.message = message
 
 
 def _err(status, code, message, **details):
@@ -53,7 +60,7 @@ def _locations_of(payload):
         if len(raw) > store.MAX_KML_UPLOAD_BYTES: raise store.BadRequest("KML upload too large")
         name = store._safe_filename(f.get("filename"))
         try: locs = kml_reader.parse_all(raw, duplicate_distance_m=load_config()["input"]["duplicate_distance_m"], file_name=name)
-        except InputRejected as e: raise store.BadRequest(e.message)
+        except InputRejected as e: raise NoUsableLocation(e.reason_codes, e.message)  # the file could not be read at all
         return P.KML, name, locs, (name, raw), None
     if itype == "coordinates":
         lat, lon = str(payload.get("lat", "")).strip(), str(payload.get("lon", "")).strip()
@@ -82,7 +89,7 @@ def dispatch(method, parts, payload, runner, check_ai=lambda adv: None):
             except P.ProjectInputError as e:
                 if e.code != "NO_USABLE_LOCATION": raise
                 return _err(422, e.code, "no usable work location in the input; every location was rejected",
-                            locations=location_rows(locs))
+                            locations=location_rows(locs), file_reasons=[])
             return (201 if created else 200), {**view, "created": created, "location_rows": location_rows(locs)}
         pid = parts[0]
         view = runner.view(pid)
@@ -99,6 +106,8 @@ def dispatch(method, parts, payload, runner, check_ai=lambda adv: None):
             if parts[1] == "approve-cap":
                 return 200, runner.approve_cap(pid, str(payload.get("approved_by") or "").strip() or None)
         return _err(404, "NOT_FOUND", "not found")
+    except NoUsableLocation as e:
+        return _err(422, "NO_USABLE_LOCATION", e.message, locations=[], file_reasons=e.reason_codes)
     except P.ProjectInputError as e:
         return _err(STATUS_BY_CODE.get(e.code, 400), e.code, e.message, **e.details)
     except (store.BadRequest, StorageError) as e:

@@ -204,8 +204,8 @@ def _start(rec):
     return rec
 
 
-def done(drafted=True, decision="REVIEW_REQUIRED"):
-    return {"state": P.FINISHED, "drafted": drafted, "decision": decision}
+def done(draft_available=True, decision="REVIEW_REQUIRED"):
+    return {"state": P.FINISHED, "draft_available": draft_available, "decision": decision}
 
 
 def test_status_before_and_at_run():
@@ -221,11 +221,11 @@ def test_status_cap():
     pid, rec = _ready(4)
     rec = _request(rec, pid)
     assert P.cap_exceeded(rec["zones"], 3) and P.roll_up(rec, {}, 3) == P.ZONE_CAP_APPROVAL_REQUIRED
-    rec["cap_approval"] = {"actor": "sme", "approved_at": "t"}                    # no zone count: covers nothing
+    rec["cap_approval"] = {"approved_by": "sme", "approved_at": "t"}              # no zone count: covers nothing
     assert P.roll_up(rec, {}, 3) == P.ZONE_CAP_APPROVAL_REQUIRED
-    rec["cap_approval"] = {"actor": "sme", "approved_at": "t", "zone_count": 3}   # approved for 3, there are 4
+    rec["cap_approval"] = {"approved_by": "sme", "approved_at": "t", "zone_count": 3}   # approved for 3, there are 4
     assert P.roll_up(rec, {}, 3) == P.ZONE_CAP_APPROVAL_REQUIRED
-    rec["cap_approval"] = {"actor": "sme", "approved_at": "t", "zone_count": 4}
+    rec["cap_approval"] = {"approved_by": "sme", "approved_at": "t", "zone_count": 4}
     assert P.roll_up(rec, {}, 3) == P.RUNNING and P.cap_cleared(rec, 3)
     pid, rec3 = _ready(3)
     assert not P.cap_exceeded(_request(rec3, pid)["zones"], 3)
@@ -235,15 +235,28 @@ def test_status_after_runs():
     pid, rec = _ready()
     rec = _start(_request(rec, pid))
     assert P.roll_up(rec, {"r0": done(), "r1": {"state": P.ACTIVE}, "r2": {"state": P.QUEUED}}, 3) == P.RUNNING
-    assert P.roll_up(rec, {"r0": done(), "r1": done(), "r2": done()}, 3) == P.REVIEW_REQUIRED
+    review = done(False, "REVIEW_REQUIRED")            # finished REVIEW_REQUIRED: no draft, but an SME can act on it
+    assert P.roll_up(rec, {"r0": review, "r1": review, "r2": review}, 3) == P.REVIEW_REQUIRED
     auto = {f"r{i}": done(decision="SUPPORTED_AUTO") for i in range(3)}
     assert P.roll_up(rec, auto, 3) == P.ALL_DRAFTED
-    assert P.roll_up(rec, {"r0": done(), "r1": done(False, None), "r2": done()}, 3) == P.PARTIAL
+    assert P.roll_up(rec, {**auto, "r1": review}, 3) == P.REVIEW_REQUIRED          # drafts plus a zone to review
+    assert P.roll_up(rec, {**auto, "r1": done(True, "DRAFT_WITH_ENGINEERING_EXCEPTION")}, 3) == P.REVIEW_REQUIRED
+    crash = done(False, None)
+    assert P.roll_up(rec, {**auto, "r1": crash}, 3) == P.PARTIAL                   # a zone errored, others have drafts
+    assert P.roll_up(rec, {"r0": review, "r1": crash, "r2": review}, 3) == P.PARTIAL
     assert P.roll_up(rec, {f"r{i}": done(False, "UNSUPPORTED_POC") for i in range(3)}, 3) == P.FAILED
+    assert P.roll_up(rec, {"r0": crash, "r1": done(False, "FAILED"), "r2": done(False, "STOPPED")}, 3) == P.FAILED
+
+
+def test_zone_outcome_keeps_the_draft_flag_apart_from_the_decision():
+    assert P.zone_outcome(done(True, "SUPPORTED_AUTO")) == P.DRAFT
+    assert P.zone_outcome(done(False, "REVIEW_REQUIRED")) == P.REVIEW and P.zone_outcome(done(True, "REVIEW_REQUIRED")) == P.REVIEW
+    assert P.zone_outcome(done(False, "UNSUPPORTED_POC")) == P.NONE and P.zone_outcome(done(False, None)) == P.NONE
 
 
 def test_status_with_a_line_zone_is_partial():
     pid, rec = record(point(-71.70, 41.40), line([(-71.70, 41.40), (-71.7005, 41.4003)]))
     rec = _start(_request(P.set_inputs(rec, ROAD_TYPES, project=FILLED), pid))
     rec["zones"][1]["current_run_id"] = None
-    assert P.roll_up(rec, {"r0": done(decision="SUPPORTED_AUTO")}, 3) == P.PARTIAL
+    assert P.roll_up(rec, {"r0": done(decision="SUPPORTED_AUTO")}, 3) == P.PARTIAL      # the line zone never runs
+    assert P.roll_up(rec, {"r0": done(False, "REVIEW_REQUIRED")}, 3) == P.PARTIAL

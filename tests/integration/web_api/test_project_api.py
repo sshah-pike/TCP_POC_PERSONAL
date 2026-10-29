@@ -173,7 +173,8 @@ def test_cap_over_http(web):
     assert st == 200 and v["status"] == P.ZONE_CAP_APPROVAL_REQUIRED and v["max_zones"] == 3 and not v["cap_cleared"]
     assert fl.launched == [] and call("GET", "/api/runs") == (200, [])
     st, v = call("POST", f"/api/projects/{pid}/approve-cap", {"approved_by": "Jane SME"})
-    assert st == 200 and v["cap_approval"]["actor"] == "Jane SME" and v["cap_approval"]["zone_count"] == 4
+    assert st == 200 and v["cap_approval"]["approved_by"] == "Jane SME" and v["cap_approval"]["zone_count"] == 4
+    assert v["cap_approval"]["verified"] is False                                   # typed text, not an identity (S10 follow-up)
     wait(pid, {P.ALL_DRAFTED}); assert len(fl.launched) == 4
     assert call("POST", f"/api/projects/{pid}/approve-cap", {})[0] == 200 and len(fl.launched) == 4   # approving again starts nothing
     within = call("POST", "/api/projects", form(kml(pts(3)), "three.kml"))[1]["project_id"]
@@ -212,6 +213,29 @@ def test_offline_project_end_to_end_with_the_output_index(web, monkeypatch):
     st, run = call("GET", f"/api/runs/{rid}")
     assert {o["name"]: o["sha256"] for o in run["outputs"]} == {x["name"]: x["sha256"] for x in index}   # shown with the files
     assert run["request"]["project"]["project_id"] == pid
+
+
+def test_the_tcp_sheet_files_are_in_the_output_index(web, monkeypatch):
+    """With sheet rendering enabled, tcp_sheet.png and tcp_sheet.pdf are registered after the renderer wrote them and are
+    in the output index with the right hash and size."""
+    call, wait, fl, tmp = web
+    monkeypatch.setenv("TCP_RENDER_SHEET", "1")                       # the runner subprocess inherits it
+    monkeypatch.setattr(server, "_RUNNER", ProjectRunner(server._ServerLauncher(), poll_s=0.2))
+    pid = call("POST", "/api/projects", {"input_type": "offline", "offline_scenario": "supported",
+                                         "advanced": {"no_dwt": True}})[1]["project_id"]
+    call("POST", f"/api/projects/{pid}/inputs", {"project": FIELDS, "apply_to_all": True})
+    assert call("POST", f"/api/projects/{pid}/run", {})[0] == 200
+    v = wait(pid, {P.ALL_DRAFTED, P.REVIEW_REQUIRED, P.PARTIAL, P.FAILED}, timeout=420)
+    assert v["status"] == P.ALL_DRAFTED
+    rid = v["zones"][0]["current_run_id"]
+    index = {x["name"]: x for x in records.read(rid, "result")["output_index"]}
+    out = store.run_path(rid, "output")
+    for name, media in (("tcp_sheet.png", "image/png"), ("tcp_sheet.pdf", "application/pdf")):
+        data = open(os.path.join(out, name), "rb").read()
+        x = index[name]
+        assert x["uri"] == f"{rid}/output/{name}" and x["media_type"] == media
+        assert x["sha256"] == hashlib.sha256(data).hexdigest() and x["size"] == len(data) > 0
+    assert sorted(index) == sorted(n for n in os.listdir(out) if os.path.isfile(os.path.join(out, n)))
 
 
 # ------------------------------------------------------------------ status fix and kml_key

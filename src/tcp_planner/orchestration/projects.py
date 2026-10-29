@@ -244,18 +244,31 @@ def zones_hash(zones):
 
 
 # ------------------------------------------------------------------ status
+DRAFT, REVIEW, NONE = "DRAFT", "REVIEW", "NONE"
+
+
+def zone_outcome(state):
+    """DRAFT, REVIEW or NONE for a finished zone run (see roll_up). draft_available is kept apart from the decision."""
+    if state.get("draft_available") and state.get("decision") == SUPPORTED_AUTO: return DRAFT
+    if state.get("decision") == REVIEW_REQUIRED or state.get("draft_available"): return REVIEW
+    return NONE
+
+
 def roll_up(record, zone_states, max_zones):
-    """Project status (plan section 12 and S3 Q6). zone_states: {run_id: {"state": QUEUED|RUNNING|FINISHED,
-    "drafted": bool, "decision": str|None}} for the zones' current runs.
+    """Project status (plan section 12; S3 Q6 as changed by the owner after commit 4).
+    zone_states: {run_id: {"state": QUEUED|RUNNING|FINISHED, "draft_available": bool, "decision": str|None}} for the
+    zones' current runs. Each finished zone is one of three outcomes (zone_outcome): DRAFT (a draft exists and the zone
+    is SUPPORTED_AUTO), REVIEW (it finished REVIEW_REQUIRED, or has a draft that is not SUPPORTED_AUTO) or NONE (the run
+    errored, was stopped or UNSUPPORTED_POC, or the zone never runs: a line or polygon zone in S3).
 
     INPUTS_REQUIRED  a location that would run lacks a start field
     READY            all fields typed; a zone has no run for its current inputs and no Run was asked for them
     ZONE_CAP_APPROVAL_REQUIRED  Run asked, more zones than max_zones, not approved: nothing runs
     RUNNING          Run asked and a zone is not finished (or not yet started)
-    FAILED           no zone has a draft
-    PARTIAL          some zones have a draft, some not (a line or polygon zone never has one in S3)
-    REVIEW_REQUIRED  every zone has a draft and one is not SUPPORTED_AUTO
-    ALL_DRAFTED      every zone has a draft and every one is SUPPORTED_AUTO
+    FAILED           every zone is NONE: all of them errored or never ran
+    PARTIAL          some zones are DRAFT or REVIEW and some are NONE
+    REVIEW_REQUIRED  no zone is NONE and at least one is REVIEW
+    ALL_DRAFTED      every zone is DRAFT
     """
     if missing_fields(record): return INPUTS_REQUIRED
     zones = record.get("zones") or []
@@ -267,8 +280,8 @@ def roll_up(record, zone_states, max_zones):
         return RUNNING
     states = [zone_states.get(z["current_run_id"]) or {"state": QUEUED} for z in runnable]
     if any(s["state"] != FINISHED for s in states): return RUNNING
-    drafted = [s for s in states if s.get("drafted")]
-    if not drafted: return FAILED
-    if len(drafted) < len(zones): return PARTIAL
-    if any(s.get("decision") != SUPPORTED_AUTO for s in drafted): return REVIEW_REQUIRED
-    return ALL_DRAFTED
+    outcomes = [zone_outcome(s) for s in states] + [NONE] * (len(zones) - len(runnable))   # lines and polygons never run
+    if all(o == DRAFT for o in outcomes): return ALL_DRAFTED
+    if all(o == NONE for o in outcomes): return FAILED
+    if NONE in outcomes: return PARTIAL
+    return REVIEW_REQUIRED
