@@ -9,10 +9,7 @@ import os, subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 BASELINE_REF = "13757f2a2421a7c84ae2fb50a47535012cbdc753"  # last commit of tcp-mvp/s00-setup
-APPROVED = {
-    # S1: added input.duplicate_distance_m = 1.0 (approved S1 plan)
-    "config/pipeline_config.json": "af0b263e46ed6c55112ce2a1a7e269028c120c32",
-}
+APPROVED = {}  # S4 (branched from tcp-mvp/s00-setup, not S1): no approved changes yet
 
 
 def _git(*args):
