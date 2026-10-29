@@ -109,6 +109,8 @@ def validate(pack, page_texts=None, figure_renders=None):
         if getattr(rec, "ta_id", None) is not None: ref(rec.ta_id, "ta", owner)
         if table == "ta_device_use": ref(rec.device_id, "device", owner)
         if table == "deviation": ref(rec.rule_id, "rule", owner)
+        for oid in getattr(rec, "overlaps", []) or []:
+            if oid not in seen: err(f"{owner}: overlaps unknown record {oid!r}")
         if table == "table_row":
             ref(rec.table_def_id, "table_def", owner)
             td = pack.by_id.get(rec.table_def_id)

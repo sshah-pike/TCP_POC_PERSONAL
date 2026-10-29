@@ -21,6 +21,11 @@ EXPECTED_UNSOURCED = {
     "R-DEFAULT-WORK-LENGTH-MANHOLE": "UNKNOWN",
     "R-DEFAULT-WORK-LENGTH-EXCAVATION": "UNKNOWN",
     "R-DEFAULT-WORK-LENGTH-TRENCH": "UNKNOWN",
+    "E-TA6-MINOR-ROAD": "SOURCE_REVIEW_REQUIRED",
+    "R-TA10-SHORT-ZONE": "SOURCE_REVIEW_REQUIRED",
+    "E-TA33-FORM-UNDIVIDED-6N11": "SOURCE_REVIEW_REQUIRED",
+    "R-TA33-FIG-G20-2-500FT": "SOURCE_REVIEW_REQUIRED",
+    "R-TA33-FIG-DOWNSTREAM-100FT": "SOURCE_REVIEW_REQUIRED",
 }
 
 
@@ -77,15 +82,16 @@ def test_unsourced_items_are_exactly_the_known_list(pack):
     assert all(u["question"] for u in rep.unsourced)
 
 
-def test_the_only_interpretation_is_the_proposed_6n11_reading_and_it_is_not_approved(pack):
-    assert validate(pack).interpretations == [{
-        "id": "R-6N11-TA33-UNDIVIDED-FOUR-LANE", "table": "rule", "status": "SOURCE_REVIEW_REQUIRED",
-        "interpretation": pack.get("R-6N11-TA33-UNDIVIDED-FOUR-LANE").interpretation}]
+def test_the_only_interpretations_are_the_proposed_6n11_reading_and_they_are_not_approved(pack):
+    got = {(i["id"], i["status"]) for i in validate(pack).interpretations}
+    assert got == {("R-6N11-TA33-UNDIVIDED-FOUR-LANE", "SOURCE_REVIEW_REQUIRED"),
+                   ("E-TA33-FORM-UNDIVIDED-6N11", "SOURCE_REVIEW_REQUIRED")}
 
 
 def test_scope_and_no_ta_match(pack):
     assert pack.manifest.ta_scope == ["TA-1", "TA-6", "TA-10", "TA-33"] and pack.manifest.status == "DRAFT"
-    assert pack.ta("TA-2") == NO_TA_MATCH and pack.ta("TA-99") == NO_TA_MATCH
+    assert sorted(t.id for t in pack.records("ta")) == ["TA-1", "TA-10", "TA-33", "TA-6"]
+    assert pack.ta("TA-2") == NO_TA_MATCH and pack.ta("TA-99") == NO_TA_MATCH and pack.ta("TA-10").figure == "6P-10"
 
 
 def test_only_the_federal_layer_is_populated(pack):

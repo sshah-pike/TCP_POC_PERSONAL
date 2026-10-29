@@ -22,7 +22,7 @@
        "variables": {"L": "F-6B4-L"}, "result_unit": "ft", "cases": [{"when": null, "expression": "0.33*L"}],
        "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B3-SHOULDER", "SR-6B08-P04"]},
 
-      {"id": "F-6B08-SHIFTING-HALF", "name": "Shifting taper, approximately 1/2 L (Sect. 6B.08 para 08; cited only, Table 6B-3 computes)", "strength": "GUIDANCE", "qualifier": "APPROXIMATE", "role": "CITED_ONLY",
+      {"id": "F-6B08-SHIFTING-HALF", "name": "Shifting taper, approximately 1/2 L (Sect. 6B.08 para 08; cited only, owner decision: Table 6B-3 0.5 L computes)", "strength": "GUIDANCE", "qualifier": "APPROXIMATE", "role": "CITED_ONLY",
        "variables": {"L": "F-6B4-L"}, "result_unit": "ft", "cases": [{"when": null, "expression": "1/2*L"}],
        "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B08-P08"]},
       {"id": "F-6B08-SHOULDER-THIRD", "name": "Shoulder taper, approximately 1/3 L (Sect. 6B.08 para 10; cited only, owner decision Q-C)", "strength": "GUIDANCE", "qualifier": "APPROXIMATE", "role": "CITED_ONLY",

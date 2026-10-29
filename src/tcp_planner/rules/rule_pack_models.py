@@ -178,6 +178,7 @@ class EligibilityCondition(_Valued):
     description: str
     expr: Optional[Expr]
     source_ref_ids: list[str] = Field(min_length=1)
+    any_group: Optional[str] = None   # conditions sharing a group are OR'd (D-60: TA-33 road form is one OR'd rule)
 
     @model_validator(mode="after")
     def _expr(self):
@@ -200,6 +201,8 @@ class Rule(_Valued):
     unit: Optional[Unit]
     qualifier: Optional[Literal["AT_LEAST", "AT_MOST", "APPROXIMATE", "EXACT"]]
     source_ref_ids: list[str]
+    role: Literal["APPLY", "CITED_ONLY"] = "APPLY"   # CITED_ONLY: kept for the record, never applied (owner decision)
+    overlaps: list[str] = []       # ids of records covering the same item, so nothing is applied twice
 
     @model_validator(mode="after")
     def _value(self):

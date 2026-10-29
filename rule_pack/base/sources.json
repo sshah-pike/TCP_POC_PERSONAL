@@ -10,6 +10,18 @@
                     "media_type": "application/pdf"}}
     ],
     "source_ref": [
+      {"id": "SR-6B04-P03", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6B.04", "paragraph": "03", "table": null, "figure": null, "note": null,
+       "page_printed": "771", "page_pdf": 7, "strength": "GUIDANCE", "evidence": "QUOTE", "transcription": null, "figure_render": null,
+       "quote": "Typical distances for placement of advance warning signs on freeways and expressways should be longer because drivers are conditioned to uninterrupted flow. Therefore, the advance warning sign placement should extend on these facilities as far as ½ mile or more."},
+      {"id": "SR-6B04-P04", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6B.04", "paragraph": "04", "table": null, "figure": null, "note": null,
+       "page_printed": "771", "page_pdf": 7, "strength": "GUIDANCE", "evidence": "QUOTE", "transcription": null, "figure_render": null,
+       "quote": "On urban streets, the effective placement of the nearest warning sign to the TTC zone, in feet, should range from 4 to 8 times the speed limit in mph, with the high end of the range being used when speeds are relatively high. When two or more advance warning signs are used on higher-speed streets, such as major arterials, the advance warning area should extend a greater distance (see Table 6B-1)."},
+      {"id": "SR-6B04-P05", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6B.04", "paragraph": "05", "table": null, "figure": null, "note": null,
+       "page_printed": "771", "page_pdf": 7, "strength": "OPTION", "evidence": "QUOTE", "transcription": null, "figure_render": null,
+       "quote": "When a single advance warning sign is used (in cases such as low-speed residential streets), the advance warning area may be as short as 100 feet."},
+      {"id": "SR-6B04-P06", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6B.04", "paragraph": "06", "table": null, "figure": null, "note": null,
+       "page_printed": "771", "page_pdf": 7, "strength": "GUIDANCE", "evidence": "QUOTE", "transcription": null, "figure_render": null,
+       "quote": "Since rural highways are normally characterized by higher speeds, the effective placement of the first warning sign in feet should be substantially longer—from 8 to 12 times the speed limit in mph. Since two or more advance warning signs are normally used for these conditions, the advance warning area should extend 1,500 feet or more for open highway conditions (see Table 6B-1)."},
       {"id": "SR-6B04-P07", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6B.04", "paragraph": "07", "table": "6B-1", "figure": null, "note": null,
        "page_printed": "771", "page_pdf": 7, "strength": "GUIDANCE", "evidence": "QUOTE", "transcription": null, "figure_render": null,
        "quote": "The distances contained in Table 6B-1 are approximate, are intended for guidance purposes only, and should be applied with engineering judgment. These distances should be adjusted for field conditions, if necessary, by increasing or decreasing the recommended distances."},
@@ -149,7 +161,10 @@
        "quote": "TTC plans may deviate from the typical applications described in this Chapter to allow for conditions and requirements of a particular site or jurisdiction."},
       {"id": "SR-6P01-P04", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": "04", "table": null, "figure": null, "note": null,
        "page_printed": "857", "page_pdf": 93, "strength": "OPTION", "evidence": "QUOTE", "transcription": null, "figure_render": null,
-       "quote": "Other devices may be added to supplement the devices and device spacing may be adjusted to provide additional reaction time or delineation. Fewer devices may be used based on field conditions."}
+       "quote": "Other devices may be added to supplement the devices and device spacing may be adjusted to provide additional reaction time or delineation. Fewer devices may be used based on field conditions."},
+      {"id": "SR-6P01-P07", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": "07", "table": null, "figure": null, "note": null,
+       "page_printed": "857", "page_pdf": 93, "strength": "SUPPORT", "evidence": "QUOTE", "transcription": null, "figure_render": null,
+       "quote": "Most of the typical applications show TTC devices for only one direction."}
     ]
   }
 }

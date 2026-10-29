@@ -53,6 +53,40 @@ def eval_expr(e, facts):
     return True if True in vals else None if None in vals else False
 
 
+ELIGIBLE, NOT_ELIGIBLE, UNDETERMINED = "ELIGIBLE", "NOT_ELIGIBLE", "UNDETERMINED"
+
+
+def evaluate_eligibility(pack, ta_id, facts):
+    """Check one TA's eligibility conditions against facts (registry field -> value).
+
+    A SOURCED condition evaluates to True, False or None (a fact is missing). A SOURCE_REVIEW_REQUIRED or UNKNOWN
+    condition is None and adds its SME question. Conditions with the same any_group are OR'd. Any False gives
+    NOT_ELIGIBLE; otherwise any None gives UNDETERMINED; otherwise ELIGIBLE.
+    """
+    conds = [c for c in pack.records("eligibility_condition") if c.ta_id == ta_id]
+    rows, questions = [], []
+    for c in conds:
+        if c.status == Status.SOURCED: v = eval_expr(c.expr, facts)
+        else: v = None; questions.append({"condition_id": c.id, "status": c.status.value, "question": c.sme_question})
+        rows.append({"condition_id": c.id, "any_group": c.any_group, "result": v})
+    units = {}
+    for r in rows: units.setdefault(r["any_group"] or r["condition_id"], []).append(r["result"])
+    vals = [True if True in v else None if None in v else False for v in units.values()]
+    result = NOT_ELIGIBLE if False in vals else UNDETERMINED if None in vals else ELIGIBLE
+    failed = [k for k, v in units.items() if True not in v and None not in v]
+    return {"ta_id": ta_id, "result": result, "conditions": rows, "failed": failed,
+            "questions": questions if result == UNDETERMINED else []}
+
+
+def screen_tas(pack, facts):
+    """Eligibility of every TA in the pack. NO_TA_MATCH when none is ELIGIBLE or UNDETERMINED (D-60)."""
+    per_ta = {t.id: evaluate_eligibility(pack, t.id, facts) for t in pack.records("ta")}
+    live = [k for k, v in per_ta.items() if v["result"] != NOT_ELIGIBLE]
+    return {"per_ta": per_ta, "eligible": [k for k, v in per_ta.items() if v["result"] == ELIGIBLE],
+            "undetermined": [k for k, v in per_ta.items() if v["result"] == UNDETERMINED],
+            "decision": "NO_TA_MATCH" if not live else None}
+
+
 def evaluate_formula(pack, formula_id, facts):
     """Evaluate a COMPUTE formula for the given facts (registry field -> value).
 
