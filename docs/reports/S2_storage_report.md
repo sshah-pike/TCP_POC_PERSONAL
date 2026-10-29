@@ -12,8 +12,11 @@ Branch `tcp-mvp/s02-storage`. Files only (D-84): artifacts as files, state as on
 | 5a | pipeline `Run` on the ArtifactStore; `--out` rule |
 | 5b | Recorder and `ui/*` as relative-path state records; `append_event` tail read and durability; commit 4 leftovers (run_store routing, D-77 relative paths) |
 | 5c | worker and launch by run id; read-only legacy reader |
+| 6a | assistant records, events, blobs and heads on the stores; `keys()`, `streams()`, `append_event_after()` added to the store interfaces |
+| 6b/6c | audit log as a hash-chained state stream; sessions and ground-truth labels as state records; worker observers report failures |
+| 7 | project store helper; shared raw-path finder; no-raw-path scan over all persisted JSON; `RulePackStore` interface test; this report |
 
-The old "commit 4" work (SQLite based) is kept on the local branch `s2-commit4-wip` (not pushed). A diff of its 12 files
+The old "commit 4" work (SQLite based) is kept on the local branch `s2-commit4-wip` (never pushed; keep it until S2 is merged). A diff of its 12 files
 against HEAD showed only the expected differences: `stores.py`, `settings.py` and the `MANIFEST_KEY` and docstring edits in
 `evidence_store.py`.
 
@@ -35,6 +38,39 @@ against HEAD showed only the expected differences: `stores.py`, `settings.py` an
   listed and opened; every write path raises `LegacyRunReadOnly`; the HTTP API answers 409 `LEGACY_RUN_READ_ONLY` with
   "This run was made before the storage change. It can be viewed but not resumed, revised or compared. Start a new run."
   The assistant's regenerate answers the same code. The worker refuses a legacy run.
+
+## Commit 6: assistant side
+
+- **Interfaces.** `ArtifactStore.keys(prefix)` (no content read; `list()` hashes every file), `StateStore.streams(prefix)` and
+  `StateStore.append_event_after(stream, build, ...)` (the event is built from the last one under the stream lock). Contract
+  tests cover all three on both adapters, including a three-process chain that must not fork.
+- **Records (`JsonStore`).** Same layout and bytes as before (`<collection>/<id>.json`, blobs under `<collection>/<id>/`),
+  now written write-once through the ArtifactStore; events are state stream lines; heads are state records with
+  compare-and-set. `put_blob` returns `{uri, sha256, size_bytes}` instead of an absolute `path`.
+- **Audit.** One stream per day and conversation (`audits/<day>/<stream>.events.jsonl`). The cross-process lock code
+  (msvcrt/fcntl) is gone: the stream's write lock covers "read the last hash, append". Only consequential events are fsynced,
+  as before. A pre-S2 file (`<stream>.jsonl`) is read as it is and its last hash seeds the chain of the first new event.
+- **Sessions.** State record `sessions/<token hash>`. Ending a session marks it (`ended_at`); the file stays. Pre-S2 session
+  files are not read (those users sign in again).
+- **Labels.** State record per site. Draft, confirm and revoke are compare-and-set (a concurrent change gives a clear
+  "reload and try again" error instead of a silent overwrite). A pre-S2 label file is read as it is; the first change copies it,
+  with its history, into a state record and leaves the old file untouched.
+- **Worker observers.** The silent `except Exception: pass` blocks (rule pack, TLS, provider diagnostics, usage, deps)
+  now call `Recorder.note`, which reports once per distinct error to `stdout.log`.
+- **Size.** About 580 lines added and 190 removed in 15 files, well under a third of the slice, so no split.
+- **Not migrated.** Pre-S2 assistant event streams can be read but not appended to (`LegacyStreamReadOnly`).
+
+## Commit 7: project store, scan, interface
+
+- `storage/project_store.py`: `ProjectStore(state, artifacts)` with `create`, `get`, `list`, `update` (compare-and-set, retried)
+  and `put_input` (write-once, key `projects/<id>/input/<name>`). It holds no fields of its own beyond `project_id` and
+  `created_at`; what a project contains is S3's decision. A record that holds a raw path is refused.
+- `storage/rawpaths.py`: the raw-path finder now lives in `src/`; `tests/support/rawpath_scan.py` re-exports it.
+- `tests/integration/review_assistant/test_no_raw_paths.py`: builds runs (records, events, evidence, outputs, a resumed run),
+  assistant data (conversations, change sets, versions, site evidence, heads, audit, sessions), a label and a project in one
+  tree and scans every `.json` and `.jsonl` file: no raw path. A second test shows the scan does catch one.
+- `RulePackStore` stays an interface (`list_versions`, `load`, `content_hash`); a test checks it is abstract and that nothing
+  implements it yet (S4).
 
 ## Event stream: decisions and measurements
 
@@ -99,14 +135,29 @@ Full suite, once at the end of 5c (commit b5e83ed): **428 passed, 11 skipped** (
 7. **New events** `process_started`, `run_result` and `process_finished` appear in the event stream; the UI ignores them.
 8. **`run_pipeline` raises** `TcpError("OUT_DIR_NOT_EMPTY")` for a non-empty folder when called directly (new behavior).
 9. **Run folders** still pre-create empty `input/`, `output/` and `ui/` folders.
+10. **Labels and assistant data stay in their own folders** (`TCP_UI_LABELS_DIR`, `TCP_ASSISTANT_DATA_DIR`), not under
+    `<runs>/_shared/` as the `stores.py` docstring said. Moving them would relocate existing data; `_shared/` holds the
+    projects. The docstring now says so.
+11. **Audit file names change** to `<stream>.events.jsonl` with the `{seq, schema_version, event}` envelope per line.
+
+## Known limit: rendered files
+
+Image, PDF and DWT outputs are registered with the store (SHA-256 and size, in `run.refs`) only after the renderer wrote
+them. Those refs live in memory for the run: **no persisted index lists them**. The run result and the UI list output files by
+name and size only. The raw-path scan reads JSON only, so it does not look inside a PDF, PNG or DXF (a DXF or PDF could embed
+a path in its metadata; this was not checked). Also in `CLAUDE.md`.
+## Decisions taken (after commit 5)
+
+1. The worker observers report through the same once-per-distinct-error line (done in 6b/6c).
+2. No LF normalization now; revisit in S13.
+3. `kml_saved_path` is not renamed now; **S3 UI follow-up**: rename it to a key name and rebuild the web app.
+4. `s2-commit4-wip` stays local until S2 is merged; never pushed.
+5. Legacy runs stay read-only until S15.
 
 ## Open questions
 
-1. Other `except Exception: pass` blocks remain in the worker's observation wrappers (rule pack, TLS, provider
-   diagnostics, usage). Decision 4 covered `Recorder.write` and `Recorder.event`, which now report. Should those wrappers
-   also report once per error?
-2. Normalize pipeline output to LF? It would change every stored expected output once and make hashes the same on every
-   platform.
-3. Rename `kml_saved_path` to a key name and rebuild the web app?
-4. When may the local branch `s2-commit4-wip` be deleted?
-5. The 782 tracked legacy files under `var/runs/` stay read-only; S15 decides whether they move to `backup/orphans/`.
+1. Pre-S2 assistant event streams can be read but not continued. Is that acceptable for any assistant conversation still
+   in progress on a developer machine, or should they be upgraded in place?
+2. Should the output refs (SHA-256 and size of every file in the output folder) be saved in the run result, so the rendered
+   files are in an index? It changes `result` only, not the output files. It fits S3 or S13.
+3. The 782 tracked legacy files under `var/runs/` stay read-only; S15 decides whether they move to `backup/orphans/`.

@@ -5,7 +5,9 @@ whole and nothing persisted refers to its absolute location (D-77):
 - artifacts: <runs>/<key>, for example <runs>/<run_id>/output/plan.json
 - run state (records and event streams of one run): files inside that run's own folder, <runs>/<run_id>/, so a run
   is self-contained: copy it, move it, resume it
-- state shared across runs (labels, projects, heads): <runs>/_shared/
+- state shared across runs (projects, see project_store.py): <runs>/_shared/
+  The assistant's data (records, audit, sessions, heads) and the ground-truth labels keep their own configured folders
+  (TCP_ASSISTANT_DATA_DIR, TCP_UI_LABELS_DIR); they use the same file stores there.
 """
 import os
 

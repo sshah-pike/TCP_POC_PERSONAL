@@ -4,27 +4,11 @@ A raw path is a string value (or a key) that looks like a Windows drive path, a 
 with at least two segments, or a path with a parent-directory step. Store-relative keys ("<run_id>/output/plan.json")
 are allowed.
 """
-import json, os, re
+import json, os
 
-SEP = r"[\\/]"
-RAW_PATH_RE = re.compile(r"^(?:[A-Za-z]:" + SEP + r"|\\\\|/[^/\s]+/[^\s]|~" + SEP + r")|(?:^|" + SEP + r")\.\.(?:" + SEP + r"|$)")
+from tcp_planner.storage.rawpaths import RAW_PATH_RE, find_raw_paths  # noqa: F401  (re-exported for the tests)
+
 SCAN_SUFFIXES = (".json", ".jsonl")
-
-
-def _walk(node, where):
-    if isinstance(node, dict):
-        for k, v in node.items():
-            if isinstance(k, str) and RAW_PATH_RE.search(k): yield f"{where}/<key {k!r}>", k
-            yield from _walk(v, f"{where}/{k}")
-    elif isinstance(node, list):
-        for i, v in enumerate(node): yield from _walk(v, f"{where}[{i}]")
-    elif isinstance(node, str) and RAW_PATH_RE.search(node):
-        yield where, node
-
-
-def find_raw_paths(doc):
-    """[(json pointer-ish location, offending string)] for one parsed JSON document."""
-    return list(_walk(doc, ""))
 
 
 def scan_tree(root):

@@ -115,6 +115,9 @@ If code and plan disagree, **stop and report**. Do not silently follow either on
 - **Line endings.** Pipeline output files keep the OS line ending (CRLF on Windows), exactly as before S2, so stored
   expected outputs stay byte-identical. Hashes of the same run differ between Windows and Linux.
 - **Legacy runs.** Runs made before S2 (`ui/*.json`) are read-only: listed and opened, never resumed, revised or compared.
+  Assistant event streams written before S2 can be read but not appended to; sessions from before S2 are not read.
+- **Rendered files.** Image, PDF and DWT outputs are registered with the store (SHA-256 and size) only after the renderer
+  wrote them, and the refs are not saved in any index. The raw-path scan reads JSON only, so it does not look inside them.
 
 ## Tests
 
