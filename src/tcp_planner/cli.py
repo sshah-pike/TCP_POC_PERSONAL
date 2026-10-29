@@ -9,7 +9,18 @@ Output is an AUTOMATED DRAFT - NOT APPROVED FOR FIELD USE. The original POC scri
 untracked, in backup/archive/legacy_code/tcp_demo_legacy_backup.py for reference only.
 """
 import sys
-from tcp_planner.orchestration.pipeline import main
+
+
+def main(argv=None):
+    """`cli.py project ...` runs a multi-point KML as a project (one run per zone); anything else is the single-location
+    pipeline."""
+    argv = sys.argv[1:] if argv is None else argv
+    if argv and argv[0] == "project":
+        from tcp_planner.orchestration.project_cli import main as project_main
+        return project_main(argv[1:])
+    from tcp_planner.orchestration.pipeline import main as pipeline_main
+    return pipeline_main(argv)
+
 
 if __name__ == "__main__":
     sys.exit(main())

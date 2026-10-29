@@ -221,8 +221,12 @@ def test_status_cap():
     pid, rec = _ready(4)
     rec = _request(rec, pid)
     assert P.cap_exceeded(rec["zones"], 3) and P.roll_up(rec, {}, 3) == P.ZONE_CAP_APPROVAL_REQUIRED
-    rec["cap_approval"] = {"approved_by": "sme", "approved_at": "t"}
-    assert P.roll_up(rec, {}, 3) == P.RUNNING
+    rec["cap_approval"] = {"actor": "sme", "approved_at": "t"}                    # no zone count: covers nothing
+    assert P.roll_up(rec, {}, 3) == P.ZONE_CAP_APPROVAL_REQUIRED
+    rec["cap_approval"] = {"actor": "sme", "approved_at": "t", "zone_count": 3}   # approved for 3, there are 4
+    assert P.roll_up(rec, {}, 3) == P.ZONE_CAP_APPROVAL_REQUIRED
+    rec["cap_approval"] = {"actor": "sme", "approved_at": "t", "zone_count": 4}
+    assert P.roll_up(rec, {}, 3) == P.RUNNING and P.cap_cleared(rec, 3)
     pid, rec3 = _ready(3)
     assert not P.cap_exceeded(_request(rec3, pid)["zones"], 3)
 

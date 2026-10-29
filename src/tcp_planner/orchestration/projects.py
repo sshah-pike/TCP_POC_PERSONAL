@@ -48,8 +48,8 @@ SUPPORTED_AUTO = "SUPPORTED_AUTO"
 
 
 class ProjectInputError(ValueError):
-    def __init__(self, code, message):
-        super().__init__(message); self.code = code; self.message = message
+    def __init__(self, code, message, details=None):
+        super().__init__(message); self.code = code; self.message = message; self.details = details or {}
 
 
 # ------------------------------------------------------------------ identity
@@ -74,6 +74,8 @@ def new_record(*, name, source, locations, advanced=None):
             "start_fields": {"project": {f: None for f in START_FIELDS}, "per_location": {}},
             "ta_hypothesis": {"project": AUTO, "per_location": {}},
             "advanced": dict(advanced or {}), "zones": [], "run_request": None, "cap_approval": None,
+            "inputs": [],   # every upload of this project: {uri, sha256, size, media_type, uploaded_at}, newest last
+            "labels": {},   # display labels by location id: {text, input_sha256, input_key} (the upload they follow)
             "status": INPUTS_REQUIRED}
 
 
@@ -179,8 +181,8 @@ def _inputs_hash(inputs):
 
 def build_zones(record, project_id):
     """Zones for the record's current inputs: one per usable location, in document order (S3 stub). A zone whose
-    inputs (start fields, TA selection, advanced settings) are unchanged keeps its version and runs; a changed one gets
-    version + 1 and no current run."""
+    inputs (start fields, TA selection, advanced settings) are unchanged keeps its version and runs; a changed one that
+    already has runs gets version + 1 and no current run (while it has none, edits only replace its inputs)."""
     old = {z["zone_id"]: z for z in record.get("zones") or []}
     zones = []
     for loc in sorted(locations_of(record), key=lambda l: l.ordinal):
@@ -196,7 +198,7 @@ def build_zones(record, project_id):
             zones.append(prev); continue
         runnable = loc.geometry["type"] == wl.POINT
         zones.append({
-            "schema_version": SCHEMA_VERSION, "zone_id": zid, "version": (prev["version"] + 1) if prev else 1,
+            "schema_version": SCHEMA_VERSION, "zone_id": zid, "version": (prev["version"] + (1 if prev["run_ids"] else 0)) if prev else 1,
             "location_ids": [loc.location_id],
             "grouping": {"method": ONE_PER_LOCATION, "rule_version": GROUPING_RULE_VERSION, "evidence": None},
             "ta": {"value": eff["ta_hypothesis"], "source": "UI", "status": "HYPOTHESIS"},
@@ -228,6 +230,14 @@ def cap_exceeded(zones, max_zones):
     return len(runnable_zones(zones)) > max_zones
 
 
+def cap_cleared(record, max_zones):
+    """Within the cap, or approved for at least as many zones as there are now (an approval does not cover a bigger set)."""
+    zones = record.get("zones") or []
+    if not cap_exceeded(zones, max_zones): return True
+    appr = record.get("cap_approval")
+    return bool(appr) and appr.get("zone_count", 0) >= len(runnable_zones(zones))
+
+
 def zones_hash(zones):
     """Identity of a zone set and its inputs: a Run request is for exactly this set."""
     return _inputs_hash(sorted([z["zone_id"], z["version"], z["inputs_hash"]] for z in zones))
@@ -253,7 +263,7 @@ def roll_up(record, zone_states, max_zones):
     requested = bool(record.get("run_request")) and record["run_request"].get("zones_hash") == zones_hash(zones)
     if not zones or any(z["current_run_id"] is None for z in runnable):
         if not requested: return READY
-        if cap_exceeded(zones, max_zones) and not record.get("cap_approval"): return ZONE_CAP_APPROVAL_REQUIRED
+        if not cap_cleared(record, max_zones): return ZONE_CAP_APPROVAL_REQUIRED
         return RUNNING
     states = [zone_states.get(z["current_run_id"]) or {"state": QUEUED} for z in runnable]
     if any(s["state"] != FINISHED for s in states): return RUNNING

@@ -88,6 +88,20 @@ def _safe_filename(name):
     return base or "input.kml"
 
 
+def reserve_run_id():
+    """A fresh run id. Nothing is created: the project orchestrator records it first and builds the run afterwards, so a
+    crash in between leaves an id that the next attempt completes (S3)."""
+    while True:
+        run_id = datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + secrets.token_hex(3)
+        if not os.path.exists(run_path(run_id)): return run_id
+
+
+def ensure_run_dirs(run_id, subdirs=("input", "output", "ui")):
+    rdir = run_path(run_id)
+    for sub in subdirs: os.makedirs(os.path.join(rdir, sub), exist_ok=True)
+    return rdir
+
+
 def new_run_dirs(subdirs=("input", "output", "ui")):
     """Allocate a new, unique run directory (runs/<id>/...)."""
     while True:
@@ -97,6 +111,34 @@ def new_run_dirs(subdirs=("input", "output", "ui")):
         except FileExistsError: continue
         for sub in subdirs: os.makedirs(os.path.join(rdir, sub))
         return run_id, rdir
+
+
+def advanced_args(adv, online):
+    """CLI flags and the request's `advanced` record for the form's advanced settings (shared by plain runs and the
+    zone runs of a project). Validates the shape only; the server checks which AI profiles are available."""
+    argv = []
+    if online:  # the CLI ignores provider flags in offline mode; do not pretend otherwise
+        if adv.get("map_provider"):
+            if adv["map_provider"] not in MAP_PROVIDERS: raise BadRequest("unknown map provider")
+            argv += ["--map-provider", adv["map_provider"]]
+        if adv.get("ai_provider"):
+            if adv["ai_provider"] not in AI_PROVIDERS: raise BadRequest("unknown AI provider")
+            argv += ["--ai-provider", adv["ai_provider"]]
+    if adv.get("ai_profile"):  # Foundry model profile (deployment registry entry), validated by the server
+        if not online: raise BadRequest("AI profile applies to live runs only")
+        argv += ["--ai-provider", "foundry"] if "--ai-provider" not in argv else []
+    if adv.get("evidence_mode") not in (None, "", "single", "multi"):
+        raise BadRequest("evidence_mode must be single or multi")
+    if adv.get("no_dwt") is True: argv += ["--no-dwt"]
+    elif adv.get("dwt_mode"):
+        if adv["dwt_mode"] not in ("PLAN", "AERIAL_BASE"): raise BadRequest("dwt_mode must be PLAN or AERIAL_BASE")
+        argv += ["--dwt-mode", adv["dwt_mode"]]
+    return argv, {"ai_profile": (adv.get("ai_profile") or None) if online else None,
+                  "evidence_mode": adv.get("evidence_mode") or "single",
+                  "map_provider": (adv.get("map_provider") or None) if online else None,
+                  "ai_provider": (adv.get("ai_provider") or None) if online else None,
+                  "dwt_mode": None if adv.get("no_dwt") is True else (adv.get("dwt_mode") or None),
+                  "no_dwt": adv.get("no_dwt") is True}
 
 
 def create_run(payload, offline_scenarios):
@@ -145,35 +187,15 @@ def create_run(payload, offline_scenarios):
 
     adv = payload.get("advanced") or {}
     online = itype != "offline"
-    if itype != "offline":  # the CLI ignores provider flags in offline mode; do not pretend otherwise
-        if adv.get("map_provider"):
-            if adv["map_provider"] not in MAP_PROVIDERS: raise BadRequest("unknown map provider")
-            argv += ["--map-provider", adv["map_provider"]]
-        if adv.get("ai_provider"):
-            if adv["ai_provider"] not in AI_PROVIDERS: raise BadRequest("unknown AI provider")
-            argv += ["--ai-provider", adv["ai_provider"]]
-    if adv.get("ai_profile"):  # Foundry model profile (deployment registry entry), validated by the server
-        if not online: raise BadRequest("AI profile applies to live runs only")
-        argv += ["--ai-provider", "foundry"] if "--ai-provider" not in argv else []
-    if adv.get("evidence_mode") not in (None, "", "single", "multi"):
-        raise BadRequest("evidence_mode must be single or multi")
-    if adv.get("no_dwt") is True: argv += ["--no-dwt"]
-    elif adv.get("dwt_mode"):
-        if adv["dwt_mode"] not in ("PLAN", "AERIAL_BASE"): raise BadRequest("dwt_mode must be PLAN or AERIAL_BASE")
-        argv += ["--dwt-mode", adv["dwt_mode"]]
+    flags, adv_request = advanced_args(adv, online)
+    argv += flags
     argv += ["--out", out_dir]
 
-    online = itype != "offline"
     request.update(operator={"road_type": op.get("road_type") or None,
                              "speed": int(op["speed"]) if op.get("speed") not in (None, "") else None,
                              "requires_lane_closure": op.get("requires_lane_closure") is True,
                              "options": options},
-                   advanced={"ai_profile": (adv.get("ai_profile") or None) if online else None,
-                             "evidence_mode": adv.get("evidence_mode") or "single",
-                             "map_provider": (adv.get("map_provider") or None) if online else None,
-                             "ai_provider": (adv.get("ai_provider") or None) if online else None,
-                             "dwt_mode": None if adv.get("no_dwt") is True else (adv.get("dwt_mode") or None),
-                             "no_dwt": adv.get("no_dwt") is True})
+                   advanced=adv_request)
     records.create(run_id, "request", {"run_id": run_id, "created_at": _now(), "argv": argv, "request": request})
     return run_id, rdir
 
