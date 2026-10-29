@@ -8,7 +8,8 @@ from tcp_planner.ai import grounded_vision as G
 from tcp_planner.ai import foundry_provider as fp
 from tcp_planner.contracts import ProviderError
 from tcp_planner.ai.vision_provider import OBSERVATION_SCHEMA
-from tcp_planner.storage import run_store as store
+from tcp_planner.intake.lineage import lineage_key
+from tcp_planner.storage import run_store as store, run_records as records
 from tcp_planner.orchestration import run_relations as relations
 from tcp_planner.evaluation import ground_truth_labels as labels
 from tcp_planner.evaluation import comparison_scoring as evaluation
@@ -197,11 +198,9 @@ def http(monkeypatch):
 
 
 def source_run():
-    rid, rdir = store.create_run({"input_type": "coordinates", "lat": str(SC["lat"]), "lon": str(SC["lon"]),
-                                  "operator": {"road_type": "RURAL"},
-                                  "advanced": {"map_provider": "azure_maps", "ai_provider": "foundry", "no_dwt": True}}, set())
-    inproc.run(rdir)
-    return rid
+    """The comparison's source run: one point as a one-zone project (only project runs have a lineage key, D-82)."""
+    from tests.support.project_runs import zone_run
+    return zone_run(SC["lat"], SC["lon"], advanced={"map_provider": "azure_maps", "ai_provider": "foundry", "no_dwt": True})
 
 
 def compare(source, profiles, variants):
@@ -273,17 +272,21 @@ def test_osm_claims_and_centerline_switches(env, monkeypatch):
 
 
 # ---------------------------------------------------------------- labels + evaluation
+SID = lineage_key("PRJ-test", "sha256:" + "0" * 64)   # a zone's lineage key (16 hex characters)
+
+
 def test_label_workflow_requires_a_person(env):
     pg = {"work_reference": {"latitude": 41.0, "longitude": -71.0}, "work_path": []}
-    d = labels.save_draft(pg, {"road.lane_count": {"value": 2}}, "assistant draft", "drafted from close-up", "run-x")
+    d = labels.save_draft(SID, pg, {"road.lane_count": {"value": 2}}, "assistant draft", "drafted from close-up", "run-x")
+    assert d["site_id"] == SID
     assert d["status"] == "DRAFT" and d["confirmed_by"] is None
     with pytest.raises(store.BadRequest): labels.confirm(d["site_id"], "", "ok")
     with pytest.raises(store.BadRequest): labels.confirm(d["site_id"], "Jane", " ")
-    with pytest.raises(store.BadRequest): labels.save_draft(pg, {"road.lane_count": {"value": "two"}}, "a", "b", "r")
+    with pytest.raises(store.BadRequest): labels.save_draft(SID, pg, {"road.lane_count": {"value": "two"}}, "a", "b", "r")
     c = labels.confirm(d["site_id"], "Jane Reviewer", "checked on site photos", {"road.lane_count": 2, "road.two_way": True})
     assert c["status"] == "CONFIRMED" and c["confirmed_by"] == "Jane Reviewer" and c["confirmed_at"]
     assert [h["action"] for h in c["history"]] == ["draft", "confirm"]
-    with pytest.raises(store.BadRequest): labels.save_draft(pg, {}, "assistant", "redo", "r")  # cannot overwrite confirmed
+    with pytest.raises(store.BadRequest): labels.save_draft(SID, pg, {}, "assistant", "redo", "r")  # cannot overwrite confirmed
 
 
 def test_evaluation_scores_only_confirmed_labels(env, monkeypatch):
@@ -294,10 +297,12 @@ def test_evaluation_scores_only_confirmed_labels(env, monkeypatch):
               "road.traveled_way_width_m": {"value": 7.3, "tolerance": 1.0}, "work.side": {"value": "RIGHT"},  # deliberately wrong
               "work.location": {"value": "BEYOND_SHOULDER"}, "work.encroaches_traveled_way": {"value": False},
               "work.affects_pedestrian_route": {"value": False}, "site.complex_intersection_conflict": {"value": False}}
-    labels.save_draft(pg, fields, "assistant draft", "test", src)
+    sid = labels.site_id_for(records.read(src, "request")["request"])
+    assert sid == records.read(src, "request")["request"]["project"]["lineage_key"]
+    labels.save_draft(sid, pg, fields, "assistant draft", "test", src)
     ev = evaluation.evaluate_comparison(cid)
     assert ev["scored"] is False and all(not r["scored"] for c in ev["columns"] for r in c["rows"])
-    labels.confirm(labels.site_id_for(pg), "Jane Reviewer", "verified")
+    labels.confirm(sid, "Jane Reviewer", "verified")
     ev = evaluation.evaluate_comparison(cid)
     assert ev["scored"] is True
     a = next(c for c in ev["columns"] if c["profile"] == "fake-a")

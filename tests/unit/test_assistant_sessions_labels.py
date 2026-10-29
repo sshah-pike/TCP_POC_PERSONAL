@@ -4,11 +4,13 @@ import json
 import pytest
 
 from tcp_planner.evaluation import ground_truth_labels as labels
+from tcp_planner.intake.lineage import lineage_key
 from tcp_planner.review.assistant.core import identity
 from tcp_planner.review.assistant.core.errors import AssistantError
 from tcp_planner.storage import run_store as store
 
 PG = {"work_reference": {"latitude": 41.4, "longitude": -71.7}, "work_path": []}
+SID = lineage_key("PRJ-test", "sha256:" + "0" * 64)   # a zone's lineage key (D-82)
 
 
 @pytest.fixture
@@ -37,12 +39,12 @@ def test_session_is_a_state_record_keyed_by_the_token_hash_and_ending_marks_it(d
 
 def test_label_draft_confirm_revoke_are_versioned_records(dirs):
     fields = {"road.lane_count": {"value": 2}}
-    d = labels.save_draft(PG, fields, "ai", "from evidence", "20261029-120000-abcdef")
-    sid = d["site_id"]
+    d = labels.save_draft(SID, PG, fields, "ai", "from evidence", "20261029-120000-abcdef")
+    sid = d["site_id"]; assert sid == SID
     assert (dirs / "labels" / f"{sid}.state.json").is_file()
     c = labels.confirm(sid, "A. Reviewer", "checked on the image", {"road.lane_count": 4})
     assert c["status"] == "CONFIRMED" and c["fields"]["road.lane_count"]["value"] == 4
-    with pytest.raises(store.BadRequest): labels.save_draft(PG, fields, "ai", "again", "20261029-120000-abcdef")
+    with pytest.raises(store.BadRequest): labels.save_draft(SID, PG, fields, "ai", "again", "20261029-120000-abcdef")
     r = labels.revoke(sid, "A. Reviewer", "wrong")
     assert r["status"] == "DRAFT" and [h["action"] for h in r["history"]] == ["draft", "confirm", "revoke"]
     rec = json.loads((dirs / "labels" / f"{sid}.state.json").read_text())
@@ -51,7 +53,7 @@ def test_label_draft_confirm_revoke_are_versioned_records(dirs):
 
 
 def test_pre_s2_label_is_read_and_carried_over_by_the_first_change(dirs):
-    sid = labels.site_id_for(PG)
+    sid = SID
     legacy = {"site_id": sid, "name": None, "work_reference": PG["work_reference"], "work_path": [], "source_run_id": "x",
               "status": "DRAFT", "fields": {"road.lane_count": {"value": 2, "tolerance": None, "note": None, "evidence": []}},
               "drafted_by": "old", "drafted_at": "2026-10-01T00:00:00+00:00", "confirmed_by": None, "confirmed_at": None,

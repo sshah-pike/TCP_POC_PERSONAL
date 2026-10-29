@@ -1,8 +1,9 @@
 """Human ground-truth labels for evaluation sites (draft -> confirmed by a person).
 
-labels/<site_id>.state.json   a state record (versioned, compare-and-set); site_id = first 16 hex chars of the
-                              work-reference geometry hash. Labels from before S2 (labels/<site_id>.json) are read as
-                              they are; the first change copies one into a state record and leaves the old file alone.
+labels/<site_id>.state.json   a state record (versioned, compare-and-set); site_id = the SME lineage key of the zone
+                              (D-82, S3): lineage_key(project_id, zone geometry hash), 16 hex characters. Labels from
+                              before S2 (labels/<site_id>.json) are read as they are; the first change copies one into a
+                              state record and leaves the old file alone.
 Only CONFIRMED labels count as evaluation ground truth. A draft (for example prepared from evidence by an
 assistant) is shown but never scored. Confirmation requires a reviewer name and a reason; every change is
 appended to the label's history with a timestamp. No credentials or URLs are stored.
@@ -35,9 +36,10 @@ def _now():
     return datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
 
 
-def site_id_for(project_geometry):
-    from tcp_planner.storage.evidence_store import geometry_hash
-    return geometry_hash(project_geometry)[:16]
+def site_id_for(run_request):
+    """The label id of a run: the lineage key of its zone (D-82), from the project link in the run's request record.
+    None for a run outside a project: such a run has no lineage and no label."""
+    return ((run_request or {}).get("project") or {}).get("lineage_key")
 
 
 SCHEMA_VERSION = 1
@@ -98,9 +100,10 @@ def _commit(doc, version):
         raise store.BadRequest("the label was changed by someone else; reload it and try again") from None
 
 
-def save_draft(project_geometry, fields, drafted_by, reason, source_run_id, name=None):
-    """Create or replace a DRAFT label. A confirmed label is never overwritten by a draft."""
-    sid = site_id_for(project_geometry)
+def save_draft(site_id, project_geometry, fields, drafted_by, reason, source_run_id, name=None):
+    """Create or replace a DRAFT label of the zone with lineage key site_id. A confirmed label is never overwritten
+    by a draft. project_geometry only supplies the location stored with the label."""
+    sid = _check_site(site_id)
     existing, version = _load(sid)
     if existing and existing["status"] == "CONFIRMED":
         raise store.BadRequest("label is already confirmed; drafts cannot overwrite it")

@@ -33,7 +33,9 @@ def test_no_persisted_json_holds_a_raw_path(aenv, runs, inproc_launch, monkeypat
     call("GET", f"conversations/{cid}", token=t)  # finalizes the attempt
 
     from tcp_planner.evaluation import ground_truth_labels as labels
-    d = labels.save_draft({"work_reference": {"latitude": 41.4, "longitude": -71.7}, "work_path": []},
+    from tcp_planner.storage import run_records
+    sid = labels.site_id_for(run_records.read(runs["missing_road_type"], "request")["request"])
+    d = labels.save_draft(sid, {"work_reference": {"latitude": 41.4, "longitude": -71.7}, "work_path": []},
                           {"road.lane_count": {"value": 2}}, "ai", "from evidence", runs["missing_road_type"])
     labels.confirm(d["site_id"], "A. Reviewer", "checked")
 

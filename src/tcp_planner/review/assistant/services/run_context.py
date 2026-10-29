@@ -38,6 +38,10 @@ def eligibility(run_id):
     st = store.build_state(run_id, with_lineage=False)
     if st is None: raise AssistantError("NOT_FOUND", "Run not found.", 404)
     add = lambda code, msg: reasons.append({"code": code, "message": msg})
+    lineage_key = ((st.get("request") or {}).get("project") or {}).get("lineage_key")  # D-82: the zone's composite key
+    if not lineage_key:
+        add("NO_PROJECT_LINEAGE", "the run does not belong to a project, so it has no SME lineage; start the work as a "
+                                  "project (one run per zone)")
     if st["state"] != "FINISHED": add("RUN_NOT_FINISHED", "the run has not finished")
     manifest = load_manifest(run_id)
     if not manifest: add("EVIDENCE_MANIFEST_MISSING", "no saved evidence manifest (CLI or pre-evidence runs are not eligible)")
@@ -71,7 +75,6 @@ def eligibility(run_id):
             r = resolve(run_id, e)
             if r is not None and verify_file(r) is None: crops.append(r)
     pg = _read(os.path.join(out, "project_geometry.json"))
-    from tcp_planner.evaluation.ground_truth_labels import site_id_for
     ctx = {"run_id": run_id, "run_state": {k: st.get(k) for k in ("decision", "reason_codes", "message", "draft_generated")},
            "request": st.get("request"), "project_geometry": pg, "site_model": site,
            "machine_site_model": _read(os.path.join(out, "machine_site_model.json")) or site,
@@ -80,7 +83,7 @@ def eligibility(run_id):
            "plan": _read(os.path.join(out, "plan.json")),
            "sme_revision_applied": _read(os.path.join(out, "sme_revision_applied.json")),
            "evidence": resolved, "crops": crops, "rule_pack": pack, "rule_pack_ref": pack.ref,
-           "lineage_key": site_id_for(pg), "outputs": [o["name"] for o in st.get("outputs") or []]}
+           "lineage_key": lineage_key, "outputs": [o["name"] for o in st.get("outputs") or []]}
     return ctx, []
 
 

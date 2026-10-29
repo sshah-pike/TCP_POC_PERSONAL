@@ -42,18 +42,13 @@ SCENARIOS = ("supported", "missing_road_type", "lane_conflict", "driveway_at_sig
 
 @pytest.fixture(scope="session")
 def run_library(tmp_path_factory):
-    """Offline UI-created runs (real runner -> pipeline, evidence saved), built once: scenario -> run_id."""
+    """Offline one-zone projects (real runner -> pipeline, evidence saved), built once: scenario -> run_id."""
     root = tmp_path_factory.mktemp("runlib")
     old = os.environ.get("TCP_UI_RUNS_DIR"); os.environ["TCP_UI_RUNS_DIR"] = str(root)
-    from tcp_planner.orchestration import offline_scenarios as offline
-    from tcp_planner.storage import run_store as store
-    from tests.integration.web_api import inproc
+    from tests.support.project_runs import offline_zone_run
     ids = {}
     try:
-        for sc in SCENARIOS:
-            rid, rdir = store.create_run({"input_type": "offline", "offline_scenario": sc, "offline_input": "coordinates",
-                                          "advanced": {"no_dwt": True}}, set(offline.SCENARIOS))
-            inproc.run(rdir); ids[sc] = rid
+        for sc in SCENARIOS: ids[sc] = offline_zone_run(sc)   # one-zone offline projects: the runs carry a lineage key (D-82)
     finally:
         if old is None: os.environ.pop("TCP_UI_RUNS_DIR", None)
         else: os.environ["TCP_UI_RUNS_DIR"] = old

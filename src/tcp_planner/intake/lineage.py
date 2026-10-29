@@ -1,7 +1,8 @@
-"""SME lineage key: composite of project and zone geometry hash (S1 decision; callers are wired in S3).
+"""SME lineage key: composite of project and zone geometry hash (D-82).
 
-Clean break from the POC key `geometry_hash(pg)[:16]` (no migration of POC-era runs). `site_id_for` and the
-assistant keep using the old key until S3 introduces projects and zones.
+Clean break from the POC key `geometry_hash(pg)[:16]` (no migration of POC-era runs). Since S3 the assistant, the
+ground-truth labels and `site_id_for` use this key, read from the project link in a run's request record; a run
+outside a project has no lineage key (the assistant answers NO_PROJECT_LINEAGE).
 """
 from tcp_planner.contracts import canonical_json, sha256_hex
 
