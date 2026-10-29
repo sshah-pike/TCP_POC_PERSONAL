@@ -8,7 +8,7 @@ empty APPROVED.
 import os, subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-BASELINE_REF = "af55e0e9f341155e952b3988a335c918683dcf94"  # last commit of tcp-mvp/s01-intake
+BASELINE_REF = "b2c95fe56fcb4ed9e43804edae57a5c0bd1013f6"  # last commit of tcp-mvp/s02-storage
 APPROVED = {}
 
 
