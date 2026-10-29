@@ -95,7 +95,13 @@ def test_scope_and_no_ta_match(pack):
 
 
 def test_only_the_federal_layer_is_populated(pack):
+    """S4 scope change: rules come from the MUTCD only. Jurisdiction, client and deviation layers stay empty."""
     assert {layer.value for _, layer, _, _ in pack.located_records()} == {"FEDERAL"}
+    assert {p.layer.value for p in pack.manifest.parts} == {"FEDERAL"}
+    assert pack.records("deviation") == []
+    for top in ("jurisdiction", "client", "deviation"):
+        d = os.path.join(ROOT, "rule_pack", top)
+        assert not os.path.isdir(d) or not [n for n in os.listdir(d) if n.endswith(".json")]
 
 
 # ---------- formulas (acceptance criteria) ----------
