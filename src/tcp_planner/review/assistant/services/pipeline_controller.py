@@ -66,7 +66,7 @@ def start(ident, cid, pv_id, resume_stage="fusion"):
 
 def finalize_pending(ident=None):
     """Verify finished attempts (idempotent). Returns [(pv_id, status)] newly finalized."""
-    from tcp_planner.storage import run_store as store
+    from tcp_planner.storage import run_store as store, run_records as records
     done = []
     with _LOCK:
         for ra in c().store.list("resume-attempts"):
@@ -74,7 +74,7 @@ def finalize_pending(ident=None):
                 continue
             st = store.build_state(ra["run_id"], with_lineage=False, live_ids=_live_ids())
             if st is None or st["state"] == "RUNNING": continue
-            proc = _read(store.run_path(ra["run_id"], "ui", "process.json")) or {}
+            proc = records.read(ra["run_id"], "process") or {}
             if proc.get("state") != "FINISHED" and ra["run_id"] in _live_ids(): continue  # still running
             status, reason = _verify(ra, st)
             c().store.append_event("resume-attempts", ra["resume_attempt_id"], {"type": "result", "status": status,

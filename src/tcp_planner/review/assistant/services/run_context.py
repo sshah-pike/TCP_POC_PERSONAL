@@ -1,6 +1,6 @@
 """Load a finished UI run as the review context (read-only). Fails closed when the run is not eligible.
 
-Eligible: UI-created run (runs/<id>/ui/request.json), finished, evidence manifest with verified analysis imagery, OSM
+Eligible: UI-created run (runs/<id>/ui/request.state.json), finished, evidence manifest with verified analysis imagery, OSM
 and AI artifacts, not LEGACY evidence, site_model.json present, and the current approved rule pack / implementation
 config identical to the ones the run used. CLI runs (no evidence manifest) are not eligible.
 """
@@ -25,7 +25,7 @@ def not_eligible(reasons):
 
 def eligibility(run_id):
     """(context dict | None, reasons[])."""
-    from tcp_planner.storage import run_store as store
+    from tcp_planner.storage import run_store as store, run_records as records
     from tcp_planner.storage.evidence_store import load_manifest, resolve, verify_file, sha256_file
     from tcp_planner.orchestration.run_relations import evidence_compat
     from tcp_planner.rules.rule_pack_loader import load_rule_pack
@@ -61,7 +61,7 @@ def eligibility(run_id):
         if pack_ref.get("hash") and pack_ref["hash"] != pack.hash: add("RULE_PACK_CHANGED", "the approved rule pack changed since this run")
     except Exception as e:
         add("RULE_PACK_UNAVAILABLE", f"approved rule pack cannot be loaded ({getattr(e, 'code', type(e).__name__)})"); pack = None
-    deps = _read(os.path.join(rdir, "ui", "deps.json")) or {}
+    deps = records.read(run_id, "deps") or {}
     if deps.get("config_sha256") and deps["config_sha256"] != sha256_file(CONFIG_PATH):
         add("CONFIG_CHANGED", "the implementation configuration changed since this run")
     if reasons: return None, reasons

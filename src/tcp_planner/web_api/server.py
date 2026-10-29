@@ -18,7 +18,7 @@ import argparse, json, mimetypes, os, shutil, subprocess, sys, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit, parse_qs, unquote
 
-from tcp_planner.storage import run_store as store, stores
+from tcp_planner.storage import run_store as store, run_records as records, stores
 from tcp_planner.storage.interfaces import ArtifactMissing
 
 WEB_DIST = os.path.join(store.PROJECT_ROOT, "apps", "web", "dist")
@@ -83,7 +83,7 @@ def start_comparison(payload):
                                       [str(m) for m in modes], variants)
 
     def run():  # shared multi-resolution views first (one acquisition), then every model as its own child run
-        doc = store._read_json(store.run_path(cid, "ui", "comparison.json"))
+        doc = records.read(cid, "comparison")
         if doc.get("needs_views"):
             with open(store.run_path(cid, "ui", "prep.log"), "w", encoding="utf-8") as log:
                 subprocess.call([sys.executable, "-m", "tcp_planner.orchestration.run_worker", "--prepare-views",
@@ -117,14 +117,17 @@ def launch(run_id, rdir):
 
     def reap():
         proc.wait(); log.close()
-        pj = os.path.join(rdir, "ui", "process.json")
         with LIVE_LOCK: stopped = run_id in STOPPED
-        if stopped or (store._read_json(pj) or {}).get("state") != "FINISHED":  # runner died before recording its end
-            prev = store._read_json(pj) or {}
-            err = ({"error_code": store.RUN_STOPPED, "message": "run stopped by the user"} if stopped else
-                   {"error_code": "RUNNER_TERMINATED", "message": f"runner process exited with code {proc.returncode}"})
-            store._write_json(pj, {**prev, "state": "FINISHED", "exit_code": proc.returncode,
-                                   "ended_at": store._now(), "unhandled_error": err})
+        err = ({"error_code": store.RUN_STOPPED, "message": "run stopped by the user"} if stopped else
+               {"error_code": "RUNNER_TERMINATED", "message": f"runner process exited with code {proc.returncode}"})
+
+        def finish(prev):  # runner died before recording its end (or the user stopped it): record the end, once
+            prev = prev or {}
+            if not stopped and prev.get("state") == "FINISHED": return None
+            return {**prev, "state": "FINISHED", "exit_code": proc.returncode, "ended_at": store._now(),
+                    "unhandled_error": err}
+        try: records.update(run_id, "process", finish)  # compare-and-set: never overwrites the runner's own record
+        except Exception as e: print(f"[server] could not record the end of run {run_id}: {type(e).__name__}: {e}", flush=True)
         with LIVE_LOCK: LIVE.pop(run_id, None); STOPPED.discard(run_id)
 
     threading.Thread(target=reap, daemon=True).start()

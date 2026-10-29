@@ -2,15 +2,18 @@
 
 runs/<run_id>/input/   uploaded KML (as supplied)
 runs/<run_id>/output/  the pipeline's --out directory (file names exactly as the pipeline writes them)
-runs/<run_id>/ui/      UI-only metadata: request.json, process.json, events.jsonl, result.json,
-                       rule_pack.json, usage.json, stdout.log
+runs/<run_id>/ui/      UI-only metadata as state records (run_records.py): request.state.json, process.state.json,
+                       events.events.jsonl, result.state.json, ...; stdout.log stays a plain log. Runs made before S2 keep
+                       ui/*.json and are read-only (run_records.is_legacy).
 
 Everything here is derived from what the pipeline recorded (telemetry spans, written files, its result
 and exit code). Nothing is inferred, defaulted or re-decided.
 """
 import base64, datetime, json, os, re, secrets
 
+from tcp_planner.config import settings
 from tcp_planner.config.settings import PROJECT_ROOT, CONFIG_DIR, VAR_DIR
+from tcp_planner.storage import run_records as records, stores, uploads
 
 PRICING_PATH = os.path.join(CONFIG_DIR, "pricing.json")
 RUN_ID_RE = re.compile(r"^\d{8}-\d{6}-[0-9a-f]{6}$")
@@ -59,7 +62,7 @@ class BadRequest(Exception):
 
 
 def runs_dir():
-    return os.environ.get("TCP_UI_RUNS_DIR") or os.path.join(VAR_DIR, "runs")
+    return settings.runs_dir()
 
 
 def run_path(run_id, *parts):
@@ -102,7 +105,7 @@ def create_run(payload, offline_scenarios):
     itype = payload.get("input_type")
     if itype not in ("kml", "coordinates", "offline"): raise BadRequest("input_type must be kml, coordinates or offline")
     run_id, rdir = new_run_dirs()
-    out_dir = os.path.join(rdir, "output")
+    out_dir = f"{run_id}/output"  # run-relative key (D-77)
     argv, request = [], {"input_type": itype}
 
     if itype == "kml":
@@ -112,10 +115,9 @@ def create_run(payload, offline_scenarios):
         if not raw: raise BadRequest("KML file is empty")
         if len(raw) > MAX_KML_UPLOAD_BYTES: raise BadRequest("KML upload too large")
         name = _safe_filename(f.get("filename"))
-        path = os.path.join(rdir, "input", name)
-        with open(path, "wb") as fh: fh.write(raw)
-        argv += ["--kml", path]
-        request.update(kml_filename=name, kml_size_bytes=len(raw), kml_saved_path=path)
+        ref = uploads.store_upload(stores.artifacts(), run_id, name, raw)  # key <run_id>/input/<slug>.kml
+        argv += ["--kml", ref.uri]  # a run-relative key; the worker resolves it under the runs folder (D-77)
+        request.update(kml_filename=name, kml_size_bytes=len(raw), kml_saved_path=ref.uri)
     elif itype == "coordinates":
         lat, lon = str(payload.get("lat", "")).strip(), str(payload.get("lon", "")).strip()
         if not lat or not lon: raise BadRequest("latitude and longitude are required")
@@ -172,8 +174,7 @@ def create_run(payload, offline_scenarios):
                              "ai_provider": (adv.get("ai_provider") or None) if online else None,
                              "dwt_mode": None if adv.get("no_dwt") is True else (adv.get("dwt_mode") or None),
                              "no_dwt": adv.get("no_dwt") is True})
-    _write_json(os.path.join(rdir, "ui", "request.json"),
-                {"run_id": run_id, "created_at": _now(), "argv": argv, "request": request})
+    records.create(run_id, "request", {"run_id": run_id, "created_at": _now(), "argv": argv, "request": request})
     return run_id, rdir
 
 
@@ -182,16 +183,8 @@ def _now():
 
 
 # ------------------------------------------------------------------ state
-def _events(ui):
-    out = []
-    try:
-        with open(os.path.join(ui, "events.jsonl"), encoding="utf-8") as f:
-            for line in f:
-                try: out.append(json.loads(line))
-                except ValueError: pass  # a line being written right now
-    except OSError:
-        pass
-    return out
+def _events(run_id):
+    return records.events(run_id)
 
 
 def _spans(events):
@@ -268,22 +261,22 @@ def _outputs(out_dir):
 
 def build_state(run_id, live_ids=(), with_lineage=True):
     rdir = run_path(run_id); ui = os.path.join(rdir, "ui")
-    req = _read_json(os.path.join(ui, "request.json"))
+    req = records.read(run_id, "request")
     if req is None: return None
-    proc = _read_json(os.path.join(ui, "process.json")) or {}
-    result = _read_json(os.path.join(ui, "result.json"))
-    pack = _read_json(os.path.join(ui, "rule_pack.json"))
+    proc = records.read(run_id, "process") or {}
+    result = records.read(run_id, "result")
+    pack = records.read(run_id, "rule_pack")
     finished = proc.get("state") == "FINISHED"
     state = "FINISHED" if finished else "RUNNING" if run_id in live_ids else "INTERRUPTED"
     done = state != "RUNNING"
 
-    events = _events(ui); spans = _spans(events)
+    events = _events(run_id); spans = _spans(events)
     ev_events = [e for e in events if e.get("event") == "evidence"]
-    calls = _read_json(os.path.join(ui, "calls.json"))
-    if calls is None and os.path.isfile(os.path.join(ui, "deps.json")):
+    calls = records.read(run_id, "calls")
+    if calls is None and records.read(run_id, "deps") is not None:
         calls = []  # call tracking was active and no provider call was made (e.g. everything reused)
     lines = _log_lines(ui); msgs = _stage_messages(lines)
-    diags = _read_json(os.path.join(ui, "diagnostics.json"), []) or []
+    diags = records.read(run_id, "diagnostics", []) or []
     outputs = _outputs(os.path.join(rdir, "output")); have = {o["name"] for o in outputs}
 
     stages, claimed, last_started = [], set(), None
@@ -364,18 +357,18 @@ def build_state(run_id, live_ids=(), with_lineage=True):
         "selected_ta": (elig or {}).get("selected_typical_application"),
         "dwt": (result or {}).get("dwt"),
         "draft_generated": draft, "outputs": outputs, "log": lines,
-        "tls": _read_json(os.path.join(ui, "tls.json")),
-        "cost": cost_summary(req, spans, _read_json(os.path.join(ui, "usage.json"), []), have, calls, ev_events),
+        "tls": records.read(run_id, "tls"),
+        "cost": cost_summary(req, spans, records.read(run_id, "usage", []), have, calls, ev_events),
         "evidence": _evidence_list(run_id),
         "evidence_compat": _compat(run_id, {"stages": stages}),
-        "lineage": _lineage(run_id, ui, ev_events, done) if with_lineage else None,
-        "sme_revision": _sme_revision(ui, rdir, plan_status),
+        "lineage": _lineage(run_id, ev_events, done) if with_lineage else None,
+        "sme_revision": _sme_revision(run_id, rdir, plan_status),
     }
 
 
-def _sme_revision(ui, rdir, plan_status):
+def _sme_revision(run_id, rdir, plan_status):
     """SME revision lineage (revision runs only; None otherwise)."""
-    resume = _read_json(os.path.join(ui, "resume.json")) or {}
+    resume = records.read(run_id, "resume") or {}
     if not resume.get("sme_revision"): return None
     return {**resume["sme_revision"], "strict_replay": resume.get("strict_replay"), "plan_status": plan_status,
             "machine_site_model": os.path.isfile(os.path.join(rdir, "output", "machine_site_model.json"))}
@@ -395,8 +388,8 @@ def _evidence_list(run_id):
             for e in load_manifest(run_id)]
 
 
-def _lineage(run_id, ui, ev_events, done):
-    resume = _read_json(os.path.join(ui, "resume.json"))
+def _lineage(run_id, ev_events, done):
+    resume = records.read(run_id, "resume")
     if not resume: return None
     from tcp_planner.orchestration.run_relations import actual_stage
     parent = build_state(resume["parent_run_id"], with_lineage=False) if os.path.isdir(run_path(resume["parent_run_id"])) else None

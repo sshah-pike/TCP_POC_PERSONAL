@@ -163,8 +163,9 @@ class StateStore(abc.ABC):
         """StateRecords whose key is under prefix (a whole-segment prefix), sorted by key."""
 
     @abc.abstractmethod
-    def append_event(self, stream, event, schema_version):
-        """Append a JSON object to a stream. -> sequence number (1, 2, ...)"""
+    def append_event(self, stream, event, schema_version, durable=False):
+        """Append a JSON object to a stream. -> sequence number (1, 2, ...). durable=True: the event is on disk before
+        this returns (use it for state-changing events); the default is flushed only."""
 
     @abc.abstractmethod
     def events(self, stream, after=0):

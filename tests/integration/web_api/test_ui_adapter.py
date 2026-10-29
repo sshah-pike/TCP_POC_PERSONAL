@@ -8,7 +8,7 @@ import pytest
 from tcp_planner.orchestration import offline_scenarios as offline
 from tcp_planner.orchestration.pipeline import run_pipeline, DWT_CONFIG_PATH, EXIT
 from tcp_planner.web_api import server
-from tcp_planner.storage import run_store as store
+from tcp_planner.storage import run_store as store, run_records as records
 
 DRAFT_FILES = {"plan.json", "aerial_image.jpg", "debug_plan.png", "debug_plan.pdf", "tcp_sheet.png", "tcp_sheet.pdf",
                "plan.dxf", "plan.dwg"}
@@ -120,7 +120,7 @@ def test_invalid_kml_is_unsupported_at_input(api):
     assert stages["input"]["status"] == "UNSUPPORTED"
     assert "eligibility_result.json" in stages["input"]["artifacts"]
     assert all(s["status"] == "NOT_RUN" for k, s in stages.items() if k != "input")
-    assert os.path.isfile(st["request"]["kml_saved_path"]) and not st["draft_generated"]
+    assert os.path.isfile(records.resolve(st["request"]["kml_saved_path"]))  # a run-relative key (D-77) and not st["draft_generated"]
 
 
 def test_out_of_range_coordinates_rejected_by_pipeline(api):
@@ -146,7 +146,7 @@ def test_no_secrets_and_no_path_escape(api):
     for path in ("/api/meta", "/api/runs", f"/api/runs/{rid}"):
         code, body = call("GET", path)
         assert code == 200 and SECRET.encode() not in body
-    for bad in ("..%2F..%2Fui%2Frequest.json", "..%5Cui%5Crequest.json", "%2E%2E"):
+    for bad in ("..%2F..%2Fui%2Frequest.state.json", "..%2F..%2Fui%2Frequest.json", "..%5Cui%5Crequest.json", "%2E%2E"):
         assert call("GET", f"/api/runs/{rid}/files/{bad}")[0] in (400, 404)
     assert call("GET", "/api/runs/..%2F..%2Fetc")[0] in (400, 404)
     assert call("GET", "/api/meta", headers={"Host": "evil.example"})[0] == 403

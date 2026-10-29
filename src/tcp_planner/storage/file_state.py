@@ -103,7 +103,7 @@ class FileStateStore(StateStore):
                 _sleep(delay); delay = min(delay * 2, 0.1)
                 continue
             with os.fdopen(fd, "wb") as f:
-                f.write(_dump(meta).encode("utf-8")); f.flush(); os.fsync(f.fileno())
+                f.write(_dump(meta).encode("utf-8"))  # no fsync: a lock only has to be visible to other processes
             return _Lock(lock_path, meta)
 
     def _take_over_if_stale(self, lock_path):
@@ -226,19 +226,44 @@ class FileStateStore(StateStore):
             out.append((ev, complete))
         return out
 
-    def append_event(self, stream, event, schema_version):
+    TAIL_BLOCK = 8192
+
+    def _last_seq(self, path):
+        """Sequence number of the last event, read from the file tail only (no full parse). 0 for a missing or empty
+        file. A file that does not end in a newline holds a torn line: a writer refuses to build on it."""
+        def read():
+            try: f = open(path, "rb")
+            except (FileNotFoundError, NotADirectoryError): return 0
+            with f:
+                size = f.seek(0, os.SEEK_END)
+                if size == 0: return 0
+                buf, pos = b"", size
+                while True:
+                    step = min(self.TAIL_BLOCK, pos); pos -= step
+                    f.seek(pos); buf = f.read(step) + buf
+                    if buf[-1:] != b"\n":
+                        raise StorageError(f"{os.path.basename(path)} ends in a torn line; refusing to append")
+                    cut = buf[:-1].rfind(b"\n")
+                    if cut >= 0 or pos == 0: return buf[cut + 1:-1]
+        last = _retry_permission(read)
+        if last == 0: return 0
+        try: return int(json.loads(last.decode("utf-8"))["seq"])
+        except (ValueError, KeyError, TypeError) as e:
+            raise StorageError(f"{os.path.basename(path)}: last line is not a valid event: {e}") from e
+
+    def append_event(self, stream, event, schema_version, durable=False):
+        """durable=True fsyncs the line before returning (state-changing events). The default flushes only: a progress
+        event survives a process crash but may be lost in a power cut."""
         path = self._events_path(stream); _dump(event)
         if not isinstance(event, dict): raise StorageError("events must be JSON objects")
 
         def op(lock):
-            lines = self._event_lines(path)
-            if lines and not lines[-1][1]:
-                raise StorageError(f"{os.path.basename(path)} ends in a torn line; refusing to append")
-            seq = (lines[-1][0]["seq"] if lines else 0) + 1
+            seq = self._last_seq(path) + 1
             line = (_dump({"seq": seq, "schema_version": int(schema_version), "event": event}) + "\n").encode("utf-8")
             lock.assert_owned()
             with open(path, "ab") as f:
-                f.write(line); f.flush(); os.fsync(f.fileno())
+                f.write(line); f.flush()
+                if durable: os.fsync(f.fileno())
             return seq
         return self._locked(path, op)
 

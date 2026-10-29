@@ -9,7 +9,7 @@ import requests
 from tcp_planner.orchestration import offline_scenarios as offline
 from tcp_planner.ai import foundry_provider as fp
 from tcp_planner.imagery.map_provider import AzureMapsProvider
-from tcp_planner.storage import run_store as store
+from tcp_planner.storage import run_store as store, run_records as records
 from tcp_planner.orchestration import run_relations as relations
 from tcp_planner.storage.evidence_store import load_manifest, sha256_file
 from tests.integration.web_api import inproc
@@ -133,7 +133,7 @@ def test_resume_from_ai_calls_neither_azure_nor_osm(env, monkeypatch):
 def test_changed_kml_invalidates_map_and_osm_reuse(env, monkeypatch):
     http(monkeypatch); parent, _ = azure_run(kml=kml_bytes(LAT, LON))
     rid, rdir = relations.create_resume_run(parent, "vision", ai_profile="fake-a", ai_provider="foundry")
-    with open(json.load(open(os.path.join(rdir, "ui", "request.json")))["request"]["kml_saved_path"], "wb") as f:
+    with open(records.resolve(records.read(rid, "request")["request"]["kml_saved_path"]), "wb") as f:  # a run-relative key
         f.write(kml_bytes(LAT + 0.0003, LON))  # the input changed after the resume was prepared
     h = http(monkeypatch); inproc.run(rdir); st = store.build_state(rid)
     assert analysis_requests(h) == 1 and h.count("api.openstreetmap.org") == 1
@@ -222,7 +222,7 @@ def test_model_comparison_identical_inputs_independent_results(env, monkeypatch)
     assert conf["below_threshold"][1] is True
     assert rep["totals"]["new_map_calls"] == h.count("atlas.microsoft.com")  # agent crops only
     assert rep["totals"]["analysis_map_calls_in_children"] == 0 and rep["totals"]["estimated_cost_usd"] is None
-    assert os.path.isfile(store.run_path(cid, "ui", "report.json"))
+    assert records.read(cid, "report") is not None
     text = json.dumps(rep).lower()
     assert "best" not in text and "winner" not in text and "rank" not in text.replace("ranked", "")
 
@@ -314,6 +314,7 @@ def test_api_endpoints_and_no_credentials(env, monkeypatch):
         m = next(e for e in load_manifest(source) if e["kind"] == "map")
         code, img = get(f"/api/runs/{source}/evidence/{m['file']}"); assert code == 200 and img[:8] == b"\x89PNG\r\n\x1a\n"
         assert get(f"/api/runs/{source}/evidence/manifest.json")[0] == 404  # only artifacts the manifest lists
+        assert get(f"/api/runs/{source}/evidence/..%2Fui%2Frequest.state.json")[0] in (400, 404)
         assert get(f"/api/runs/{source}/evidence/..%2Fui%2Frequest.json")[0] in (400, 404)
         assert post(f"/api/runs/{source}/resume", {"stage": "nonsense"})[0] == 400
         assert post(f"/api/runs/{source}/resume", {"stage": "vision", "ai_profile": "disabled-one"})[0] == 400

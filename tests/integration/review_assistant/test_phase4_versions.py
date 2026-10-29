@@ -2,6 +2,7 @@ import json, os
 
 import pytest
 
+from tcp_planner.storage import run_records as records
 from .conftest import call, login, tree_hash
 
 
@@ -48,8 +49,7 @@ def out(aenv, rid, name):
 
 
 def events(rdir):
-    with open(os.path.join(rdir, "ui", "events.jsonl"), encoding="utf-8") as f:
-        return [json.loads(x) for x in f if x.strip()]
+    return records.events(os.path.basename(str(rdir)))
 
 
 def test_confirm_and_regenerate_end_to_end(aenv, runs, inproc_launch):
@@ -79,8 +79,7 @@ def test_confirm_and_regenerate_end_to_end(aenv, runs, inproc_launch):
     evs = [e for e in events(aenv / "runs" / child) if e.get("event") == "evidence"]
     assert not any(e.get("action") in ("strict_replay_blocked", "saved") for e in evs)
     assert {e["kind"] for e in evs if e.get("action") == "reused"} >= {"map", "osm", "ai"}
-    calls_path = aenv / "runs" / child / "ui" / "calls.json"
-    assert not calls_path.exists() or json.loads(calls_path.read_text()) == []
+    assert not records.read(child, "calls")
     titles = [m["body"].get("title") or "" for m in v["messages"] if m["kind"] == "SUMMARY"]
     assert any("Regenerated draft" in x for x in titles)
     lin = v["lineage"]
@@ -208,10 +207,9 @@ def test_strict_replay_fails_closed_instead_of_calling_provider(aenv, runs):
     inproc.run(rdir)
     evs = events(rdir)
     assert any(e.get("action") == "strict_replay_blocked" and e["kind"] == "ai" for e in evs)
-    cp = os.path.join(rdir, "ui", "calls.json")
-    calls = json.load(open(cp)) if os.path.exists(cp) else []
+    calls = records.read(rid, "calls") or []
     assert all(c["service"] != "ai" for c in calls)
-    with open(os.path.join(rdir, "ui", "result.json")) as f: res = json.load(f)
+    res = records.read(rid, "result")
     assert res["decision"] == "REVIEW_REQUIRED" and "AI_OBSERVATION_UNAVAILABLE" in res["reason_codes"]
 
 

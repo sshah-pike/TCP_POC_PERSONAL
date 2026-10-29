@@ -19,12 +19,20 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 RECORDED = os.path.join(ROOT, "tests", "fixtures", "recorded")
 
 
+def _record(run_dir, folder, name):
+    """A state record's value (<folder>/<name>.state.json), else the old <folder>/<name>.json."""
+    path = os.path.join(run_dir, folder, name + ".state.json")
+    if os.path.isfile(path):
+        with open(path, encoding="utf-8") as f: return json.load(f)["value"]
+    with open(os.path.join(run_dir, folder, name + ".json"), encoding="utf-8") as f: return json.load(f)
+
+
 def seed(run_dir, name, out_root=RECORDED):
-    """Fixtures from a saved run (evidence/manifest.json + ui/request.json). Offline."""
+    """Fixtures from a saved run (the evidence manifest and the request record; old runs: manifest.json, ui/request.json).
+    Offline."""
     from PIL import Image
     run_dir = os.path.abspath(run_dir)
-    with open(os.path.join(run_dir, "evidence", "manifest.json"), encoding="utf-8") as f: manifest = json.load(f)
-    with open(os.path.join(run_dir, "ui", "request.json"), encoding="utf-8") as f: req = json.load(f)["request"]
+    manifest = _record(run_dir, "evidence", "manifest"); req = _record(run_dir, "ui", "request")["request"]
     site_dir = os.path.join(out_root, name); store = FixtureStore(site_dir)
     os.makedirs(site_dir, exist_ok=True)
     kml_src = os.path.join(run_dir, "input", req["kml_filename"])

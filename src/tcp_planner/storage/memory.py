@@ -71,7 +71,7 @@ class InMemoryStateStore(StateStore):
         if prefix: validate_key(prefix)
         return [self.get(k) for k in sorted(self._s) if _under(k, prefix)]
 
-    def append_event(self, stream, event, schema_version):
+    def append_event(self, stream, event, schema_version, durable=False):
         validate_key(stream); ev = self._copy(event)
         with self._lock:
             lst = self._e.setdefault(stream, []); lst.append((int(schema_version), ev)); return len(lst)
