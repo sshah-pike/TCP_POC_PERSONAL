@@ -1,4 +1,4 @@
-import type { Decision, StageStatus } from "./types";
+import type { Decision, Project, ProjectLocation, ProjectStatus, StageStatus } from "./types";
 
 export function fmtMs(ms: number | null | undefined): string {
   if (ms === null || ms === undefined) return "—";
@@ -42,6 +42,21 @@ export function decisionClass(d: Decision | null | undefined): string {
   if (d === "SUPPORTED_AUTO") return "ok";
   if ((d as string) === "DRAFT_WITH_ENGINEERING_EXCEPTION") return "exc";
   if (d === "REVIEW_REQUIRED" || d === "STOPPED") return "warn";
-  if (d === "UNSUPPORTED_POC" || d === "FAILED" || d === "ERROR") return "bad";
+  if (d === "UNSUPPORTED_POC" || d === "FAILED") return "bad";
   return "run";
+}
+
+export function projectStatusClass(s: ProjectStatus | null | undefined): string {
+  if (s === "ALL_DRAFTED") return "ok";
+  if (s === "REVIEW_REQUIRED" || s === "PARTIAL" || s === "ZONE_CAP_APPROVAL_REQUIRED") return "warn";
+  if (s === "FAILED") return "bad";
+  if (s === "RUNNING") return "run";
+  return "idle";  // INPUTS_REQUIRED, READY: nothing has run
+}
+
+/** The display label of a location: the placemark name of the latest upload (D-72), else "Location n" (document order).
+ *  A label is never used in a decision. */
+export function locationName(project: Pick<Project, "labels">, loc: Pick<ProjectLocation, "location_id" | "ordinal" | "display_label">): string {
+  const text = (project.labels[loc.location_id]?.text ?? loc.display_label ?? "").trim();
+  return text !== "" ? text : `Location ${loc.ordinal + 1}`;
 }

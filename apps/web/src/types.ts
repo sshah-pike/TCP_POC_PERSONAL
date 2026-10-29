@@ -2,7 +2,8 @@
 
 export type StageStatus =
   | "WAITING" | "RUNNING" | "COMPLETED" | "WARNING" | "REVIEW" | "ERROR" | "FAILED" | "UNSUPPORTED" | "NOT_RUN";
-export type Decision = "SUPPORTED_AUTO" | "REVIEW_REQUIRED" | "ERROR" | "UNSUPPORTED_POC" | "FAILED" | "STOPPED";
+// The decision shown is always the pipeline's (exit 3 is REVIEW_REQUIRED). A service/API failure is `service_error`, a badge.
+export type Decision = "SUPPORTED_AUTO" | "REVIEW_REQUIRED" | "UNSUPPORTED_POC" | "FAILED" | "STOPPED";
 export type InputType = "kml" | "coordinates" | "offline";
 
 export interface Span {
@@ -87,13 +88,16 @@ export interface RulePackInfo {
 export interface ErrorInfo { error_code: string; message: string; details?: unknown }
 
 export interface RunRequest {
-  input_type: InputType;
+  input_type: InputType | "zone";
   kml_filename?: string;
   kml_size_bytes?: number;
+  kml_key?: string;          // run-relative key of the stored upload (runs made in S2 call it kml_saved_path)
   kml_saved_path?: string;
   offline_scenario?: string;
   offline_input?: string;
-  operator: { road_type: string | null; speed: number | null; requires_lane_closure: boolean; options: string[] };
+  project?: { project_id: string; zone_id: string; zone_version: number; lineage_key: string };
+  operator: { road_type: string | null; speed: number | null; requires_lane_closure: boolean; options: string[];
+              traffic_volume?: string | null; ta_hypothesis?: string };
   advanced: { map_provider: string | null; ai_provider: string | null; dwt_mode: string | null; no_dwt: boolean;
               ai_profile?: string | null; evidence_mode?: string };
 }
@@ -134,6 +138,7 @@ export interface RunState {
   runtime_ms: number | null;
   exit_code: number | null;
   decision: Decision | null;
+  service_error?: string[] | null;     // service/API failure codes among the reason codes: shown as a badge
   reason_codes: string[];
   message: string | null;
   error: ErrorInfo | null;
@@ -159,6 +164,10 @@ export interface RunSummary {
   input: string;
   state: RunState["state"];
   decision: Decision | null;
+  service_error: boolean;
+  project_id: string | null;
+  zone_id: string | null;
+  zone_version: number | null;
   runtime_ms: number | null;
   rule_pack: string | null;
   estimated_cost_usd: number | null;
@@ -212,6 +221,11 @@ export interface Meta {
   dwt_config_present: boolean;
   road_types: string[];
   supported_road_types: string[];
+  start_fields: StartFieldName[];
+  traffic_volumes: string[];
+  ta_choices: string[];
+  max_zones: number;
+  max_parallel_zone_runs: number;
   rule_pack: RulePackInfo | null;
   rule_pack_error: ErrorInfo | null;
   pricing_source: string | null;
@@ -219,6 +233,7 @@ export interface Meta {
   resume_stages: string[];
 }
 
+/** Orphaned with NewRunForm (S3): runs start from a project now. Moved to backup/orphans/ by the S15 sweep. */
 export interface NewRunPayload {
   input_type: InputType;
   kml?: { filename: string; content_base64: string };
@@ -229,6 +244,64 @@ export interface NewRunPayload {
   operator: { road_type: string; speed: string; requires_lane_closure: boolean; options: { key: string; value: string }[] };
   advanced: { map_provider: string; ai_provider: string; dwt_mode: string; no_dwt: boolean; ai_profile: string; evidence_mode: string };
 }
+
+export interface NewProjectPayload {
+  input_type: InputType;
+  kml?: { filename: string; content_base64: string };
+  lat?: string;
+  lon?: string;
+  offline_scenario?: string;
+  advanced: { map_provider?: string; ai_provider?: string; dwt_mode?: string; no_dwt?: boolean; ai_profile?: string; evidence_mode?: string };
+}
+
+// ---- projects (S3): one KML -> a project -> one run per zone
+export type StartFieldName = "road_type" | "posted_speed_mph" | "traffic_volume" | "lane_closure";
+export type ProjectStatus = "INPUTS_REQUIRED" | "READY" | "ZONE_CAP_APPROVAL_REQUIRED" | "RUNNING" | "ALL_DRAFTED" | "PARTIAL"
+  | "REVIEW_REQUIRED" | "FAILED";
+
+/** The four mandatory start fields as saved on the project. null = not typed yet (nothing is ever pre-filled). */
+export interface StartFields {
+  road_type: string | null; posted_speed_mph: number | null; traffic_volume: string | null; lane_closure: boolean | null;
+}
+
+export interface ProjectLocation {
+  location_id: string; ordinal: number; display_label: string | null; reject_reasons: string[];
+  geometry: { type: "POINT" | "LINESTRING" | "POLYGON"; coords: unknown } | null;
+}
+
+export interface ZoneRun { state: "QUEUED" | "RUNNING" | "FINISHED"; draft_available: boolean; decision: Decision | null;
+                           service_error?: string[] | null }
+
+export interface ProjectZone {
+  zone_id: string; version: number; location_ids: string[]; status: string; lineage_key: string;
+  ta: { value: string; source: string; status: string }; current_run_id: string | null; run_ids: string[];
+}
+
+export interface Project {
+  project_id: string; name: string; created_at: string; status: ProjectStatus;
+  source: { kind: string; offline_scenario?: string };
+  locations: ProjectLocation[];
+  labels: Record<string, { text: string | null; input_sha256: string; input_key: string }>;  // follow the latest upload
+  inputs: { uri: string; sha256: string; size: number; media_type: string; uploaded_at: string }[];
+  start_fields: { project: StartFields; per_location: Record<string, Partial<StartFields>> };
+  ta_hypothesis: { project: string; per_location: Record<string, string> };
+  zones: ProjectZone[];
+  zone_runs: Record<string, ZoneRun>;
+  missing_fields: Record<string, string[]>;
+  max_zones: number; cap_cleared: boolean;
+  cap_approval: { approved_by: string; approved_at: string; zone_count: number; verified: boolean } | null;
+  created?: boolean;
+}
+
+export interface ProjectSummary { project_id: string; name: string; created_at: string; status: ProjectStatus; zones: number }
+
+export interface ProjectInputsPayload {
+  project?: Partial<StartFields>; apply_to_all?: boolean; per_location?: Record<string, Partial<StartFields>>;
+  ta_project?: string; ta_per_location?: Record<string, string | null>;
+}
+
+/** One location of a KML as read, with why it can not be used (NO_USABLE_LOCATION answer). */
+export interface LocationRow { location_id: string; ordinal: number; label: string | null; type: string | null; reject_reasons: string[] }
 
 export interface Variant { evidence_mode: string; vision_mode: string; osm_claims: boolean; centerline_views: boolean }
 

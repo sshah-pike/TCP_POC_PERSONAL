@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { fmtBytes, fmtMs, fmtTime, fmtUsd } from "../format";
 import type { RunState } from "../types";
+import ServiceErrorBadge from "./ServiceErrorBadge";
 
 const NA = "Not Available";
 
@@ -18,7 +19,7 @@ export default function Summary({ run }: { run: RunState }) {
   const rp = run.rule_pack;
   const ai = run.cost.ai;
   const tok = (k: string) => (ai.usage && ai.usage[k] !== undefined ? ai.usage[k].toLocaleString() : NA);
-  const inputLabel = { kml: "KML", coordinates: "Coordinates", offline: "Offline self-test" }[r.input_type];
+  const inputLabel = { kml: "KML", coordinates: "Coordinates", offline: "Offline self-test", zone: "Project zone" }[r.input_type];
   // offline scenarios carry their own operator values; the CLI only overrides what the user supplied
   const notGiven = r.input_type === "offline" ? "(scenario default)" : "(not provided)";
 
@@ -27,7 +28,7 @@ export default function Summary({ run }: { run: RunState }) {
       <h2>EXECUTION SUMMARY</h2>
       <div className="kv">
         <Row k="Run ID" v={run.run_id} mono />
-        <Row k="Decision" v={<b>{run.decision ?? "RUNNING"}</b>} />
+        <Row k="Decision" v={<><b>{run.decision ?? "RUNNING"}</b> <ServiceErrorBadge codes={run.service_error} /></>} />
         <Row k="Exit code" v={run.exit_code ?? "—"} mono />
         <Row k="Started" v={fmtTime(run.started_at ?? run.created_at)} />
         <Row k="Completed" v={fmtTime(run.ended_at)} />
@@ -41,13 +42,22 @@ export default function Summary({ run }: { run: RunState }) {
         {r.input_type === "kml" && (
           <>
             <Row k="Input file" v={`${r.kml_filename} (${fmtBytes(r.kml_size_bytes)})`} />
-            <Row k="Saved at" v={r.kml_saved_path} mono />
+            <Row k="Input key" v={r.kml_key ?? r.kml_saved_path} mono />
           </>
         )}
         {r.input_type === "offline" && <Row k="Scenario" v={`${r.offline_scenario} (input: ${r.offline_input})`} />}
+        {r.project && (
+          <>
+            <Row k="Project" v={r.project.project_id} mono />
+            <Row k="Zone" v={`${r.project.zone_id} v${r.project.zone_version}`} mono />
+            <Row k="SME lineage key" v={r.project.lineage_key} mono />
+          </>
+        )}
         <Row k="Road type" v={r.operator.road_type ?? notGiven} />
         <Row k="Speed" v={r.operator.speed ?? notGiven} />
         <Row k="Requires lane closure" v={r.operator.requires_lane_closure ? "yes" : "no"} />
+        {r.operator.traffic_volume !== undefined && <Row k="Traffic volume" v={r.operator.traffic_volume ?? notGiven} />}
+        {r.operator.ta_hypothesis !== undefined && <Row k="Select TA" v={r.operator.ta_hypothesis === "AUTO" ? "Auto" : r.operator.ta_hypothesis} />}
         <Row k="TA-1 options" v={r.operator.options.length ? r.operator.options.join(", ") : "none"} mono />
         <Row
           k="Advanced"

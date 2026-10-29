@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { decisionClass, fmtMs, fmtTime, fmtUsd } from "../format";
-import type { ComparisonSummary, RunSummary } from "../types";
+import { decisionClass, fmtMs, fmtTime, fmtUsd, projectStatusClass } from "../format";
+import type { ComparisonSummary, ProjectSummary, RunSummary } from "../types";
+import ServiceErrorBadge from "./ServiceErrorBadge";
 
-export type Selection = { kind: "run" | "comparison" | "labels"; id: string };
+export type Selection = { kind: "run" | "comparison" | "labels" | "project"; id: string };
 
 interface Props {
+  projects?: ProjectSummary[];
   runs: RunSummary[];
   comparisons: ComparisonSummary[];
   selected: Selection | null;
@@ -17,9 +19,10 @@ function loadOpen(): Set<string> {
   try { return new Set(JSON.parse(localStorage.getItem(STORE_KEY) || "[]") as string[]); } catch { return new Set(); }
 }
 
-/** Run history as a tree: original run -> resumed runs -> comparisons -> per-model child runs.
- *  Every node with sub-items is a group that can be collapsed / expanded. */
-export default function RunHistory({ runs, comparisons, selected, onSelect }: Props) {
+/** Run history as a tree: project -> its zone runs -> resumed runs -> comparisons -> per-model child runs. Runs that
+ *  belong to no project (made before S3) are listed under "Other runs". Every node with sub-items is a group that can be
+ *  collapsed / expanded. */
+export default function RunHistory({ projects = [], runs, comparisons, selected, onSelect }: Props) {
   const [open, setOpen] = useState<Set<string>>(loadOpen);
   useEffect(() => { localStorage.setItem(STORE_KEY, JSON.stringify([...open])); }, [open]);
 
@@ -27,6 +30,10 @@ export default function RunHistory({ runs, comparisons, selected, onSelect }: Pr
   const resumes = (parent: string) => runs.filter((r) => r.parent_run_id === parent && !r.comparison_id);
   const compsOf = (source: string) => comparisons.filter((c) => c.source_run_id === source);
   const roots = runs.filter((r) => !r.parent_run_id || !byId.has(r.parent_run_id));
+  const known = new Set(projects.map((p) => p.project_id));
+  const inProject = (r: RunSummary) => !!r.project_id && known.has(r.project_id);
+  const projectRoots = (pid: string) => roots.filter((r) => r.project_id === pid);
+  const otherRoots = roots.filter((r) => !inProject(r));
 
   // ids of every group node and the groups that contain a given id (so the selected item is never hidden)
   const groups: string[] = [];
@@ -42,7 +49,8 @@ export default function RunHistory({ runs, comparisons, selected, onSelect }: Pr
       c.children.forEach((ch) => ancestors.set(ch.run_id, [...path, id, c.comparison_id]));
     });
   };
-  roots.forEach((r) => walk(r.run_id, []));
+  roots.forEach((r) => walk(r.run_id, inProject(r) ? [r.project_id as string] : []));
+  projects.forEach((p) => { if (projectRoots(p.project_id).length) groups.push(p.project_id); });
   const forced = new Set(selected ? ancestors.get(selected.id) ?? [] : []);
   const isOpen = (id: string) => open.has(id) || forced.has(id);
   const toggle = (id: string) => setOpen((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -66,8 +74,11 @@ export default function RunHistory({ runs, comparisons, selected, onSelect }: Pr
           >
             <div className="hist-top">
               <span className="mono small">{depth > 0 ? "↳ " : ""}{r.run_id}</span>
-              <span className={`pill ${r.state === "RUNNING" ? "run" : decisionClass(r.decision)}`}>
-                {r.state === "RUNNING" ? "RUNNING" : r.decision ?? r.state}
+              <span>
+                <span className={`pill ${r.state === "RUNNING" ? "run" : decisionClass(r.decision)}`}>
+                  {r.state === "RUNNING" ? "RUNNING" : r.decision ?? r.state}
+                </span>{" "}
+                <ServiceErrorBadge codes={r.service_error} />
               </span>
             </div>
             <div className="small">
@@ -109,6 +120,26 @@ export default function RunHistory({ runs, comparisons, selected, onSelect }: Pr
     );
   };
 
+  const projectItem = (p: ProjectSummary) => {
+    const kids = projectRoots(p.project_id);
+    return (
+      <div key={p.project_id} data-testid="history-project">
+        <div className="hist-row">
+          {kids.length > 0 ? twisty(p.project_id, kids.length) : <span className="twisty-pad" />}
+          <button className={`hist proj ${selected?.kind === "project" && selected.id === p.project_id ? "sel" : ""}`}
+                  onClick={() => onSelect({ kind: "project", id: p.project_id })}>
+            <div className="hist-top">
+              <span className="small"><b>{p.name}</b></span>
+              <span className={`pill ${projectStatusClass(p.status)}`}>{p.status}</span>
+            </div>
+            <div className="muted small">{p.zones} zone{p.zones === 1 ? "" : "s"} · <span className="mono">{p.project_id}</span></div>
+          </button>
+        </div>
+        {kids.length > 0 && isOpen(p.project_id) && kids.map((r) => runItem(r, 1))}
+      </div>
+    );
+  };
+
   return (
     <div className="card">
       <div className="hist-head">
@@ -120,10 +151,14 @@ export default function RunHistory({ runs, comparisons, selected, onSelect }: Pr
           </span>
         )}
       </div>
-      {runs.length === 0 ? (
-        <div className="muted small">No runs yet.</div>
+      {runs.length === 0 && projects.length === 0 ? (
+        <div className="muted small">No projects or runs yet.</div>
       ) : (
-        <div className="history">{roots.map((r) => runItem(r, 0))}</div>
+        <div className="history">
+          {projects.map(projectItem)}
+          {projects.length > 0 && otherRoots.length > 0 && <div className="muted small hist-sep">Other runs</div>}
+          {otherRoots.map((r) => runItem(r, 0))}
+        </div>
       )}
     </div>
   );

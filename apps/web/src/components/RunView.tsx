@@ -8,6 +8,7 @@ import ArtifactLink from "./ArtifactLink";
 import FinalDraft from "./FinalDraft";
 import StageList from "./StageList";
 import Summary from "./Summary";
+import ServiceErrorBadge from "./ServiceErrorBadge";
 import SmeReviewEntry from "../assistant/SmeReviewEntry";
 import type { WhoAmI } from "../assistant/types";
 
@@ -55,16 +56,12 @@ function DecisionPanel({ run }: { run: RunState }) {
           <div className="small">Reason codes:</div>
           {codes}
           <div>Pipeline stopped safely. No TCP draft was generated.</div>
-          {run.message && <div className="muted small">{run.message}</div>}
-        </div>
-      );
-    case "ERROR":
-      return (
-        <div className="banner bad">
-          <div className="big">ERROR</div>
-          <div className="small">Reason codes:</div>
-          {codes}
-          <div>A service or API call failed (imagery, OSM or AI). This is not a site discrepancy. No TCP draft was generated.</div>
+          {run.service_error && (
+            <div className="small" data-testid="service-error-note">
+              <ServiceErrorBadge codes={run.service_error} /> A service or API call failed ({run.service_error.join(", ")}):
+              imagery, OSM or AI could not be used. That is not a site discrepancy; the decision is still REVIEW REQUIRED.
+            </div>
+          )}
           {run.message && <div className="muted small">{run.message}</div>}
         </div>
       );
@@ -174,6 +171,7 @@ export default function RunView({ runId, meta, onFinished, onOpenRun, onOpenComp
           <span className={`pill ${running ? "run" : decisionClass(run.decision)}`}>
             {running ? "RUNNING" : run.decision ?? run.state}
           </span>
+          {!running && <ServiceErrorBadge codes={run.service_error} />}
           <span className="spacer" />
           {running && (
             <button className="btn danger" onClick={stop} disabled={stopping}>{stopping ? "Stopping…" : "Stop run"}</button>
