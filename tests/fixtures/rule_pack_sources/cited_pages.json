@@ -135,5 +135,55 @@
     }
    ]
   }
+ ],
+ "figure_renders": [
+  {
+   "figure": "6P-1",
+   "pdf_page": 97,
+   "printed_page": "861",
+   "dpi": 150,
+   "artifact": {
+    "uri": "tests/fixtures/rule_pack_sources/figures/figure_6P-1_p861.png",
+    "sha256": "35dce7e5cd05bd3e0eab7485eda3990b6e92027ceedaed15877a555656182faf",
+    "size": 62377,
+    "media_type": "image/png"
+   }
+  },
+  {
+   "figure": "6P-6",
+   "pdf_page": 107,
+   "printed_page": "871",
+   "dpi": 150,
+   "artifact": {
+    "uri": "tests/fixtures/rule_pack_sources/figures/figure_6P-6_p871.png",
+    "sha256": "ca5b205c0c1e5032ccdc29a9ce9cdd9b7ae302149f715179c014acf5fa84d3a5",
+    "size": 113857,
+    "media_type": "image/png"
+   }
+  },
+  {
+   "figure": "6P-10",
+   "pdf_page": 115,
+   "printed_page": "879",
+   "dpi": 150,
+   "artifact": {
+    "uri": "tests/fixtures/rule_pack_sources/figures/figure_6P-10_p879.png",
+    "sha256": "2cc22142fd8d86e7a2f338a5873894dfd5bf5530e938a296ddaf72cc62fe13d9",
+    "size": 207421,
+    "media_type": "image/png"
+   }
+  },
+  {
+   "figure": "6P-33",
+   "pdf_page": 161,
+   "printed_page": "925",
+   "dpi": 150,
+   "artifact": {
+    "uri": "tests/fixtures/rule_pack_sources/figures/figure_6P-33_p925.png",
+    "sha256": "f80515afbc2e0f99d35fe915beb000e1c8c1a9ad45c447210bc54821780bb44b",
+    "size": 173574,
+    "media_type": "image/png"
+   }
+  }
  ]
 }

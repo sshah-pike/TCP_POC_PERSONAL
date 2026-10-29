@@ -42,6 +42,11 @@ DOCS = {
 }
 # The reference TMP drafts are comparison material, not rule sources (S4 scope change), so they are not snapshotted.
 FIGURE_PAGES = {97, 107, 115, 161}
+# Figure drawings have no text layer for their labels, so figure-only values are FIGURE_TRANSCRIPTION evidence read
+# from these renders. The PNGs are committed next to the snapshot; their sha256 is recorded in it.
+FIGURES = {97: "6P-1", 107: "6P-6", 115: "6P-10", 161: "6P-33"}
+FIGURE_DPI = 150
+FIG_DIR = os.path.join(os.path.dirname(OUT), "figures")
 
 
 def normalize(text):
@@ -74,22 +79,41 @@ def build():
                      "page_count": pdf.page_count, "pages": out_pages})
     return {"schema_version": SCHEMA_VERSION, "generator": "spikes/rule_pack_extract/extract.py",
             "extractor": f"PyMuPDF {pymupdf.VersionBind}", "normalization": "NFKC; U+2010/U+2011 -> '-'; whitespace runs -> ' '",
-            "documents": docs}
+            "documents": docs}, render_figures()
+
+
+def render_figures():
+    """{file name: PNG bytes} for the four TA figure pages, and the snapshot entries describing them."""
+    pdf = pymupdf.open(os.path.join(ROOT, *MUTCD.split("/")))
+    pngs, entries = {}, []
+    for n, fig in FIGURES.items():
+        png = pdf[n - 1].get_pixmap(dpi=FIGURE_DPI).tobytes("png")
+        m = re.search(r"Page (\d{3})", pdf[n - 1].get_text("text"))
+        name = f"figure_{fig}_p{m.group(1)}.png"
+        pngs[name] = png
+        entries.append({"figure": fig, "pdf_page": n, "printed_page": m.group(1), "dpi": FIGURE_DPI,
+                        "artifact": {"uri": f"tests/fixtures/rule_pack_sources/figures/{name}",
+                                     "sha256": hashlib.sha256(png).hexdigest(), "size": len(png), "media_type": "image/png"}})
+    return pngs, entries
 
 
 def main(argv):
-    snap = build()
+    snap, (pngs, figures) = build()
+    snap["figure_renders"] = figures
     if "--check" in argv:
         with open(OUT, encoding="utf-8") as f: old = json.load(f)
         old.pop("extractor", None); new = dict(snap); new.pop("extractor", None)
         ok = old == new
-        print("snapshot matches the PDFs" if ok else "SNAPSHOT DIFFERS from the PDFs")
+        print("snapshot matches the PDFs" if ok else "SNAPSHOT DIFFERS from the PDFs (text, or figure renders from another PyMuPDF version)")
         return 0 if ok else 1
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
+    os.makedirs(FIG_DIR, exist_ok=True)
+    for name, png in pngs.items():
+        with open(os.path.join(FIG_DIR, name), "wb") as f: f.write(png)
     with open(OUT, "w", encoding="utf-8", newline="\n") as f:
         json.dump(snap, f, ensure_ascii=False, indent=1); f.write("\n")
     for d in snap["documents"]:
         print(f"{d['source_document_id']}: {len(d['pages'])} pages, sha256 {d['artifact']['sha256'][:16]}...")
+    for e in figures: print(f"figure {e['figure']}: {e['artifact']['uri']} ({e['artifact']['size']} bytes)")
     return 0
 
 

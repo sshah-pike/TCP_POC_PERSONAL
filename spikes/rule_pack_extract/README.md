@@ -29,4 +29,5 @@ Printed MUTCD page = PDF page + 764 on every cited page; the snapshot stores bot
 On the four figure pages (PDF 97, 107, 115, 161 = printed 861, 871, 879, 925) only the title and the "Notes: See
 Table ..." text are in the text layer. Every label in the drawing (sign codes, A/B/C, "1/3 L", "10 ft MIN.",
 "50 to 100 ft", "500 ft", "100 ft (optional)", "Buffer space (optional)") is vector outlines. Values read only from a
-drawing cannot be checked by quote; they were read from page renders (`pymupdf` `get_pixmap(dpi=110)`).
+drawing cannot be checked by quote. They are loaded as `FIGURE_TRANSCRIPTION` evidence, read from the page renders
+committed in `tests/fixtures/rule_pack_sources/figures/` (150 dpi; sha256 in the snapshot's `figure_renders`).
