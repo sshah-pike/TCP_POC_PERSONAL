@@ -1227,6 +1227,23 @@ This feature is not built now. You approved offering it later and asked for the 
 | Reference-only toggle | The role field is stored. A UI toggle to mark stray points such as a distant yard comes later. Every point is work by default |
 | Cross-run imagery cache | Store Azure Maps imagery and crops and reuse them for the same location. Needs an expiry rule and a scope (per project or shared). The Azure terms check was dropped by your decision |
 | Cloud move | Azure Blob and PostgreSQL adapters, a migration tool, and the client's region, retention and tenancy answers. Out of the MVP (D-40) |
+| Police detail instead of flagger | Flagger is always the default traffic control method; the SME can switch to police detail after the draft (D-68). Nothing in the MVP picks police from the place. A later suggestion from a cited jurisdiction rule, the research so far and what it would depend on are in "Police detail instead of flagger: notes for later" below |
+
+### Police detail instead of flagger: notes for later
+
+**MVP rule.** Flagger is always the default traffic control method. The SME can switch to police detail as a post-draft review action (D-68). There is no jurisdiction logic in the MVP.
+
+**Future idea.** Suggest police detail where a cited jurisdiction or agency rule applies, found from the KML point (state, county and town boundaries). The suggestion carries its citation and the status `SOURCE_REVIEW_REQUIRED` until the SME confirms it, and it never applies automatically. A place that is not listed defaults to flagger.
+
+**Research notes (unverified: web summaries, the owner to confirm before any use)**
+
+- MUTCD allows a flagger or a uniformed law enforcement officer and sets no rule for choosing between them. The flagger chapter is 6E in the 2009 edition and 6D in the 2023 text.
+- Massachusetts: a 2008 law and the state rules (cited as 700 CMR 6.00 in one source and 701 CMR 7 in another; confirm which) call for road flaggers on low-speed roads and on low-traffic high-speed roads, and for police details on high-speed roads, with exceptions. Many towns and utilities still use police by local practice or labour contract. The 45 mph figure for Massachusetts comes from a 2008 news report on the draft rules, not from the final rule; do not use it.
+- Rhode Island: RIDOT uses state police on limited-access projects and for statewide striping, and local police or flaggers elsewhere (RIDOT Standard Specifications, Section 913).
+- Ohio: an officer is required for full closures and for signal installation.
+- Nothing was found for Connecticut, New Jersey, New York or California.
+
+**Dependencies if built later.** The S6 data sources (Census boundaries); S8 and S11 (traffic control method); and the police sign code question (W20-8), which stays an SME question.
 
 ## 17. Architecture Decision Records
 

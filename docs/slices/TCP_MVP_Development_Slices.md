@@ -11,6 +11,8 @@ Each slice below is written so a Claude Code prompt can be generated from it dir
 3. One branch per slice off the previous slice (`tcp-mvp/base` for the first), named `tcp-mvp/sNN-short-name`. Merge only when the gate passes.
 4. Setup once per environment: `pip install -e . --no-build-isolation` inside `.venv`.
 
+*Future scope that no slice builds, such as suggesting police detail instead of a flagger from the work location, is kept in the plan, Section 16.*
+
 ## Common preamble for every Claude Code prompt
 
 ```
