@@ -10,8 +10,8 @@ import os, subprocess
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 BASELINE_REF = "b2c95fe56fcb4ed9e43804edae57a5c0bd1013f6"  # last commit of tcp-mvp/s02-storage
 APPROVED = {
-    # S3 Q3/Q4 (owner decision): new "project" section, max_zones 3 and max_parallel_zone_runs 3; no other change
-    "config/pipeline_config.json": "48b0efb8999d66ef9f25fb86b0dce94d08a55a79",
+    # S3 Q3/Q4 (owner decision): new "project" section with max_zones 3 and max_parallel_zone_runs 3 only
+    "config/pipeline_config.json": "852c9dcaa2503b938cbf98a251b4daddef178fb4",
 }
 
 
