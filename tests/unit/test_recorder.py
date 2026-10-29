@@ -82,3 +82,23 @@ def test_durable_flag_is_passed_through(runs, monkeypatch):
 def test_result_record_holds_the_run_relative_key_not_the_folder():
     rec = w._result_record({"decision": "X", "out_dir": r"C:\runs\r1\output"}, "r1")
     assert rec == {"decision": "X", "out_key": "r1/output"}
+
+
+def test_observer_failures_are_reported_once_per_distinct_error(runs, monkeypatch, capsys):
+    """The worker's observers (diagnostics, usage, rule pack, TLS) no longer swallow their errors silently."""
+    rec = w.Recorder(RID)
+    import tcp_planner.audit.provider_diagnostics as pd
+    monkeypatch.setattr(pd, "describe", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("cannot describe")))
+    for _ in range(3): w._record(rec, ValueError("x"), "azure", 0.0)
+    rec.note("usage record", KeyError("model")); rec.note("usage record", KeyError("model"))
+    lines = [ln for ln in capsys.readouterr().out.splitlines() if ln.startswith("[recorder]")]
+    assert len(lines) == 2
+    assert "provider diagnostic record failed" in lines[0] and "cannot describe" in lines[0]
+    assert "usage record failed" in lines[1]
+
+
+def test_no_observer_swallows_an_error_silently():
+    import inspect
+    src = inspect.getsource(w)
+    assert "except Exception:\n            pass" not in src and "except Exception:\n        pass" not in src
+    assert "except Exception:\n                pass" not in src and "except Exception:\n                    pass" not in src

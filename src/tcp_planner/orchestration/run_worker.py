@@ -48,6 +48,10 @@ class Recorder:
         self._reported.add((what, text))
         print(f"[recorder] {what} failed: {text}", flush=True)
 
+    def note(self, what, error):
+        """For an observer that could not record something: reported once per distinct error, the run goes on."""
+        self._fail(what, error)
+
     def event(self, durable=False, **ev):
         """durable=True for state-changing events (fsynced); progress events are flushed only."""
         from tcp_planner.storage import run_records
@@ -159,8 +163,8 @@ def install_observers(rec, run=None):
             rec.write("rule_pack", {"id": pack.id, "version": pack.version, "status": pack.status,
                                          "hash": pack.hash, "selected_ta": pack.selected_ta(),
                                          "file": os.path.basename(pack.path)})
-        except Exception:
-            pass
+        except Exception as e:
+            rec.note("rule pack record", e)
         return pack
 
     app.load_rule_pack = observed_load_rule_pack
@@ -177,8 +181,8 @@ def install_observers(rec, run=None):
             rec.write("tls", {"ssl_context": f"{mod}.SSLContext",
                                    "trust_store": "WINDOWS_SYSTEM_STORE (truststore)" if mod.startswith("truststore")
                                    else "PYTHON_DEFAULT (truststore not active)"})
-        except Exception:
-            pass
+        except Exception as e:
+            rec.note("tls record", e)
         _install_anthropic_usage(rec)
 
     app.use_os_trust_store = trust_then_observe
@@ -199,8 +203,8 @@ def _record(rec, error, provider, t0):
     try:
         from tcp_planner.audit.provider_diagnostics import describe
         rec.add_diagnostic(describe(error, provider, round((time.perf_counter() - t0) * 1000, 1)))
-    except Exception:
-        pass
+    except Exception as e:
+        rec.note("provider diagnostic record", e)
 
 
 class _Evidence:
@@ -557,7 +561,8 @@ class EvidenceVisionProvider:
 def _install_anthropic_usage(rec):
     try:
         import anthropic
-    except Exception:
+    except Exception as e:
+        rec.note("usage recording (anthropic SDK)", e)
         return
     def wrap(create, endpoint, provider):
         def observed_create(*a, **k):
@@ -576,8 +581,8 @@ def _install_anthropic_usage(rec):
                                "stop_reason": getattr(resp, "stop_reason", None),
                                "usage": u.model_dump(mode="json") if u is not None else None,
                                "duration_ms": round((time.perf_counter() - t0) * 1000, 1)})
-            except Exception:
-                pass
+            except Exception as e:
+                rec.note("usage record", e)
             return resp
         return observed_create
 
@@ -588,8 +593,8 @@ def _install_anthropic_usage(rec):
                 try:
                     self.messages.create = wrap(self.messages.create, "messages", provider)
                     self.beta.messages.create = wrap(self.beta.messages.create, "beta.messages", provider)
-                except Exception:
-                    pass
+                except Exception as e:
+                    rec.note("usage recording (client wrap)", e)
         return UsageRecording
 
     anthropic.Anthropic = recording(anthropic.Anthropic, "anthropic")
@@ -608,8 +613,8 @@ def _run_context(run_dir, req, rec):  # run_dir is only kept as a label of the c
     try:
         from tcp_planner.orchestration.pipeline import CONFIG_PATH
         rec.write("deps", {"config_sha256": sha256_file(CONFIG_PATH)})
-    except Exception:
-        pass
+    except Exception as e:
+        rec.note("deps record", e)
     from tcp_planner.storage import run_records
     resume = run_records.read(ctx["run_id"], "resume")
     if resume:
