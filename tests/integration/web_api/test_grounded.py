@@ -206,7 +206,7 @@ def source_run():
 
 def compare(source, profiles, variants):
     cid = relations.create_comparison(source, profiles, variants=variants)
-    with inproc.isolated(): runner.prepare_views(store.run_path(cid))
+    with inproc.isolated(): runner.prepare_views(cid)
     for c in relations.create_children(cid): inproc.run(store.run_path(c))
     return cid
 

@@ -1,4 +1,4 @@
-"""Execute ONE pipeline run for the UI, in its own process:   python -m tcp_planner.orchestration.run_worker <run_dir>
+"""Execute ONE pipeline run for the UI, in its own process:   python -m tcp_planner.orchestration.run_worker <run_id>
 
 The run is the unmodified CLI entry point `tcp_planner.orchestration.pipeline.main(argv)` with the argv stored in
 the run's request record (ui/request, see storage/run_records.py), so argument handling, .env loading, TLS setup, offline scenarios, outputs
@@ -624,7 +624,7 @@ def _run_context(run_dir, req, rec):  # run_dir is only kept as a label of the c
     return ctx
 
 
-def prepare_views(comparison_dir):
+def prepare_views(comparison_id):
     """Acquire the fixed multi-resolution view set ONCE for a comparison, before any model runs, so every
     multi-resolution child reuses identical images. Uses the source run's verified analysis imagery request and
     OSM evidence (no new analysis-imagery or OSM call). Same .env / TLS initialisation as the CLI."""
@@ -635,7 +635,7 @@ def prepare_views(comparison_dir):
     from tcp_planner.storage import evidence_store as E
     from tcp_planner.audit.provider_diagnostics import sanitize
     from tcp_planner.storage import run_records
-    cdir = os.path.abspath(comparison_dir); cid = os.path.basename(cdir); rec = Recorder(cid)
+    cid = comparison_id; cdir = run_records.run_root(cid); rec = Recorder(cid)
     doc = run_records.read(cid, "comparison")
     src = doc["source_run_id"]; src_dir = run_records.run_root(src)
     rec.write("prep", {"state": "RUNNING", "started_at": now_iso()})
@@ -693,10 +693,15 @@ def resolve_argv(argv):
 
 def main(argv=None):
     argv = argv if argv is not None else sys.argv[1:]
-    if argv and argv[0] == "--prepare-views":
-        return 0 if prepare_views(argv[1]) else 1
     from tcp_planner.storage import run_records
-    run_dir = os.path.abspath(argv[0]); run_id = os.path.basename(run_dir)
+    from tcp_planner.storage.run_store import RUN_ID_RE
+    prepare = bool(argv) and argv[0] == "--prepare-views"
+    target = argv[1] if prepare and len(argv) > 1 else argv[0] if argv and not prepare else None
+    if not target or not RUN_ID_RE.match(target):  # a run id, never a folder: the folder is found under the runs folder
+        print("error: the runner takes a run id (for example 20261029-120000-abcdef), not a folder", file=sys.stderr)
+        return 2
+    if prepare: return 0 if prepare_views(target) else 1
+    run_id = target; run_dir = run_records.run_root(run_id)
     if run_records.is_legacy(run_id):
         print(run_records.LEGACY_MESSAGE); return 2
     req = run_records.read(run_id, "request")

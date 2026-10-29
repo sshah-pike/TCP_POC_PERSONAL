@@ -12,8 +12,8 @@ def inproc_launch(monkeypatch):
     from tests.integration.web_api import inproc
     launched = []
 
-    def launch(rid, rdir):
-        launched.append(rid); inproc.run(rdir)
+    def launch(rid):
+        launched.append(rid); inproc.run(rid)
     monkeypatch.setattr(pipeline_controller, "LAUNCHER", launch)
     return launched
 
@@ -132,7 +132,7 @@ def test_save_proposed_revision_then_regenerate_and_roles(aenv, runs, inproc_lau
 def test_failed_regeneration_keeps_parent_and_allows_retry(aenv, runs, monkeypatch):
     from tcp_planner.review.assistant.services import pipeline_controller
 
-    def boom(rid, rdir): raise RuntimeError("cannot start")
+    def boom(rid): raise RuntimeError("cannot start")
     monkeypatch.setattr(pipeline_controller, "LAUNCHER", boom)
     t, cid = conv(runs, "missing_road_type")
     stage_fact(t, cid, "road.road_type", "CORRECT", "RURAL")
@@ -218,13 +218,13 @@ def test_running_regeneration_is_not_finalized(aenv, runs, monkeypatch):
     import sys, types
     from tcp_planner.review.assistant.services import pipeline_controller
     started = []
-    monkeypatch.setattr(pipeline_controller, "LAUNCHER", lambda rid, rdir: started.append((rid, rdir)))  # launched, not finished
+    monkeypatch.setattr(pipeline_controller, "LAUNCHER", lambda rid: started.append(rid))  # launched, not finished
     t, cid = conv(runs, "missing_road_type")
     call("POST", f"conversations/{cid}/decisions", {"type": "FACT", "field": "road.road_type", "action": "CORRECT",
                                                     "value": "RURAL", "reason": "x"}, token=t)
     r = review(t, cid)
     st, _, res = call("POST", f"conversations/{cid}/confirm", {"review_sha256": r["review_sha256"], "mode": "CONFIRM_AND_REGENERATE"}, token=t)
-    rid, rdir = started[0]
+    rid = started[0]
     fake = types.SimpleNamespace(live_ids=lambda: {rid})
     monkeypatch.setitem(sys.modules, "tcp_planner.web_api.server", fake)
     call("GET", f"conversations/{cid}", token=t)
@@ -232,7 +232,7 @@ def test_running_regeneration_is_not_finalized(aenv, runs, monkeypatch):
     st2, _, dup = call("POST", f"plan-versions/{res['plan_version_id']}/regenerate", {"conversation_id": cid}, token=t)
     assert st2 == 409                                  # no second attempt while one is running
     from tests.integration.web_api import inproc
-    inproc.run(rdir)                                  # the run finishes
+    inproc.run(rid)                                   # the run finishes
     monkeypatch.setitem(sys.modules, "tcp_planner.web_api.server", types.SimpleNamespace(live_ids=lambda: set()))
     call("GET", f"conversations/{cid}", token=t)
     assert call("GET", f"plan-versions/{res['plan_version_id']}", token=t)[2]["current_status"] == "DRAFT_COMPLIANT"

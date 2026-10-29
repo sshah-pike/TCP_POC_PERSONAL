@@ -259,6 +259,7 @@ def variant_label(v):
 def create_comparison(source_id, profiles, modes=("single",), variants=None):
     """Plan a comparison. Children are created by create_children() after any evidence preparation."""
     from tcp_planner.ai.foundry_provider import profile_catalog
+    if records.is_legacy(source_id): raise records.LegacyRunReadOnly(source_id)
     available = {p["name"]: p for p in profile_catalog() if p["available"]}
     modes = list(dict.fromkeys(modes or ["single"]))
     if not profiles: raise store.BadRequest("select at least one model profile")

@@ -187,7 +187,8 @@ def test_anthropic_usage_recorder_observes_only(tmp_path, monkeypatch):
     monkeypatch.setattr(Messages, "create", lambda self, **k: sentinel)
     orig = anthropic.Anthropic
     try:
-        rec = runner.Recorder(str(tmp_path))
+        monkeypatch.setenv("TCP_UI_RUNS_DIR", str(tmp_path))
+        rec = runner.Recorder("20261029-120000-abcdef")
         runner._install_anthropic_usage(rec)
         client = anthropic.Anthropic(api_key="test")
         assert client.messages.create(model="claude-test", max_tokens=1, messages=[]) is sentinel  # unchanged

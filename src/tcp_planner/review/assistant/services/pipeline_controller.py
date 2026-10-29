@@ -22,9 +22,9 @@ def c():
     return _C["c"]
 
 
-def _default_launcher(run_id, rdir):
+def _default_launcher(run_id):
     from tcp_planner.web_api import server
-    server.launch(run_id, rdir)
+    server.launch(run_id)
 
 
 LAUNCHER = _default_launcher   # tests inject an in-process runner
@@ -36,6 +36,9 @@ def start(ident, cid, pv_id, resume_stage="fusion"):
     if not pv: raise AssistantError("NOT_FOUND", "Plan version not found.", 404)
     if V.status(pv) in V.SUCCESS: raise AssistantError("ALREADY_GENERATED", "This version was already generated.", 409)
     with open(c().store.blob_path("versions", pv_id, "sme_revision.json"), encoding="utf-8") as f: revision = json.load(f)
+    from tcp_planner.storage import run_records
+    if run_records.is_legacy(pv["parent_run_id"]):
+        raise AssistantError("LEGACY_RUN_READ_ONLY", run_records.LEGACY_MESSAGE, 409, recoverable=False)
     ra_id = new_id("ra")
     c().audit.write("RESUME_REQUESTED", ident, consequential=True, conversation_id=cid, plan_version=pv_id,
                     change_set_id=pv["change_set_id"], selected_resume_step=resume_stage, resume_attempt_id=ra_id,
@@ -54,7 +57,7 @@ def start(ident, cid, pv_id, resume_stage="fusion"):
         "conversation_id": cid, "revision_sha256": revision["content_sha256"]})
     c().store.append_event("versions", pv_id, {"type": "resume_started", "resume_attempt_id": ra_id, "run_id": run_id, "at": now_iso()})
     try:
-        LAUNCHER(run_id, rdir)
+        LAUNCHER(run_id)
     except Exception as e:
         c().store.append_event("resume-attempts", ra_id, {"type": "result", "status": "DRAFT_GENERATION_FAILED",
                                                           "reason": f"launch failed ({type(e).__name__})", "at": now_iso()})

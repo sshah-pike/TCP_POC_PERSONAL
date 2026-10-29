@@ -38,7 +38,7 @@ def inproc(tmp_path, monkeypatch):
         monkeypatch.setattr(requests, "get", fake_get)
         rid, rdir = store.create_run({"input_type": "coordinates", "lat": lat, "lon": lon,
                                       "advanced": {"map_provider": "usgs_naip", "no_dwt": True}}, set())
-        code = runner.main([rdir])
+        code = runner.main([os.path.basename(rdir)])
         return code, store.build_state(rid), rdir
 
     yield run

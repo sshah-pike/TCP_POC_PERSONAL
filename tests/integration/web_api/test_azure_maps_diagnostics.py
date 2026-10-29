@@ -36,7 +36,7 @@ def inproc(tmp_path, monkeypatch):
         rid, rdir = store.create_run({"input_type": "coordinates", "lat": "41.415", "lon": "-71.742",
                                       "operator": {"road_type": "RURAL"},
                                       "advanced": {"map_provider": "azure_maps", "no_dwt": True}}, set())
-        code = runner.main([rdir])
+        code = runner.main([os.path.basename(rdir)])
         return code, store.build_state(rid), rdir
 
     yield run

@@ -44,7 +44,7 @@ def start_run(payload):
     adv = payload.get("advanced") or {} if isinstance(payload, dict) else {}
     if adv.get("ai_profile"): _ai_choice({"ai_profile": adv["ai_profile"]})  # must be a configured, available profile
     run_id, rdir = store.create_run(payload, set(offline.SCENARIOS) | set(offline.ALIASES))
-    return launch(run_id, rdir)
+    return launch(run_id)
 
 
 def _ai_choice(payload):
@@ -67,7 +67,7 @@ def start_resume(parent_id, payload):
                                                vision_mode=str(payload.get("vision_mode") or "baseline"),
                                                osm_claims=payload.get("osm_claims") is True,
                                                centerline_views=payload.get("centerline_views") is True)
-    return launch(run_id, rdir)
+    return launch(run_id)
 
 
 def start_comparison(payload):
@@ -87,10 +87,10 @@ def start_comparison(payload):
         if doc.get("needs_views"):
             with open(store.run_path(cid, "ui", "prep.log"), "w", encoding="utf-8") as log:
                 subprocess.call([sys.executable, "-m", "tcp_planner.orchestration.run_worker", "--prepare-views",
-                                 store.run_path(cid)],
+                                 cid],  # the worker takes a run id and finds the folder itself
                                 cwd=store.PROJECT_ROOT, stdout=log, stderr=subprocess.STDOUT,
                                 env=dict(os.environ, PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8"))
-        for rid in relations.create_children(cid): launch(rid, store.run_path(rid))
+        for rid in relations.create_children(cid): launch(rid)
 
     threading.Thread(target=run, daemon=True).start()
     return cid
@@ -108,10 +108,11 @@ def stop_run(run_id):
     return {"run_id": run_id, "stopping": True}
 
 
-def launch(run_id, rdir):
-    log = open(os.path.join(rdir, "ui", "stdout.log"), "w", encoding="utf-8")
+def launch(run_id):
+    """Start the worker for a run by its id; the worker resolves the run folder under the runs folder itself (D-77)."""
+    log = open(os.path.join(store.run_path(run_id, "ui"), "stdout.log"), "w", encoding="utf-8")
     env = dict(os.environ, PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8")
-    proc = subprocess.Popen([sys.executable, "-m", "tcp_planner.orchestration.run_worker", rdir],
+    proc = subprocess.Popen([sys.executable, "-m", "tcp_planner.orchestration.run_worker", run_id],
                             cwd=store.PROJECT_ROOT, stdout=log, stderr=subprocess.STDOUT, env=env)
     with LIVE_LOCK: LIVE[run_id] = proc
 
@@ -300,6 +301,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"run_id": start_run(payload)}, 201)
         except (ValueError, UnicodeDecodeError):
             return self._json({"error": "invalid JSON"}, 400)
+        except records.LegacyRunReadOnly as e:
+            return self._json({"error": str(e), "error_code": e.code}, 409)
         except store.BadRequest as e:
             return self._json({"error": str(e)}, 400)
 

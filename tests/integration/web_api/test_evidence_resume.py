@@ -339,7 +339,7 @@ def test_fully_reused_run_reports_zero_provider_calls(env, monkeypatch):
 def prep(cid):
     from tcp_planner.orchestration import run_worker as runner
     with inproc.isolated():
-        return runner.prepare_views(store.run_path(cid))
+        return runner.prepare_views(cid)
 
 
 def test_comparison_multi_resolution_views_acquired_once_and_identical(env, monkeypatch):
