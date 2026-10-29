@@ -43,13 +43,15 @@ STAGES = (
      ("plan.json", "aerial_image.jpg", "debug_plan.png", "debug_plan.pdf", "sheet_aerial.jpg", "tcp_sheet.png",
       "tcp_sheet.pdf", "plan.dxf", "plan.dwg", "dwt_result.json")),
 )
-# reason codes that mean a service/API failure (not a site-fact discrepancy): shown as ERROR, not REVIEW
+# reason codes that mean a service/API failure (not a site-fact discrepancy). They never change the decision shown
+# (REVIEW_REQUIRED stays REVIEW_REQUIRED, exit 3): a run lists them as `service_error` and the UI shows a badge (S3, Q12-B)
 ERROR_REASON_CODES = {"MAP_CONTEXT_UNAVAILABLE", "OSM_CONTEXT_UNAVAILABLE", "AI_OBSERVATION_UNAVAILABLE",
                       "AI_CALL2_UNAVAILABLE", "CROPS_UNAVAILABLE"}
 
 
-def _is_error(codes):
-    return any(c in ERROR_REASON_CODES for c in codes or ())
+def service_codes(codes):
+    """The service/API failure codes among reason codes (sorted, no duplicates); empty when there are none."""
+    return sorted({c for c in codes or () if c in ERROR_REASON_CODES})
 
 
 EXIT_DECISION = {0: "SUPPORTED_AUTO", 3: "REVIEW_REQUIRED", 4: "UNSUPPORTED_POC",
@@ -159,7 +161,7 @@ def create_run(payload, offline_scenarios):
         name = _safe_filename(f.get("filename"))
         ref = uploads.store_upload(stores.artifacts(), run_id, name, raw)  # key <run_id>/input/<slug>.kml
         argv += ["--kml", ref.uri]  # a run-relative key; the worker resolves it under the runs folder (D-77)
-        request.update(kml_filename=name, kml_size_bytes=len(raw), kml_saved_path=ref.uri)
+        request.update(kml_filename=name, kml_size_bytes=len(raw), kml_key=ref.uri)
     elif itype == "coordinates":
         lat, lon = str(payload.get("lat", "")).strip(), str(payload.get("lon", "")).strip()
         if not lat or not lon: raise BadRequest("latitude and longitude are required")
@@ -258,9 +260,10 @@ def _stage_outcome(key, attrs):
     if key == "fusion" and (a.get("conflicts") or a.get("inputs_complete") is False):
         return "WARNING", [f"conflicts={a.get('conflicts')}", f"inputs_complete={a.get('inputs_complete')}"]
     if key == "eligibility" and a.get("decision") in ("REVIEW_REQUIRED", "UNSUPPORTED_POC"):
-        codes = str(a.get("reason_codes") or "").split(",")
-        return ("ERROR" if _is_error(codes) else "REVIEW" if a["decision"] == "REVIEW_REQUIRED" else "UNSUPPORTED"), \
-            [f"decision={a['decision']}", f"reason_codes={a.get('reason_codes')}"]
+        svc = service_codes(str(a.get("reason_codes") or "").split(","))
+        problems = [f"decision={a['decision']}", f"reason_codes={a.get('reason_codes')}"]
+        if svc: problems.append(f"service_error={','.join(svc)}")
+        return ("REVIEW" if a["decision"] == "REVIEW_REQUIRED" else "UNSUPPORTED"), problems
     if key == "rules" and a.get("issues"):
         return "WARNING", [f"placement issues={a['issues']}"]
     if key == "validation" and (a.get("rule") != "PASS" or a.get("geometry") != "PASS"):
@@ -299,7 +302,9 @@ def build_state(run_id, live_ids=(), with_lineage=True):
         calls = []  # call tracking was active and no provider call was made (e.g. everything reused)
     lines = _log_lines(ui); msgs = _stage_messages(lines)
     diags = records.read(run_id, "diagnostics", []) or []
-    outputs = _outputs(os.path.join(rdir, "output")); have = {o["name"] for o in outputs}
+    index = {x["name"]: x for x in (result or {}).get("output_index") or []}  # SHA-256 of each output file (S3)
+    outputs = [dict(o, sha256=(index.get(o["name"]) or {}).get("sha256")) for o in _outputs(os.path.join(rdir, "output"))]
+    have = {o["name"] for o in outputs}
 
     stages, claimed, last_started = [], set(), None
     for i, (key, title, span_names, files) in enumerate(STAGES, start=1):
@@ -359,8 +364,8 @@ def build_state(run_id, live_ids=(), with_lineage=True):
     else:
         decision = None
     elig = (result or {}).get("eligibility") or _read_json(os.path.join(rdir, "output", "eligibility_result.json"))
-    if decision == "REVIEW_REQUIRED" and _is_error((result or {}).get("reason_codes") or (elig or {}).get("reason_codes")):
-        decision = "ERROR"  # API / service failure, not a site-understanding discrepancy
+    reason_codes = (result or {}).get("reason_codes") or (elig or {}).get("reason_codes") or []
+    service_error = service_codes(reason_codes) or None  # a badge, never a different decision (Q12-B)
     draft = decision == "SUPPORTED_AUTO" and exit_code == 0 and "plan.json" in have
     plan_status = (result or {}).get("plan_status")  # SME revision runs only
     if plan_status == "DRAFT_WITH_ENGINEERING_EXCEPTION" and exit_code == 5 and "plan.json" in have and not error:
@@ -372,7 +377,7 @@ def build_state(run_id, live_ids=(), with_lineage=True):
         "state": state, "started_at": proc.get("started_at"), "ended_at": proc.get("ended_at"),
         "runtime_ms": proc.get("runtime_ms"), "exit_code": exit_code,
         "decision": decision,
-        "reason_codes": (result or {}).get("reason_codes") or (elig or {}).get("reason_codes") or [],
+        "reason_codes": reason_codes, "service_error": service_error,
         "message": (elig or {}).get("message"), "error": error,
         "stages": stages, "span_total_ms": span_total,
         "rule_pack": pack, "plan": {"plan_id": (result or {}).get("plan_id"), "plan_hash": (result or {}).get("plan_hash")},
@@ -520,10 +525,14 @@ def list_runs(live_ids=()):
         st = build_state(rid, live_ids)
         if not st: continue
         r = st["request"] or {}
+        proj = r.get("project") or {}
         label = {"kml": f"KML: {r.get('kml_filename')}", "coordinates": "Coordinates",
-                 "offline": f"Offline: {r.get('offline_scenario')}"}.get(r.get("input_type"), "?")
+                 "offline": f"Offline: {r.get('offline_scenario')}",
+                 "zone": f"Zone {proj.get('zone_id')}"}.get(r.get("input_type"), "?")
         out.append({"run_id": rid, "created_at": st["created_at"], "input": label, "state": st["state"],
-                    "decision": st["decision"], "runtime_ms": st["runtime_ms"],
+                    "decision": st["decision"], "service_error": bool(st["service_error"]), "runtime_ms": st["runtime_ms"],
+                    "project_id": proj.get("project_id"), "zone_id": proj.get("zone_id"),
+                    "zone_version": proj.get("zone_version"),
                     "rule_pack": f"{st['rule_pack']['id']} v{st['rule_pack']['version']}" if st["rule_pack"] else None,
                     "estimated_cost_usd": st["cost"]["ai"]["estimated_cost_usd"],
                     "parent_run_id": (st["lineage"] or {}).get("parent_run_id"),

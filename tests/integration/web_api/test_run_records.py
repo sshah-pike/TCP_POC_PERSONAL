@@ -27,7 +27,7 @@ def test_new_run_records_hold_no_absolute_path(env, monkeypatch):
     for rid in (parent, child):
         req = records.read(rid, "request")
         assert [a for a in req["argv"] if os.path.isabs(a)] == []
-        assert req["request"]["kml_saved_path"] == f"{rid}/input/site.kml"
+        assert req["request"]["kml_key"] == f"{rid}/input/site.kml" and "kml_saved_path" not in req["request"]
         assert req["argv"][req["argv"].index("--out") + 1] == f"{rid}/output"
         res = records.read(rid, "result")
         assert "out_dir" not in res and res["out_key"] == f"{rid}/output"
@@ -54,5 +54,5 @@ def test_moved_runs_folder_resumes(env, monkeypatch, tmp_path):
         for n in names:
             if n.endswith((".json", ".jsonl")):
                 with open(os.path.join(base, n), "rb") as f: assert str(a).encode() not in f.read(), n
-    assert records.read(child, "request")["request"]["kml_saved_path"] == f"{child}/input/site.kml"
+    assert records.read(child, "request")["request"]["kml_key"] == f"{child}/input/site.kml"
     assert os.path.isfile(records.resolve(f"{child}/input/site.kml"))

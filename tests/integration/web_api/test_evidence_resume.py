@@ -75,7 +75,9 @@ def stage(st, key):
 def test_azure_image_persisted_immediately_and_kept_after_review(env, monkeypatch):
     h = http(monkeypatch, osm_error=requests.exceptions.ReadTimeout("Read timed out."))
     rid, st = azure_run()
-    assert st["decision"] == "ERROR" and st["reason_codes"] == ["OSM_CONTEXT_UNAVAILABLE", "OSM_REQUEST_FAILED"]
+    assert st["decision"] == "REVIEW_REQUIRED" and st["exit_code"] == 3           # exit 3 is REVIEW_REQUIRED, not ERROR (S3 Q12-B)
+    assert st["reason_codes"] == ["OSM_CONTEXT_UNAVAILABLE", "OSM_REQUEST_FAILED"]
+    assert st["service_error"] == ["OSM_CONTEXT_UNAVAILABLE"]                    # shown as a badge next to the decision
     [m] = [e for e in load_manifest(rid) if e["kind"] == "map"]
     assert m["producer_span"] == "tcp.map.retrieve" and m["mode"] == "saved"
     path = store.run_path(rid, "evidence", m["file"])  # same layout on disk: <runs>/<run_id>/evidence/<file>
@@ -133,7 +135,7 @@ def test_resume_from_ai_calls_neither_azure_nor_osm(env, monkeypatch):
 def test_changed_kml_invalidates_map_and_osm_reuse(env, monkeypatch):
     http(monkeypatch); parent, _ = azure_run(kml=kml_bytes(LAT, LON))
     rid, rdir = relations.create_resume_run(parent, "vision", ai_profile="fake-a", ai_provider="foundry")
-    with open(records.resolve(records.read(rid, "request")["request"]["kml_saved_path"]), "wb") as f:  # a run-relative key
+    with open(records.resolve(records.read(rid, "request")["request"]["kml_key"]), "wb") as f:  # a run-relative key
         f.write(kml_bytes(LAT + 0.0003, LON))  # the input changed after the resume was prepared
     h = http(monkeypatch); inproc.run(rdir); st = store.build_state(rid)
     assert analysis_requests(h) == 1 and h.count("api.openstreetmap.org") == 1
@@ -271,7 +273,7 @@ def test_azure_sheet_mosaic_within_limits_and_georeferenced(monkeypatch):
 def test_azure_non_image_response_fails_closed_as_map_failure(env, monkeypatch, response):
     http(monkeypatch, azure=response)
     rid, st = azure_run()
-    assert st["decision"] == "ERROR" and st["exit_code"] == 3
+    assert st["decision"] == "REVIEW_REQUIRED" and st["service_error"]  # exit 3 stays REVIEW_REQUIRED (S3 Q12-B) and st["exit_code"] == 3
     assert st["reason_codes"] == ["MAP_CONTEXT_UNAVAILABLE", "MAP_REQUEST_FAILED"]
     d = stage(st, "imagery")["diagnostics"][0]
     assert d["pipeline_error_code"] == "MAP_REQUEST_FAILED" and d["http_status"] == 200

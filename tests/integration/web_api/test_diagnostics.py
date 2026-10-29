@@ -61,7 +61,7 @@ class FakeResponse:
 
 
 def assert_fail_closed(code, st, rdir):
-    assert code == 3 and st["decision"] == "ERROR"
+    assert code == 3 and st["decision"] == "REVIEW_REQUIRED" and st["service_error"]  # exit 3 stays REVIEW_REQUIRED (S3 Q12-B)
     assert st["reason_codes"] == EXPECTED_CODES
     assert not st["draft_generated"] and not ({o["name"] for o in st["outputs"]} & DRAFT)
     stages = {s["key"]: s for s in st["stages"]}
@@ -159,7 +159,7 @@ def test_osm_tls_failure_after_imagery_succeeds(inproc):
                           "certificate chain (_ssl.c:1032)')))")
 
     code, st, rdir = inproc(fake_get)
-    assert code == 3 and st["decision"] == "ERROR"
+    assert code == 3 and st["decision"] == "REVIEW_REQUIRED" and st["service_error"]  # exit 3 stays REVIEW_REQUIRED (S3 Q12-B)
     assert st["reason_codes"] == ["OSM_CONTEXT_UNAVAILABLE", "OSM_REQUEST_FAILED"]
     stages = {s["key"]: s for s in st["stages"]}
     assert stages["imagery"]["status"] == "COMPLETED" and stages["imagery"]["diagnostics"] == []

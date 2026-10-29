@@ -60,7 +60,7 @@ def raising(exc):
 
 
 def assert_fail_closed(code, st, rdir, expected=EXPECTED):
-    assert code == 3 and st["decision"] == "ERROR" and st["reason_codes"] == expected
+    assert code == 3 and st["decision"] == "REVIEW_REQUIRED" and st["service_error"]  # exit 3 stays REVIEW_REQUIRED (S3 Q12-B) and st["reason_codes"] == expected
     assert not st["draft_generated"] and not ({o["name"] for o in st["outputs"]} & DRAFT)
     stages = {s["key"]: s for s in st["stages"]}
     assert stages["imagery"]["status"] == "ERROR"

@@ -454,6 +454,9 @@ def _finish(run, result, elig):
     result["eligibility"] = elig
     _write_report(run, result, elig)
     result["outputs"] = sorted(set(run.written)); result["out_dir"] = run.out
+    # SHA-256 and size of every output file as the store registered it, rendered files included (kept in the run's result
+    # record by the worker as `output_index`)
+    result["output_refs"] = [dict(run.refs[n].to_dict(), name=n) for n in sorted(run.refs)]
     return result
 
 

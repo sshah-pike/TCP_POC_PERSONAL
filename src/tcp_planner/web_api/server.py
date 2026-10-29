@@ -7,7 +7,8 @@ process loads .env itself exactly as the CLI does.
 
 GET  /api/meta                          form choices (from the rule pack, config and offline module)
 GET  /api/runs                          run history
-POST /api/runs                          start a run (JSON body)
+POST /api/runs                          start a single run (JSON body); a project starts its zone runs itself
+GET|POST /api/projects[/...]            projects: one run per zone (tcp_planner.web_api.project_routes)
 POST /api/runs/<id>/stop                stop a running run (ends its runner process; recorded as STOPPED)
 GET  /api/runs/<id>                     run state (stages, decision, outputs, cost)
 GET  /api/runs/<id>/files/<name>        a file the pipeline wrote to runs/<id>/output/
@@ -37,6 +38,30 @@ STOPPED = set()  # run ids stopped by the user (the reaper records them as RUN_S
 
 def live_ids():
     with LIVE_LOCK: return set(LIVE)
+
+
+class _ServerLauncher:
+    """What the project orchestrator needs from this server: start a run's worker, and which runs are alive."""
+    def launch(self, run_id): return launch(run_id)
+
+    def live_ids(self): return live_ids()
+
+
+_RUNNER = None
+
+
+def project_runner():
+    """The one project orchestrator of this server process (S3 Q5-A: its threads run here)."""
+    global _RUNNER
+    with LIVE_LOCK:
+        if _RUNNER is None:
+            from tcp_planner.orchestration.project_runner import ProjectRunner
+            _RUNNER = ProjectRunner(_ServerLauncher())
+    return _RUNNER
+
+
+def _check_ai_profile(adv):
+    _ai_choice({"ai_profile": adv["ai_profile"]})
 
 
 def start_run(payload):
@@ -141,7 +166,9 @@ def meta():
     from tcp_planner.sheets.dwt_renderer import MODES
     from tcp_planner.contracts import APP_VERSION
     from tcp_planner.rules.rule_pack_loader import load_rule_pack
+    from tcp_planner.orchestration import projects as P
     out = {"app_version": APP_VERSION, "offline_scenarios": list(offline.SCENARIOS), "offline_aliases": offline.ALIASES,
+           "start_fields": list(P.START_FIELDS), "traffic_volumes": list(P.TRAFFIC_VOLUMES), "ta_choices": list(P.TA_CHOICES),
            "map_providers": list(store.UI_MAP_PROVIDERS), "ai_providers": list(store.UI_AI_PROVIDERS),
            "dwt_modes": list(MODES), "dwt_config_present": os.path.isfile(DWT_CONFIG_PATH),
            "road_types": [], "supported_road_types": [], "rule_pack": None, "rule_pack_error": None,
@@ -152,7 +179,9 @@ def meta():
         out["foundry_profiles"] = profile_catalog()
     except Exception as e:
         out["foundry_profiles_error"] = type(e).__name__
-    try: out["supported_road_types"] = load_config()["supported_road_types"]
+    try:
+        cfg = load_config(); out["supported_road_types"] = cfg["supported_road_types"]
+        out["max_zones"] = cfg["project"]["max_zones"]; out["max_parallel_zone_runs"] = cfg["project"]["max_parallel_zone_runs"]
     except Exception as e: out["config_error"] = getattr(e, "code", type(e).__name__)
     try:
         pack = load_rule_pack()
@@ -208,6 +237,8 @@ class Handler(BaseHTTPRequestHandler):
         url = urlsplit(self.path); parts = [unquote(p) for p in url.path.split("/") if p]
         if parts[:2] == ["api", "assistant"]:
             return self._assistant("GET", parts[2:], url.query, None)
+        if parts[:2] == ["api", "projects"]:
+            return self._project("GET", parts[2:], None)
         try:
             if parts[:1] == ["api"]:
                 if parts == ["api", "meta"]: return self._json(meta())
@@ -275,6 +306,15 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"error": "invalid JSON"}, 400)
             if not isinstance(payload, dict): return self._json({"error": "JSON object expected"}, 400)
             return self._assistant("POST", parts[2:], urlsplit(self.path).query, payload)
+        if parts[:2] == ["api", "projects"]:
+            if not (self.headers.get("Content-Type") or "").startswith("application/json"):
+                return self._json({"error": "Content-Type must be application/json"}, 415)
+            n = int(self.headers.get("Content-Length") or 0)
+            if n > MAX_BODY: return self._json({"error": "request body too large"}, 413)
+            try: payload = json.loads(self.rfile.read(n).decode("utf-8")) if n else {}
+            except (ValueError, UnicodeDecodeError): return self._json({"error": "invalid JSON"}, 400)
+            if not isinstance(payload, dict): return self._json({"error": "JSON object expected"}, 400)
+            return self._project("POST", parts[2:], payload)
         route =("run" if path == "/api/runs" else "comparison" if path == "/api/comparisons"
                  else "stop" if len(parts) == 4 and parts[:2] == ["api", "runs"] and parts[3] == "stop"
                  else "resume" if len(parts) == 4 and parts[:2] == ["api", "runs"] and parts[3] == "resume"
@@ -305,6 +345,11 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"error": str(e), "error_code": e.code}, 409)
         except store.BadRequest as e:
             return self._json({"error": str(e)}, 400)
+
+    def _project(self, method, parts, payload):
+        from tcp_planner.web_api import project_routes
+        status, body = project_routes.dispatch(method, parts, payload, project_runner(), check_ai=_check_ai_profile)
+        return self._json(body, status)
 
     def _assistant(self, method, parts, query, payload):
         """SME Review Assistant routes (tcp_planner.review.assistant.routes); unavailable unless TCP_SME_ASSISTANT_ENABLED=true."""

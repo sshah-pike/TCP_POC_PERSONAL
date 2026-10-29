@@ -62,8 +62,9 @@ def test_ui_reports_existing_decision(api, tmp_path, name):
     st = run({"input_type": "offline", "offline_scenario": name})
     ref = direct(name, tmp_path / "ref")
 
-    shown = "ERROR" if ref["decision"] == "REVIEW_REQUIRED" and store._is_error(ref["reason_codes"]) else ref["decision"]
-    assert st["decision"] == shown  # service/API failures are shown as ERROR, not REVIEW_REQUIRED
+    shown = ref["decision"]
+    assert st["decision"] == shown  # the pipeline's decision is always shown (exit 3 is REVIEW_REQUIRED); S3 Q12-B
+    assert st["service_error"] == (store.service_codes(ref["reason_codes"]) or None)  # service failures are a badge
     assert st["reason_codes"] == ref["reason_codes"]
     assert st["exit_code"] == EXIT[ref["decision"]]
     outputs = {o["name"] for o in st["outputs"]}
@@ -83,7 +84,7 @@ def test_ui_reports_existing_decision(api, tmp_path, name):
         if ref["decision"] == "REVIEW_REQUIRED":
             assert by["validation"]["status"] == "REVIEW" and by["render"]["status"] == "NOT_RUN"
     else:
-        assert elig["status"] == {"REVIEW_REQUIRED": "REVIEW", "ERROR": "ERROR", "UNSUPPORTED_POC": "UNSUPPORTED"}[shown]
+        assert elig["status"] == {"REVIEW_REQUIRED": "REVIEW", "UNSUPPORTED_POC": "UNSUPPORTED"}[shown]
         assert all(by[k]["status"] == "NOT_RUN" for k in ("rules", "validation", "render"))
     if ref["decision"] == "SUPPORTED_AUTO":
         a, b = (json.load(open(os.path.join(d, "plan.json"), encoding="utf-8"))
@@ -120,7 +121,7 @@ def test_invalid_kml_is_unsupported_at_input(api):
     assert stages["input"]["status"] == "UNSUPPORTED"
     assert "eligibility_result.json" in stages["input"]["artifacts"]
     assert all(s["status"] == "NOT_RUN" for k, s in stages.items() if k != "input")
-    assert os.path.isfile(records.resolve(st["request"]["kml_saved_path"]))  # a run-relative key (D-77) and not st["draft_generated"]
+    assert os.path.isfile(records.resolve(st["request"]["kml_key"]))  # a run-relative key (D-77) and not st["draft_generated"]
 
 
 def test_out_of_range_coordinates_rejected_by_pipeline(api):

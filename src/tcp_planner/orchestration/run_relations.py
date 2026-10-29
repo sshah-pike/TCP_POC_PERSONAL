@@ -108,7 +108,7 @@ def _dependency_changes(parent_id, parent_state):
 
 def _input_file(parent_id, parent_state):
     r = parent_state.get("request") or {}
-    saved = r.get("kml_saved_path") if r.get("input_type") == "kml" else None
+    saved = (r.get("kml_key") or r.get("kml_saved_path")) if r.get("input_type") == "kml" else None  # kml_saved_path: runs from S2
     if not saved: return None
     return saved if os.path.isabs(saved) else records.resolve(saved)  # new runs hold a run-relative key (D-77)
 
@@ -205,7 +205,7 @@ def create_resume_run(parent_id, stage, ai_profile=None, ai_provider=None, compa
                 if not os.path.isfile(src): raise store.BadRequest("source input file is missing")
                 with open(src, "rb") as f: data = f.read()
                 ref = uploads.store_upload(stores.artifacts(), run_id, request.get("kml_filename") or os.path.basename(src), data)
-                argv += ["--kml", ref.uri]; request["kml_saved_path"] = ref.uri
+                argv += ["--kml", ref.uri]; request["kml_key"] = ref.uri; request.pop("kml_saved_path", None)
             i += 2; continue
         argv.append(a); i += 1
     offline = request.get("input_type") == "offline"

@@ -106,6 +106,10 @@ def _result_record(res, run_id):
     """The pipeline result as the run's result record: no absolute path (D-77). out_dir becomes the run-relative key."""
     rec = dict(res)
     if "out_dir" in rec: rec["out_key"] = f"{run_id}/output"; del rec["out_dir"]
+    refs = rec.pop("output_refs", None)
+    if refs is not None:  # the output index: {name, uri (run-relative key), sha256, size, media_type} per output file
+        rec["output_index"] = [{"name": x["name"], "uri": f"{run_id}/output/{x['uri']}", "sha256": x["sha256"],
+                                "size": x["size"], "media_type": x["media_type"]} for x in refs]
     return rec
 
 
