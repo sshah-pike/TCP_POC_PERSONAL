@@ -99,6 +99,11 @@
     "max_work_path_m": 150.0,
     "duplicate_distance_m": 1.0
   },
+  "project": {
+    "note": "S3 owner decisions (Q3, Q4): above max_zones a project waits for one-click approval; at most max_parallel_zone_runs zone runs are active at once, the rest queue.",
+    "max_zones": 3,
+    "max_parallel_zone_runs": 3
+  },
   "fusion": {
     "min_critical_confidence": 0.7,
     "osm_tag_confidence": 0.9,

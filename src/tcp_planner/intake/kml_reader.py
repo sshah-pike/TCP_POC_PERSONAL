@@ -50,6 +50,17 @@ def from_coordinates(lat, lon):
             "non_authoritative_metadata": {"ignored_element_count": 0}}
 
 
+def location_from_coordinates(lat, lon):
+    """A latitude/longitude pair -> one POINT WorkLocation (coordinates and offline projects, S3). Same checks as
+    from_coordinates; the id and hash come from the geometry only, exactly as for a KML Point."""
+    ref = from_coordinates(lat, lon)["work_reference"]
+    geom = {"type": wl.POINT, "coords": [ref["latitude"], ref["longitude"]]}
+    ghash = wl.geometry_hash_of(geom)
+    return wl.WorkLocation(location_id=wl.base_location_id(ghash), ordinal=0,
+                           source=wl.Source(file=None, input_hash=ghash, placemark_index=0, geometry_index=0, name=None),
+                           geometry=geom, geometry_hash=ghash)
+
+
 # ---------------------------------------------------------------- file level
 def _load(source, file_name=None):
     """-> (raw bytes, root element, file name). File-level failures raise InputRejected(INVALID_KML)."""
