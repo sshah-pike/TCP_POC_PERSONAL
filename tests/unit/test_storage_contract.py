@@ -154,3 +154,41 @@ def test_file_state_cas_one_winner_across_processes(tmp_path):
     got = sorted(q.get(timeout=10) for _ in ps)
     assert got == ["stale", "stale", "stale", "win"]
     assert FileStateStore(path).get("heads/p").version == 2
+
+
+# ------------------------------------------------------------------ S2 commit 6 additions
+def test_keys_match_list_without_reading_content(artifacts):
+    for k in ("c/a.json", "c/a/blob.png", "c/b.json", "d/x.json"):
+        artifacts.put(k, b"x", "image/png" if k.endswith(".png") else JSON)
+    assert artifacts.keys("c") == ["c/a.json", "c/a/blob.png", "c/b.json"] == [r.uri for r in artifacts.list("c")]
+    assert artifacts.keys() == ["c/a.json", "c/a/blob.png", "c/b.json", "d/x.json"]
+    assert artifacts.keys("nothing") == []
+
+
+def test_streams_lists_event_streams_by_whole_segment_prefix(state):
+    for s in ("audits/2026-10-29/c1", "audits/2026-10-29/system", "audits/2026-10-30/c1", "conversations/c1", "auditsx/y"):
+        state.append_event(s, {"i": 1}, 1)
+    assert state.streams("audits") == ["audits/2026-10-29/c1", "audits/2026-10-29/system", "audits/2026-10-30/c1"]
+    assert state.streams("conversations") == ["conversations/c1"] and state.streams("nope") == []
+
+
+def test_append_event_after_builds_from_the_last_event(state):
+    def chain(last): return {"n": 1 if last is None else last["n"] + 1, "prev": None if last is None else last["n"]}
+    assert [state.append_event_after("s/e", chain, 1) for _ in range(3)] == [1, 2, 3]
+    assert [e["event"] for e in state.events("s/e")] == [{"n": 1, "prev": None}, {"n": 2, "prev": 1}, {"n": 3, "prev": 2}]
+    assert state.append_event("s/e", {"n": 9, "prev": 3}, 1) == 4
+
+
+def _chain_worker(root, n):
+    from tcp_planner.storage.file_state import FileStateStore as F
+    st = F(root)
+    for _ in range(n): st.append_event_after("s/e", lambda last: {"n": 1 if last is None else last["n"] + 1}, 1)
+
+
+def test_append_event_after_never_forks_across_processes(tmp_path):
+    ctx = multiprocessing.get_context("spawn")
+    ps = [ctx.Process(target=_chain_worker, args=(str(tmp_path), 15)) for _ in range(3)]
+    for p in ps: p.start()
+    for p in ps: p.join(120)
+    evs = FileStateStore(tmp_path).events("s/e")
+    assert [e["seq"] for e in evs] == list(range(1, 46)) and [e["event"]["n"] for e in evs] == list(range(1, 46))

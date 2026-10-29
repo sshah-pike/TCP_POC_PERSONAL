@@ -10,6 +10,10 @@ class ImmutableExists(Exception):
     """A record with this id already exists (never overwritten)."""
 
 
+class LegacyStreamReadOnly(Exception):
+    """An event stream written before S2 (no envelope) can be read but not appended to."""
+
+
 class IntegrityError(Exception):
     """A stored record does not match its content hash."""
 
@@ -31,7 +35,7 @@ class RecordStore(abc.ABC):
     def events(self, collection, record_id): ...              # -> [event]
 
     @abc.abstractmethod
-    def put_blob(self, collection, record_id, name, data): ... # -> {"path", "sha256", "size_bytes"}
+    def put_blob(self, collection, record_id, name, data): ... # -> {"uri", "sha256", "size_bytes"}
 
     @abc.abstractmethod
     def blob_path(self, collection, record_id, name): ...

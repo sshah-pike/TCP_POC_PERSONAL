@@ -62,13 +62,18 @@ class LocalFsArtifactStore(ArtifactStore):
         if not os.path.isfile(path): return None
         with open(path, "rb") as f: return self._ref(key, f.read())
 
-    def list(self, prefix=""):
+    def keys(self, prefix=""):
         base = self._path(prefix) if prefix else self.root
         files = [base] if os.path.isfile(base) else [os.path.join(d, n) for d, _s, ns in os.walk(base) for n in ns]
         out = []
         for p in files:
             name = os.path.basename(p)
             if name.startswith(TMP_PREFIX) or name.endswith(RESERVED_SUFFIXES) or ".lock.stale-" in name: continue
-            key = os.path.relpath(p, self.root).replace(os.sep, "/")
-            with open(p, "rb") as f: out.append(self._ref(key, f.read()))
-        return sorted(out, key=lambda r: r.uri)
+            out.append(os.path.relpath(p, self.root).replace(os.sep, "/"))
+        return sorted(out)
+
+    def list(self, prefix=""):
+        out = []
+        for key in self.keys(prefix):
+            with open(self._path(key), "rb") as f: out.append(self._ref(key, f.read()))
+        return out

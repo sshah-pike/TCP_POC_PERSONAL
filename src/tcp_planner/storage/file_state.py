@@ -228,15 +228,16 @@ class FileStateStore(StateStore):
 
     TAIL_BLOCK = 8192
 
-    def _last_seq(self, path):
-        """Sequence number of the last event, read from the file tail only (no full parse). 0 for a missing or empty
-        file. A file that does not end in a newline holds a torn line: a writer refuses to build on it."""
+    def _last_event(self, path):
+        """The last event line parsed ({seq, schema_version, event}), read from the file tail only (no full parse); None
+        for a missing or empty file. A file that does not end in a newline holds a torn line: a writer refuses to build
+        on it."""
         def read():
             try: f = open(path, "rb")
-            except (FileNotFoundError, NotADirectoryError): return 0
+            except (FileNotFoundError, NotADirectoryError): return None
             with f:
                 size = f.seek(0, os.SEEK_END)
-                if size == 0: return 0
+                if size == 0: return None
                 buf, pos = b"", size
                 while True:
                     step = min(self.TAIL_BLOCK, pos); pos -= step
@@ -246,19 +247,31 @@ class FileStateStore(StateStore):
                     cut = buf[:-1].rfind(b"\n")
                     if cut >= 0 or pos == 0: return buf[cut + 1:-1]
         last = _retry_permission(read)
-        if last == 0: return 0
-        try: return int(json.loads(last.decode("utf-8"))["seq"])
+        if last is None: return None
+        try:
+            env = json.loads(last.decode("utf-8")); env["seq"] = int(env["seq"]); env["event"]; env["schema_version"]
+            return env
         except (ValueError, KeyError, TypeError) as e:
             raise StorageError(f"{os.path.basename(path)}: last line is not a valid event: {e}") from e
 
     def append_event(self, stream, event, schema_version, durable=False):
         """durable=True fsyncs the line before returning (state-changing events). The default flushes only: a progress
         event survives a process crash but may be lost in a power cut."""
-        path = self._events_path(stream); _dump(event)
+        _dump(event)
         if not isinstance(event, dict): raise StorageError("events must be JSON objects")
+        return self.append_event_after(stream, lambda _last: event, schema_version, durable)
+
+    def append_event_after(self, stream, build, schema_version, durable=False):
+        """build(last event dict or None) -> the event to append, called under the stream's write lock, so a chain (each
+        event carrying the hash of the one before) can never fork. build may be called again if the lock is lost."""
+        path = self._events_path(stream)
 
         def op(lock):
-            seq = self._last_seq(path) + 1
+            last = self._last_event(path)
+            event = build(None if last is None else last["event"])
+            _dump(event)
+            if not isinstance(event, dict): raise StorageError("events must be JSON objects")
+            seq = (0 if last is None else last["seq"]) + 1
             line = (_dump({"seq": seq, "schema_version": int(schema_version), "event": event}) + "\n").encode("utf-8")
             lock.assert_owned()
             with open(path, "ab") as f:
@@ -266,6 +279,16 @@ class FileStateStore(StateStore):
                 if durable: os.fsync(f.fileno())
             return seq
         return self._locked(path, op)
+
+    def streams(self, prefix=""):
+        if prefix: validate_key(prefix)
+        base = os.path.join(self.root, *prefix.split("/")) if prefix else self.root
+        out = []
+        for d, _dirs, names in os.walk(base) if os.path.isdir(base) else ():
+            for n in names:
+                if n.endswith(EVENTS_SUFFIX) and not n.startswith(TMP_PREFIX):
+                    out.append(os.path.relpath(os.path.join(d, n[:-len(EVENTS_SUFFIX)]), self.root).replace(os.sep, "/"))
+        return sorted(out)
 
     def events(self, stream, after=0):
         return [{"seq": e["seq"], "schema_version": e["schema_version"], "event": e["event"]}

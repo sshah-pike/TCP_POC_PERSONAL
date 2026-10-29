@@ -38,6 +38,10 @@ class InMemoryArtifactStore(ArtifactStore):
         if prefix: validate_key(prefix)
         return [self.stat(k) for k in sorted(self._d) if _under(k, prefix)]
 
+    def keys(self, prefix=""):
+        if prefix: validate_key(prefix)
+        return [k for k in sorted(self._d) if _under(k, prefix)]
+
 
 class InMemoryStateStore(StateStore):
     def __init__(self): self._s = {}; self._e = {}; self._lock = threading.Lock()
@@ -72,9 +76,18 @@ class InMemoryStateStore(StateStore):
         return [self.get(k) for k in sorted(self._s) if _under(k, prefix)]
 
     def append_event(self, stream, event, schema_version, durable=False):
-        validate_key(stream); ev = self._copy(event)
+        return self.append_event_after(stream, lambda _last: event, schema_version, durable)
+
+    def append_event_after(self, stream, build, schema_version, durable=False):
+        validate_key(stream)
         with self._lock:
-            lst = self._e.setdefault(stream, []); lst.append((int(schema_version), ev)); return len(lst)
+            lst = self._e.setdefault(stream, [])
+            ev = self._copy(build(self._copy(lst[-1][1]) if lst else None))
+            lst.append((int(schema_version), ev)); return len(lst)
+
+    def streams(self, prefix=""):
+        if prefix: validate_key(prefix)
+        return [k for k in sorted(self._e) if _under(k, prefix)]
 
     def events(self, stream, after=0):
         return [{"seq": i, "schema_version": sv, "event": self._copy(ev)}

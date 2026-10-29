@@ -114,6 +114,10 @@ class ArtifactStore(abc.ABC):
     def list(self, prefix=""):
         """ArtifactRefs whose key is under prefix (a whole-segment prefix), sorted by uri."""
 
+    @abc.abstractmethod
+    def keys(self, prefix=""):
+        """Sorted keys under prefix, without reading any content (list() hashes every file)."""
+
     def exists(self, key):
         return self.stat(key) is not None
 
@@ -166,6 +170,15 @@ class StateStore(abc.ABC):
     def append_event(self, stream, event, schema_version, durable=False):
         """Append a JSON object to a stream. -> sequence number (1, 2, ...). durable=True: the event is on disk before
         this returns (use it for state-changing events); the default is flushed only."""
+
+    @abc.abstractmethod
+    def append_event_after(self, stream, build, schema_version, durable=False):
+        """Like append_event, but the event is build(last event dict or None), computed under the stream's write lock, so
+        a hash chain can not fork. -> sequence number"""
+
+    @abc.abstractmethod
+    def streams(self, prefix=""):
+        """Sorted names of the event streams under prefix (a whole-segment prefix)."""
 
     @abc.abstractmethod
     def events(self, stream, after=0):
