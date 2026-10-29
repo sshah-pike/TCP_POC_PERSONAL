@@ -101,6 +101,21 @@ If code and plan disagree, **stop and report**. Do not silently follow either on
 - Every persisted record carries a `schema_version`.
 - Artifacts are write-once.
 
+### Known limits of the file stores (S2, D-84)
+
+- **Lock gap.** A state write checks that it still owns its lock file and then calls `os.replace`. A lock can be taken
+  over in the gap between the check and the replace, so two writers can in rare cases both write; the version number
+  (compare-and-set) catches most of these.
+- **PID reuse.** A lock records the owner's PID and timestamp. After the owner dies, a new process may reuse the PID and
+  the lock looks alive until it goes stale (`TCP_STATE_LOCK_STALE_S`, default 30 s).
+- **OneDrive.** The repo sits in OneDrive. It may sync or hold `.lock`, `.tmp-*` and `*.lock.stale-*` files, which makes
+  a write wait or retry. These names are in `.gitignore`. Local disks only; no network shares.
+- **Event durability.** Only events the caller marks `durable=True` (process started and finished, result) are fsynced.
+  A progress event (span start/end) survives a process crash but can be lost in a power cut.
+- **Line endings.** Pipeline output files keep the OS line ending (CRLF on Windows), exactly as before S2, so stored
+  expected outputs stay byte-identical. Hashes of the same run differ between Windows and Linux.
+- **Legacy runs.** Runs made before S2 (`ui/*.json`) are read-only: listed and opened, never resumed, revised or compared.
+
 ## Tests
 
 - **Unit and integration tests make no live calls.** Use recorded fixtures and fakes. The network is blocked in tests, and a missing fixture is an error.
