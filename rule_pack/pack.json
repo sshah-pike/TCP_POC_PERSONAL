@@ -34,7 +34,7 @@
     {
       "path": "base/rules.json",
       "layer": "FEDERAL",
-      "sha256": "181c79e429693ba5bc9792b7315c62fb84e3304f72deddd640da13b73337efe1"
+      "sha256": "05434ca9fbe3b88fa9cc2e49bf24ae1e179bfe2cc31169773466c6f4abc96aac"
     },
     {
       "path": "base/devices.json",
@@ -64,8 +64,8 @@
     {
       "path": "ta/TA-33.json",
       "layer": "FEDERAL",
-      "sha256": "e53a02e23b4afe2b4aaddb184af32ec68c1594cd740fb4e7911055b837653ce9"
+      "sha256": "a389ca8335527aae2b928606e2d67baf41ab1d4e8dcbb7349d03ba16d8afd9e1"
     }
   ],
-  "content_sha256": "494dbf6d168bd429e48dfcffcb7656109dd1efee40ef3b15fdb8b57504dfc339"
+  "content_sha256": "5862cd9acc42256c43d9b95cf4287598e487adfd1661ec2a6e826695b34e653f"
 }
