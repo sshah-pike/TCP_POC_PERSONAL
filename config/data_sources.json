@@ -1,0 +1,79 @@
+{
+  "schema_version": "1",
+  "config_id": "TCP_S06_DATA_SOURCES",
+  "note": "Allow list of external data sources (CLAUDE.md, Data sources: D-53, D-62, D-63). A request to any host not listed under an enabled source is refused before any network use. Session 1 enables Azure Maps and OSM Overpass only; every other source stays disabled with no host until the session 2 discovery is approved. No source fills a mandatory start field.",
+  "user_agent": "tcp-planner/0.2 (traffic control plan drafting tool; S6 site understanding; contact: to be set by the owner in config/data_sources.json)",
+  "sources": {
+    "azure_maps": {
+      "hosts": [
+        "atlas.microsoft.com"
+      ],
+      "enabled": true,
+      "license_note": "Microsoft Azure Maps terms of use (imagery); the terms check was dropped by D-46",
+      "timeout_s": 60,
+      "max_bytes": 20000000
+    },
+    "osm_overpass": {
+      "hosts": [
+        "overpass-api.de"
+      ],
+      "enabled": true,
+      "license_note": "OpenStreetMap data, ODbL 1.0, (c) OpenStreetMap contributors; Overpass API fair-use policy: small bounded queries, descriptive User-Agent",
+      "timeout_s": 25,
+      "max_bytes": 2000000,
+      "query_limits": {
+        "max_radius_m": 600,
+        "max_elements": 5000,
+        "note": "queries are bounded by radius and by element count; CALIBRATION_PENDING until measured"
+      }
+    },
+    "massgis": {
+      "hosts": [],
+      "enabled": false,
+      "license_note": "licence to be checked in S6 session 2 (source discovery, STOP 5)",
+      "status": "PLANNED: MassGIS / MassDOT road inventory (first in session 2). Endpoint, key, attribute names and licence are UNKNOWN until discovery; no host is allowed."
+    },
+    "rigis": {
+      "hosts": [],
+      "enabled": false,
+      "license_note": "licence to be checked in S6 session 2 (source discovery, STOP 5)",
+      "status": "PLANNED: RIGIS / RIDOT. Endpoint, key, attribute names and licence are UNKNOWN until discovery; no host is allowed."
+    },
+    "hpms": {
+      "hosts": [],
+      "enabled": false,
+      "license_note": "licence to be checked in S6 session 2 (source discovery, STOP 5)",
+      "status": "PLANNED: FHWA HPMS. Endpoint, key, attribute names and licence are UNKNOWN until discovery; no host is allowed."
+    },
+    "census_urban": {
+      "hosts": [],
+      "enabled": false,
+      "license_note": "licence to be checked in S6 session 2 (source discovery, STOP 5)",
+      "status": "PLANNED: Census TIGER urban areas. Endpoint, key, attribute names and licence are UNKNOWN until discovery; no host is allowed."
+    },
+    "usgs_3dep": {
+      "hosts": [],
+      "enabled": false,
+      "license_note": "licence to be checked in S6 session 2 (source discovery, STOP 5)",
+      "status": "PLANNED: USGS 3DEP elevation. Endpoint, key, attribute names and licence are UNKNOWN until discovery; no host is allowed."
+    },
+    "gtfs_mbta": {
+      "hosts": [],
+      "enabled": false,
+      "license_note": "licence to be checked in S6 session 2 (source discovery, STOP 5)",
+      "status": "PLANNED: MBTA GTFS. Endpoint, key, attribute names and licence are UNKNOWN until discovery; no host is allowed."
+    },
+    "gtfs_ripta": {
+      "hosts": [],
+      "enabled": false,
+      "license_note": "licence to be checked in S6 session 2 (source discovery, STOP 5)",
+      "status": "PLANNED: RIPTA GTFS. Endpoint, key, attribute names and licence are UNKNOWN until discovery; no host is allowed."
+    },
+    "fra_crossings": {
+      "hosts": [],
+      "enabled": false,
+      "license_note": "licence to be checked in S6 session 2 (source discovery, STOP 5)",
+      "status": "PLANNED: FRA grade-crossing inventory. Endpoint, key, attribute names and licence are UNKNOWN until discovery; no host is allowed."
+    }
+  }
+}
