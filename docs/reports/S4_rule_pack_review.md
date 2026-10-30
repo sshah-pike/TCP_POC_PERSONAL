@@ -497,9 +497,8 @@ Every size row whose sign code has no catalog entry with the same id. Where a ca
 | SZ-R9-10 | R9-10 | side variants only: R9-10L |
 | SZ-R9-11 | R9-11 | side variants only: R9-11L, R9-11R |
 | SZ-M4-9 | M4-9 | side variants only: M4-9L, M4-9R |
-| SZ-M4-9a | M4-9a | no entry |
-| SZ-M4-9b | M4-9b | no entry |
-| SZ-M4-9c | M4-9c | no entry |
+| SZ-M4-9a | M4-9a | side variants only: M4-9a-L, M4-9a-R |
+| SZ-M4-9c | M4-9c | side variants only: M4-9c-L, M4-9c-R |
 
 ### Add-on rules: gate and action kind
 
