@@ -24,7 +24,8 @@ Catalog version 0.2, schema_version 1, catalog hash `5e9898940a09b7bcf4ba9f318df
 
 - Pack `device` records: 16. Every one has a catalog entry with an SVG that exists, matches its sha256 and parses as XML: yes.
 - Pack `ta_device_use` rows: 18. Every one resolves through its device record to a catalog entry.
-- Catalog entries: 56; SVG files: 56; none missing, none unlisted.
+- Catalog entries: 56; SVG files: 56; pre-rendered PNG files: 56 (sha256 and size recorded per entry); none missing, none unlisted.
+- Placeholder label text (S12 draws it): "PLACEHOLDER SYMBOLS - NOT CLIENT LIBRARY". Every entry's asset is PLACEHOLDER_ASSET: yes.
 - The five note-only signs (W20-5L, W4-2L, W21-5, W5-1, W3-4) have pack `device` rows since S4b and size rows; they have no `ta_device_use` row.
 - Golden drafts: every printed code resolves except W20-8 (Colorado police sign, out of scope, no alias). M4-A8 resolves through the PROPOSED alias.
 

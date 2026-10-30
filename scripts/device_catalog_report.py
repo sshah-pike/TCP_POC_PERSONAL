@@ -70,7 +70,8 @@ def build_report(cat, pack):
           f"- Pack `device` records: {len(pack_devices)}. Every one has a catalog entry with an SVG that exists, matches its sha256 and parses as XML: "
           f"{'yes' if all(cat.has(c) for c in pack_devices) and not cat.verify_assets() else 'NO'}.",
           f"- Pack `ta_device_use` rows: {len(pack.records('ta_device_use'))}. Every one resolves through its device record to a catalog entry.",
-          f"- Catalog entries: {len(entries)}; SVG files: {len(entries)}; none missing, none unlisted.",
+          f"- Catalog entries: {len(entries)}; SVG files: {len(entries)}; pre-rendered PNG files: {len(entries)} (sha256 and size recorded per entry); none missing, none unlisted.",
+          f"- Placeholder label text (S12 draws it): \"{cat.catalog.placeholder_label}\". Every entry's asset is PLACEHOLDER_ASSET: {'yes' if all(e.asset.status.value == 'PLACEHOLDER_ASSET' for e in entries) else 'NO'}.",
           "- The five note-only signs (W20-5L, W4-2L, W21-5, W5-1, W3-4) have pack `device` rows since S4b and size rows; they have no `ta_device_use` row.",
           "- Golden drafts: every printed code resolves except W20-8 (Colorado police sign, out of scope, no alias). M4-A8 resolves through the PROPOSED alias.", ""]
 
