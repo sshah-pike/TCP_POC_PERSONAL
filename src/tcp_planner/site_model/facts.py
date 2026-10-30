@@ -14,13 +14,13 @@ Scalar = Union[bool, int, float, str]
 
 REASON_CODES = ("not_visible", "occluded", "low_resolution", "ambiguous", "source_disagreement", "threshold_in_interval",
                 "no_source", "malformed", "missing", "duplicate", "low_confidence", "no_registry_value", "ai_conflict",
-                "not_stated", "single_source", "layout_not_allowed", "source_failed", "no_tag", "check_failed", "near_edge", "no_road_near", "site_exception")
+                "not_stated", "single_source", "layout_not_allowed", "source_failed", "no_tag", "check_failed", "near_edge", "no_road_near", "site_exception", "wrong_road_suspected")
 FLAGS = ("DEFAULT_ASSUMED", "POLICY_SUGGESTED", "CALIBRATION_PENDING", "SOURCE_REVIEW_REQUIRED", "CONTEXT_ONLY",
          "AI_ONLY_UNCONFIRMED", "NEEDS_SECOND_SOURCE", "EVIDENCE_OVER_15_WORDS", "UNIT_MISMATCH", "AI_CONFLICT", "PROPOSED")
 # flags that keep a fact out of every rule input (the value is shown to the SME only)
 BLOCKING_FLAGS = frozenset({"CONTEXT_ONLY", "NEEDS_SECOND_SOURCE"})
 QUESTION_KINDS = ("WIDTH_NEAR_THRESHOLD", "LANES_DISAGREE", "START_FIELD_CONFLICT", "FACT_UNKNOWN", "WORK_SIDE_CONFIRM",
-                  "WORK_LOCATION_CONFLICT", "LAYOUT_NOT_ALLOWED", "LANES_UNSPLIT", "WHICH_ROAD", "BEARING_MISMATCH",
+                  "WORK_LOCATION_CONFLICT", "LAYOUT_NOT_ALLOWED", "LANES_UNSPLIT", "WHICH_ROAD",
                   "WORK_LOCATION_NEAR_EDGE")
 
 
@@ -119,6 +119,10 @@ class Question(_Rec):
     project_id: Optional[str] = None
     osm_way_id: Optional[int] = None
     context: dict = {}
+    # A question CANDIDATE is not a blocking question: S7's what-if test makes it blocking only when the fact decides the TA.
+    # `suggested` is the AI value, pre-filled for the SME to confirm.
+    candidate: bool = False
+    suggested: Optional[Scalar] = None
 
 
 class AnswerRecord(_Rec):

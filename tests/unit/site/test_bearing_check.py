@@ -5,6 +5,7 @@ import os
 
 import pytest
 
+from tcp_planner.ai import call1
 from tcp_planner.data_sources.osm import OsmWay
 from tcp_planner.site_model import bearing_check as BC
 from tcp_planner.site_model import lengths as L
@@ -42,7 +43,7 @@ def test_the_three_e_second_st_marks_of_gpt(rep, agrees):
     assert (chk.status == BC.AGREE) is agrees
     if not agrees:
         assert chk.status == BC.MISMATCH and chk.mark_bearing < 5 and chk.diff_deg > 80 and not chk.widths_ok
-        assert chk.questions[0].kind == "BEARING_MISMATCH" and chk.questions[0].osm_way_id == 1 and chk.questions[0].field == "road"
+        assert chk.questions[0].kind == "WHICH_ROAD" and chk.questions[0].osm_way_id == 1 and chk.questions[0].field == "road"
 
 
 @pytest.mark.parametrize("rep,agrees", [(1, True), (2, False), (3, True)])
@@ -60,16 +61,66 @@ def test_the_claude_marks_agree_on_both_sites():
             assert chk.status == BC.AGREE and chk.diff_deg <= 10 and chk.widths_ok
 
 
-def test_a_mismatch_makes_every_width_unknown_and_keeps_other_facts():
-    chk = BC.check_bearing(marks_of(call("gpt-5.6-sol", "second", 1)), [road(1, SECOND)])
-    widths = SiteFact(field="lane_width_ft", registry_id="lane_width_ft", unit="ft", source="AI_MARKS", outcome="FOUND", value=11.2)
-    near = SiteFact(field="distance_from_edge_ft", registry_id="distance_from_edge_ft", unit="ft", source="CODE", outcome="FOUND", value=4.0)
-    other = SiteFact(field="lanes_per_direction", registry_id="lanes_per_direction", source="AI", outcome="FOUND", value=1)
-    out = BC.block_widths([widths, near, other], chk)
-    assert [f.outcome for f in out] == ["UNKNOWN", "UNKNOWN", "FOUND"] and out[0].reason_code == "check_failed" and out[0].value is None
-    assert "BEARING" not in out[2].evidence and "MISMATCH" in out[0].evidence and "CALIBRATION_PENDING" in out[0].flags
+ALL18 = [r.name for r in call1.FIELDS]
+
+
+def all_facts():
+    """One FOUND fact per call 1 field (as the AI read them) plus two code widths."""
+    out = []
+    for r in call1.FIELDS:
+        v = {"bool": True, "count": 2, "enum": "N", "text": "parked truck"}[r.kind]
+        if r.name == "work_location": v = "IN_LANE"
+        out.append(SiteFact(field=r.name, registry_id=r.registry_id, source="AI", outcome="FOUND", value=v, confidence=0.9,
+                            flags=("CONTEXT_ONLY",) if r.registry_id is None else ()))
+    out.append(SiteFact(field="lane_width_ft", registry_id="lane_width_ft", unit="ft", source="AI_MARKS", outcome="FOUND", value=11.2))
+    out.append(SiteFact(field="distance_from_edge_ft", registry_id="distance_from_edge_ft", unit="ft", source="CODE", outcome="FOUND", value=4.0))
+    return out
+
+
+def test_all_18_fields_are_classified_as_road_specific_or_scene_with_a_reason():
+    assert set(BC.ROAD_SPECIFIC) | set(BC.SCENE) == set(ALL18) and not (set(BC.ROAD_SPECIFIC) & set(BC.SCENE))
+    assert len(BC.ROAD_SPECIFIC) == 12 and len(BC.SCENE) == 6
+    assert all(isinstance(v, str) and len(v) > 10 for v in {**BC.ROAD_SPECIFIC, **BC.SCENE}.values())
+
+
+def _blocked(check):
+    return {f.field: f for f in BC.block_road_specific(all_facts(), check)}
+
+
+@pytest.mark.parametrize("site,rep,bearing", [("second", 1, SECOND), ("colorado", 2, COLORADO)])
+def test_a_bearing_failure_makes_every_road_specific_fact_unknown_wrong_road_suspected(site, rep, bearing):
+    """E Second St call 4 (0 degrees) and Colorado call 8 (140 degrees)."""
+    chk = BC.check_bearing(marks_of(call("gpt-5.6-sol", site, rep)), [road(1, bearing)])
+    assert chk.status == BC.MISMATCH and len(chk.questions) == 1 and chk.questions[0].kind == "WHICH_ROAD"
+    before = {f.field: f for f in all_facts()}
+    after = _blocked(chk)
+    for name in BC.ROAD_SPECIFIC:
+        f = after[name]
+        assert f.outcome == "UNKNOWN" and f.value is None and f.reason_code == "wrong_road_suspected", name
+        assert any(c.value == before[name].value and c.source == "AI" for c in f.candidates), name        # the AI value is kept for the SME
+    for name in ("lane_width_ft", "distance_from_edge_ft"):
+        assert after[name].outcome == "UNKNOWN" and after[name].reason_code == "wrong_road_suspected"
+    for name in BC.SCENE: assert after[name] == before[name], name                                         # scene facts are untouched
+
+
+def test_the_two_failing_calls_by_number():
+    e = BC.check_bearing(marks_of(call("gpt-5.6-sol", "second", 1)), [road(1, SECOND)])
+    c = BC.check_bearing(marks_of(call("gpt-5.6-sol", "colorado", 2)), [road(1, COLORADO)])
+    assert e.mark_bearing < 5 and 130 < c.mark_bearing < 150 and e.diff_deg > 80 and c.diff_deg > 70
+
+
+def test_an_ok_check_changes_nothing_and_a_which_road_check_blocks_too():
     ok = BC.check_bearing(marks_of(call("gpt-5.6-sol", "second", 2)), [road(1, SECOND)])
-    assert BC.block_widths([widths], ok)[0].outcome == "FOUND"
+    assert BC.block_road_specific(all_facts(), ok) == all_facts()
+    amb = BC.check_bearing((), [road(1, 90, "Main St", offset_m=3), road(2, 0, "Side St", offset_m=4)])
+    assert amb.status == BC.WHICH_ROAD and _blocked(amb)["lanes_per_direction"].reason_code == "wrong_road_suspected"
+
+
+def test_a_fact_that_was_already_unknown_gets_the_new_reason_and_no_empty_candidate():
+    f = SiteFact(field="shoulder_present", registry_id="shoulder_present", source="AI", outcome="UNKNOWN", reason_code="occluded")
+    chk = BC.check_bearing(marks_of(call("gpt-5.6-sol", "second", 1)), [road(1, SECOND)])
+    g = BC.block_road_specific([f], chk)[0]
+    assert g.reason_code == "wrong_road_suspected" and g.candidates == ()
 
 
 # ---------------------------------------------------------------- tolerance, modulo 180

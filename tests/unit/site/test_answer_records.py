@@ -67,7 +67,7 @@ def test_every_question_the_s6_code_raises_can_be_stored_as_an_answer():
     ns = OsmWay(6, {"highway": "secondary"}, ((3.0, -100.0), (3.0, 100.0)))
     mm = BC.check_bearing(marks, [ns]).questions[0]
     r = answer_record(mm, "OSM_IS_RIGHT", "sme", WHEN)
-    assert (r.kind, r.field, r.osm_way_id) == ("BEARING_MISMATCH", "road", 6)
+    assert (r.kind, r.field, r.osm_way_id) == ("WHICH_ROAD", "road", 6)
     near = ER.check_edge(marks + (mark("work_point", ((640, 305),)),), 0.5, True).question
     assert answer_record(near, "IN_LANE", "sme", WHEN).field == "work_location"
 

@@ -5,10 +5,11 @@ the bearing of the marks (code, from the edge marks, else the lane lines, modulo
 way within `bearing.tolerance_deg` (config, CALIBRATION_PENDING).
 
   AGREE        within the tolerance
-  MISMATCH     beyond it: every width (the facts in feet) becomes UNKNOWN with reason check_failed, plus a BEARING_MISMATCH question
+  MISMATCH     beyond it: every road-specific fact becomes UNKNOWN with reason wrong_road_suspected (AI values kept as candidates),
+               plus the one WHICH_ROAD question (`block_road_specific`; ROAD_SPECIFIC and SCENE classify the 18 fields)
   WHICH_ROAD   several OSM ways (service ways excluded) lie within `bearing.which_road_distance_m` and their bearings differ by
                more than the tolerance: the road of the job is not clear. The marks decide only when exactly one candidate matches
-               them; otherwise the SME is asked which road (the widths then wait for the answer)
+               them; otherwise the SME is asked which road (the road-specific facts then wait for the answer)
   NO_MARKS     the marks give no bearing: nothing to compare
   NO_ROAD      no OSM way within the configured distance: nothing to compare (the edge rule handles "no road near")
 
@@ -101,23 +102,61 @@ def check_bearing(marks, ways, point=(0.0, 0.0), cfg=None):
     d = axis_diff_deg(mb, wb)
     if d <= tol:
         return BearingCheck(AGREE, mb, c.way.id, wb, d, tol, (), flags, f"marks {_fmt(mb)} deg ({how}), way {c.way.id} {_fmt(wb)} deg, difference {d:.0f} deg")
-    q = Question(question_id=question_id("BEARING_MISMATCH", "road", c.way.id), kind="BEARING_MISMATCH", field="road", osm_way_id=c.way.id,
+    name = c.way.tags.get("name") or c.way.tags.get("ref") or ""
+    q = Question(question_id=question_id("WHICH_ROAD", "road", c.way.id), kind="WHICH_ROAD", field="road", osm_way_id=c.way.id,
                  reason=(f"the marks run {_fmt(mb)} degrees but the nearest OSM road (way {c.way.id}) runs {_fmt(wb)} degrees: the AI may have marked "
-                         "another road. Confirm the road or enter the widths."), options=("MARKS_ARE_RIGHT", "OSM_IS_RIGHT", "ENTER_WIDTHS"),
-                 reveals=("lane_width_ft", "shoulder_width_ft", "distance_from_edge_ft"),
-                 context={"mark_bearing": round(mb, 1), "way_bearing": round(wb, 1), "diff_deg": round(d, 1), "tolerance_deg": tol, "marks_from": how})
+                         "another road. Which road is the work on?"),
+                 options=(f"way {c.way.id} {name} bearing {_fmt(wb)}".replace("  ", " "), f"the road the AI marked (bearing {_fmt(mb)})"),
+                 reveals=("road",), context={"mark_bearing": round(mb, 1), "way_bearing": round(wb, 1), "diff_deg": round(d, 1), "tolerance_deg": tol,
+                                             "marks_from": how, "ways": [{"id": c.way.id, "name": c.way.tags.get("name"), "bearing": round(wb, 1),
+                                                                          "distance_m": round(c.distance_m, 1)}]})
     return BearingCheck(MISMATCH, mb, c.way.id, wb, d, tol, (q,), flags, f"marks {_fmt(mb)} deg ({how}), way {c.way.id} {_fmt(wb)} deg, difference {d:.0f} deg beyond {tol}")
 
 
-def block_widths(facts, check):
-    """Facts with every width (unit ft, source CODE or AI_MARKS) made UNKNOWN, reason check_failed, when the check says the widths
-    cannot be trusted. Facts are replaced, not edited; the evidence names the check. Other facts and an OK check pass unchanged."""
+# Which of the 18 call 1 fields describe THE road (so a wrong road makes them wrong) and which describe the scene at the work point.
+# A road-specific fact is read against one road's edges, lanes or sides; a scene fact is something seen at the work location whichever
+# road the marks followed. Owner answer to STOP 5, 2026-10-31.
+ROAD_SPECIFIC = {
+    "work_location": "judged against the edges and lane lines of the marked road",
+    "work_side": "the side of the marked road the work is on",
+    "lanes_per_direction": "a count for the marked road",
+    "oneway": "a property of the marked road",
+    "shoulder_present": "next to the marked road's lanes",
+    "divided_highway": "a property of the marked road",
+    "median_work": "a median of the marked road",
+    "bicycle_lane_present": "next to the marked road's lanes",
+    "sidewalk_present": "along the marked road",
+    "sidewalk_side": "a side of the marked road",
+    "parking_present": "along the marked road",
+    "approaching_lanes_one": "approaching lanes of the marked road",
+}
+SCENE = {
+    "bus_stop_present": "seen at the work location, not a property of one road",
+    "driveway_present": "seen at the work location, not a property of one road",
+    "crosswalk_present": "seen at the work location, not a property of one road",
+    "intersection_in_view": "seen in the image, not a property of one road",
+    "grade_crossing_present": "seen in the image, not a property of one road",
+    "obstructions": "what blocks the view, not a property of one road",
+}
+
+
+def is_road_specific(fact):
+    """A call 1 field from ROAD_SPECIFIC, or any width computed from marks (unit ft, source CODE or AI_MARKS)."""
+    return fact.field in ROAD_SPECIFIC or (fact.unit == "ft" and fact.source in ("CODE", "AI_MARKS"))
+
+
+def block_road_specific(facts, check):
+    """When the check says the marks may follow another road (MISMATCH or WHICH_ROAD), every road-specific fact becomes UNKNOWN with
+    reason wrong_road_suspected; the AI's value stays as a candidate for the SME. Scene facts and an OK check pass unchanged. The check's one
+    'which road?' question is in `check.questions`."""
     if check.widths_ok: return list(facts)
+    from tcp_planner.site_model.facts import Candidate
     out = []
     for f in facts:
-        if f.unit == "ft" and f.source in ("CODE", "AI_MARKS"):
-            out.append(f.model_copy(update={"outcome": "UNKNOWN", "value": None, "interval": None, "reason_code": "check_failed",
-                                            "evidence": f"bearing check {check.status}: {check.evidence}", "flags": tuple(dict.fromkeys(f.flags + check.flags))}))
-        else:
-            out.append(f)
+        if not is_road_specific(f):
+            out.append(f); continue
+        cand = f.candidates + ((Candidate(source=f.source, value=f.value, outcome=f.outcome),) if f.value is not None else ())
+        out.append(f.model_copy(update={"outcome": "UNKNOWN", "value": None, "interval": None, "reason_code": "wrong_road_suspected", "candidates": cand,
+                                        "evidence": f"bearing check {check.status}: {check.evidence}",
+                                        "flags": tuple(dict.fromkeys(f.flags + check.flags))}))
     return out
