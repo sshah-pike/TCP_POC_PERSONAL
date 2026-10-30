@@ -14,16 +14,22 @@ PACK_DIRS = ("base", "ta", "jurisdiction", "client")
 # Every record that is not SOURCED. Adding one must be deliberate: it becomes an SME question.
 EXPECTED_UNSOURCED = {
     "R-LOW-SPEED-CUTOFF": "SOURCE_REVIEW_REQUIRED",
-    "R-6N11-TA33-UNDIVIDED-FOUR-LANE": "SOURCE_REVIEW_REQUIRED",
+    "R-6N11-TA33-UNDIVIDED-OTHER": "SOURCE_REVIEW_REQUIRED",
     "R-TMA-SPEED-THRESHOLD": "UNKNOWN",
     "R-DEFAULT-WORK-VEHICLE-WIDTH": "UNKNOWN",
     "R-DEFAULT-WORK-LENGTH-POLE": "UNKNOWN",
     "R-DEFAULT-WORK-LENGTH-MANHOLE": "UNKNOWN",
     "R-DEFAULT-WORK-LENGTH-EXCAVATION": "UNKNOWN",
     "R-DEFAULT-WORK-LENGTH-TRENCH": "UNKNOWN",
+    "R-6B4-W-MERGING": "SOURCE_REVIEW_REQUIRED",
+    "R-6B4-W-SHIFTING": "SOURCE_REVIEW_REQUIRED",
+    "R-6B4-W-SHOULDER": "SOURCE_REVIEW_REQUIRED",
+    "R-SIGN-NAMING-W4-2-SIDE": "SOURCE_REVIEW_REQUIRED",
+    "R-SIGN-SIZE-M4-9AL": "UNKNOWN",
+    "R-SIGN-SIZE-R9-3BR": "UNKNOWN",
     "E-TA6-MINOR-ROAD": "SOURCE_REVIEW_REQUIRED",
     "R-TA10-SHORT-ZONE": "SOURCE_REVIEW_REQUIRED",
-    "E-TA33-FORM-UNDIVIDED-6N11": "SOURCE_REVIEW_REQUIRED",
+    "E-TA33-FORM-UNDIVIDED-OTHER": "SOURCE_REVIEW_REQUIRED",
     "R-TA33-FIG-G20-2-500FT": "SOURCE_REVIEW_REQUIRED",
     "R-TA33-FIG-DOWNSTREAM-100FT": "SOURCE_REVIEW_REQUIRED",
 }
@@ -73,7 +79,7 @@ def test_every_part_file_on_disk_is_in_the_manifest(pack):
 
 
 def test_stored_hash_is_the_recomputed_hash(pack):
-    assert JsonRulePackStore().content_hash() == pack.hash and JsonRulePackStore().list_versions() == ["1.0.0"]
+    assert JsonRulePackStore().content_hash() == pack.hash and JsonRulePackStore().list_versions() == ["1.1.0"]
 
 
 def test_unsourced_items_are_exactly_the_known_list(pack):
@@ -82,10 +88,16 @@ def test_unsourced_items_are_exactly_the_known_list(pack):
     assert all(u["question"] for u in rep.unsourced)
 
 
-def test_the_only_interpretations_are_the_proposed_6n11_reading_and_they_are_not_approved(pack):
+# Owner-approved readings (S4b): sign side variants (stage A), placement anchors (stage C), the 6N.11 four-lane case (stage E).
+EXPECTED_INTERPRETATIONS = {"SZ-W20-5R", "SZ-W20-5L", "SZ-W4-2R", "SZ-W4-2L", "R-6B1-ABC-CONSECUTIVE", "R-TA1-ANCHOR-A",
+                            "R-TA6-ANCHOR-A-WORK-SIDE", "R-TA6-ANCHOR-A-OPPOSITE", "R-TA10-ANCHOR-A", "R-TA33-ANCHOR-A",
+                            "R-6N11-TA33-UNDIVIDED-FOUR-LANE-RIGHT", "E-TA33-FORM-UNDIVIDED-FOUR-LANE-RIGHT"}
+
+
+def test_interpretations_are_exactly_the_owner_approved_s4b_readings(pack):
     got = {(i["id"], i["status"]) for i in validate(pack).interpretations}
-    assert got == {("R-6N11-TA33-UNDIVIDED-FOUR-LANE", "SOURCE_REVIEW_REQUIRED"),
-                   ("E-TA33-FORM-UNDIVIDED-6N11", "SOURCE_REVIEW_REQUIRED")}
+    assert got == {(rid, "SOURCED") for rid in EXPECTED_INTERPRETATIONS}
+    assert all(i["interpretation"].startswith("INTERPRETATION") for i in validate(pack).interpretations)
 
 
 def test_scope_and_no_ta_match(pack):
@@ -151,7 +163,8 @@ def test_tables_hold_every_printed_row(pack):
     rows = pack.records("table_row")
     assert {r.key["road_type"] for r in rows if r.table_def_id == "T-6B1"} == {"URBAN_LOW_SPEED", "URBAN_HIGH_SPEED", "RURAL", "EXPRESSWAY_FREEWAY"}
     assert sorted(r.key["speed_mph"] for r in rows if r.table_def_id == "T-6B2") == list(range(20, 80, 5))
-    assert all(r.status.value == "SOURCED" and None not in r.values.values() for r in rows)
+    six_b = [r for r in rows if r.table_def_id.startswith("T-6B")]   # sign-size rows may print "—" (test_sign_sizes.py)
+    assert all(r.status.value == "SOURCED" and None not in r.values.values() for r in six_b)
 
 
 def test_nine_ft_option_stays_unknown_while_low_speed_has_no_source(pack):
@@ -163,7 +176,7 @@ def test_nine_ft_option_stays_unknown_while_low_speed_has_no_source(pack):
 
 def test_trace_names_table_section_page_and_pack(pack):
     t = pack.trace("T-6B2-25")
-    assert t["pack_hash"] == pack.hash and t["pack_version"] == "1.0.0" and t["status"] == "SOURCED"
+    assert t["pack_hash"] == pack.hash and t["pack_version"] == "1.1.0" and t["status"] == "SOURCED"
     assert t["source_refs"] == [{"source_ref_id": "SR-6B2-25", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6B.06",
                                  "paragraph": None, "table": "6B-2", "figure": None, "note": None, "page": "775",
                                  "strength": "OPTION", "evidence": "QUOTE"}]

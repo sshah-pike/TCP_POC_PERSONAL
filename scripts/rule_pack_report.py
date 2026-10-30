@@ -1,4 +1,4 @@
-"""Write docs/reports/S4_rule_pack_review.md from rule pack v1, for SME and owner sign-off.
+"""Write docs/reports/S4_rule_pack_review.md from rule pack v1, for SME and owner sign-off (S4, updated in S4b).
 
 Run after any pack change: python scripts/rule_pack_report.py
 tests/unit/rules/test_rule_pack_report.py fails when the committed report no longer matches the pack.
@@ -19,7 +19,8 @@ EDITION_LINE = ("Source edition: MUTCD Chapter 6, December 2023 revision (file s
 # source_ref count after each S4 commit that changed the pack (commit 3's message said 57 in error; 48 is right)
 SOURCE_REF_COUNTS = [("Commit 3, base tables", "e6ad7d5", 48),
                      ("Commit 4, TA files (+4 Sect. 6B.04 paras 03-06, +1 Sect. 6P.01 para 07, +59 TA files)", "e36225b", 112),
-                     ("Commits 5 to 8 (no pack records added)", "this report", None)]
+                     ("Commits 5 to 8 (no pack records added)", "43f5f46", 112),
+                     ("S4b pack round (sign sizes, note-only devices, anchors, 6G.10 and 6I.02, 6N.11 split)", "tcp-mvp/s04b-pack-round", None)]
 
 DECISIONS = [
     ("Scope", "Rules come from the MUTCD only. The Colorado, E Second St and Granite drafts are comparison material, not rule sources. The client, jurisdiction and deviation layers stay in the schema, empty."),
@@ -44,7 +45,10 @@ EXTERNAL_INPUTS = [
     ("R-LOW-SPEED-CUTOFF", "Upper speed for 'low speed' (Sect. 6N.07 para 04; TA-6 notes 2 and 4). Blocks TA-6 and the 9 ft option."),
     ("E-TA6-MINOR-ROAD", "Definition of 'minor road' (TA-6 note 2). Blocks TA-6."),
     ("R-TA10-SHORT-ZONE", "Length of a 'short TTC zone' for the single-flagger option (TA-10 note 2)."),
-    ("R-6N11-TA33-UNDIVIDED-FOUR-LANE / E-TA33-FORM-UNDIVIDED-6N11", "Whether an undivided road with two lanes each way and the right lane closed may use TA-33 (Sect. 6N.11 para 06)."),
+    ("R-6N11-TA33-UNDIVIDED-OTHER / E-TA33-FORM-UNDIVIDED-OTHER", "Whether TA-33 may be used on an undivided road with three or more lanes each way, or with a left-lane or interior-lane closure (Sect. 6N.11 para 06 covers only the four-lane, right-lane case; S4b stage E)."),
+    ("R-6B4-W-MERGING, R-6B4-W-SHIFTING, R-6B4-W-SHOULDER", "Which measured width is W (Table 6B-4) for each taper type (S4b stage C)."),
+    ("R-SIGN-NAMING-W4-2-SIDE", "Whether W4-2R and W4-2L are the codes the drafts and the sign supplier use, and W4-2L is the mirror image (S4b stage A)."),
+    ("R-SIGN-SIZE-M4-9AL, R-SIGN-SIZE-R9-3BR", "Which sign each client code is, and its size (not in the MUTCD tables; S4b stage A)."),
     ("R-TA33-FIG-G20-2-500FT, R-TA33-FIG-DOWNSTREAM-100FT", "Confirmation of the two numbers read only from Figure 6P-33."),
     ("R-TMA-SPEED-THRESHOLD", "Whether a TMA is ever suggested by speed, and at what speed (open question 6)."),
     ("R-DEFAULT-WORK-VEHICLE-WIDTH", "Assumed work-vehicle width when none is visible (open question 7)."),
@@ -165,7 +169,7 @@ def build_report(pack):
     L += ["## Owner decisions recorded in S4", "", "| Item | Decision |", "| --- | --- |"]
     L += [f"| {a} | {_md(b)} |" for a, b in DECISIONS] + [""]
 
-    L += ["## Every value, with quote and page", "", "### Tables 6B-1, 6B-2 and 6B-3", ""]
+    L += ["## Every value, with quote and page", "", "### Tables 6B-1, 6B-2, 6B-3 and sign sizes (Tables 6G-1, 6H-1, 6I-1)", ""]
     L += _table(pack, pack.records("table_row"), "table_row") + [""]
     L += ["### Formulas (Tables 6B-3, 6B-4; Sect. 6B.08, 6K.01)", ""] + _table(pack, pack.records("formula"), "formula") + [""]
     shared = [r for r in pack.records("rule") if r.ta_id is None and r.status.value == "SOURCED"]
@@ -203,7 +207,8 @@ def build_report(pack):
           "Current D-60 text: \"TA-33 is one OR'd rule covering divided roads and undivided roads with two or more lanes each way (6N.11).\"", "",
           "Source, Sect. 6N.11 para 06, p. 847 (Option): \"When the right-hand lane is closed, TTC similar to that shown in Figure 6P-33 may be used for undivided or divided four-lane roads.\"", "",
           "Proposed D-60 text: \"TA-33 is one OR'd rule: (a) a divided highway with two or more lanes in the closed direction (figure title; 6N.11 paras 02 and 03), or (b) an undivided four-lane road with the right-hand lane closed (6N.11 para 06). Branch (b) is a proposed reading of 'four-lane' (two lanes each way) and stays SOURCE_REVIEW_REQUIRED until the SME confirms it; until then an undivided site goes to an SME question. A left-lane (median-side) closure on an undivided road, or an undivided road with more than two lanes each way, is not covered by 6N.11 para 06.\"", "",
-          "Not edited in the plan; for the owner to decide.", ""]
+          "Not edited in the plan; for the owner to decide.", "",
+          "**Superseded (S4b).** Owner decision D-91 (2026-10-30) and S4b stage E source branch (b) for the four-lane, right-lane case; broader undivided cases stay SOURCE_REVIEW_REQUIRED. See 'S4b changes'.", ""]
 
     L += ["## Differences from plan section 4B (proposals)", "", "| Field | Proposal |", "| --- | --- |"]
     L += [f"| {a} | {_md(b)} |" for a, b in REGISTRY_PROPOSALS] + [""]
@@ -214,7 +219,83 @@ def build_report(pack):
         b = b or f"The POC pack header cites \"{poc['document']}\", {poc['date']}; v1 cites the December 2023 file. The POC header is unchanged."
         L.append(f"| {a} | {_md(b)} |")
     L.append("")
+    L += s4b_section(pack, rep)
     return "\n".join(L)
+
+
+# ---------- S4b pack round (owner decisions D-90, D-91, D-99; 2026-10-30) ----------
+S4B_STAGES = [
+    ("A", "Sign sizes: Tables 6G-1 (p. 796), 6H-1 (pp. 803-804) and 6I-1 (p. 811) as quoted rows in base/sign_sizes.json, one row per sign, inches, width x height; '—' is null. The tables are made binding by Sect. 6G.02 para 02, 6H.01 para 03 and 6I.01 para 07 (Standard). Read only through rule_pack_effective.sign_size(): a null column is a gap with an SME question, never 0 and never another column."),
+    ("B", "Device rows for the note-only signs W21-5, W3-4, W5-1, W20-5L and W4-2L (S5 plan Q4 option B). No model, validator or ta_device_use change; the note rules keep their actions (USE_LEFT_LANE_SIGNS, ROAD_NARROWS_SIGN_MAY_BE_ADDED, BE_PREPARED_TO_STOP_MAY_BE_ADDED, W20-1_MAY_BE_REPLACED). No note rule has a field that can name a device, so none was filled or added."),
+    ("C", "Placement anchors as owner-accepted readings of the figure renders (R-TAxx-ANCHOR-A, R-6B1-ABC-CONSECUTIVE). The TA-1 and TA-6 opposite-approach readings are marked 'Owner-accepted, SME confirmation pending'. W per taper type (merging, shifting, shoulder) is SOURCE_REVIEW_REQUIRED; W is not set."),
+    ("D", "Add-ons (D-90): Sect. 6G.10 (sidewalk closed; 6G.08 not loaded) and Sect. 6I.02 (M4-9 family, M4-8a; M4-8P, M4-8bP, M4-10 not loaded) as cited rules in base/sidewalk_detour.json, optional per zone. No layout numbers: the MUTCD gives none."),
+    ("E", "Sect. 6N.11 split (D-91): undivided, two lanes each way, right lane closed is SOURCED from paras 02 and 06 (owner-confirmed reading); broader undivided cases stay SOURCE_REVIEW_REQUIRED."),
+]
+S4B_REMOVED = [
+    ("R-6N11-TA33-UNDIVIDED-FOUR-LANE", "base/rules.json", "Replaced by R-6N11-TA33-UNDIVIDED-FOUR-LANE-RIGHT (SOURCED) and R-6N11-TA33-UNDIVIDED-OTHER (SOURCE_REVIEW_REQUIRED)", "docs/plans/S7_plan.md lines 43, 201, 383; docs/plans/S16_plan.md line 234"),
+    ("E-TA33-FORM-UNDIVIDED-6N11", "ta/TA-33.json", "Replaced by E-TA33-FORM-UNDIVIDED-FOUR-LANE-RIGHT (SOURCED) and E-TA33-FORM-UNDIVIDED-OTHER (SOURCE_REVIEW_REQUIRED)", "docs/plans/S7_plan.md lines 43, 201, 383; docs/plans/S16_plan.md line 234"),
+]
+S4B_CHANGED = [
+    ("SR-6P33-FIG-SIGNS", "Transcription corrected (owner checked the 400 dpi crops). Superseded reading: \"a W4-2R Lane Ends sign at dimension A from the upstream end of the shoulder taper\". Current: A runs from the upstream end of the merging taper (start of L); the shoulder taper begins inside A and ends where the merging taper begins. SourceRef has no note field, so the old wording is kept here."),
+    ("R-TA1-ANCHOR-A, R-TA6-ANCHOR-A-OPPOSITE", "Rule text ends 'Owner-accepted, SME confirmation pending.'"),
+    ("Manifest", "version 1.0.0 -> 1.1.0; status stays DRAFT. Two part files added: base/sign_sizes.json, base/sidewalk_detour.json."),
+    ("Registry", "One field added: addon_sidewalk_closed (boolean, ASKED_IF_NEEDED, SME_FORM). It is the S11 add-on toggle ADDON:sidewalk_closed; S11 must map the toggle onto this fact and not invent a second name. No other registry change (closed_lane_side unchanged)."),
+]
+S4B_SUPERSEDED_S4 = [
+    ("Q-B, Sect. 6N.11", "Superseded by D-91 and stage E."),
+    ("Note-only signs", "Superseded by stage B: the five signs have device records; the note actions are unchanged."),
+    ("S8 client modules proposal ('a pedestrian module needs Sect. 6G.10 loaded first')", "6G.10 is loaded (stage D)."),
+]
+S4B_FOLLOW_UPS = [
+    ("a", "Pack store", "Keep sealed versions side by side (for example rule_pack/versions/<version>/) so a run replays against its recorded pack version without git. Before the first recording against pack v1. Today the store holds one version: after 1.1.0, load('1.0.0') raises RULE_PACK_VERSION_MISSING; 1.0.0 is in git at 9649481, and no run is recorded against it (the pipeline still reads the POC pack)."),
+    ("b", "Add-on signs (S5, S8)", "R9-9, R9-10, R9-11, R9-11a, M4-9, M4-9a, M4-9b, M4-9c and M4-8a have size rows but no device rows, and several have no catalog entry or symbol (see 'Size rows and the device catalog'). They need catalog entries, symbols and device rows before S8 places them."),
+    ("c", "closed_lane_side (S7)", "An unknown or unstated side must never default to RIGHT. The enum has only RIGHT and MEDIAN_SIDE, so a left or interior closure on an undivided road cannot be stated exactly; it routes to E-TA33-FORM-UNDIVIDED-OTHER only when reported as MEDIAN_SIDE. No registry change in S4b (owner decision)."),
+    ("d", "S8 plan", "docs/plans/S8_plan.md lines 208, 219 and 221 (lines 199, 210 and 212 in the earlier copy in C:/work/plans-backup) describe the TA-33 anchor as 'A from the upstream end of the shoulder taper' / 'of the last taper' and list 'TA-33 A when there is no shoulder taper' as undefined. Superseded by the corrected reading: A always ends at the upstream end of the merging taper (R-TA33-ANCHOR-A)."),
+    ("e", "S7 and S16 plans", "They cite the removed ids E-TA33-FORM-UNDIVIDED-6N11 and R-6N11-TA33-UNDIVIDED-FOUR-LANE (docs/plans/S7_plan.md lines 43, 201, 383; docs/plans/S16_plan.md line 234). Use the replacement ids above."),
+]
+CATALOG = os.path.join(ROOT, "assets", "symbols", "device_catalog.json")
+
+
+def s4b_section(pack, rep):
+    with open(CATALOG, encoding="utf-8") as f: catalog = {e["id"]: e for e in json.load(f)["entries"]}
+    size_defs = {d.id: d.table for d in pack.records("table_def") if set(d.key_fields) == {"sign"}}
+    size_rows = [r for r in pack.records("table_row") if r.table_def_id in size_defs]
+    L = ["## S4b changes", "",
+         f"Pack version `{pack.version}`, status `{pack.manifest.status}`, hash `{pack.hash}`. "
+         f"{len(rep.unsourced)} unsourced records, {len(rep.interpretations)} interpretations, "
+         f"{len(pack.records('registry_field'))} registry fields.", "",
+         "| Stage | What changed |", "| --- | --- |"]
+    L += [f"| {a} | {_md(b)} |" for a, b in S4B_STAGES] + [""]
+    L += ["### Records removed or replaced", "", "| Record | Part | Replaced by | Cited in |", "| --- | --- | --- | --- |"]
+    L += [f"| {a} | {b} | {_md(c)} | {d} |" for a, b, c, d in S4B_REMOVED] + [""]
+    L += ["### Other changed records", "", "| Record | Change |", "| --- | --- |"]
+    L += [f"| {a} | {_md(b)} |" for a, b in S4B_CHANGED] + [""]
+    L += ["### S4 decisions above that S4b supersedes", "", "| S4 item | Now |", "| --- | --- |"]
+    L += [f"| {a} | {_md(b)} |" for a, b in S4B_SUPERSEDED_S4] + [""]
+    L += ["### Flags written into a device `name`", "",
+          "`Device` has no interpretation or note field (no model change in S4b), so these flags are in the name text.", "",
+          "| Device | Name |", "| --- | --- |"]
+    L += [f"| {d.id} | {_md(d.name)} |" for d in pack.records("device") if "INTERPRETATION" in d.name or "prints no code" in d.name] + [""]
+    L += ["### Size rows and the device catalog", "",
+          "Every size row whose sign code has no catalog entry with the same id. Where a catalog entry exists, its sizes equal the row (checked when the rows were built).", "",
+          "| Size row | Sign | Catalog |", "| --- | --- | --- |"]
+    for r in size_rows:
+        sign = r.key["sign"]
+        if sign in catalog: continue
+        near = sorted(i for i in catalog if i.startswith(sign) and i[len(sign):] in ("L", "R"))
+        L.append(f"| {r.id} | {sign} | " + (f"side variants only: {', '.join(near)}" if near else "no entry") + " |")
+    L += ["", "### Add-on rules: gate and action kind", "",
+          "None fires on its own: each needs its gate fact true; an unset fact evaluates to None (tests/unit/rules/test_rule_pack_addons.py). "
+          "No add-on sign has a device row or a ta_device_use row, so none is required or placed by a TA.", "",
+          "| Rule | Strength | Gate | Action | Action kind |", "| --- | --- | --- | --- | --- |"]
+    for r in pack.records("rule"):
+        if r.topic not in ("sidewalk_closure", "detour"): continue
+        kind = ("none (text only)" if not r.action else "sign placement (Guidance)" if r.strength.value == "GUIDANCE"
+                else "sign required when the add-on is on (Standard)" if r.strength.value == "STANDARD" else "optional sign (Option)")
+        L.append(f"| {r.id} | {r.strength.value.title()} | {expr_text(r.condition)} | {r.action or ''} | {kind} |")
+    L += ["", "### Follow-ups", "", "| | Area | Follow-up |", "| --- | --- | --- |"]
+    L += [f"| {a} | {b} | {_md(c)} |" for a, b, c in S4B_FOLLOW_UPS] + [""]
+    return L
 
 
 def main():

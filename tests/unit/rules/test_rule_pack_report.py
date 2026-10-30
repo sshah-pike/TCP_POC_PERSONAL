@@ -17,7 +17,9 @@ def test_report_carries_the_required_sections():
     assert EDITION_LINE in text.splitlines()[:5]
     for heading in ("## Every value, with quote and page", "## Figure-only values", "## Unsourced items and their SME questions",
                     "## Proposed amendment to D-60 (Sect. 6N.11)", "## Proposals for the owner (not edited)",
-                    "### source_ref count by commit", "## External inputs needed"):
+                    "### source_ref count by commit", "## External inputs needed", "## S4b changes",
+                    "### Records removed or replaced", "### Flags written into a device `name`", "### Size rows and the device catalog",
+                    "### Add-on rules: gate and action kind", "### Follow-ups"):
         assert heading in text
     for item in ("D-51", "D-68", "Open question 15", "Open question 17", "Open question 18", "S8 client modules"):
         assert f"**{item}" in text

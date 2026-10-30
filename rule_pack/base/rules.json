@@ -78,12 +78,19 @@
                              {"field": "duration", "op": "NE", "value": "MOBILE"}]},
        "action": "MERGING_TAPER_REQUIRED", "value": null, "value_max": null, "unit": null, "qualifier": null,
        "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6N11-P03", "SR-6N11-P02"]},
-      {"id": "R-6N11-TA33-UNDIVIDED-FOUR-LANE", "layer": "FEDERAL", "ta_id": null, "jurisdiction": null, "topic": "ta33_applicability", "strength": "OPTION",
-       "text": "When the right-hand lane is closed, TTC similar to Figure 6P-33 may be used for undivided or divided four-lane roads.",
+      {"id": "R-6N11-TA33-UNDIVIDED-FOUR-LANE-RIGHT", "layer": "FEDERAL", "ta_id": null, "jurisdiction": null, "topic": "ta33_applicability", "strength": "OPTION",
+       "text": "Undivided road, two lanes each way, right-hand lane closed: TTC similar to Figure 6P-33 may be used (Sect. 6N.11 para 06).",
+       "condition": {"all": [{"field": "divided_highway", "op": "EQ", "value": false}, {"field": "lanes_per_direction", "op": "EQ", "value": 2},
+                             {"field": "closed_lane_side", "op": "EQ", "value": "RIGHT"}]},
+       "action": "TA33_MAY_BE_USED_ON_UNDIVIDED", "value": null, "value_max": null, "unit": null, "qualifier": null,
+       "status": "SOURCED", "sme_question": null,
+       "interpretation": "INTERPRETATION (owner-confirmed reading, S4b stage E): 'undivided ... four-lane roads' (para 06) is read as divided_highway = false with lanes_per_direction = 2, i.e. two lanes in each direction, multi-lane as para 02 defines it ('two or more lanes of moving motor vehicle traffic in one direction'); 'the right-hand lane is closed' is read as closed_lane_side = RIGHT.",
+       "source_ref_ids": ["SR-6N11-P06", "SR-6N11-P02"]},
+      {"id": "R-6N11-TA33-UNDIVIDED-OTHER", "layer": "FEDERAL", "ta_id": null, "jurisdiction": null, "topic": "ta33_applicability", "strength": "OPTION",
+       "text": "Undivided multi-lane cases outside the four-lane, right-lane reading (three or more lanes each way, left-lane or interior-lane closures): para 06 covers only four-lane roads with the right-hand lane closed, so whether Figure 6P-33 applies is not sourced.",
        "condition": null, "action": null, "value": null, "value_max": null, "unit": null, "qualifier": null,
-       "status": "SOURCE_REVIEW_REQUIRED",
-       "interpretation": "PROPOSED, not owner-approved: 'undivided or divided four-lane roads' read as divided_highway = false with lanes_per_direction = 2 (two lanes each way) and closed_lane_side = RIGHT. Para 02 defines multi-lane as 'two or more lanes of moving motor vehicle traffic in one direction'.",
-       "sme_question": "Sect. 6N.11 para 06 allows Figure 6P-33 on 'undivided or divided four-lane roads' when the right-hand lane is closed. Is an undivided road with two lanes each way and the right lane closed the right reading of 'four-lane'?",
+       "status": "SOURCE_REVIEW_REQUIRED", "interpretation": null,
+       "sme_question": "Sect. 6N.11 para 06 allows Figure 6P-33 on undivided roads only for four-lane roads with the right-hand lane closed. This undivided site has three or more lanes each way, or a left-lane or interior-lane closure. Should TA-33 be used here, and with what changes?",
        "source_ref_ids": ["SR-6N11-P06", "SR-6N11-P02"]},
 
       {"id": "R-6P01-FIGURES-ARE-GUIDANCE", "layer": "FEDERAL", "ta_id": null, "jurisdiction": null, "topic": "typical_application_strength", "strength": "SUPPORT",
@@ -128,7 +135,11 @@
        "text": "Default work-space length for work_type TRENCH when the footprint is not visible. No source gives a number.",
        "condition": null, "action": null, "value": null, "value_max": null, "unit": "ft", "qualifier": null,
        "status": "UNKNOWN", "interpretation": null, "source_ref_ids": [],
-       "sme_question": "What work-space length (ft) should be assumed for a trench when the footprint is not visible?"}
+       "sme_question": "What work-space length (ft) should be assumed for a trench when the footprint is not visible?"},
+      {"id": "R-6B1-ABC-CONSECUTIVE", "layer": "FEDERAL", "ta_id": null, "jurisdiction": null, "topic": "advance_sign_anchor", "strength": "GUIDANCE", "text": "A, B and C are consecutive gaps along the approach: A from the TA's anchor to the first (nearest) sign, B from the first to the second sign, C from the second to the third. Each TA's anchor is an R-TAxx-ANCHOR-A rule.", "condition": null, "action": "ABC_CONSECUTIVE_UPSTREAM", "value": null, "value_max": null, "unit": null, "qualifier": null, "status": "SOURCED", "sme_question": null, "interpretation": "INTERPRETATION (owner-accepted reading of the figure render, S4b stage C): the Table 6B-1 note defines A, B and C as successive sign-to-sign distances; Figures 6P-10 and 6P-33 draw them end to end with no overlap.", "source_ref_ids": ["SR-6B1-NOTE-ABC", "SR-6P10-FIG-ANCHOR", "SR-6P33-FIG-ANCHOR"]},
+      {"id": "R-6B4-W-MERGING", "layer": "FEDERAL", "ta_id": null, "jurisdiction": null, "topic": "taper_offset_width", "strength": "GUIDANCE", "text": "W (offset width, Table 6B-4) for a merging taper. The MUTCD defines W as 'width of offset in feet' but not which width to measure for this taper type; W is not set.", "condition": null, "action": null, "value": null, "value_max": null, "unit": "ft", "qualifier": null, "status": "SOURCE_REVIEW_REQUIRED", "sme_question": "Table 6B-4 defines W only as 'width of offset in feet'. For a merging taper (TA-33), which measured width should be W: the closed lane's width (lane_width_ft), the lane width plus a closed shoulder, or something else?", "interpretation": null, "source_ref_ids": ["SR-6B4-DEFS", "SR-6B3-MERGING"]},
+      {"id": "R-6B4-W-SHIFTING", "layer": "FEDERAL", "ta_id": null, "jurisdiction": null, "topic": "taper_offset_width", "strength": "GUIDANCE", "text": "W (offset width, Table 6B-4) for a shifting taper. The MUTCD defines W as 'width of offset in feet' but not which width to measure for this taper type; W is not set.", "condition": null, "action": null, "value": null, "value_max": null, "unit": "ft", "qualifier": null, "status": "SOURCE_REVIEW_REQUIRED", "sme_question": "Table 6B-4 defines W only as 'width of offset in feet'. For a shifting taper (for example the TA-6 note 5 lane shift), which measured width should be W: the lateral distance the lane moves, or something else?", "interpretation": null, "source_ref_ids": ["SR-6B4-DEFS", "SR-6B3-SHIFTING"]},
+      {"id": "R-6B4-W-SHOULDER", "layer": "FEDERAL", "ta_id": null, "jurisdiction": null, "topic": "taper_offset_width", "strength": "GUIDANCE", "text": "W (offset width, Table 6B-4) for a shoulder taper. The MUTCD defines W as 'width of offset in feet' but not which width to measure for this taper type; W is not set.", "condition": null, "action": null, "value": null, "value_max": null, "unit": "ft", "qualifier": null, "status": "SOURCE_REVIEW_REQUIRED", "sme_question": "Table 6B-4 defines W only as 'width of offset in feet'. For a shoulder taper (TA-6, TA-33 note 3), which measured width should be W: the closed shoulder's width (shoulder_width_ft), or something else?", "interpretation": null, "source_ref_ids": ["SR-6B4-DEFS", "SR-6B3-SHOULDER"]}
     ]
   }
 }
