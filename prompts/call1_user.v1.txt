@@ -1,0 +1,13 @@
+id: call1_user
+version: 1
+role: user_template
+sha256: 81b8f01912963d536b1c1b14d702f0abd6bcc062f512522ad3729f49bcbef988
+---
+Image {w}x{h} px, north-up, {mpp:.3f} m per pixel. Work location = image centre ({cx},{cy}). Sides are N, S, E, W.
+For the road nearest the work location give one fact per field (facts) and one mark per visible feature (marks):
+- work_location: ROADWAY|SHOULDER|BEYOND_SHOULDER|SIDEWALK|UNKNOWN. work_side: N|S|E|W.
+- lanes_per_direction: count of through lanes in one direction. sidewalk_side: N|S|E|W|BOTH|NONE|UNKNOWN. obstructions: short list or NONE.
+- every other field: true|false|UNKNOWN.
+- marks: points as 'x1,y1;x2,y2;...' in image pixels; one mark per lane line; road_edge_left and road_edge_right: the two pavement edges, either order.
+Evidence: at most {words} words. For UNKNOWN, evidence is exactly one of: not_visible, occluded, low_resolution, ambiguous.
+Report no length or distance. Return the JSON object only.

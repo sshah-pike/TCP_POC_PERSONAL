@@ -6,6 +6,7 @@ SRC_DIR = os.path.dirname(PACKAGE_DIR)
 PROJECT_ROOT = os.path.dirname(SRC_DIR)
 CONFIG_DIR = os.path.join(PROJECT_ROOT, "config")
 RULE_PACK_DIR = os.path.join(PROJECT_ROOT, "rule_pack")
+PROMPTS_DIR = os.path.join(PROJECT_ROOT, "prompts")  # versioned AI prompts, one file each, hash in the header
 ASSETS_DIR = os.path.join(PROJECT_ROOT, "assets")
 SYMBOLS_DIR = os.path.join(ASSETS_DIR, "symbols")  # device catalog and symbol files; asset uris are relative to ASSETS_DIR
 DEVICE_CATALOG_PATH = os.path.join(SYMBOLS_DIR, "device_catalog.json")
