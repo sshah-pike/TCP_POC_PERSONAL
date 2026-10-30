@@ -1,0 +1,39 @@
+{
+  "site": "granite",
+  "point": "P32",
+  "lat": 41.3710265954301,
+  "lon": -71.82035330409971,
+  "half_extent_m": 212.4,
+  "width_px": 1280,
+  "height_px": 1280,
+  "metres_per_pixel": 0.448139,
+  "sha256": "5560a76ca2ceb41fbe8c99df91a6f643aaf161137efb20fd55362e00ae947fb3",
+  "map_meta": {
+    "provider": "AZURE_MAPS",
+    "retrieved_at": "2026-10-28T13:19:50+00:00",
+    "center": {
+      "latitude": 41.3710266,
+      "longitude": -71.8203533
+    },
+    "bounding_box": {
+      "min_latitude": 41.3684501,
+      "min_longitude": -71.8237865,
+      "max_latitude": 41.373603,
+      "max_longitude": -71.8169201
+    },
+    "width_pixels": 1280,
+    "height_pixels": 1280,
+    "ground_extent_m": {
+      "width": 573.618,
+      "height": 573.618
+    },
+    "metres_per_pixel": 0.448139,
+    "orientation": "NORTH_UP",
+    "georeference_model": "LOCAL_TANGENT_PLANE_AT_CENTER",
+    "zoom": 17,
+    "tileset": "microsoft.imagery",
+    "api_version": "2024-04-01",
+    "scale_model": "azure-static-512px-v2",
+    "request_tiles": 1
+  }
+}

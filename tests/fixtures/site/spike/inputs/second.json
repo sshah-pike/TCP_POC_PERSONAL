@@ -1,0 +1,39 @@
+{
+  "site": "second",
+  "point": "MH 223",
+  "lat": 42.33743803651997,
+  "lon": -71.02685856279096,
+  "half_extent_m": 212.4,
+  "width_px": 1280,
+  "height_px": 1280,
+  "metres_per_pixel": 0.441419,
+  "sha256": "b87f38dd7d0beb34db38a0c369bfe25d3c7cc77dd2a9839b4591f2423a586262",
+  "map_meta": {
+    "provider": "AZURE_MAPS",
+    "retrieved_at": "2026-10-28T13:20:55+00:00",
+    "center": {
+      "latitude": 42.337438,
+      "longitude": -71.0268586
+    },
+    "bounding_box": {
+      "min_latitude": 42.3349002,
+      "min_longitude": -71.0302918,
+      "max_latitude": 42.3399758,
+      "max_longitude": -71.0234253
+    },
+    "width_pixels": 1280,
+    "height_pixels": 1280,
+    "ground_extent_m": {
+      "width": 565.016,
+      "height": 565.016
+    },
+    "metres_per_pixel": 0.441419,
+    "orientation": "NORTH_UP",
+    "georeference_model": "LOCAL_TANGENT_PLANE_AT_CENTER",
+    "zoom": 17,
+    "tileset": "microsoft.imagery",
+    "api_version": "2024-04-01",
+    "scale_model": "azure-static-512px-v2",
+    "request_tiles": 1
+  }
+}

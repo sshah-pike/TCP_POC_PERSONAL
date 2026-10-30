@@ -1,0 +1,15 @@
+{
+  "schema_version": "1",
+  "config_id": "TCP_S06_SITE_UNDERSTANDING",
+  "regulatory_status": "IMPLEMENTATION_SETTING_NOT_MUTCD_VALUE",
+  "note": "Site understanding settings (S6). No MUTCD value lives here. Every entry has a source or is tagged CALIBRATION_PENDING.",
+  "call1": {
+    "evidence_max_words": {"value": 15, "source": "S0 prompt tuning proposal P1, approved S6 Q3 B"},
+    "work_location_min_confidence": {"value": 0.85, "source": "owner decision, S6 session 1"},
+    "safety_critical_fields": {
+      "value": ["lanes_per_direction", "divided_highway", "shoulder_present", "oneway"],
+      "source": "owner decision, S6 session 1 (Q7/Q8): AI plus OSM must agree, otherwise UNKNOWN"
+    },
+    "common_fact_min_confidence": {"value": null, "source": "CALIBRATION_PENDING", "note": "no floor applied until calibrated"}
+  }
+}

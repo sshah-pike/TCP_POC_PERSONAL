@@ -1,0 +1,39 @@
+{
+  "site": "colorado",
+  "point": "P13",
+  "lat": 42.27575907259692,
+  "lon": -71.10121450786647,
+  "half_extent_m": 212.4,
+  "width_px": 1280,
+  "height_px": 1280,
+  "metres_per_pixel": 0.441851,
+  "sha256": "d9eb9370347df910b404b480ec2afe3ec228d1bfc02b3c2017aa26df4a388c70",
+  "map_meta": {
+    "provider": "AZURE_MAPS",
+    "retrieved_at": "2026-10-28T13:19:44+00:00",
+    "center": {
+      "latitude": 42.2757591,
+      "longitude": -71.1012145
+    },
+    "bounding_box": {
+      "min_latitude": 42.2732188,
+      "min_longitude": -71.1046477,
+      "max_latitude": 42.2782994,
+      "max_longitude": -71.0977813
+    },
+    "width_pixels": 1280,
+    "height_pixels": 1280,
+    "ground_extent_m": {
+      "width": 565.57,
+      "height": 565.57
+    },
+    "metres_per_pixel": 0.441851,
+    "orientation": "NORTH_UP",
+    "georeference_model": "LOCAL_TANGENT_PLANE_AT_CENTER",
+    "zoom": 17,
+    "tileset": "microsoft.imagery",
+    "api_version": "2024-04-01",
+    "scale_model": "azure-static-512px-v2",
+    "request_tiles": 1
+  }
+}
