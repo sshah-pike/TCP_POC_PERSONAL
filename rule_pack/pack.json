@@ -47,14 +47,19 @@
       "sha256": "d8d53bc2fc09a2f2f4a56082ca34cc417be436c9d95b2cd5e989df75e06b9ed8"
     },
     {
+      "path": "base/sidewalk_detour.json",
+      "layer": "FEDERAL",
+      "sha256": "86e4413d350ee96a05c7d5f26290a55ec264af60f667ef977efaef8c70243042"
+    },
+    {
       "path": "ta/TA-1.json",
       "layer": "FEDERAL",
-      "sha256": "30b04774904ad04f0408513f80653ae2bc0788b28ee96505a813b1ad85d10365"
+      "sha256": "cfec997491d09bc49d197aa1ad15e1458ac26387ac74d82a012d51180cd28926"
     },
     {
       "path": "ta/TA-6.json",
       "layer": "FEDERAL",
-      "sha256": "adbf76448cac832d9e2847e6c31d79f91fc2b202612a948b222c4368281fac62"
+      "sha256": "5a7a25f8ea3c1d8e2113019cf637196f93afa1d1f5a533890f38a4313318726b"
     },
     {
       "path": "ta/TA-10.json",
@@ -64,8 +69,8 @@
     {
       "path": "ta/TA-33.json",
       "layer": "FEDERAL",
-      "sha256": "a389ca8335527aae2b928606e2d67baf41ab1d4e8dcbb7349d03ba16d8afd9e1"
+      "sha256": "b59a13d4346effd8d35ac8d3481e1cdd1bfc7905a5d7077350c604d614dc51fc"
     }
   ],
-  "content_sha256": "5862cd9acc42256c43d9b95cf4287598e487adfd1661ec2a6e826695b34e653f"
+  "content_sha256": "36c8ccfbe3c1f4c5cabeff6c921e831ae2af4988e35bee4042b85d8d1d27c484"
 }

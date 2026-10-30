@@ -36,6 +36,7 @@ DOCS = {
         47: "6I.01 para 07 (guide sign sizes shall be as shown in Table 6I-1); 6I.02; Table 6I-1 (S4b)",
         31: "6G.08 paras 01-02 (higher fines signs R2-10, R2-11)",
         33: "6G.08 paras 03-05 (DOUBLE FINES legends); 6G.10 (SIDEWALK CLOSED signs)",
+        48: "6I.02 paras 05-14 (DETOUR M4-9, END DETOUR M4-8a, M4-9a/b/c pedestrian and bicyclist detours) (S4b)",
         51: "6K.01 para 04 (device spacing 1 x and 2 x speed)",
         62: "6L.02 para 15 (AFAD advance signing includes BE PREPARED TO STOP (W3-4)) (S4b)",
         81: "6N.05 para 03 (SHOULDER WORK (W21-5) sign when work vehicles are on the shoulder) (S4b)",
