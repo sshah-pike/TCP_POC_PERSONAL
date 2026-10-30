@@ -156,20 +156,25 @@ class AnthropicMessagesAPI:
     CAPABILITIES = {"image_input": True, "structured_output": True, "usage_reporting": True,
                     "verified": "2026-10-16/18 live: image input, tri-state-v1 schema enforced, usage reported"}
 
-    def send(self, endpoint, key, deployment, effort, parts, schema, system=SYSTEM_PROMPT):
+    @staticmethod
+    def build_body(deployment, effort, parts, schema, system=SYSTEM_PROMPT, schema_name=None):
+        """The exact keyword arguments of messages.create. schema_name is not used by this API family."""
+        content = [{"type": "text", "text": v} if k == "text" else
+                   {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg",
+                                                "data": base64.standard_b64encode(v).decode()}} for k, v in parts]
+        return dict(model=deployment, max_tokens=MAX_OUTPUT_TOKENS, system=system,
+                    output_config={"effort": effort, "format": {"type": "json_schema", "schema": schema}},
+                    messages=[{"role": "user", "content": content}])
+
+    def send(self, endpoint, key, deployment, effort, parts, schema, system=SYSTEM_PROMPT, schema_name=None):
         try:
             import anthropic
         except ImportError:
             raise ProviderError("AI_SDK_MISSING", "pip install anthropic")
-        content = [{"type": "text", "text": v} if k == "text" else
-                   {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg",
-                                                "data": base64.standard_b64encode(v).decode()}} for k, v in parts]
+        body = self.build_body(deployment, effort, parts, schema, system, schema_name)
         client = anthropic.AnthropicFoundry(api_key=key, base_url=endpoint + "/anthropic/")
         try:
-            resp = client.messages.create(
-                model=deployment, max_tokens=MAX_OUTPUT_TOKENS, system=system,
-                output_config={"effort": effort, "format": {"type": "json_schema", "schema": schema}},
-                messages=[{"role": "user", "content": content}])
+            resp = client.messages.create(**body)
         except anthropic.AuthenticationError as e:
             raise classify_api_error(401, getattr(e, "message", None) or "Foundry authentication failed")
         except anthropic.PermissionDeniedError as e:
@@ -201,15 +206,22 @@ class OpenAIResponsesAPI:
                     "verified": "2026-10-18 live (gpt-5.6-sol): input_image read, strict json_schema enforced, "
                                 "full tri-state-v1 observation schema accepted, usage reported"}
 
-    def send(self, endpoint, key, deployment, effort, parts, schema, system=SYSTEM_PROMPT):
-        import requests
+    @staticmethod
+    def build_body(deployment, effort, parts, schema, system=SYSTEM_PROMPT, schema_name=None):
+        """The exact JSON body of POST /openai/v1/responses (schema name defaults to the observation call's)."""
         content = [{"type": "input_text", "text": v} if k == "text" else
                    {"type": "input_image", "image_url": "data:image/jpeg;base64," + base64.b64encode(v).decode(),
                     "detail": "high"} for k, v in parts]
         body = {"model": deployment, "instructions": system, "max_output_tokens": MAX_OUTPUT_TOKENS,
                 "input": [{"role": "user", "content": content}],
-                "text": {"format": {"type": "json_schema", "name": "tcp_observation", "schema": schema, "strict": True}}}
+                "text": {"format": {"type": "json_schema", "name": schema_name or "tcp_observation", "schema": schema,
+                                    "strict": True}}}
         if effort: body["reasoning"] = {"effort": effort}
+        return body
+
+    def send(self, endpoint, key, deployment, effort, parts, schema, system=SYSTEM_PROMPT, schema_name=None):
+        import requests
+        body = self.build_body(deployment, effort, parts, schema, system, schema_name)
         try:
             r = requests.post(endpoint + "/openai/v1/responses", json=body, timeout=(10, 600),
                               headers={"api-key": key, "Content-Type": "application/json", "User-Agent": "tcp-poc/0.2"})

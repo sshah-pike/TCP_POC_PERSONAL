@@ -1,12 +1,14 @@
 {
   "_note": "Model/deployment registry for FoundryVisionProvider. NO SECRETS: the endpoint and key are common to the Foundry resource and come from .env (TCP_FOUNDRY_ENDPOINT/TCP_FOUNDRY_API_KEY, or the existing ANTHROPIC_FOUNDRY_BASE_URL/ANTHROPIC_FOUNDRY_API_KEY). 'api' is the API family verified for the deployment (anthropic_messages for Claude, openai_responses for GPT); Claude deployments must not use openai_responses (verified 2026-10-18: the image is dropped and the schema is not enforced there). TCP_FOUNDRY_PROFILE selects a profile; default_profile otherwise (gpt-5.6-sol: the agent's call-2 schema exceeds the Claude strict-grammar limit, verified live 2026-10-19).",
   "default_profile": "gpt-5.6-sol",
+  "default_max_image_px": 1280,
   "profiles": {
     "claude-opus-5-5": {
       "display_name": "Claude Opus 5.5",
       "deployment": "claude-opus-5-5",
       "api": "anthropic_messages",
       "effort": "high",
+      "max_image_px": 1280,
       "enabled": true
     },
     "claude-opus-5-5-fast": {
@@ -15,6 +17,7 @@
       "deployment": "claude-opus-5-5-fast",
       "api": "anthropic_messages",
       "effort": "high",
+      "max_image_px": 1280,
       "enabled": true
     },
     "gpt-5.6-sol": {
@@ -22,6 +25,7 @@
       "deployment": "gpt-5.6-sol",
       "api": "openai_responses",
       "effort": "high",
+      "max_image_px": 1280,
       "enabled": true
     }
   }
