@@ -1,7 +1,7 @@
 {
   "schema_version": "1",
   "pack_id": "TCP_MUTCD_CH6_RULE_PACK",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "status": "DRAFT",
   "source_edition_note": "Source edition: MUTCD Chapter 6, December 2023 revision (file sha256 recorded). The edition the client applies is not yet confirmed.",
   "ta_scope": [
@@ -19,7 +19,7 @@
     {
       "path": "base/registry.json",
       "layer": "FEDERAL",
-      "sha256": "644d1527c8cacbdd87e33da55fd40a8c27845049d607219e8e24fa9dbc0501e3"
+      "sha256": "c3dad89cf9fdd01047ce51e45e1fc61894945463ad8d93a0ff20f341b2443d1f"
     },
     {
       "path": "base/tables.json",
@@ -49,7 +49,7 @@
     {
       "path": "base/sidewalk_detour.json",
       "layer": "FEDERAL",
-      "sha256": "86e4413d350ee96a05c7d5f26290a55ec264af60f667ef977efaef8c70243042"
+      "sha256": "d027781e3ee900b747ca0d5cc0752a4ce81571959c6ff3796d63bf222f0dad76"
     },
     {
       "path": "ta/TA-1.json",
@@ -72,5 +72,5 @@
       "sha256": "b59a13d4346effd8d35ac8d3481e1cdd1bfc7905a5d7077350c604d614dc51fc"
     }
   ],
-  "content_sha256": "36c8ccfbe3c1f4c5cabeff6c921e831ae2af4988e35bee4042b85d8d1d27c484"
+  "content_sha256": "80c25240ab584974f40f4f17205a8490127549837a30f7b69e9d11dd95a18b0a"
 }
