@@ -6,7 +6,7 @@
   "MUTCD 11th Edition Chapter 6, December 2023 revision (supplied file)",
   "Client reference drafts: Colorado, E Second, Granite"
  ],
- "catalog_hash": "3d7ee0915c13e35eb1a8410ebf8d546dc1cbc889b08606932e55388bcd619f6f",
+ "catalog_hash": "ac304fefab8a63684eda587e200ff1ab59d1f50a317df1b238d23d15ff7715fd",
  "entries": [
   {
    "device_id": "W20-1",
@@ -343,7 +343,7 @@
    "code_status": "MUTCD",
    "name": "END DETOUR",
    "category": "guide_sign",
-   "size_source": "NOT_IN_MVP_PACK",
+   "size_source": "PACK",
    "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6I-1; Sect. 6I.02",
    "asset": {
@@ -365,7 +365,7 @@
    "code_status": "MUTCD",
    "name": "DETOUR with left arrow",
    "category": "guide_sign",
-   "size_source": "NOT_IN_MVP_PACK",
+   "size_source": "PACK",
    "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6I-1; Sect. 6I.02",
    "asset": {
@@ -387,7 +387,7 @@
    "code_status": "MUTCD",
    "name": "DETOUR with right arrow",
    "category": "guide_sign",
-   "size_source": "NOT_IN_MVP_PACK",
+   "size_source": "PACK",
    "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6I-1; Sect. 6I.02",
    "asset": {
@@ -401,6 +401,106 @@
    "observed_in_drafts": [
     "Granite V"
    ]
+  },
+  {
+   "device_id": "M4-9a-L",
+   "mutcd_code": "M4-9a-L",
+   "printed_as": [],
+   "code_status": "MUTCD",
+   "name": "Bike/Pedestrian Detour, left arrow",
+   "category": "guide_sign",
+   "size_source": "PACK",
+   "size_text": "",
+   "source": "MUTCD 11th Ed. (Dec 2023) Table 6I-1, p.811; Sect. 6I.02",
+   "asset": {
+    "uri": "symbols/svg/M4-9a-L.svg",
+    "sha256": "3d36127a5c9c88198606319fa7034965f07fe9d0d08a88f90a263ad983c72b20",
+    "size": 1067,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Sect. 6I.02 para 11 (Standard): the sign shall have an arrow; para 12: on the face or on a supplemental plaque. Placeholder shows the legend only.",
+   "observed_in_drafts": []
+  },
+  {
+   "device_id": "M4-9a-R",
+   "mutcd_code": "M4-9a-R",
+   "printed_as": [],
+   "code_status": "MUTCD",
+   "name": "Bike/Pedestrian Detour, right arrow",
+   "category": "guide_sign",
+   "size_source": "PACK",
+   "size_text": "",
+   "source": "MUTCD 11th Ed. (Dec 2023) Table 6I-1, p.811; Sect. 6I.02",
+   "asset": {
+    "uri": "symbols/svg/M4-9a-R.svg",
+    "sha256": "83edda3901c4ebc879d4c6dfc07269aa289ea6072b1a68c1839eee7a7184adbb",
+    "size": 1068,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Sect. 6I.02 para 11 (Standard): the sign shall have an arrow; para 12: on the face or on a supplemental plaque. Placeholder shows the legend only.",
+   "observed_in_drafts": []
+  },
+  {
+   "device_id": "M4-9b",
+   "mutcd_code": "M4-9b",
+   "printed_as": [],
+   "code_status": "MUTCD",
+   "name": "Pedestrian Detour",
+   "category": "guide_sign",
+   "size_source": "PACK",
+   "size_text": "",
+   "source": "MUTCD 11th Ed. (Dec 2023) Table 6I-1, p.811; Sect. 6I.02",
+   "asset": {
+    "uri": "symbols/svg/M4-9b.svg",
+    "sha256": "dd7d85a272ae9b2d19290abfc26b8bfb1a8f9979fad012c8a1e64a5c422fa611",
+    "size": 1044,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Sect. 6I.02 para 13 (Option). No arrow is stated for this sign.",
+   "observed_in_drafts": []
+  },
+  {
+   "device_id": "M4-9c-L",
+   "mutcd_code": "M4-9c-L",
+   "printed_as": [],
+   "code_status": "MUTCD",
+   "name": "Bike Detour (with arrow), left arrow",
+   "category": "guide_sign",
+   "size_source": "PACK",
+   "size_text": "",
+   "source": "MUTCD 11th Ed. (Dec 2023) Table 6I-1, p.811; Sect. 6I.02",
+   "asset": {
+    "uri": "symbols/svg/M4-9c-L.svg",
+    "sha256": "6a8243abfe015cae2383c76450aaee01fa1ba24e9d48d1b88a375ebeefad5bcd",
+    "size": 1058,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Table 6I-1 names this sign \"with arrow\". Placeholder shows the legend only.",
+   "observed_in_drafts": []
+  },
+  {
+   "device_id": "M4-9c-R",
+   "mutcd_code": "M4-9c-R",
+   "printed_as": [],
+   "code_status": "MUTCD",
+   "name": "Bike Detour (with arrow), right arrow",
+   "category": "guide_sign",
+   "size_source": "PACK",
+   "size_text": "",
+   "source": "MUTCD 11th Ed. (Dec 2023) Table 6I-1, p.811; Sect. 6I.02",
+   "asset": {
+    "uri": "symbols/svg/M4-9c-R.svg",
+    "sha256": "a0e34100feaab8cdc5ce28ffc2a5011249f84a3df05c1512c5e2ad55b516b17c",
+    "size": 1059,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Table 6I-1 names this sign \"with arrow\". Placeholder shows the legend only.",
+   "observed_in_drafts": []
   },
   {
    "device_id": "M4-9AL",
@@ -454,7 +554,7 @@
    "code_status": "MUTCD",
    "name": "SIDEWALK CLOSED",
    "category": "regulatory_sign",
-   "size_source": "NOT_IN_MVP_PACK",
+   "size_source": "PACK",
    "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6G-1, p.796; Sect. 6G.10",
    "asset": {
@@ -477,7 +577,7 @@
    "code_status": "MUTCD",
    "name": "SIDEWALK CLOSED USE OTHER SIDE (left arrow)",
    "category": "regulatory_sign",
-   "size_source": "NOT_IN_MVP_PACK",
+   "size_source": "PACK",
    "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6G-1, p.796 (R9-10); Sect. 6G.10",
    "asset": {
@@ -499,7 +599,7 @@
    "code_status": "MUTCD",
    "name": "SIDEWALK CLOSED AHEAD CROSS HERE (left)",
    "category": "regulatory_sign",
-   "size_source": "NOT_IN_MVP_PACK",
+   "size_source": "PACK",
    "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6G-1, p.796 (R9-11); Sect. 6G.10",
    "asset": {
@@ -522,7 +622,7 @@
    "code_status": "MUTCD",
    "name": "SIDEWALK CLOSED AHEAD CROSS HERE (right)",
    "category": "regulatory_sign",
-   "size_source": "NOT_IN_MVP_PACK",
+   "size_source": "PACK",
    "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6G-1, p.796 (R9-11); Sect. 6G.10",
    "asset": {
@@ -545,7 +645,7 @@
    "code_status": "MUTCD",
    "name": "SIDEWALK CLOSED CROSS HERE",
    "category": "regulatory_sign",
-   "size_source": "NOT_IN_MVP_PACK",
+   "size_source": "PACK",
    "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6G-1, p.796; Sect. 6G.10",
    "asset": {

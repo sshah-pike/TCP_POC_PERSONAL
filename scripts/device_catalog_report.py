@@ -5,10 +5,12 @@ tests/unit/devices/test_device_catalog_report.py fails when the committed report
 Tables are generated from the catalog and the pack. V01_USED_BY and NO_FREEWAY_SIZE are the v0.1 catalog's own claims,
 kept here as data because v0.2 no longer stores them (git history holds the v0.1 file).
 """
-import os, sys
+import glob, json, os, sys
 from collections import defaultdict
 from tcp_planner.rules.device_catalog import load_catalog
+from tcp_planner.rules.rule_pack_effective import SIGN_SIZE_COLUMNS, sign_size
 from tcp_planner.rules.rule_pack_store import JsonRulePackStore
+from tcp_planner.rules.sign_size_map import NOT_A_SIGN, PACK_DESIGNATION, size_designation
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "docs", "reports", "S5_device_catalog_review.md")
@@ -23,19 +25,22 @@ V01_USED_BY = {
     "DEV-BARRICADE-T3": "all", "DEV-ARROW-BOARD": "TA-33", "DEV-PCMS": "all", "DEV-FLAG-TREE": "all",
     "DEV-WORK-VEHICLE": "all", "DEV-TMA": "TA-6, TA-33", "DEV-FLAGGER": "TA-10", "DEV-POLICE-DETAIL": "TA-10 (police variant)",
     "DEV-WORK-SPACE": "all", "DEV-SIGN-POST": "all", "DEV-TEMP-BARRIER": "TA-6 (option)"}
-# MUTCD signs whose v0.1 size row had no freeway/expressway value
-NO_FREEWAY_SIZE = ["R9-9", "R9-10L", "R9-11L", "R9-11R", "R9-11a", "R3-7R", "R1-1-PADDLE"]
+# MUTCD signs with no size row in pack 1.1.0 whose codes the golden drafts may print
+NOT_IN_PACK_MUTCD = ["W21-5a", "W9-2L", "R8-3", "R2-10", "R2-11", "R3-7R", "R1-1-PADDLE"]
+GOLDEN_DIR = os.path.join(ROOT, "tests", "golden")
 
 DECISIONS = [
-    ("Q3, size column", "Conventional for URBAN_LOW_SPEED, URBAN_HIGH_SPEED and RURAL; Freeway for EXPRESSWAY_FREEWAY; Minimum is never selected automatically. Every size has a quote check. Built in commit 5, after S4b adds the size rows."),
-    ("Q5, used_by_tas", "Removed from the catalog. \"Used by\" is derived from the pack's ta_device_use rows (table below)."),
-    ("Q6, asset references", "The catalog carries schema_version \"1\"; each asset is {uri, sha256, size, media_type, status}, the uri a key relative to the assets folder. CLAUDE.md gets a note in the S5 report commit."),
-    ("Q7, symbol drawing", "Pre-rendered PNGs: a dev script renders each SVG with PyMuPDF (dev tool, never imported from src/); PNGs are committed with their hashes. Commit 6. No dependency is added."),
-    ("Q8, placeholder label", "S5 provides the placeholder flag and the label text; S12 draws it."),
-    ("Q10, non-sign devices", "Text only (size_source TEXT_ONLY); no validator reads their size_text."),
+    ("Q1 C, Q5 A", "Sign sizes are sourced rows in the pack (S4b: 21 rows in rule_pack/base/sign_sizes.json); the catalog holds assets and names. \"Used by\" is derived from the pack's ta_device_use rows, not stored."),
+    ("Q2", "Every catalog sign that has a size row in the pack has size_source PACK (list in the next section)."),
+    ("Q3 A, PROPOSED", "URBAN_LOW_SPEED, URBAN_HIGH_SPEED and RURAL use the Conventional column; EXPRESSWAY_FREEWAY uses Freeway; Minimum is never selected automatically. PROPOSED: the SME has not confirmed it (SME question 38). It is marked PROPOSED in the code (size_for) and here."),
+    ("Q4", "Done in S4b: device rows only (option B) for W21-5, W3-4, W5-1, W20-5L and W4-2L."),
+    ("Q6, asset references", "The catalog carries schema_version \"1\"; each asset is {uri, sha256, size, media_type, status}, the uri a key relative to the assets folder."),
+    ("Q7 A, symbol drawing", "Pre-rendered PNGs: a dev script renders each SVG with PyMuPDF (dev tool, never imported from src/); PNGs are committed with their hashes. No dependency is added to pyproject.toml."),
+    ("Q8 B, placeholder label", "S5 provides the placeholder flag and the label text; S12 draws it."),
+    ("Q10 A, non-sign devices", "Text only (size_source TEXT_ONLY); no validator reads their size_text."),
+    ("Q12 A", "A device whose size is SOURCE_REVIEW_REQUIRED or UNKNOWN passes the validator but forces REVIEW_REQUIRED and names the device. A null column (\"-\" in the table) is never read as 0 and never replaced by the Conventional size."),
     ("Scope", "Police, W20-8, client sign codes and client modules are out of scope: no alias for them. printed_as is kept only for in-scope MUTCD signs, plus the comparison-only alias M4-A8 for M4-8a, status PROPOSED."),
     ("Edition", "December 2023 only."),
-    ("Not in S5", "Plan commits 3 and 4 (size rows, pack reconciliation) belong to slice S4b."),
 ]
 
 
@@ -66,7 +71,7 @@ def build_report(cat, pack):
           f"{'yes' if all(cat.has(c) for c in pack_devices) and not cat.verify_assets() else 'NO'}.",
           f"- Pack `ta_device_use` rows: {len(pack.records('ta_device_use'))}. Every one resolves through its device record to a catalog entry.",
           f"- Catalog entries: {len(entries)}; SVG files: {len(entries)}; none missing, none unlisted.",
-          "- Signs the four TA figures show beside notes (W20-5L, W4-2L, W21-5, W5-1, W3-4) have catalog entries but no pack `device` record (S4 owner decision, \"Note-only signs\"). W20-5L and W4-2L are needed when TA-33 note 1 applies; S4b or S8 decides how.",
+          "- The five note-only signs (W20-5L, W4-2L, W21-5, W5-1, W3-4) have pack `device` rows since S4b and size rows; they have no `ta_device_use` row.",
           "- Golden drafts: every printed code resolves except W20-8 (Colorado police sign, out of scope, no alias). M4-A8 resolves through the PROPOSED alias.", ""]
 
     L += ["## Entries by code status", "", "| code_status | Entries |", "| --- | --- |"]
@@ -86,24 +91,50 @@ def build_report(cat, pack):
           "The same four entries. Their size has no source in the repo (plan open question 14); `size_text` is empty.", ""]
     L += [f"- `{e.device_id}`" for e in entries if e.size_source.value == "SOURCE_REVIEW_REQUIRED"] + [""]
 
-    L += ["## Signs with no freeway size", "",
-          "In the v0.1 data these 7 MUTCD signs had no freeway/expressway size: " + ", ".join(f"`{c}`" for c in NO_FREEWAY_SIZE) +
-          ". With Q3 A, an EXPRESSWAY_FREEWAY plan that placed one would get SOURCE_REVIEW_REQUIRED, never the Conventional size. "
-          "None of the 7 is a sign a TA uses or a TA note cites.", ""]
+    L += ["## Size mapping: catalog id to pack size row", "",
+          "From `src/tcp_planner/rules/sign_size_map.py`. A left or right variant reads the row of its designation. \"-\" is a column the table prints as \"\u2014\" (a gap with an SME question, never 0, never the Conventional size).", "",
+          "| Catalog id | Pack designation | Conventional w x h | Freeway w x h | Minimum w x h |", "| --- | --- | --- | --- | --- |"]
+    nofree = []
+    for e in entries:
+        d, _ = size_designation(e)
+        if d is None: continue
+        cols = []
+        for c in SIGN_SIZE_COLUMNS:
+            r = sign_size(pack, d, c)
+            cols.append(f"{r['width_in']} x {r['height_in']}" if r["status"] == "SOURCED" else "-")
+            if c == "freeway_expressway" and r["status"] != "SOURCED": nofree.append(e.device_id)
+        L.append(f"| {e.device_id} | {d} | " + " | ".join(cols) + " |")
+    L += ["", f"{len(PACK_DESIGNATION)} entries have a size row. No catalog id reads two rows, and every pack size row is read by at least one catalog id.", "",
+          "Signs with no Freeway size in the table (an EXPRESSWAY_FREEWAY plan placing one gets SOURCE_REVIEW_REQUIRED): " + ", ".join(f"`{i}`" for i in nofree) + ".", ""]
+    L += ["### Entries with no size row, with the reason", "", "| Catalog id | Reason |", "| --- | --- |"]
+    L += [f"| {e.device_id} | {_md(size_designation(e)[1])} |" for e in entries if size_designation(e)[0] is None and e.code_status.value != "DEVICE"]
+    L += [f"| {sum(1 for e in entries if e.code_status.value == 'DEVICE')} DEV-* entries | {NOT_A_SIGN} |", "",
+          "`NOT_IN_MVP_PACK` is a reason, not a value in the pack. `size_for` on any of these returns UNKNOWN and forces REVIEW_REQUIRED naming the device (Q12 A).", ""]
+
+    L += ["### Pack size rows that had no same-id catalog entry (S4b list of six): closed", "",
+          "| Pack row | Table wording | Catalog entries now | Arrow |", "| --- | --- | --- | --- |",
+          "| R9-10 | SIDEWALK CLOSED, (ARROW) USE OTHER SIDE | R9-10L | existing variant |",
+          "| R9-11 | SIDEWALK CLOSED AHEAD, (ARROW) CROSS HERE | R9-11L, R9-11R | existing variants |",
+          "| M4-9 | Detour | M4-9L, M4-9R | existing variants |",
+          "| M4-9a | Bike/Pedestrian Detour | M4-9a-L, M4-9a-R | yes: Sect. 6I.02 para 11 (Standard) \"shall have an arrow\"; para 12 allows it on the face or on a supplemental plaque |",
+          "| M4-9b | Pedestrian Detour | M4-9b | none stated (para 13) |",
+          "| M4-9c | Bike Detour (with arrow) | M4-9c-L, M4-9c-R | yes: the Table 6I-1 title says \"with arrow\" |", "",
+          "The new ids use a hyphen before L and R (M4-9a-L, not M4-9aL) because the catalog already has the client code M4-9AL, and Windows and OneDrive treat file names that differ only by case as one file. "
+          "The new symbols show the legend text only, with a visible PLACEHOLDER label; the arrow is not drawn. They have no device rows and no ta_device_use rows.", ""]
 
     L += ["## Aliases (printed_as)", "", "| device_id | Printed code | Status |", "| --- | --- | --- |"]
     L += [f"| {e.device_id} | {p.code} | {p.status.value} |" for e in entries for p in e.printed_as] + [""]
     L += ["Comparison only: an alias never selects a device for placement. It stays PROPOSED until an SME confirms the printed code (plan open question 13).", ""]
 
     L += ["## size_source", "", "| size_source | Entries | Meaning |", "| --- | --- | --- |"]
-    meaning = {"PACK": "size is a sourced row in the rule pack (rows come with S4b)",
+    meaning = {"PACK": "size is a sourced row in the rule pack (see the mapping above)",
                "NOT_IN_MVP_PACK": "MUTCD sign no in-scope TA uses; no size row",
                "TEXT_ONLY": "non-sign device; size_text is informational",
                "SOURCE_REVIEW_REQUIRED": "no source; forces REVIEW_REQUIRED"}
     for s, m in meaning.items():
         ids = [e.device_id for e in entries if e.size_source.value == s]
         L.append(f"| {s} | {len(ids)}: {_md(', '.join(ids))} | {m} |")
-    L += ["", "The 12 `PACK` signs are plan question Q2 option A (the signs a TA uses or a TA note cites). The owner has not answered Q2 yet; S4b decides the final set and changes this column if needed.", ""]
+    L += [""]
 
     L += ["## Catalog v0.1 \"used_by_tas\" against the pack (acceptance: derive, do not store)", "",
           "| device_id | v0.1 catalog said | Pack ta_device_use says | Same |", "| --- | --- | --- | --- |"]
@@ -120,12 +151,24 @@ def build_report(cat, pack):
     unused = [e for e in entries if e.device_id not in used]
     L += [f"{len(unused)} of {len(entries)} entries have no `ta_device_use` row: " + ", ".join(f"`{e.device_id}`" for e in unused), ""]
 
+    L += ["## Golden drafts: signs with no pack size row", "",
+          "Occurrences of each code in the sheet's extraction (callout and device lists). No alias applies to any of them. W21-5a, R2-10 and R1-1-PADDLE appear in no golden file.", "",
+          "| Code | Job | Sheet | Occurrences |", "| --- | --- | --- | --- |"]
+    for f in sorted(glob.glob(os.path.join(GOLDEN_DIR, "golden_*.json"))):
+        with open(f, encoding="utf-8") as fh: g = json.load(fh)
+        for sh in g["sheets"]:
+            t = json.dumps(sh)
+            for c in NOT_IN_PACK_MUTCD:
+                n = t.count(f'"{c}"')
+                if n: L.append(f"| {c} | {os.path.basename(f)[7:-5]} | {sh['sheet_number']} of {sh['of']} ({sh['phase_label']}) | {n} |")
+    L.append("")
+
     L += ["## Open items for the owner", "",
-          "1. **Q2 (not answered).** Which signs get sourced size rows. The `PACK` column assumes the 12 of option A.",
+          "1. **SME question 38 (Q3 A).** Confirm the road-type to size-column mapping; PROPOSED until then.",
           "2. **Q13.** SME confirmation of printed codes: M4-A8 (alias kept), M4-9AL, R9-3BR, R9-10L (MUTCD code R9-10), RI 27.1.1, the TEMPORARY NO PARKING plaque.",
           "3. **Q14.** Sizes and legends for the four SOURCE_REVIEW_REQUIRED entries. Not supplied; they stay unsized.",
-          "4. **Note-only signs.** W20-5L, W4-2L, W21-5, W5-1, W3-4 have no pack device record (S4b).",
-          "5. **Stale comment.** `rule_pack_models.py` says sizes and assets live in the catalog; the catalog now holds assets only (S4b touches that file).", ""]
+          "4. **Seven MUTCD signs with no size row** (list above). R8-3, R2-11, R3-7R and W9-2L appear in the golden drafts; they need size rows before S8 places them.",
+          "5. **M4-9a arrow.** Sect. 6I.02 para 12 lets the arrow sit on a supplemental plaque; the catalog models the arrow variants as L and R entries.", ""]
     return "\n".join(L)
 
 

@@ -16,7 +16,7 @@ def test_report_lists_client_state_and_review_required_entries():
     text, cat = _committed(), load_catalog()
     assert EDITION_LINE in text.splitlines()[:5]
     for h in ("## CLIENT_CODE and STATE_CODE entries", "## SOURCE_REVIEW_REQUIRED entries", "## Aliases (printed_as)",
-              "## Signs with no freeway size", "## Entries no TA uses"):
+              "## Entries no TA uses"):
         assert h in text
     for e in cat.entries:
         if e.code_status.value in ("CLIENT_CODE", "STATE_CODE"): assert f"| {e.device_id} |" in text

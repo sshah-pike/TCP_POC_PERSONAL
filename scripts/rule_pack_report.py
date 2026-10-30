@@ -257,7 +257,7 @@ CATALOG = os.path.join(ROOT, "assets", "symbols", "device_catalog.json")
 
 
 def s4b_section(pack, rep):
-    with open(CATALOG, encoding="utf-8") as f: catalog = {e["id"]: e for e in json.load(f)["entries"]}
+    with open(CATALOG, encoding="utf-8") as f: catalog = {e["device_id"]: e for e in json.load(f)["entries"]}
     size_defs = {d.id: d.table for d in pack.records("table_def") if set(d.key_fields) == {"sign"}}
     size_rows = [r for r in pack.records("table_row") if r.table_def_id in size_defs]
     L = ["## S4b changes", "",
@@ -282,7 +282,7 @@ def s4b_section(pack, rep):
     for r in size_rows:
         sign = r.key["sign"]
         if sign in catalog: continue
-        near = sorted(i for i in catalog if i.startswith(sign) and i[len(sign):] in ("L", "R"))
+        near = sorted(i for i in catalog if i.startswith(sign) and i[len(sign):] in ("L", "R", "-L", "-R"))
         L.append(f"| {r.id} | {sign} | " + (f"side variants only: {', '.join(near)}" if near else "no entry") + " |")
     L += ["", "### Add-on rules: gate and action kind", "",
           "None fires on its own: each needs its gate fact true; an unset fact evaluates to None (tests/unit/rules/test_rule_pack_addons.py). "

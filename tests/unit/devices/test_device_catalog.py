@@ -28,7 +28,7 @@ def _doc():
 
 def test_counts_and_unique_ids(cat):
     ids = [e.device_id for e in cat.entries]
-    assert len(ids) == 51 and len(set(ids)) == 51
+    assert len(ids) == 56 and len(set(ids)) == 56
     assert cat.version == "0.2" and cat.catalog.schema_version == "1"
 
 
@@ -51,8 +51,8 @@ def test_size_source_rules(cat):
     assert srr == {"CLIENT-POLICE-OFFICER-AHEAD", "M4-9AL", "R9-3BR", "RI-27.1.1"}
     assert all(by[i].size_text == "" for i in srr)
     assert {i for i, e in by.items() if e.size_source.value == "TEXT_ONLY"} == {i for i in by if i.startswith("DEV-")}
-    assert {i for i, e in by.items() if e.size_source.value == "PACK"} == {
-        "W20-1", "W20-4", "W20-5R", "W20-5L", "W20-7", "W21-5", "W5-1", "W4-2R", "W4-2L", "W3-4", "W16-2P", "G20-2"}
+    from tcp_planner.rules.sign_size_map import PACK_DESIGNATION
+    assert {i for i, e in by.items() if e.size_source.value == "PACK"} == set(PACK_DESIGNATION)
 
 
 def test_no_regulatory_number_or_used_by_in_catalog():
@@ -144,8 +144,20 @@ def test_wrong_schema_version_and_bad_uri_are_refused(tmp_path, monkeypatch):
 
 
 def test_no_raw_path_in_catalog():
-    text = open(dc.DEVICE_CATALOG_PATH, encoding="utf-8").read()
-    assert not re.search(r"[A-Za-z]:[\/]|\\|file://|OneDrive", text)
+    def strings(x):
+        if isinstance(x, str): yield x
+        elif isinstance(x, dict): yield from (s for v in x.values() for s in strings(v))
+        elif isinstance(x, list): yield from (s for v in x for s in strings(v))
+    bs = re.escape(chr(92))
+    bad = [s for s in strings(_doc()) if re.search(rf"[A-Za-z]:[/{bs}]|{bs}|file://|OneDrive", s)]
+    assert not bad, bad
+
+
+def test_ids_and_asset_files_are_unique_ignoring_case(cat):
+    """Windows and OneDrive treat M4-9AL and M4-9aL as one file name: an id or uri may not differ from another by case only."""
+    ids = [e.device_id.lower() for e in cat.entries]
+    uris = [e.asset.uri.lower() for e in cat.entries]
+    assert len(set(ids)) == len(ids) and len(set(uris)) == len(uris)
 
 
 def test_only_the_loader_reads_the_catalog_or_symbol_folder():
