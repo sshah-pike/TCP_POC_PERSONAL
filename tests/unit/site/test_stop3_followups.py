@@ -18,7 +18,7 @@ def pack():
 def lane(value, half=0.0):
     iv = Interval(lo=value - half, hi=value + half, unit="ft")
     m = MeasuredLength(name="lane_width", value_ft=value, interval_ft=iv, method="AI_MARKS", mpp=0.3, pixel_error_px=3.0, inputs=("x",), calculation="c")
-    return SiteFact(field="lane_width_ft", registry_id="lane_width_ft", value=value, unit="ft", source="AI_MARKS", status="RESOLVED", interval=iv, measured=m)
+    return SiteFact(field="lane_width_ft", registry_id="lane_width_ft", value=value, unit="ft", source="AI_MARKS", outcome="FOUND", interval=iv, measured=m)
 
 
 # ---------------------------------------------------------------- 1. footprint: PROPOSED, trace, SME override wins
@@ -148,7 +148,7 @@ def test_the_gate_names_both_kinds_of_flag_and_leaves_clean_results_alone(pack):
     clean, _ = P.encroachment_depth(sme_override_ft=2.0)
     assert rule_inputs([clean]).gate(SUPPORTED_AUTO) == (SUPPORTED_AUTO, [])
     veh = P.work_vehicle_width()
-    only_default = SiteFact(field="oneway", registry_id="oneway", value=False, source="AI", status="RESOLVED", flags=("AI_ONLY_UNCONFIRMED",))
+    only_default = SiteFact(field="oneway", registry_id="oneway", value=False, source="AI", outcome="FOUND", flags=("AI_ONLY_UNCONFIRMED",))
     d, reasons = rule_inputs([veh, only_default]).gate(SUPPORTED_AUTO)
     assert d == REVIEW_REQUIRED and {(r["fact"], r["flag"]) for r in reasons} == {("work_vehicle_width_ft", "DEFAULT_ASSUMED"), ("oneway", "AI_ONLY_UNCONFIRMED")}
 

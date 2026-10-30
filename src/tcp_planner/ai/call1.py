@@ -8,6 +8,7 @@ The schema, prompt and request builder join this module in the next commit.
 import json, math
 from typing import NamedTuple, Optional
 from pydantic import BaseModel, ConfigDict, StrictFloat, StrictInt, StrictStr, ValidationError
+from tcp_planner.site_model.outcomes import UNKNOWN, outcome_for
 from tcp_planner.site_model.facts import SiteFact, Mark, Question, Candidate, question_id
 from tcp_planner.site_model.site_config import call1_setting, load_site_config
 
@@ -89,6 +90,11 @@ class Observation(BaseModel):
     confidence: Optional[float] = None
     evidence: str = ""
     flags: tuple = ()
+
+    @property
+    def outcome(self):
+        """FOUND, NOT_PRESENT or UNKNOWN (site_model/outcomes.py): a false presence field is NOT_PRESENT, a malformed or unstated one UNKNOWN."""
+        return outcome_for(self.field, self.value) if self.status == "RESOLVED" else UNKNOWN
 
 
 class Call1Result(NamedTuple):
@@ -206,8 +212,9 @@ MARKS_AGREE, MARKS_MISSING, MARKS_DISAGREE = "AGREE", "MISSING", "DISAGREE"   # 
 def _fact(row, obs, flags=(), value=None, status=None, reason=None):
     st = status or obs.status
     fl = tuple(dict.fromkeys(list(obs.flags) + list(flags) + (["CONTEXT_ONLY"] if row.registry_id is None else [])))
-    return SiteFact(field=row.name, registry_id=row.registry_id, value=obs.value if value is None and st == "RESOLVED" else value,
-                    unit=row.unit, confidence=obs.confidence, source=SOURCE_AI, evidence=obs.evidence, status=st,
+    v = obs.value if value is None and st == "RESOLVED" else value
+    return SiteFact(field=row.name, registry_id=row.registry_id, value=v, unit=row.unit, confidence=obs.confidence, source=SOURCE_AI,
+                    evidence=obs.evidence, outcome=outcome_for(row.name, v) if st == "RESOLVED" else UNKNOWN,
                     reason_code=reason or (obs.reason_code if st == "UNKNOWN" else None), flags=fl)
 
 

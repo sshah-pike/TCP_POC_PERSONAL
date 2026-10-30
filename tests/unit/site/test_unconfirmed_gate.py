@@ -42,7 +42,7 @@ def test_a_confirmed_fact_does_not_change_the_decision():
 
 
 def test_a_result_that_did_not_read_the_fact_is_not_gated():
-    other = SiteFact(field="median_work", registry_id="median_work", value=False, source="AI", status="RESOLVED")
+    other = SiteFact(field="median_work", registry_id="median_work", value=False, source="AI", outcome="FOUND")
     inputs = rule_inputs([_wl(MARKS_MISSING), other])
     assert inputs.gate(SUPPORTED_AUTO, used=["median_work"]) == (SUPPORTED_AUTO, [])
     assert inputs.gate(SUPPORTED_AUTO, used=["median_work", "work_location"])[0] == REVIEW_REQUIRED

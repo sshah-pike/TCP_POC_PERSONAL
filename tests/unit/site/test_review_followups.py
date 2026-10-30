@@ -16,7 +16,7 @@ def pack():
 def lane(value):
     iv = Interval(lo=value, hi=value, unit="ft")
     m = MeasuredLength(name="lane_width", value_ft=value, interval_ft=iv, method="AI_MARKS", mpp=0.3, pixel_error_px=3.0, inputs=("x",), calculation="c")
-    return SiteFact(field="lane_width_ft", registry_id="lane_width_ft", value=value, unit="ft", source="AI_MARKS", status="RESOLVED", interval=iv, measured=m)
+    return SiteFact(field="lane_width_ft", registry_id="lane_width_ft", value=value, unit="ft", source="AI_MARKS", outcome="FOUND", interval=iv, measured=m)
 
 
 # ---------------------------------------------------------------- shadow vehicle: the decision table, row by row

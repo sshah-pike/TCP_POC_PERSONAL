@@ -167,7 +167,7 @@ def length_fact(field, m, reason, pack, context=None):
     """(SiteFact, Question or None). RESOLVED with its interval when no pack limit lies inside it; UNKNOWN with a fixed
     reason otherwise."""
     if m is None:
-        return SiteFact(field=field, registry_id=field, unit="ft", source="CODE", status="UNKNOWN", reason_code=reason), None
+        return SiteFact(field=field, registry_id=field, unit="ft", source="CODE", outcome="UNKNOWN", reason_code=reason), None
     base = dict(field=field, registry_id=field, unit="ft", source=m.method, interval=m.interval_ft, measured=m, flags=m.flags)
     hit = thresholds_inside(pack, field, m.interval_ft, context)
     if hit:
@@ -175,8 +175,8 @@ def length_fact(field, m, reason, pack, context=None):
                 + ", ".join(hit))
         q = Question(question_id=question_id("WIDTH_NEAR_THRESHOLD", field), kind="WIDTH_NEAR_THRESHOLD", reason=text,
                      options=(), reveals=(field,))
-        return SiteFact(**base, status="UNKNOWN", reason_code="threshold_in_interval"), q
-    return SiteFact(**base, value=m.value_ft, status="RESOLVED"), None
+        return SiteFact(**base, outcome="UNKNOWN", reason_code="threshold_in_interval"), q
+    return SiteFact(**base, value=m.value_ft, outcome="FOUND"), None
 
 
 def lane_spacing(marks, mpp_sent, cfg=None):
@@ -260,12 +260,12 @@ def measure_lengths(marks, mpp_sent, pack, *, total_lanes=None, gate=None, cross
     if lq: questions.append(lq)
     add("lane_width_ft", lane, lreason or reason)
     sw, rsw = shoulder_width(marks, mpp_sent, cfg); add("shoulder_width_ft", sw, rsw)
-    facts.append(SiteFact(field="median_width_ft", registry_id="median_width_ft", unit="ft", source="CODE", status="UNKNOWN",
+    facts.append(SiteFact(field="median_width_ft", registry_id="median_width_ft", unit="ft", source="CODE", outcome="UNKNOWN",
                           reason_code="no_source"))        # call 1 has no median mark: nothing to measure
     de, rde = distance_from_edge(marks, mpp_sent, cfg)
     if de is not None and de.value_ft < 0:                 # between the road edges: work_location decides, not this distance
         measured[de.name] = de
         facts.append(SiteFact(field="distance_from_edge_ft", registry_id="distance_from_edge_ft", unit="ft", source="AI_MARKS",
-                              status="UNKNOWN", reason_code="ambiguous", measured=de, flags=de.flags))
+                              outcome="UNKNOWN", reason_code="ambiguous", measured=de, flags=de.flags))
     else: add("distance_from_edge_ft", de, rde)
     return MeasureResult(tuple(facts), tuple(questions), measured)

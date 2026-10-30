@@ -15,6 +15,7 @@ from typing import NamedTuple, Optional
 from pydantic import BaseModel, ConfigDict
 
 from tcp_planner.site_model.facts import Candidate, SCHEMA_VERSION
+from tcp_planner.site_model.outcomes import FOUND, NOT_PRESENT, UNKNOWN, outcome_for
 from tcp_planner.site_model.start_fields import START_FIELDS
 
 HIGH, MEDIUM, LOW = "HIGH", "MEDIUM", "LOW"
@@ -40,6 +41,31 @@ class FusionRecord(BaseModel):
     note: str = ""
 
 
+class SourceReading(NamedTuple):
+    """What one data source said about a field, with its outcome (site_model/outcomes.py): FOUND carries the value, NOT_PRESENT
+    means the source checked and nothing is there (value False or NONE), UNKNOWN means it could not decide (no tag, source failed)."""
+    source: str
+    outcome: str
+    value: Optional[object] = None
+
+    @staticmethod
+    def found(source, value): return SourceReading(source, FOUND, value)
+
+    @staticmethod
+    def not_present(source, value=False): return SourceReading(source, NOT_PRESENT, value)
+
+    @staticmethod
+    def unknown(source): return SourceReading(source, UNKNOWN, None)
+
+
+def _pair(c, field):
+    """(source_id, value, outcome) from a (source_id, value) pair or a SourceReading. UNKNOWN has no value."""
+    if isinstance(c, SourceReading):
+        return c.source, (None if c.outcome == UNKNOWN else c.value), c.outcome
+    sid, v = c
+    return sid, v, outcome_for(field, v)
+
+
 def compare(field, ai_value, source_candidates, same=None):
     """FusionRecord for the AI reading against data-source candidates (each a (source_id, value) pair; value None = the source
     cannot decide, for example an odd OSM lane total that cannot be split between directions).
@@ -50,11 +76,12 @@ def compare(field, ai_value, source_candidates, same=None):
     `same(ai, source)` overrides equality. Refuses a mandatory start field: no data source fills one (D-59)."""
     if field in START_FIELDS: raise ValueError(f"{field} is a mandatory start field: no data source may supply it")
     same = same or (lambda a, b: a == b)
-    cands = [Candidate(source="AI", value=ai_value, confidence_class=None)]
-    decided = [(sid, v) for sid, v in source_candidates if v is not None]
-    for sid, v in source_candidates:
+    readings = [_pair(c, field) for c in source_candidates]
+    cands = [Candidate(source="AI", value=ai_value, confidence_class=None, outcome=outcome_for(field, ai_value))]
+    decided = [(sid, v) for sid, v, _ in readings if v is not None]
+    for sid, v, oc in readings:
         agree = None if v is None or ai_value is None else same(ai_value, v)
-        cands.append(Candidate(source=sid, value=v, confidence_class=confidence_class(sid, agree)))
+        cands.append(Candidate(source=sid, value=v, confidence_class=confidence_class(sid, agree), outcome=oc))
     if not source_candidates: return FusionRecord(field=field, candidates=tuple(cands), agreement=SINGLE_SOURCE, note="only the imagery reading exists")
     if not decided: return FusionRecord(field=field, candidates=tuple(cands), agreement=UNDECIDABLE, note="no source could decide the value")
     if ai_value is None: return FusionRecord(field=field, candidates=tuple(cands), agreement=UNDECIDABLE, note="the imagery reading is unknown")

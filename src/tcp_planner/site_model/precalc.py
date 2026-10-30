@@ -28,7 +28,7 @@ def context_values(*fact_groups):
 
 
 def _unknown(field, reason, flags=(), unit=None, evidence=""):
-    return SiteFact(field=field, registry_id=field, unit=unit, source="CODE", status="UNKNOWN", reason_code=reason, flags=tuple(flags),
+    return SiteFact(field=field, registry_id=field, unit=unit, source="CODE", outcome="UNKNOWN", reason_code=reason, flags=tuple(flags),
                     evidence=evidence)
 
 
@@ -38,11 +38,11 @@ def work_vehicle_width(measured_ft=None, use_default=True, cfg=None):
     The default is optional: use_default=False leaves the fact UNKNOWN (no_source)."""
     if measured_ft is not None:
         return SiteFact(field="work_vehicle_width_ft", registry_id="work_vehicle_width_ft", value=float(measured_ft), unit="ft",
-                        source="GEOMETRY", status="RESOLVED")
+                        source="GEOMETRY", outcome="FOUND")
     inches, flags, optional = default_setting("work_vehicle_width_in", cfg)
     if not use_default or inches is None: return _unknown("work_vehicle_width_ft", "no_source", unit="ft")
     return SiteFact(field="work_vehicle_width_ft", registry_id="work_vehicle_width_ft", value=inches / IN_PER_FT, unit="ft",
-                    source="DEFAULT", status="RESOLVED", flags=flags,
+                    source="DEFAULT", outcome="FOUND", flags=flags,
                     evidence="default width from config (23 CFR 658.15); no vehicle measured")
 
 
@@ -53,7 +53,7 @@ def _depth_fact(value, source, flags, inputs, calc):
     m = MeasuredLength(name="encroachment_depth", value_ft=value, interval_ft=Interval(lo=value, hi=value, unit="ft"), method="GEOMETRY",
                        mpp=0.0, pixel_error_px=0.0, inputs=tuple(inputs), calculation=calc, flags=tuple(flags))
     return SiteFact(field="encroachment_depth_ft", registry_id="encroachment_depth_ft", value=value, unit="ft", source=source,
-                    status="RESOLVED", interval=m.interval_ft, measured=m, flags=tuple(flags), evidence=calc)
+                    outcome="FOUND", interval=m.interval_ft, measured=m, flags=tuple(flags), evidence=calc)
 
 
 def encroachment_depth(work_space_depth_ft=None, clearance_ft=None, vehicle=None, include_vehicle=False, sme_override_ft=None):
@@ -176,7 +176,7 @@ def remaining_width_decision(pack, fact, context=None):
 def freeway(road_type):
     """freeway flag from the SME's road_type (read, never changed)."""
     if road_type is None: return _unknown("freeway", "missing")
-    return SiteFact(field="freeway", registry_id="freeway", value=road_type == EXPRESSWAY, source="CODE", status="RESOLVED")
+    return SiteFact(field="freeway", registry_id="freeway", value=road_type == EXPRESSWAY, source="CODE", outcome="FOUND")
 
 
 # What the input `layout_omits` means per TA. The two notes are the same fact (a lit vehicle replaces what the layout drops), but
@@ -208,14 +208,14 @@ def shadow_vehicle(pack, ta_id, context, layout_omits):
                                               and the allowed durations; never True or False."""
     if layout_omits is None: return _unknown("shadow_vehicle_present", "missing"), None
     if layout_omits is False:
-        return SiteFact(field="shadow_vehicle_present", registry_id="shadow_vehicle_present", value=False, source="CODE", status="RESOLVED",
+        return SiteFact(field="shadow_vehicle_present", registry_id="shadow_vehicle_present", value=False, source="CODE", outcome="FOUND",
                         evidence="optional and off by default" + (" (TA-6 note 8)" if ta_id == "TA-6" else "")), None
     rules = shadow_rules(pack, ta_id)
     res = [(r, eval_expr(r.condition, dict(context or {}))) for r in rules]
     ok = [r for r, v in res if v is True]
     if ok:
         r = ok[0]
-        return SiteFact(field="shadow_vehicle_present", registry_id="shadow_vehicle_present", value=True, source="CODE", status="RESOLVED",
+        return SiteFact(field="shadow_vehicle_present", registry_id="shadow_vehicle_present", value=True, source="CODE", outcome="FOUND",
                         evidence=f"required: {r.id}: \"{_quote(pack, r)}\"; {OMISSION_MEANING.get(ta_id, 'the layout omits what the note allows')}"), None
     if any(v is None for _, v in res): return _unknown("shadow_vehicle_present", "missing"), None
     if rules:
@@ -236,7 +236,7 @@ def tma_suggestion(pack, posted_speed_mph):
     rule = tma_rule(pack)
     if rule is None: return _unknown("tma_present", "no_source", ("SOURCE_REVIEW_REQUIRED",))
     if posted_speed_mph is None: return _unknown("tma_present", "missing")
-    return SiteFact(field="tma_present", registry_id="tma_present", value=posted_speed_mph >= rule.value, source="CODE", status="RESOLVED",
+    return SiteFact(field="tma_present", registry_id="tma_present", value=posted_speed_mph >= rule.value, source="CODE", outcome="FOUND",
                     flags=("POLICY_SUGGESTED",), evidence=f"suggested by {rule.id}; always optional (the SME can override)")
 
 
@@ -248,9 +248,9 @@ def arrow_board(pack, context):
     ctx = dict(context or {})
     req = eval_expr(rule.condition, ctx) if rule else None
     if req is True:
-        return SiteFact(field="arrow_board_present", registry_id="arrow_board_present", value=True, source="CODE", status="RESOLVED",
+        return SiteFact(field="arrow_board_present", registry_id="arrow_board_present", value=True, source="CODE", outcome="FOUND",
                         evidence=f"REQUIRED by {rule.id}: one per closed lane, count not known")
     if req is None: return _unknown("arrow_board_present", "missing")
     wanted = ctx.get("arrow_board_wanted") is True
-    return SiteFact(field="arrow_board_present", registry_id="arrow_board_present", value=wanted, source="CODE", status="RESOLVED",
+    return SiteFact(field="arrow_board_present", registry_id="arrow_board_present", value=wanted, source="CODE", outcome="FOUND",
                     evidence="OPTIONAL_WANTED" if wanted else "OPTIONAL_NOT_WANTED (not asked or not wanted)")

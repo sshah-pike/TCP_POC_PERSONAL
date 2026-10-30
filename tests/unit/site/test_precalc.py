@@ -21,7 +21,7 @@ def lane(value, half=0.0):
     iv = Interval(lo=value - half, hi=value + half, unit="ft")
     m = MeasuredLength(name="lane_width", value_ft=value, interval_ft=iv, method="AI_MARKS", mpp=0.3, pixel_error_px=3.0, inputs=("x",), calculation="c",
                        flags=("CALIBRATION_PENDING",))
-    return SiteFact(field="lane_width_ft", registry_id="lane_width_ft", value=value, unit="ft", source="AI_MARKS", status="RESOLVED",
+    return SiteFact(field="lane_width_ft", registry_id="lane_width_ft", value=value, unit="ft", source="AI_MARKS", outcome="FOUND",
                     interval=iv, measured=m, flags=("CALIBRATION_PENDING",))
 
 
@@ -95,7 +95,7 @@ def test_remaining_width_is_lane_minus_depth_with_the_shifted_interval(pack):
 
 
 def test_remaining_width_is_unknown_without_lane_or_depth(pack):
-    unk = SiteFact(field="lane_width_ft", registry_id="lane_width_ft", unit="ft", source="CODE", status="UNKNOWN", reason_code="ambiguous")
+    unk = SiteFact(field="lane_width_ft", registry_id="lane_width_ft", unit="ft", source="CODE", outcome="UNKNOWN", reason_code="ambiguous")
     depth_unknown = P.encroachment_depth()[0]
     assert P.remaining_lane_width(pack, unk, P.encroachment_depth(3.0, 0.0)[0])[0].reason_code == "ambiguous"
     assert P.remaining_lane_width(pack, lane(12.0), depth_unknown)[0].reason_code == "no_source"

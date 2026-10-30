@@ -7,12 +7,14 @@ import hashlib
 from typing import Literal, Optional, Union
 from pydantic import BaseModel, ConfigDict, model_validator
 
+from tcp_planner.site_model.outcomes import FOUND, HAS_VALUE, NOT_PRESENT, OUTCOMES, UNKNOWN
+
 SCHEMA_VERSION = "1"
 Scalar = Union[bool, int, float, str]
 
 REASON_CODES = ("not_visible", "occluded", "low_resolution", "ambiguous", "source_disagreement", "threshold_in_interval",
                 "no_source", "malformed", "missing", "duplicate", "low_confidence", "no_registry_value", "ai_conflict",
-                "not_stated", "single_source", "layout_not_allowed")
+                "not_stated", "single_source", "layout_not_allowed", "source_failed", "no_tag", "check_failed")
 FLAGS = ("DEFAULT_ASSUMED", "POLICY_SUGGESTED", "CALIBRATION_PENDING", "SOURCE_REVIEW_REQUIRED", "CONTEXT_ONLY",
          "AI_ONLY_UNCONFIRMED", "NEEDS_SECOND_SOURCE", "EVIDENCE_OVER_15_WORDS", "UNIT_MISMATCH", "AI_CONFLICT", "PROPOSED")
 # flags that keep a fact out of every rule input (the value is shown to the SME only)
@@ -40,6 +42,7 @@ class Candidate(_Rec):
     source: str
     value: Optional[Scalar] = None
     confidence_class: Optional[str] = None
+    outcome: Optional[str] = None            # FOUND | NOT_PRESENT | UNKNOWN as that source reported it
     evidence_ref: Optional[str] = None
 
 
@@ -67,17 +70,24 @@ class SiteFact(_Rec):
     source: str
     evidence: str = ""                      # stored whole, never parsed for numbers (D-64)
     evidence_ref: Optional[str] = None
-    status: Literal["RESOLVED", "UNKNOWN"]
+    outcome: Literal["FOUND", "NOT_PRESENT", "UNKNOWN"]      # see site_model/outcomes.py for what each means
     reason_code: Optional[str] = None
     interval: Optional[Interval] = None
     measured: Optional[MeasuredLength] = None
     flags: tuple = ()
     candidates: tuple = ()
 
+    @property
+    def status(self):
+        """RESOLVED when the fact has a value (FOUND or NOT_PRESENT), else UNKNOWN. Read-only; `outcome` is what is stored."""
+        return "RESOLVED" if self.outcome in HAS_VALUE else "UNKNOWN"
+
     @model_validator(mode="after")
     def _consistent(self):
-        if self.status == "UNKNOWN" and self.value is not None: raise ValueError("UNKNOWN fact carries a value")
-        if self.status == "RESOLVED" and self.value is None: raise ValueError("RESOLVED fact has no value")
+        if self.outcome == UNKNOWN and self.value is not None: raise ValueError("UNKNOWN fact carries a value")
+        if self.outcome in HAS_VALUE and self.value is None: raise ValueError(f"{self.outcome} fact has no value")
+        if self.outcome == NOT_PRESENT and not (self.value is False or (isinstance(self.value, str) and self.value.upper() == "NONE")):
+            raise ValueError("NOT_PRESENT needs the value False or NONE")
         if self.reason_code is not None and self.reason_code not in REASON_CODES: raise ValueError("bad reason_code")
         if any(f not in FLAGS for f in self.flags): raise ValueError("bad flag")
         if "CONTEXT_ONLY" in self.flags and self.registry_id is not None: raise ValueError("CONTEXT_ONLY has registry_id")

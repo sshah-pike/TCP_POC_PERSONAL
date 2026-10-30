@@ -21,10 +21,10 @@ def start_facts(zone_input):
     for name in START_FIELDS:
         v = sf.get(name)
         if v is None or v == "":
-            out.append(SiteFact(field=name, registry_id=name, unit=UNITS.get(name), source=SOURCE_UI, status="UNKNOWN",
+            out.append(SiteFact(field=name, registry_id=name, unit=UNITS.get(name), source=SOURCE_UI, outcome="UNKNOWN",
                                 reason_code="missing", flags=("SOURCE_REVIEW_REQUIRED",)))
         else:
-            out.append(SiteFact(field=name, registry_id=name, unit=UNITS.get(name), value=v, source=SOURCE_UI, status="RESOLVED"))
+            out.append(SiteFact(field=name, registry_id=name, unit=UNITS.get(name), value=v, source=SOURCE_UI, outcome="FOUND"))
     return tuple(out)
 
 

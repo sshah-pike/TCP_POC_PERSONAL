@@ -32,26 +32,26 @@ def test_no_rule_input_can_read_a_context_only_fact():
 
 def test_a_fact_cannot_be_context_only_and_carry_a_registry_id():
     with pytest.raises(ValidationError):
-        SiteFact(field="x", registry_id="oneway", value=True, source="AI", status="RESOLVED", flags=("CONTEXT_ONLY",))
+        SiteFact(field="x", registry_id="oneway", value=True, source="AI", outcome="FOUND", flags=("CONTEXT_ONLY",))
 
 
 def test_rule_inputs_skips_a_fact_with_no_registry_id_even_without_the_flag():
-    f = SiteFact(field="x", value=True, source="AI", status="RESOLVED")
+    f = SiteFact(field="x", value=True, source="AI", outcome="FOUND")
     assert rule_inputs([f]) == {}
 
 
 def test_rule_inputs_returns_registry_facts_that_are_resolved_and_unblocked():
-    ok = SiteFact(field="median_work", registry_id="median_work", value=False, source="AI", status="RESOLVED")
-    blocked = SiteFact(field="oneway", registry_id="oneway", value=False, source="AI", status="RESOLVED", flags=("NEEDS_SECOND_SOURCE",))
-    unknown = SiteFact(field="shoulder_present", registry_id="shoulder_present", source="AI", status="UNKNOWN", reason_code="missing")
+    ok = SiteFact(field="median_work", registry_id="median_work", value=False, source="AI", outcome="FOUND")
+    blocked = SiteFact(field="oneway", registry_id="oneway", value=False, source="AI", outcome="FOUND", flags=("NEEDS_SECOND_SOURCE",))
+    unknown = SiteFact(field="shoulder_present", registry_id="shoulder_present", source="AI", outcome="UNKNOWN", reason_code="missing")
     assert list(rule_inputs([ok, blocked, unknown])) == ["median_work"]
 
 
 def test_fact_invariants():
-    with pytest.raises(ValidationError): SiteFact(field="x", value=1, source="AI", status="UNKNOWN")
-    with pytest.raises(ValidationError): SiteFact(field="x", source="AI", status="RESOLVED")
-    with pytest.raises(ValidationError): SiteFact(field="x", source="AI", status="UNKNOWN", reason_code="because")
-    with pytest.raises(ValidationError): SiteFact(field="x", source="AI", status="UNKNOWN", flags=("MADE_UP",))
+    with pytest.raises(ValidationError): SiteFact(field="x", value=1, source="AI", outcome="UNKNOWN")
+    with pytest.raises(ValidationError): SiteFact(field="x", source="AI", outcome="FOUND")
+    with pytest.raises(ValidationError): SiteFact(field="x", source="AI", outcome="UNKNOWN", reason_code="because")
+    with pytest.raises(ValidationError): SiteFact(field="x", source="AI", outcome="UNKNOWN", flags=("MADE_UP",))
     with pytest.raises(ValidationError): Interval(lo=2, hi=1, unit="ft")
 
 
