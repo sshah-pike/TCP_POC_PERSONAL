@@ -99,6 +99,7 @@ If code and plan disagree, **stop and report**. Do not silently follow either on
 - All reads and writes go through `ArtifactStore`, `StateStore` and `RulePackStore`. Use local adapters only, because cloud is out of the MVP.
 - Persist artifact references `{uri, sha256, size, media_type}`, never raw paths.
 - Every persisted record carries a `schema_version`.
+  - Rule pack exception (S4): `schema_version` sits on `rule_pack/pack.json` and on every part file. Rows inherit their part's version and do not repeat it.
 - Artifacts are write-once.
 
 ### Known limits of the file stores (S2, D-84)

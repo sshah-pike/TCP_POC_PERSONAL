@@ -15,6 +15,7 @@ dependencies = [
     "anthropic>=1.13",
     "ezdxf>=1.4",
     "truststore",
+    "pydantic>=2",
 ]
 
 [project.optional-dependencies]
