@@ -1,1148 +1,1620 @@
 {
- "catalog_version": "0.1",
+ "schema_version": "1",
+ "catalog_version": "0.2",
  "status": "PLACEHOLDER_ASSETS",
  "sources": [
   "MUTCD 11th Edition Chapter 6, December 2023 revision (supplied file)",
   "Client reference drafts: Colorado, E Second, Granite"
  ],
+ "placeholder_label": "PLACEHOLDER SYMBOLS - NOT CLIENT LIBRARY",
+ "catalog_hash": "5e9898940a09b7bcf4ba9f318df4a95939b38b247625d6339fc377ddc4a59fc6",
  "entries": [
   {
-   "id": "W20-1",
+   "device_id": "W20-1",
    "mutcd_code": "W20-1",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "ROAD WORK AHEAD (or XX FT)",
    "category": "warning_sign",
-   "size_in": {
-    "conventional": "36x36",
-    "freeway_expressway": "48x48",
-    "minimum": "30x30"
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6H-1, p.803-804; Sect. 6H.03",
-   "used_by_tas": [
-    "TA-1",
-    "TA-6",
-    "TA-10",
-    "TA-33"
-   ],
+   "asset": {
+    "uri": "symbols/svg/W20-1.svg",
+    "sha256": "06852d96552d693666a3632bfe37dc367ca7632f8d1e037869d9e42c4bd549c5",
+    "size": 1035,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "Colorado",
     "E Second",
     "Granite"
    ],
-   "asset": {
-    "file": "svg/W20-1.svg",
+   "raster": {
+    "uri": "symbols/png/W20-1.png",
+    "sha256": "db9173185ed76e08dfa49d316eed4e717ab3aa863ebf2b2ac1be5636e024077b",
+    "size": 10951,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "W20-4",
+   "device_id": "W20-4",
    "mutcd_code": "W20-4",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "ONE LANE ROAD AHEAD (or XX FT)",
    "category": "warning_sign",
-   "size_in": {
-    "conventional": "36x36",
-    "freeway_expressway": "48x48",
-    "minimum": "30x30"
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6H-1, p.803-804; Sect. 6H.06",
-   "used_by_tas": [
-    "TA-10"
-   ],
+   "asset": {
+    "uri": "symbols/svg/W20-4.svg",
+    "sha256": "2e060d04d17860f1dbc56e250ab02082c4687b55be7d075876510460112e33b9",
+    "size": 1030,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "Colorado",
     "Granite V"
    ],
-   "asset": {
-    "file": "svg/W20-4.svg",
+   "raster": {
+    "uri": "symbols/png/W20-4.png",
+    "sha256": "7f687807276f13a44ffe42fd7d152fea03ed4156005f5c53683b99b0ea4fd581",
+    "size": 9135,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "W20-5R",
+   "device_id": "W20-5R",
    "mutcd_code": "W20-5R",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "RIGHT LANE CLOSED AHEAD",
    "category": "warning_sign",
-   "size_in": {
-    "conventional": "36x36",
-    "freeway_expressway": "48x48",
-    "minimum": "30x30"
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6H-1, p.803-804 (W20-5,5a); Sect. 6H.07",
-   "used_by_tas": [
-    "TA-33"
-   ],
+   "asset": {
+    "uri": "symbols/svg/W20-5R.svg",
+    "sha256": "3527979202341c9caef9e3bc71978e5ceff444d316f7c020ee446cfd9fe70f69",
+    "size": 1051,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "Granite"
    ],
-   "asset": {
-    "file": "svg/W20-5R.svg",
+   "raster": {
+    "uri": "symbols/png/W20-5R.png",
+    "sha256": "0848cf0857d58542fde9532b9074c4c1f10f81f9b131bcee570071e9412b6fae",
+    "size": 8828,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "W20-5L",
+   "device_id": "W20-5L",
    "mutcd_code": "W20-5L",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "LEFT LANE CLOSED AHEAD",
    "category": "warning_sign",
-   "size_in": {
-    "conventional": "36x36",
-    "freeway_expressway": "48x48",
-    "minimum": "30x30"
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6H-1, p.803-804 (W20-5,5a); Sect. 6H.07",
-   "used_by_tas": [
-    "TA-33"
-   ],
-   "observed_in_drafts": [],
    "asset": {
-    "file": "svg/W20-5L.svg",
+    "uri": "symbols/svg/W20-5L.svg",
+    "sha256": "bd3313575cd5349d151401e1407b37f868e7a644861e11c9551cbeddafdddefd",
+    "size": 1036,
+    "media_type": "image/svg+xml",
     "status": "PLACEHOLDER_ASSET"
    },
-   "code_status": "MUTCD",
    "notes": "TA-33 note 1: used when the median-side lane is closed",
-   "version": "0.1"
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/W20-5L.png",
+    "sha256": "1996723c2b26edf36ca9a1497df31a79d4713ed4557e593c60bc20a5b7a250fa",
+    "size": 9150,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
-   "id": "W20-7",
+   "device_id": "W20-7",
    "mutcd_code": "W20-7",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "Flagger (symbol)",
    "category": "warning_sign",
-   "size_in": {
-    "conventional": "36x36",
-    "freeway_expressway": "48x48",
-    "minimum": "30x30"
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6H-1, p.803-804; Sect. 6H.15",
-   "used_by_tas": [
-    "TA-10"
-   ],
-   "observed_in_drafts": [],
    "asset": {
-    "file": "svg/W20-7.svg",
+    "uri": "symbols/svg/W20-7.svg",
+    "sha256": "c7359024394aef15bacfbbfe7fc769cc977b94a517141934aa0fd43b947c073a",
+    "size": 1005,
+    "media_type": "image/svg+xml",
     "status": "PLACEHOLDER_ASSET"
    },
-   "code_status": "MUTCD",
    "notes": "Glyph simplified",
-   "version": "0.1"
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/W20-7.png",
+    "sha256": "96630ee8349f508519279454ae98b362ea4fd72bc46879f7e01ce9f6a73e3a94",
+    "size": 7465,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
-   "id": "W21-5",
+   "device_id": "W21-5",
    "mutcd_code": "W21-5",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "SHOULDER WORK",
    "category": "warning_sign",
-   "size_in": {
-    "conventional": "36x36",
-    "freeway_expressway": "48x48",
-    "minimum": "30x30"
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6H-1, p.803-804; Sect. 6H.22",
-   "used_by_tas": [
-    "TA-1",
-    "TA-6"
-   ],
+   "asset": {
+    "uri": "symbols/svg/W21-5.svg",
+    "sha256": "90c67417e44c0f96b2b0c4c76779aed21d5229472a1ce287ed774b74875f085b",
+    "size": 1030,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "TA-1 note 2 allows it in place of W20-1. Drafts print SHOULDER WORK AHEAD",
    "observed_in_drafts": [
     "E Second"
    ],
-   "asset": {
-    "file": "svg/W21-5.svg",
+   "raster": {
+    "uri": "symbols/png/W21-5.png",
+    "sha256": "539a8e9a4115798fd1babbcf119e075ab5aaf0ce2139ef2d17ac95abb10ae051",
+    "size": 10153,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "TA-1 note 2 allows it in place of W20-1. Drafts print SHOULDER WORK AHEAD",
-   "version": "0.1"
+   }
   },
   {
-   "id": "W21-5a",
+   "device_id": "W21-5a",
    "mutcd_code": "W21-5a",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "SHOULDER CLOSED",
    "category": "warning_sign",
-   "size_in": {
-    "conventional": "36x36",
-    "freeway_expressway": "48x48",
-    "minimum": "30x30"
-   },
+   "size_source": "NOT_IN_MVP_PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6H-1, p.803-804; Sect. 6H.22",
-   "used_by_tas": [
-    "TA-6"
-   ],
-   "observed_in_drafts": [],
    "asset": {
-    "file": "svg/W21-5a.svg",
+    "uri": "symbols/svg/W21-5a.svg",
+    "sha256": "50c88bac618da41c216e4cb9e03562759a60a42f93d2fffc46bcb83a86d7dcb5",
+    "size": 852,
+    "media_type": "image/svg+xml",
     "status": "PLACEHOLDER_ASSET"
    },
-   "code_status": "MUTCD",
    "notes": "",
-   "version": "0.1"
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/W21-5a.png",
+    "sha256": "3b2948bc2b0193a15b040449e5b9720bcd323f7fca7618006f178df12eb98ae7",
+    "size": 8585,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
-   "id": "W5-1",
+   "device_id": "W5-1",
    "mutcd_code": "W5-1",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "ROAD NARROWS",
    "category": "warning_sign",
-   "size_in": {
-    "conventional": "36x36",
-    "freeway_expressway": "48x48",
-    "minimum": "30x30"
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6H-1, p.803-804; Sect. 6H.01",
-   "used_by_tas": [
-    "TA-6"
-   ],
+   "asset": {
+    "uri": "symbols/svg/W5-1.svg",
+    "sha256": "bdeddac194c9fcdd33fa869f24ab56884032f0f879a2c5b5c9bef81dc2ad754b",
+    "size": 846,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "TA-6 note 6 option",
    "observed_in_drafts": [
     "E Second"
    ],
-   "asset": {
-    "file": "svg/W5-1.svg",
+   "raster": {
+    "uri": "symbols/png/W5-1.png",
+    "sha256": "0ef71948b72961fa5368429f6afb0198d8d91ffcd842fdc792aeddbecde570e9",
+    "size": 8976,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "TA-6 note 6 option",
-   "version": "0.1"
+   }
   },
   {
-   "id": "W4-2R",
+   "device_id": "W4-2R",
    "mutcd_code": "W4-2R",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "Lane Ends (right lane)",
    "category": "warning_sign",
-   "size_in": {
-    "conventional": "36x36",
-    "freeway_expressway": "48x48",
-    "minimum": "30x30"
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6H-1, p.803-804; Sect. 6H.08",
-   "used_by_tas": [
-    "TA-33"
-   ],
+   "asset": {
+    "uri": "symbols/svg/W4-2R.svg",
+    "sha256": "f660d8b7694464dbfa6ae17912ae0ccf0331b947d618dc9bcf00a5748d16adb1",
+    "size": 752,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Glyph simplified",
    "observed_in_drafts": [
     "Granite"
    ],
-   "asset": {
-    "file": "svg/W4-2R.svg",
+   "raster": {
+    "uri": "symbols/png/W4-2R.png",
+    "sha256": "7bab8a4b27f14e4b12d7ec888aca9a2db19765129b502d2c582fdb6d17ba8fb2",
+    "size": 6225,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "Glyph simplified",
-   "version": "0.1"
+   }
   },
   {
-   "id": "W4-2L",
+   "device_id": "W4-2L",
    "mutcd_code": "W4-2L",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "Lane Ends (left lane)",
    "category": "warning_sign",
-   "size_in": {
-    "conventional": "36x36",
-    "freeway_expressway": "48x48",
-    "minimum": "30x30"
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6H-1, p.803-804; Sect. 6H.08",
-   "used_by_tas": [
-    "TA-33"
-   ],
-   "observed_in_drafts": [],
    "asset": {
-    "file": "svg/W4-2L.svg",
+    "uri": "symbols/svg/W4-2L.svg",
+    "sha256": "d61a7d5481388b294abb48498cdb5bb281b8cc0b18e51560116a1cadb1237660",
+    "size": 751,
+    "media_type": "image/svg+xml",
     "status": "PLACEHOLDER_ASSET"
    },
-   "code_status": "MUTCD",
    "notes": "Glyph simplified",
-   "version": "0.1"
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/W4-2L.png",
+    "sha256": "ccaa9e118956a5d23fbe2bc9386a25f4e13bb570969c6a1e813a2af6919b25dd",
+    "size": 6229,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
-   "id": "W9-2L",
+   "device_id": "W9-2L",
    "mutcd_code": "W9-2L",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "LANE ENDS MERGE LEFT",
    "category": "warning_sign",
-   "size_in": {
-    "conventional": "36x36",
-    "freeway_expressway": "48x48",
-    "minimum": "30x30"
-   },
+   "size_source": "NOT_IN_MVP_PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6H-1, p.803-804 (W9-1,2)",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/W9-2L.svg",
+    "sha256": "abd80a490ed7c00614899a74f8d6aa70f66d0adc597b778b5593e9d55f52da7d",
+    "size": 1032,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "Granite II"
    ],
-   "asset": {
-    "file": "svg/W9-2L.svg",
+   "raster": {
+    "uri": "symbols/png/W9-2L.png",
+    "sha256": "9b7b181df5e2f2ba3da6f53c67e2a842d91795552c45c59c278482bcbb5428c5",
+    "size": 7974,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "W3-4",
+   "device_id": "W3-4",
    "mutcd_code": "W3-4",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "BE PREPARED TO STOP",
    "category": "warning_sign",
-   "size_in": {
-    "conventional": "36x36",
-    "freeway_expressway": "48x48",
-    "minimum": "30x30"
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6H-1, p.803-804; Sect. 6H.01",
-   "used_by_tas": [
-    "TA-10"
-   ],
-   "observed_in_drafts": [],
    "asset": {
-    "file": "svg/W3-4.svg",
+    "uri": "symbols/svg/W3-4.svg",
+    "sha256": "d9c89233ef25810b0ac0eaf2edf51119e55dacee6da15473ad85f487e1f5d1c2",
+    "size": 1030,
+    "media_type": "image/svg+xml",
     "status": "PLACEHOLDER_ASSET"
    },
-   "code_status": "MUTCD",
    "notes": "TA-10 note 4 option",
-   "version": "0.1"
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/W3-4.png",
+    "sha256": "6379f2b95efbc011c49f830eb52ed99f7dd776210893ca9cc4787b09cde8c351",
+    "size": 8634,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
-   "id": "W16-2P",
+   "device_id": "W16-2P",
    "mutcd_code": "W16-2P",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "XX FEET (plaque)",
    "category": "warning_plaque",
-   "size_in": {
-    "conventional": "24x18",
-    "freeway_expressway": "30x24",
-    "minimum": null
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6H-1, p.803-804",
-   "used_by_tas": [
-    "TA-10"
-   ],
-   "observed_in_drafts": [],
    "asset": {
-    "file": "svg/W16-2P.svg",
+    "uri": "symbols/svg/W16-2P.svg",
+    "sha256": "fb457de3b2aae8942243a75e897e61d095ba3910b512c8b7bf0b41428ba02369",
+    "size": 846,
+    "media_type": "image/svg+xml",
     "status": "PLACEHOLDER_ASSET"
    },
-   "code_status": "MUTCD",
    "notes": "Optional below W20-7",
-   "version": "0.1"
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/W16-2P.png",
+    "sha256": "edfa6380e066e1ed37c3e2069042412aa265db34754945f5f5505329eee73b4e",
+    "size": 4825,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
-   "id": "CLIENT-POLICE-OFFICER-AHEAD",
+   "device_id": "CLIENT-POLICE-OFFICER-AHEAD",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "CLIENT_CODE",
    "name": "POLICE OFFICER AHEAD (printed as W20-8 on the drafts)",
    "category": "warning_sign",
-   "size_in": "SOURCE_REVIEW_REQUIRED",
+   "size_source": "SOURCE_REVIEW_REQUIRED",
+   "size_text": "",
    "source": "Client drafts (Colorado); not in MUTCD Ch.6",
-   "used_by_tas": [
-    "TA-10 (police variant)"
-   ],
+   "asset": {
+    "uri": "symbols/svg/CLIENT-POLICE-OFFICER-AHEAD.svg",
+    "sha256": "1318b6d702df6ab0ddb71afdb7301af924d583b5d1eec993b7260f6b2f6aa77b",
+    "size": 1032,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "In MUTCD 11th Ed. W20-8 is the SLOW face of the STOP/SLOW paddle (Table 6H-1). The client uses W20-8 for this sign. Confirm code with the client/MassDOT",
    "observed_in_drafts": [
     "Colorado"
    ],
-   "asset": {
-    "file": "svg/CLIENT-POLICE-OFFICER-AHEAD.svg",
+   "raster": {
+    "uri": "symbols/png/CLIENT-POLICE-OFFICER-AHEAD.png",
+    "sha256": "cb2e9590db6be9a5edd39112a125cba057c7d12fd8a85bcbeb504472e065631e",
+    "size": 9099,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "CLIENT_CODE",
-   "notes": "In MUTCD 11th Ed. W20-8 is the SLOW face of the STOP/SLOW paddle (Table 6H-1). The client uses W20-8 for this sign. Confirm code with the client/MassDOT",
-   "version": "0.1"
+   }
   },
   {
-   "id": "G20-2",
+   "device_id": "G20-2",
    "mutcd_code": "G20-2",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "END ROAD WORK",
    "category": "guide_sign",
-   "size_in": {
-    "conventional": "36x18",
-    "freeway_expressway": "48x24",
-    "minimum": null
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6H-1, p.803-804; Sect. 6H.36",
-   "used_by_tas": [
-    "TA-1",
-    "TA-6",
-    "TA-10",
-    "TA-33"
-   ],
+   "asset": {
+    "uri": "symbols/svg/G20-2.svg",
+    "sha256": "5a10fce55d2987aed2f6fd5b406720971ba5ff011f0a8f67a1da7999770e5ad5",
+    "size": 858,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "Colorado",
     "E Second",
     "Granite"
    ],
-   "asset": {
-    "file": "svg/G20-2.svg",
+   "raster": {
+    "uri": "symbols/png/G20-2.png",
+    "sha256": "807283c0cc082c60527f618e7e96869e944d54699f98257a7f0f9ffca5a0adfc",
+    "size": 10678,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "M4-8a",
+   "device_id": "M4-8a",
    "mutcd_code": "M4-8a",
+   "printed_as": [
+    {
+     "code": "M4-A8",
+     "status": "PROPOSED"
+    }
+   ],
+   "code_status": "MUTCD",
    "name": "END DETOUR",
    "category": "guide_sign",
-   "size_in": {
-    "conventional": "24x18",
-    "freeway_expressway": "24x18",
-    "minimum": null
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6I-1; Sect. 6I.02",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/M4-8a.svg",
+    "sha256": "ec4f7138ee1bd439a9b6a25ce2efebca8c4cd8a0db467e22688b1b38f55e59fa",
+    "size": 852,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Drafts print M4-A8; likely M4-8a. Confirm",
    "observed_in_drafts": [
     "Granite V (printed M4-A8)"
    ],
-   "asset": {
-    "file": "svg/M4-8a.svg",
+   "raster": {
+    "uri": "symbols/png/M4-8a.png",
+    "sha256": "1402839864fdbe8f22ecfecdffc0003121965b0ba1d70f84d6eb4633cda946be",
+    "size": 7746,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "Drafts print M4-A8; likely M4-8a. Confirm",
-   "version": "0.1"
+   }
   },
   {
-   "id": "M4-9L",
+   "device_id": "M4-9L",
    "mutcd_code": "M4-9L",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "DETOUR with left arrow",
    "category": "guide_sign",
-   "size_in": {
-    "conventional": "30x24",
-    "freeway_expressway": "48x36",
-    "minimum": null
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6I-1; Sect. 6I.02",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/M4-9L.svg",
+    "sha256": "68b162cf10b525ab4cf7db3bed816c624cb2bb7a3df9b9151d04ba2d0468a7cd",
+    "size": 796,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "Granite V"
    ],
-   "asset": {
-    "file": "svg/M4-9L.svg",
+   "raster": {
+    "uri": "symbols/png/M4-9L.png",
+    "sha256": "d4983b5d0de674186e1a31b19cd6e79ad2451a8a75c001223bff27a1c3bbbcc4",
+    "size": 7946,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "M4-9R",
+   "device_id": "M4-9R",
    "mutcd_code": "M4-9R",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "DETOUR with right arrow",
    "category": "guide_sign",
-   "size_in": {
-    "conventional": "30x24",
-    "freeway_expressway": "48x36",
-    "minimum": null
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6I-1; Sect. 6I.02",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/M4-9R.svg",
+    "sha256": "ed55b739426e3d4bca14e436323f5a43e12e3ea65047f41c10cae33ca8f4dfd6",
+    "size": 799,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "Granite V"
    ],
-   "asset": {
-    "file": "svg/M4-9R.svg",
+   "raster": {
+    "uri": "symbols/png/M4-9R.png",
+    "sha256": "51c7667dd090b51f0230928eedb49f05c97861df3e04597898783fa70f27b86e",
+    "size": 7956,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "M4-9AL",
+   "device_id": "M4-9a-L",
+   "mutcd_code": "M4-9a-L",
+   "printed_as": [],
+   "code_status": "MUTCD",
+   "name": "Bike/Pedestrian Detour, left arrow",
+   "category": "guide_sign",
+   "size_source": "PACK",
+   "size_text": "",
+   "source": "MUTCD 11th Ed. (Dec 2023) Table 6I-1, p.811; Sect. 6I.02",
+   "asset": {
+    "uri": "symbols/svg/M4-9a-L.svg",
+    "sha256": "3d36127a5c9c88198606319fa7034965f07fe9d0d08a88f90a263ad983c72b20",
+    "size": 1067,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Sect. 6I.02 para 11 (Standard): the sign shall have an arrow; para 12: on the face or on a supplemental plaque. Placeholder shows the legend only.",
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/M4-9a-L.png",
+    "sha256": "8a2e382da15e6d5d2529a83768fde2584be9f63d594f91ed8973d9694edfa6ee",
+    "size": 18561,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
+  },
+  {
+   "device_id": "M4-9a-R",
+   "mutcd_code": "M4-9a-R",
+   "printed_as": [],
+   "code_status": "MUTCD",
+   "name": "Bike/Pedestrian Detour, right arrow",
+   "category": "guide_sign",
+   "size_source": "PACK",
+   "size_text": "",
+   "source": "MUTCD 11th Ed. (Dec 2023) Table 6I-1, p.811; Sect. 6I.02",
+   "asset": {
+    "uri": "symbols/svg/M4-9a-R.svg",
+    "sha256": "83edda3901c4ebc879d4c6dfc07269aa289ea6072b1a68c1839eee7a7184adbb",
+    "size": 1068,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Sect. 6I.02 para 11 (Standard): the sign shall have an arrow; para 12: on the face or on a supplemental plaque. Placeholder shows the legend only.",
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/M4-9a-R.png",
+    "sha256": "9f301082884fd5f856fff50d50ab68adcb7c3b030ef91bcc99fd313dc3c2a7e0",
+    "size": 19207,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
+  },
+  {
+   "device_id": "M4-9b",
+   "mutcd_code": "M4-9b",
+   "printed_as": [],
+   "code_status": "MUTCD",
+   "name": "Pedestrian Detour",
+   "category": "guide_sign",
+   "size_source": "PACK",
+   "size_text": "",
+   "source": "MUTCD 11th Ed. (Dec 2023) Table 6I-1, p.811; Sect. 6I.02",
+   "asset": {
+    "uri": "symbols/svg/M4-9b.svg",
+    "sha256": "dd7d85a272ae9b2d19290abfc26b8bfb1a8f9979fad012c8a1e64a5c422fa611",
+    "size": 1044,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Sect. 6I.02 para 13 (Option). No arrow is stated for this sign.",
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/M4-9b.png",
+    "sha256": "126e2b323386a6c249cdd95ba65a77d9f3cc4a1be962b1f5c5bcc6cf84844380",
+    "size": 15423,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
+  },
+  {
+   "device_id": "M4-9c-L",
+   "mutcd_code": "M4-9c-L",
+   "printed_as": [],
+   "code_status": "MUTCD",
+   "name": "Bike Detour (with arrow), left arrow",
+   "category": "guide_sign",
+   "size_source": "PACK",
+   "size_text": "",
+   "source": "MUTCD 11th Ed. (Dec 2023) Table 6I-1, p.811; Sect. 6I.02",
+   "asset": {
+    "uri": "symbols/svg/M4-9c-L.svg",
+    "sha256": "6a8243abfe015cae2383c76450aaee01fa1ba24e9d48d1b88a375ebeefad5bcd",
+    "size": 1058,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Table 6I-1 names this sign \"with arrow\". Placeholder shows the legend only.",
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/M4-9c-L.png",
+    "sha256": "c4533e767f4e450e5e8d5471f43d18614cf38b833e390c7a331d2299998e2e53",
+    "size": 14328,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
+  },
+  {
+   "device_id": "M4-9c-R",
+   "mutcd_code": "M4-9c-R",
+   "printed_as": [],
+   "code_status": "MUTCD",
+   "name": "Bike Detour (with arrow), right arrow",
+   "category": "guide_sign",
+   "size_source": "PACK",
+   "size_text": "",
+   "source": "MUTCD 11th Ed. (Dec 2023) Table 6I-1, p.811; Sect. 6I.02",
+   "asset": {
+    "uri": "symbols/svg/M4-9c-R.svg",
+    "sha256": "a0e34100feaab8cdc5ce28ffc2a5011249f84a3df05c1512c5e2ad55b516b17c",
+    "size": 1059,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Table 6I-1 names this sign \"with arrow\". Placeholder shows the legend only.",
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/M4-9c-R.png",
+    "sha256": "bf84a362dfc0069456c8779796c64d2f609a889be382d15da667c42fab921e52",
+    "size": 14977,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
+  },
+  {
+   "device_id": "M4-9AL",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "CLIENT_CODE",
    "name": "DETOUR (variant printed M4-9AL)",
    "category": "guide_sign",
-   "size_in": "SOURCE_REVIEW_REQUIRED",
+   "size_source": "SOURCE_REVIEW_REQUIRED",
+   "size_text": "",
    "source": "Client drafts; code not in Table 6I-1",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/M4-9AL.svg",
+    "sha256": "68b162cf10b525ab4cf7db3bed816c624cb2bb7a3df9b9151d04ba2d0468a7cd",
+    "size": 796,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Confirm meaning (angled arrow?)",
    "observed_in_drafts": [
     "Granite V"
    ],
-   "asset": {
-    "file": "svg/M4-9AL.svg",
+   "raster": {
+    "uri": "symbols/png/M4-9AL.png",
+    "sha256": "d4983b5d0de674186e1a31b19cd6e79ad2451a8a75c001223bff27a1c3bbbcc4",
+    "size": 7946,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "CLIENT_CODE",
-   "notes": "Confirm meaning (angled arrow?)",
-   "version": "0.1"
+   }
   },
   {
-   "id": "R8-3",
+   "device_id": "R8-3",
    "mutcd_code": "R8-3",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "No Parking (symbol)",
    "category": "regulatory_sign",
-   "size_in": {
-    "conventional": "24x24",
-    "freeway_expressway": "36x36",
-    "minimum": null
-   },
+   "size_source": "NOT_IN_MVP_PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6G-1, p.796",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/R8-3.svg",
+    "sha256": "88bb18b92eabe4238b3cd03ca89b05c489276d236701e2ab54c2f08f61650b3d",
+    "size": 732,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Drafts add a TEMPORARY NO PARKING legend; plaque size SOURCE_REVIEW_REQUIRED",
    "observed_in_drafts": [
     "Colorado",
     "E Second"
    ],
-   "asset": {
-    "file": "svg/R8-3.svg",
+   "raster": {
+    "uri": "symbols/png/R8-3.png",
+    "sha256": "3c59c3a485111dd989c11a0f69e9908fba967b7b5d6afadecd221289d23992b6",
+    "size": 18555,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "Drafts add a TEMPORARY NO PARKING legend; plaque size SOURCE_REVIEW_REQUIRED",
-   "version": "0.1"
+   }
   },
   {
-   "id": "R9-9",
+   "device_id": "R9-9",
    "mutcd_code": "R9-9",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "SIDEWALK CLOSED",
    "category": "regulatory_sign",
-   "size_in": {
-    "conventional": "24x12",
-    "freeway_expressway": null,
-    "minimum": null
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6G-1, p.796; Sect. 6G.10",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/R9-9.svg",
+    "sha256": "6a1c5fb5b05d9d669ac8dcf331fc6e132e04249791ba0a186f364811c6da7a9c",
+    "size": 875,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "E Second II",
     "Granite"
    ],
-   "asset": {
-    "file": "svg/R9-9.svg",
+   "raster": {
+    "uri": "symbols/png/R9-9.png",
+    "sha256": "623627d9514c69be6f343b8f9e0c50a970c1cd337a2e02105bb79db602265f44",
+    "size": 11423,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "R9-10L",
+   "device_id": "R9-10L",
    "mutcd_code": "R9-10L",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "SIDEWALK CLOSED USE OTHER SIDE (left arrow)",
    "category": "regulatory_sign",
-   "size_in": {
-    "conventional": "24x12",
-    "freeway_expressway": null,
-    "minimum": null
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6G-1, p.796 (R9-10); Sect. 6G.10",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/R9-10L.svg",
+    "sha256": "f1130345b5eea781f0fc12a4f59e2d4090dd1d07fbfd271e6cc49693a5f68d16",
+    "size": 1014,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Drafts print R9-10L; MUTCD code R9-10",
    "observed_in_drafts": [
     "Granite V"
    ],
-   "asset": {
-    "file": "svg/R9-10L.svg",
+   "raster": {
+    "uri": "symbols/png/R9-10L.png",
+    "sha256": "b7bdc5e4a5c359f83724cc84fb5a926024b25d885098fdcec71a9b02caa742d8",
+    "size": 13248,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "Drafts print R9-10L; MUTCD code R9-10",
-   "version": "0.1"
+   }
   },
   {
-   "id": "R9-11L",
+   "device_id": "R9-11L",
    "mutcd_code": "R9-11L",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "SIDEWALK CLOSED AHEAD CROSS HERE (left)",
    "category": "regulatory_sign",
-   "size_in": {
-    "conventional": "24x18",
-    "freeway_expressway": null,
-    "minimum": null
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6G-1, p.796 (R9-11); Sect. 6G.10",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/R9-11L.svg",
+    "sha256": "35b4b561ec56372001d558dc64a60204918bf60c9496de4d7482b6e705e5a539",
+    "size": 1190,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "E Second II",
     "Granite"
    ],
-   "asset": {
-    "file": "svg/R9-11L.svg",
+   "raster": {
+    "uri": "symbols/png/R9-11L.png",
+    "sha256": "c6a58e3c3df3de892a26dd5954b90fecc01167f55a600fbca6f149b7ee2ffce1",
+    "size": 15304,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "R9-11R",
+   "device_id": "R9-11R",
    "mutcd_code": "R9-11R",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "SIDEWALK CLOSED AHEAD CROSS HERE (right)",
    "category": "regulatory_sign",
-   "size_in": {
-    "conventional": "24x18",
-    "freeway_expressway": null,
-    "minimum": null
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6G-1, p.796 (R9-11); Sect. 6G.10",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/R9-11R.svg",
+    "sha256": "333c8637011d03cef1bbbbee7c0dd1b2d6c251a07fffaf3189615112d9d8b96c",
+    "size": 1193,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "E Second II",
     "Granite"
    ],
-   "asset": {
-    "file": "svg/R9-11R.svg",
+   "raster": {
+    "uri": "symbols/png/R9-11R.png",
+    "sha256": "5805dbe5cd5e697006b3a78f25e046d52bbb55760498b976e1095474da9ac196",
+    "size": 15383,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "R9-11a",
+   "device_id": "R9-11a",
    "mutcd_code": "R9-11a",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "SIDEWALK CLOSED CROSS HERE",
    "category": "regulatory_sign",
-   "size_in": {
-    "conventional": "24x12",
-    "freeway_expressway": null,
-    "minimum": null
-   },
+   "size_source": "PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6G-1, p.796; Sect. 6G.10",
-   "used_by_tas": [],
-   "observed_in_drafts": [],
    "asset": {
-    "file": "svg/R9-11a.svg",
+    "uri": "symbols/svg/R9-11a.svg",
+    "sha256": "9fc0f8ba47a1f7a68cddd12ebcf598e504948d42a66cdf771a554b3385b6b056",
+    "size": 883,
+    "media_type": "image/svg+xml",
     "status": "PLACEHOLDER_ASSET"
    },
-   "code_status": "MUTCD",
    "notes": "",
-   "version": "0.1"
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/R9-11a.png",
+    "sha256": "d9d2f3fc8e6bdd0c1bfec2db23dafe765cae1b4d8b8ee0b9faadd95d6d30ac39",
+    "size": 12000,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
-   "id": "R9-3BR",
+   "device_id": "R9-3BR",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "CLIENT_CODE",
    "name": "USE CROSSWALK (printed R9-3BR)",
    "category": "regulatory_plaque",
-   "size_in": "SOURCE_REVIEW_REQUIRED",
+   "size_source": "SOURCE_REVIEW_REQUIRED",
+   "size_text": "",
    "source": "Client drafts; not in Table 6G-1",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/R9-3BR.svg",
+    "sha256": "7c64cb73e08ed0ed6ea418a333b96ad240474088b028f22304d4bb5ca01ac797",
+    "size": 997,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Likely R9-3bP from MUTCD Part 2. Confirm",
    "observed_in_drafts": [
     "Granite V"
    ],
-   "asset": {
-    "file": "svg/R9-3BR.svg",
+   "raster": {
+    "uri": "symbols/png/R9-3BR.png",
+    "sha256": "b71d666535e6ccd6a03c3c085e8563a33cd4f7fc40edade3f6afdd21dc63c4c3",
+    "size": 11655,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "CLIENT_CODE",
-   "notes": "Likely R9-3bP from MUTCD Part 2. Confirm",
-   "version": "0.1"
+   }
   },
   {
-   "id": "R2-10",
+   "device_id": "R2-10",
    "mutcd_code": "R2-10",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "BEGIN HIGHER (DOUBLE) FINES ZONE",
    "category": "regulatory_sign",
-   "size_in": {
-    "conventional": "24x30",
-    "freeway_expressway": "36x48",
-    "minimum": null
-   },
+   "size_source": "NOT_IN_MVP_PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6G-1, p.796; Sect. 6G.08",
-   "used_by_tas": [],
-   "observed_in_drafts": [],
    "asset": {
-    "file": "svg/R2-10.svg",
+    "uri": "symbols/svg/R2-10.svg",
+    "sha256": "c3ce9cff53325e794e9b1d1ac999c625963a8ec130c47030f5d42ce695f3a320",
+    "size": 1223,
+    "media_type": "image/svg+xml",
     "status": "PLACEHOLDER_ASSET"
    },
-   "code_status": "MUTCD",
    "notes": "",
-   "version": "0.1"
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/R2-10.png",
+    "sha256": "8c653722a9b4be691571522e09d8818bf2732d085b32767c973da0457c38f867",
+    "size": 13813,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
-   "id": "R2-11",
+   "device_id": "R2-11",
    "mutcd_code": "R2-11",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "END HIGHER (DOUBLE) FINES ZONE",
    "category": "regulatory_sign",
-   "size_in": {
-    "conventional": "24x30",
-    "freeway_expressway": "36x48",
-    "minimum": null
-   },
+   "size_source": "NOT_IN_MVP_PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6G-1, p.796; Sect. 6G.08 (option 03 allows DOUBLE)",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/R2-11.svg",
+    "sha256": "317bd2c2ca9ba4ecda94db55d3f13a3e756c2be7a9a3f673f01f21252c9592cd",
+    "size": 1219,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "Granite (RI)"
    ],
-   "asset": {
-    "file": "svg/R2-11.svg",
+   "raster": {
+    "uri": "symbols/png/R2-11.png",
+    "sha256": "13b9215bd0df88c3b77ec1dab4337d81ed9bcc884caf144a428081c237ed246c",
+    "size": 13403,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "RI-27.1.1",
+   "device_id": "RI-27.1.1",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "STATE_CODE",
    "name": "TRAFFIC FINES DOUBLED IN WORK ZONE (Rhode Island)",
    "category": "regulatory_sign",
-   "size_in": "SOURCE_REVIEW_REQUIRED",
+   "size_source": "SOURCE_REVIEW_REQUIRED",
+   "size_text": "",
    "source": "Client drafts (RI); RIDOT standard not supplied",
-   "used_by_tas": [
-    "jurisdiction RI"
-   ],
+   "asset": {
+    "uri": "symbols/svg/RI-27.1.1.svg",
+    "sha256": "2085a75b8b0aa99b94dff9d345a7f7de80098f1a0d0c5b8550f8cb9fa4876496",
+    "size": 1239,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Get RIDOT detail for size and legend",
    "observed_in_drafts": [
     "Granite (RI)"
    ],
-   "asset": {
-    "file": "svg/RI-27.1.1.svg",
+   "raster": {
+    "uri": "symbols/png/RI-27.1.1.png",
+    "sha256": "ef3d4e40e2b5bf3dd2447d66ebc09958935af6a5aa26d50cf99f348c901305c0",
+    "size": 17984,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "STATE_CODE",
-   "notes": "Get RIDOT detail for size and legend",
-   "version": "0.1"
+   }
   },
   {
-   "id": "R3-7R",
+   "device_id": "R3-7R",
    "mutcd_code": "R3-7R",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "RIGHT LANE MUST TURN RIGHT",
    "category": "regulatory_sign",
-   "size_in": {
-    "conventional": "30x30",
-    "freeway_expressway": null,
-    "minimum": null
-   },
+   "size_source": "NOT_IN_MVP_PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6G-1, p.796; Sect. 6G.02",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/R3-7R.svg",
+    "sha256": "a028102b0273bc51b8928374b0e0cf7cb33d8b7f2ad9228e4cb17347851b7902",
+    "size": 1070,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "Granite II"
    ],
-   "asset": {
-    "file": "svg/R3-7R.svg",
+   "raster": {
+    "uri": "symbols/png/R3-7R.png",
+    "sha256": "1a459e9c35e9a80c7896ffc3b64b61737555c5477b7e2190542ce9e9c3644e05",
+    "size": 15370,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "MUTCD",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "R1-1-PADDLE",
+   "device_id": "R1-1-PADDLE",
    "mutcd_code": "R1-1-PADDLE",
+   "printed_as": [],
+   "code_status": "MUTCD",
    "name": "STOP/SLOW paddle (STOP face R1-1, SLOW face W20-8)",
    "category": "flagger_device",
-   "size_in": {
-    "conventional": "18x18",
-    "freeway_expressway": null,
-    "minimum": null
-   },
+   "size_source": "NOT_IN_MVP_PACK",
+   "size_text": "",
    "source": "MUTCD 11th Ed. (Dec 2023) Table 6G-1, p.796 and MUTCD 11th Ed. (Dec 2023) Table 6H-1, p.803-804; Sect. 6D.02",
-   "used_by_tas": [
-    "TA-10"
-   ],
-   "observed_in_drafts": [],
    "asset": {
-    "file": "svg/R1-1-PADDLE.svg",
+    "uri": "symbols/svg/R1-1-PADDLE.svg",
+    "sha256": "1da1c33839c0acb23b7ee0ce2c0cfd4db2d4eda36c5bf9bb294e9792672e475f",
+    "size": 597,
+    "media_type": "image/svg+xml",
     "status": "PLACEHOLDER_ASSET"
    },
-   "code_status": "MUTCD",
    "notes": "",
-   "version": "0.1"
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/R1-1-PADDLE.png",
+    "sha256": "79b7e37b23308223530f694c9f775dcbc6f68e814f97d7d27acf81133b8316bd",
+    "size": 7922,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
-   "id": "DEV-CONE",
+   "device_id": "DEV-CONE",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Channelizing device - cone",
    "category": "device",
-   "size_in": {
-    "height_in_min": "18 (28 night/high speed)"
-   },
+   "size_source": "TEXT_ONLY",
+   "size_text": "height_in_min: 18 (28 night/high speed)",
    "source": "MUTCD 11th Ed. Sect. 6K.03 (min 18 in; 28 in at night or high speed)",
-   "used_by_tas": [
-    "all"
-   ],
+   "asset": {
+    "uri": "symbols/svg/DEV-CONE.svg",
+    "sha256": "bf7bd5288f9e3255f00b3e6ed2933489bf6aea9d19068be80c6d8f6395c32ba4",
+    "size": 512,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "legend"
    ],
-   "asset": {
-    "file": "svg/DEV-CONE.svg",
+   "raster": {
+    "uri": "symbols/png/DEV-CONE.png",
+    "sha256": "3143ce9bf84a01d01c5cd89887cb6892309a1f2ec27344b9dce23d4f1f522830",
+    "size": 2566,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "DEVICE",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "DEV-DRUM",
+   "device_id": "DEV-DRUM",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Channelizing device - drum (barrel)",
    "category": "device",
-   "size_in": {
-    "height_in_min": 36,
-    "width_in_min": 18
-   },
+   "size_source": "TEXT_ONLY",
+   "size_text": "height_in_min: 36; width_in_min: 18",
    "source": "MUTCD 11th Ed. Sect. 6K.06 (min 36 in high, 18 in wide)",
-   "used_by_tas": [
-    "all"
-   ],
+   "asset": {
+    "uri": "symbols/svg/DEV-DRUM.svg",
+    "sha256": "5c8f66476fff86797aef4fea6d4357f7521cc0d904276444ff3f1e565126a92c",
+    "size": 591,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "legend"
    ],
-   "asset": {
-    "file": "svg/DEV-DRUM.svg",
+   "raster": {
+    "uri": "symbols/png/DEV-DRUM.png",
+    "sha256": "edec44ac5d0b19d8fa041291094f8331a5a09a98728a0a6679fdf2bf0beaec10",
+    "size": 1241,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "DEVICE",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "DEV-TUBULAR",
+   "device_id": "DEV-TUBULAR",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Tubular marker",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "MUTCD 11th Ed. Sect. 6K.04",
-   "used_by_tas": [
-    "all"
-   ],
-   "observed_in_drafts": [],
    "asset": {
-    "file": "svg/DEV-TUBULAR.svg",
+    "uri": "symbols/svg/DEV-TUBULAR.svg",
+    "sha256": "9aad3932ffb8f813f966afcc54fb9b044b796ac0156143188708352af8f3823b",
+    "size": 574,
+    "media_type": "image/svg+xml",
     "status": "PLACEHOLDER_ASSET"
    },
-   "code_status": "DEVICE",
    "notes": "",
-   "version": "0.1"
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/DEV-TUBULAR.png",
+    "sha256": "d4a2613564924c2586eb7bc8bc219a56c540bc78deda964c96ff82efb054f7ca",
+    "size": 1246,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
-   "id": "DEV-BARRICADE-T3",
+   "device_id": "DEV-BARRICADE-T3",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Type 3 barricade",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "MUTCD 11th Ed. Sect. 6K.07; client detail sheet shows 60 in min height, 4 ft min length",
-   "used_by_tas": [
-    "all"
-   ],
+   "asset": {
+    "uri": "symbols/svg/DEV-BARRICADE-T3.svg",
+    "sha256": "02c1e8b63320c2f5530fafa6f566dad42b4c705d826d384657d91340309fe14d",
+    "size": 2553,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "legend"
    ],
-   "asset": {
-    "file": "svg/DEV-BARRICADE-T3.svg",
+   "raster": {
+    "uri": "symbols/png/DEV-BARRICADE-T3.png",
+    "sha256": "6d98a1dbb508fa03f91dd47a8586e54dec21172a639643660b1f1bbefb54e0cf",
+    "size": 3945,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "DEVICE",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "DEV-ARROW-BOARD",
+   "device_id": "DEV-ARROW-BOARD",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Arrow board (flashing arrow panel)",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "MUTCD 11th Ed. Sect. 6L.06, Figure 6L-3 (Types A 48x24, B 60x30, C 96x48 in, D arrow only)",
-   "used_by_tas": [
-    "TA-33"
-   ],
+   "asset": {
+    "uri": "symbols/svg/DEV-ARROW-BOARD.svg",
+    "sha256": "e83075c87d5b373055ef9e9a3f625a9ff35c583559675ae925b4ef3ed0c0b54f",
+    "size": 948,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "TA-33 note 7: required when a freeway lane is closed",
    "observed_in_drafts": [
     "Granite II, V"
    ],
-   "asset": {
-    "file": "svg/DEV-ARROW-BOARD.svg",
+   "raster": {
+    "uri": "symbols/png/DEV-ARROW-BOARD.png",
+    "sha256": "bd228feae5f9f4929adabfdcf7f065b253b9c9a885e9cd0e0450a3a4a2771014",
+    "size": 2490,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "DEVICE",
-   "notes": "TA-33 note 7: required when a freeway lane is closed",
-   "version": "0.1"
+   }
   },
   {
-   "id": "DEV-PCMS",
+   "device_id": "DEV-PCMS",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Portable changeable message sign (VMS)",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "MUTCD 11th Ed. Sect. 6L.05",
-   "used_by_tas": [
-    "all"
-   ],
+   "asset": {
+    "uri": "symbols/svg/DEV-PCMS.svg",
+    "sha256": "2847e770f74b6d34efec2ce32fb8bc3ba323425c924ed8cbd910897ac0e38d8a",
+    "size": 748,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "legend"
    ],
-   "asset": {
-    "file": "svg/DEV-PCMS.svg",
+   "raster": {
+    "uri": "symbols/png/DEV-PCMS.png",
+    "sha256": "4e99d9a2080cbe2949746df23ab45691b075cda5d9018657c920883bd99770fb",
+    "size": 7326,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "DEVICE",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "DEV-FLAG-TREE",
+   "device_id": "DEV-FLAG-TREE",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "High-level warning device (flag tree)",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "MUTCD 11th Ed. Sect. 6L.08",
-   "used_by_tas": [
-    "all"
-   ],
+   "asset": {
+    "uri": "symbols/svg/DEV-FLAG-TREE.svg",
+    "sha256": "f9afd792e8bc92f4ad794450fd456712ea04014f7f3d8d657d50f38ec0b2126a",
+    "size": 537,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "legend"
    ],
-   "asset": {
-    "file": "svg/DEV-FLAG-TREE.svg",
+   "raster": {
+    "uri": "symbols/png/DEV-FLAG-TREE.png",
+    "sha256": "128721279b4e1aed067f63d678f7fda43bdfff087e0e9ee632eb066f4bc06688",
+    "size": 858,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "DEVICE",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "DEV-WORK-VEHICLE",
+   "device_id": "DEV-WORK-VEHICLE",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Work / construction vehicle",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "MUTCD 11th Ed. Table 6P-2 (work vehicle / shadow vehicle)",
-   "used_by_tas": [
-    "all"
-   ],
+   "asset": {
+    "uri": "symbols/svg/DEV-WORK-VEHICLE.svg",
+    "sha256": "dd784df09d40540c26b7b1f78a11238a472baa524c411c44f247208f43b18fda",
+    "size": 567,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "all drafts"
    ],
-   "asset": {
-    "file": "svg/DEV-WORK-VEHICLE.svg",
+   "raster": {
+    "uri": "symbols/png/DEV-WORK-VEHICLE.png",
+    "sha256": "268efefa393cfc25f2ad02c4665f8a34485bd6fb5d5bc97c40f9b63d667183b6",
+    "size": 1635,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "DEVICE",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "DEV-TMA",
+   "device_id": "DEV-TMA",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Truck-mounted attenuator",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "MUTCD 11th Ed. Table 6P-2; Sect. 6M.05",
-   "used_by_tas": [
-    "TA-6",
-    "TA-33"
-   ],
+   "asset": {
+    "uri": "symbols/svg/DEV-TMA.svg",
+    "sha256": "ea9f62ddbf26f6fa78438206ba7a6c75985877d2a13d56d27aa1d5ecb4786d43",
+    "size": 644,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Optional on TA-6 and TA-33",
    "observed_in_drafts": [
     "legend"
    ],
-   "asset": {
-    "file": "svg/DEV-TMA.svg",
+   "raster": {
+    "uri": "symbols/png/DEV-TMA.png",
+    "sha256": "d569c749f1eaba9f42503d9ef1f58da0fa39129147ab95f8b2b101189d4ed5cd",
+    "size": 1315,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "DEVICE",
-   "notes": "Optional on TA-6 and TA-33",
-   "version": "0.1"
+   }
   },
   {
-   "id": "DEV-FLAGGER",
+   "device_id": "DEV-FLAGGER",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Flagger (plan symbol)",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "MUTCD 11th Ed. Table 6P-2; Chapter 6E",
-   "used_by_tas": [
-    "TA-10"
-   ],
-   "observed_in_drafts": [],
    "asset": {
-    "file": "svg/DEV-FLAGGER.svg",
+    "uri": "symbols/svg/DEV-FLAGGER.svg",
+    "sha256": "3b3d94b811776ca3eafba4a35c0400af7d5d0182abdace5ef9ad9b09b89483dc",
+    "size": 521,
+    "media_type": "image/svg+xml",
     "status": "PLACEHOLDER_ASSET"
    },
-   "code_status": "DEVICE",
    "notes": "",
-   "version": "0.1"
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/DEV-FLAGGER.png",
+    "sha256": "c047083c87e2b1ba271dfc3b1a84088195dddcf152ee9dace0b0e541923ddaf7",
+    "size": 1473,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
-   "id": "DEV-POLICE-DETAIL",
+   "device_id": "DEV-POLICE-DETAIL",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Police detail (client legend)",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "Client legend (POLICE DETAIL)",
-   "used_by_tas": [
-    "TA-10 (police variant)"
-   ],
+   "asset": {
+    "uri": "symbols/svg/DEV-POLICE-DETAIL.svg",
+    "sha256": "1151e01a344933013b397c4143751e44c71bb77c479479daf70d23540e956616",
+    "size": 637,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "Client replaces flaggers with police details",
    "observed_in_drafts": [
     "Colorado"
    ],
-   "asset": {
-    "file": "svg/DEV-POLICE-DETAIL.svg",
+   "raster": {
+    "uri": "symbols/png/DEV-POLICE-DETAIL.png",
+    "sha256": "d58fd4a4d2335f4a0c378bc1e1777f16e43436e6de2dbbb9fa383d39547d98c8",
+    "size": 3966,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "DEVICE",
-   "notes": "Client replaces flaggers with police details",
-   "version": "0.1"
+   }
   },
   {
-   "id": "DEV-WORK-SPACE",
+   "device_id": "DEV-WORK-SPACE",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Work space / work zone (hatched area)",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "MUTCD 11th Ed. Table 6P-2; client legend WORK ZONE",
-   "used_by_tas": [
-    "all"
-   ],
+   "asset": {
+    "uri": "symbols/svg/DEV-WORK-SPACE.svg",
+    "sha256": "b3117770eb37a85f7665a77493aad3d41dda6dbb7c53779b8b6726aed67218a6",
+    "size": 584,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "all drafts"
    ],
-   "asset": {
-    "file": "svg/DEV-WORK-SPACE.svg",
+   "raster": {
+    "uri": "symbols/png/DEV-WORK-SPACE.png",
+    "sha256": "b537455b34ed9a0f2e154d936d6d99afd783e8bf87772bd4ddecf949323c9f8e",
+    "size": 464,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "DEVICE",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "DEV-TRENCH",
+   "device_id": "DEV-TRENCH",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Proposed trench (dashed line)",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "Client legend (PROPOSED TRENCH)",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/DEV-TRENCH.svg",
+    "sha256": "260f7a314ac128cdb4e933edd47c7d9414116a1760b8698bcb781346e265bc3a",
+    "size": 415,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "legend"
    ],
-   "asset": {
-    "file": "svg/DEV-TRENCH.svg",
+   "raster": {
+    "uri": "symbols/png/DEV-TRENCH.png",
+    "sha256": "4d2d6deaabfec3a7f01fea46a7299d6f77f0ca925718dcf6293ccc3612333c35",
+    "size": 280,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "DEVICE",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "DEV-FLOW-RED",
+   "device_id": "DEV-FLOW-RED",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Traffic flow arrow (red)",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "Client legend (TRAFFIC FLOW, WORK ZONE)",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/DEV-FLOW-RED.svg",
+    "sha256": "a21ca80cba2500ab7c0eed6aabce5eef6f3ac363d712a77006b94019de800d86",
+    "size": 440,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "Colorado",
     "Granite"
    ],
-   "asset": {
-    "file": "svg/DEV-FLOW-RED.svg",
+   "raster": {
+    "uri": "symbols/png/DEV-FLOW-RED.png",
+    "sha256": "545ab7ffa91e619b480f212d247599c8ae88e4771f41bccbf853dea9c0314586",
+    "size": 717,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "DEVICE",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "DEV-FLOW-BLUE",
+   "device_id": "DEV-FLOW-BLUE",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Traffic flow arrow (blue)",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "Client legend (TRAFFIC FLOW, WORK ZONE)",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/DEV-FLOW-BLUE.svg",
+    "sha256": "f59b795816a563c20703c104aa752da273cc7fee63ffac67693721eab440010f",
+    "size": 441,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "Colorado",
     "Granite"
    ],
-   "asset": {
-    "file": "svg/DEV-FLOW-BLUE.svg",
+   "raster": {
+    "uri": "symbols/png/DEV-FLOW-BLUE.png",
+    "sha256": "00b0c633ee92a03e60f767a0541f7332645c6147d18c1e6cc4bd81a2dc6e9acd",
+    "size": 721,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "DEVICE",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "DEV-FLOW-GREEN",
+   "device_id": "DEV-FLOW-GREEN",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Traffic flow arrow (green)",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "Client legend (TRAFFIC FLOW, WORK ZONE)",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/DEV-FLOW-GREEN.svg",
+    "sha256": "8661f236d23f977da6048b11dfd4327e0c1809f3d26bd96463511005530975d9",
+    "size": 442,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "Colorado",
     "Granite"
    ],
-   "asset": {
-    "file": "svg/DEV-FLOW-GREEN.svg",
+   "raster": {
+    "uri": "symbols/png/DEV-FLOW-GREEN.png",
+    "sha256": "6f393b160bd8632ae99202b08daa7c9b7d69005e02807f506a22ba9dfaac6230",
+    "size": 714,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "DEVICE",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "DEV-SIGN-POST",
+   "device_id": "DEV-SIGN-POST",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Sign post (plan view)",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "MUTCD 11th Ed. Table 6P-2 (sign)",
-   "used_by_tas": [
-    "all"
-   ],
+   "asset": {
+    "uri": "symbols/svg/DEV-SIGN-POST.svg",
+    "sha256": "42516f48a06e8d1164007b55b94ac7fe7f1c95d588d5d7a1f71d6a60295e5460",
+    "size": 453,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "all drafts"
    ],
-   "asset": {
-    "file": "svg/DEV-SIGN-POST.svg",
+   "raster": {
+    "uri": "symbols/png/DEV-SIGN-POST.png",
+    "sha256": "d9952a49637a8bcce878be6ae86efe3f3a4727850bdff24da14ecfaf419944f0",
+    "size": 374,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "DEVICE",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "DEV-TEMP-BARRIER",
+   "device_id": "DEV-TEMP-BARRIER",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Temporary traffic barrier",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "MUTCD 11th Ed. Sect. 6M.02",
-   "used_by_tas": [
-    "TA-6 (option)"
-   ],
-   "observed_in_drafts": [],
    "asset": {
-    "file": "svg/DEV-TEMP-BARRIER.svg",
+    "uri": "symbols/svg/DEV-TEMP-BARRIER.svg",
+    "sha256": "1856e8c05f7d71ca45d8c5e838f65cdd697110141666781ff89a84179a53b5f8",
+    "size": 703,
+    "media_type": "image/svg+xml",
     "status": "PLACEHOLDER_ASSET"
    },
-   "code_status": "DEVICE",
    "notes": "",
-   "version": "0.1"
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/DEV-TEMP-BARRIER.png",
+    "sha256": "d1441760a49b6871aa20ba50ab7706e623fde276b722e8f6264838babaea35bf",
+    "size": 636,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
-   "id": "DEV-BUS-STOP",
+   "device_id": "DEV-BUS-STOP",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Bus stop (existing / relocated)",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "Client legend (MBTA / RIPTA bus stop)",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/DEV-BUS-STOP.svg",
+    "sha256": "372b1b7a3171128db0af0b45b76d19e28503beee0d79babb4f896d7a188d361b",
+    "size": 569,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "legend"
    ],
-   "asset": {
-    "file": "svg/DEV-BUS-STOP.svg",
+   "raster": {
+    "uri": "symbols/png/DEV-BUS-STOP.png",
+    "sha256": "4965f0564b28acb0b5fdb0477bc1f32ea15e540325faa39d6a2790b5b14a7f5c",
+    "size": 2823,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "DEVICE",
-   "notes": "",
-   "version": "0.1"
+   }
   },
   {
-   "id": "DEV-PARKING-METER",
+   "device_id": "DEV-PARKING-METER",
    "mutcd_code": null,
+   "printed_as": [],
+   "code_status": "DEVICE",
    "name": "Parking meter (single)",
    "category": "device",
-   "size_in": "see source",
+   "size_source": "TEXT_ONLY",
+   "size_text": "see source",
    "source": "Client legend (SINGLE/DOUBLE PARKING METER)",
-   "used_by_tas": [],
+   "asset": {
+    "uri": "symbols/svg/DEV-PARKING-METER.svg",
+    "sha256": "ca2320c8379a13222308166a4c9a8e91b7b405b02af649c3625c24c395ea9498",
+    "size": 356,
+    "media_type": "image/svg+xml",
+    "status": "PLACEHOLDER_ASSET"
+   },
+   "notes": "",
    "observed_in_drafts": [
     "legend"
    ],
-   "asset": {
-    "file": "svg/DEV-PARKING-METER.svg",
+   "raster": {
+    "uri": "symbols/png/DEV-PARKING-METER.png",
+    "sha256": "7608c036e7d121ee0d4b6bf5624459aa1a38deabb9f9b62554e1490bc19f0a2a",
+    "size": 634,
+    "media_type": "image/png",
     "status": "PLACEHOLDER_ASSET"
-   },
-   "code_status": "DEVICE",
-   "notes": "",
-   "version": "0.1"
+   }
   }
  ]
 }

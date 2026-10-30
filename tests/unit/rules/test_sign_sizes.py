@@ -29,7 +29,7 @@ def pack():
 
 @pytest.fixture(scope="module")
 def catalog_ids():
-    with open(CATALOG, encoding="utf-8") as f: return {e["id"] for e in json.load(f)["entries"]}
+    with open(CATALOG, encoding="utf-8") as f: return {e["device_id"] for e in json.load(f)["entries"]}
 
 
 def _size_rows(pack):

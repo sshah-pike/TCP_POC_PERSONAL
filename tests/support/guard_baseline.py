@@ -8,7 +8,7 @@ empty APPROVED.
 import os, subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-BASELINE_REF = "a498adc81ff7e5a78f72db63f603ad269aaaabf0"  # merge-base of HEAD with origin/tcp-mvp/base
+BASELINE_REF = "c2c0250575b6bf72b516306f20535d3369267356"  # merge-base of HEAD with origin/tcp-mvp/base (after merging base)
 APPROVED = {}
 
 
