@@ -1,0 +1,897 @@
+{
+ "note": "Marks parsed from the owner's saved gpt-5.6-sol and claude-opus-5-5 call 1 results (var/s06_call1_check, calls 4-9; calls 1-3 are Granite). Only the marks are kept. The stand-in OSM bearings are NOT recorded OSM data: they are the bearing the agreeing calls give (E Second St runs east-west, Colorado about 37 degrees); replace them with the recorded Overpass way when scripts/s06_record_osm.py has run.",
+ "standin_way_bearing_deg": {
+  "second": 90.0,
+  "colorado": 37.0
+ },
+ "calls": [
+  {
+   "profile": "gpt-5.6-sol",
+   "call": 4,
+   "site": "second",
+   "rep": 1,
+   "mpp_sent": 0.441419,
+   "marks": [
+    {
+     "feature": "road_edge_left",
+     "status": "RESOLVED",
+     "points": [
+      [
+       565.0,
+       520.0
+      ],
+      [
+       565.0,
+       640.0
+      ],
+      [
+       564.0,
+       780.0
+      ]
+     ]
+    },
+    {
+     "feature": "road_edge_right",
+     "status": "RESOLVED",
+     "points": [
+      [
+       589.0,
+       520.0
+      ],
+      [
+       590.0,
+       640.0
+      ],
+      [
+       589.0,
+       780.0
+      ]
+     ]
+    },
+    {
+     "feature": "work_point",
+     "status": "RESOLVED",
+     "points": [
+      [
+       640.0,
+       640.0
+      ]
+     ]
+    },
+    {
+     "feature": "curb",
+     "status": "RESOLVED",
+     "points": [
+      [
+       565.0,
+       530.0
+      ],
+      [
+       565.0,
+       650.0
+      ],
+      [
+       564.0,
+       770.0
+      ]
+     ]
+    },
+    {
+     "feature": "curb",
+     "status": "RESOLVED",
+     "points": [
+      [
+       589.0,
+       530.0
+      ],
+      [
+       590.0,
+       650.0
+      ],
+      [
+       589.0,
+       770.0
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "gpt-5.6-sol",
+   "call": 5,
+   "site": "second",
+   "rep": 2,
+   "mpp_sent": 0.441419,
+   "marks": [
+    {
+     "feature": "road_edge_left",
+     "status": "RESOLVED",
+     "points": [
+      [
+       586.0,
+       611.0
+      ],
+      [
+       700.0,
+       611.0
+      ],
+      [
+       820.0,
+       610.0
+      ],
+      [
+       930.0,
+       610.0
+      ]
+     ]
+    },
+    {
+     "feature": "road_edge_right",
+     "status": "RESOLVED",
+     "points": [
+      [
+       586.0,
+       637.0
+      ],
+      [
+       700.0,
+       637.0
+      ],
+      [
+       820.0,
+       636.0
+      ],
+      [
+       930.0,
+       635.0
+      ]
+     ]
+    },
+    {
+     "feature": "work_point",
+     "status": "RESOLVED",
+     "points": [
+      [
+       640.0,
+       640.0
+      ]
+     ]
+    },
+    {
+     "feature": "curb",
+     "status": "RESOLVED",
+     "points": [
+      [
+       586.0,
+       611.0
+      ],
+      [
+       700.0,
+       611.0
+      ],
+      [
+       820.0,
+       610.0
+      ],
+      [
+       930.0,
+       610.0
+      ]
+     ]
+    },
+    {
+     "feature": "curb",
+     "status": "RESOLVED",
+     "points": [
+      [
+       586.0,
+       637.0
+      ],
+      [
+       700.0,
+       637.0
+      ],
+      [
+       820.0,
+       636.0
+      ],
+      [
+       930.0,
+       635.0
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "gpt-5.6-sol",
+   "call": 6,
+   "site": "second",
+   "rep": 3,
+   "mpp_sent": 0.441419,
+   "marks": [
+    {
+     "feature": "road_edge_left",
+     "status": "RESOLVED",
+     "points": [
+      [
+       557.0,
+       600.0
+      ],
+      [
+       640.0,
+       601.0
+      ],
+      [
+       760.0,
+       603.0
+      ],
+      [
+       900.0,
+       606.0
+      ],
+      [
+       938.0,
+       607.0
+      ]
+     ]
+    },
+    {
+     "feature": "road_edge_right",
+     "status": "RESOLVED",
+     "points": [
+      [
+       557.0,
+       624.0
+      ],
+      [
+       640.0,
+       625.0
+      ],
+      [
+       760.0,
+       627.0
+      ],
+      [
+       900.0,
+       630.0
+      ],
+      [
+       938.0,
+       631.0
+      ]
+     ]
+    },
+    {
+     "feature": "work_point",
+     "status": "RESOLVED",
+     "points": [
+      [
+       640.0,
+       640.0
+      ]
+     ]
+    },
+    {
+     "feature": "curb",
+     "status": "RESOLVED",
+     "points": [
+      [
+       557.0,
+       624.0
+      ],
+      [
+       640.0,
+       625.0
+      ],
+      [
+       760.0,
+       627.0
+      ],
+      [
+       900.0,
+       630.0
+      ],
+      [
+       938.0,
+       631.0
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "gpt-5.6-sol",
+   "call": 7,
+   "site": "colorado",
+   "rep": 1,
+   "mpp_sent": 0.441851,
+   "marks": [
+    {
+     "feature": "road_edge_left",
+     "status": "RESOLVED",
+     "points": [
+      [
+       775.0,
+       488.0
+      ],
+      [
+       749.0,
+       535.0
+      ],
+      [
+       721.0,
+       585.0
+      ],
+      [
+       694.0,
+       635.0
+      ],
+      [
+       667.0,
+       686.0
+      ],
+      [
+       641.0,
+       737.0
+      ],
+      [
+       614.0,
+       788.0
+      ]
+     ]
+    },
+    {
+     "feature": "road_edge_right",
+     "status": "RESOLVED",
+     "points": [
+      [
+       790.0,
+       496.0
+      ],
+      [
+       764.0,
+       544.0
+      ],
+      [
+       736.0,
+       594.0
+      ],
+      [
+       709.0,
+       644.0
+      ],
+      [
+       682.0,
+       695.0
+      ],
+      [
+       656.0,
+       746.0
+      ],
+      [
+       629.0,
+       797.0
+      ]
+     ]
+    },
+    {
+     "feature": "work_point",
+     "status": "RESOLVED",
+     "points": [
+      [
+       640.0,
+       640.0
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "gpt-5.6-sol",
+   "call": 8,
+   "site": "colorado",
+   "rep": 2,
+   "mpp_sent": 0.441851,
+   "marks": [
+    {
+     "feature": "road_edge_left",
+     "status": "RESOLVED",
+     "points": [
+      [
+       633.0,
+       545.0
+      ],
+      [
+       662.0,
+       558.0
+      ],
+      [
+       684.0,
+       580.0
+      ],
+      [
+       705.0,
+       607.0
+      ],
+      [
+       723.0,
+       638.0
+      ],
+      [
+       733.0,
+       665.0
+      ]
+     ]
+    },
+    {
+     "feature": "road_edge_right",
+     "status": "RESOLVED",
+     "points": [
+      [
+       619.0,
+       560.0
+      ],
+      [
+       648.0,
+       574.0
+      ],
+      [
+       670.0,
+       595.0
+      ],
+      [
+       691.0,
+       620.0
+      ],
+      [
+       708.0,
+       647.0
+      ],
+      [
+       718.0,
+       673.0
+      ]
+     ]
+    },
+    {
+     "feature": "work_point",
+     "status": "RESOLVED",
+     "points": [
+      [
+       640.0,
+       640.0
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "gpt-5.6-sol",
+   "call": 9,
+   "site": "colorado",
+   "rep": 3,
+   "mpp_sent": 0.441851,
+   "marks": [
+    {
+     "feature": "road_edge_left",
+     "status": "RESOLVED",
+     "points": [
+      [
+       852.0,
+       533.0
+      ],
+      [
+       817.0,
+       573.0
+      ],
+      [
+       782.0,
+       613.0
+      ],
+      [
+       747.0,
+       653.0
+      ],
+      [
+       712.0,
+       693.0
+      ],
+      [
+       677.0,
+       733.0
+      ]
+     ]
+    },
+    {
+     "feature": "road_edge_right",
+     "status": "RESOLVED",
+     "points": [
+      [
+       868.0,
+       547.0
+      ],
+      [
+       833.0,
+       587.0
+      ],
+      [
+       798.0,
+       627.0
+      ],
+      [
+       763.0,
+       667.0
+      ],
+      [
+       728.0,
+       707.0
+      ],
+      [
+       693.0,
+       747.0
+      ]
+     ]
+    },
+    {
+     "feature": "work_point",
+     "status": "RESOLVED",
+     "points": [
+      [
+       640.0,
+       640.0
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "claude-opus-5-5",
+   "call": 4,
+   "site": "second",
+   "rep": 1,
+   "mpp_sent": 0.441419,
+   "marks": [
+    {
+     "feature": "road_edge_left",
+     "status": "RESOLVED",
+     "points": [
+      [
+       585.0,
+       616.0
+      ],
+      [
+       760.0,
+       616.0
+      ],
+      [
+       940.0,
+       616.0
+      ]
+     ]
+    },
+    {
+     "feature": "road_edge_right",
+     "status": "RESOLVED",
+     "points": [
+      [
+       585.0,
+       633.0
+      ],
+      [
+       760.0,
+       633.0
+      ],
+      [
+       940.0,
+       633.0
+      ]
+     ]
+    },
+    {
+     "feature": "lane_line",
+     "status": "UNKNOWN",
+     "points": []
+    },
+    {
+     "feature": "work_point",
+     "status": "RESOLVED",
+     "points": [
+      [
+       640.0,
+       640.0
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "claude-opus-5-5",
+   "call": 5,
+   "site": "second",
+   "rep": 2,
+   "mpp_sent": 0.441419,
+   "marks": [
+    {
+     "feature": "road_edge_left",
+     "status": "RESOLVED",
+     "points": [
+      [
+       585.0,
+       614.0
+      ],
+      [
+       760.0,
+       614.0
+      ],
+      [
+       940.0,
+       616.0
+      ]
+     ]
+    },
+    {
+     "feature": "road_edge_right",
+     "status": "RESOLVED",
+     "points": [
+      [
+       585.0,
+       633.0
+      ],
+      [
+       760.0,
+       633.0
+      ],
+      [
+       940.0,
+       634.0
+      ]
+     ]
+    },
+    {
+     "feature": "work_point",
+     "status": "RESOLVED",
+     "points": [
+      [
+       640.0,
+       640.0
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "claude-opus-5-5",
+   "call": 6,
+   "site": "second",
+   "rep": 3,
+   "mpp_sent": 0.441419,
+   "marks": [
+    {
+     "feature": "road_edge_left",
+     "status": "RESOLVED",
+     "points": [
+      [
+       580.0,
+       614.0
+      ],
+      [
+       760.0,
+       614.0
+      ],
+      [
+       940.0,
+       614.0
+      ]
+     ]
+    },
+    {
+     "feature": "road_edge_right",
+     "status": "RESOLVED",
+     "points": [
+      [
+       580.0,
+       631.0
+      ],
+      [
+       760.0,
+       631.0
+      ],
+      [
+       940.0,
+       631.0
+      ]
+     ]
+    },
+    {
+     "feature": "work_point",
+     "status": "RESOLVED",
+     "points": [
+      [
+       640.0,
+       640.0
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "claude-opus-5-5",
+   "call": 7,
+   "site": "colorado",
+   "rep": 1,
+   "mpp_sent": 0.441851,
+   "marks": [
+    {
+     "feature": "road_edge_left",
+     "status": "RESOLVED",
+     "points": [
+      [
+       957.0,
+       159.0
+      ],
+      [
+       880.0,
+       268.0
+      ],
+      [
+       800.0,
+       380.0
+      ],
+      [
+       692.0,
+       529.0
+      ]
+     ]
+    },
+    {
+     "feature": "road_edge_right",
+     "status": "RESOLVED",
+     "points": [
+      [
+       973.0,
+       171.0
+      ],
+      [
+       896.0,
+       280.0
+      ],
+      [
+       816.0,
+       392.0
+      ],
+      [
+       708.0,
+       541.0
+      ]
+     ]
+    },
+    {
+     "feature": "lane_line",
+     "status": "UNKNOWN",
+     "points": []
+    },
+    {
+     "feature": "work_point",
+     "status": "RESOLVED",
+     "points": [
+      [
+       640.0,
+       640.0
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "claude-opus-5-5",
+   "call": 8,
+   "site": "colorado",
+   "rep": 2,
+   "mpp_sent": 0.441851,
+   "marks": [
+    {
+     "feature": "road_edge_left",
+     "status": "RESOLVED",
+     "points": [
+      [
+       850.0,
+       600.0
+      ],
+      [
+       750.0,
+       722.0
+      ],
+      [
+       690.0,
+       802.0
+      ]
+     ]
+    },
+    {
+     "feature": "road_edge_right",
+     "status": "RESOLVED",
+     "points": [
+      [
+       870.0,
+       620.0
+      ],
+      [
+       770.0,
+       738.0
+      ],
+      [
+       710.0,
+       818.0
+      ]
+     ]
+    },
+    {
+     "feature": "work_point",
+     "status": "RESOLVED",
+     "points": [
+      [
+       640.0,
+       640.0
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "claude-opus-5-5",
+   "call": 9,
+   "site": "colorado",
+   "rep": 3,
+   "mpp_sent": 0.441851,
+   "marks": [
+    {
+     "feature": "road_edge_left",
+     "status": "RESOLVED",
+     "points": [
+      [
+       855.0,
+       598.0
+      ],
+      [
+       770.0,
+       703.0
+      ],
+      [
+       686.0,
+       808.0
+      ]
+     ]
+    },
+    {
+     "feature": "road_edge_right",
+     "status": "RESOLVED",
+     "points": [
+      [
+       875.0,
+       612.0
+      ],
+      [
+       790.0,
+       717.0
+      ],
+      [
+       705.0,
+       822.0
+      ]
+     ]
+    },
+    {
+     "feature": "work_point",
+     "status": "RESOLVED",
+     "points": [
+      [
+       640.0,
+       640.0
+      ]
+     ]
+    }
+   ]
+  }
+ ]
+}

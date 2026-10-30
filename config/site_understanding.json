@@ -140,5 +140,18 @@
       "source": "CALIBRATION_PENDING",
       "note": "the opposite way must share the name or the ref of the chosen way"
     }
+  },
+  "bearing": {
+    "note": "Bearing cross-check (owner plan 2026-10-31). The road direction read from the AI's edge and lane-line marks (code, modulo 180) must match the nearest OSM way within the tolerance. Evidence: the nine gpt-5.6-sol calls gave E Second St 0, 90, 91 degrees and Colorado 28, 140, 41 degrees; the Claude calls 90,90,90 and 36,39,39.",
+    "tolerance_deg": {
+      "value": 30,
+      "source": "CALIBRATION_PENDING",
+      "note": "largest angle (mod 180) between the mark bearing and an OSM way bearing for them to be the same road"
+    },
+    "which_road_distance_m": {
+      "value": 25,
+      "source": "CALIBRATION_PENDING",
+      "note": "OSM ways (service ways excluded) within this distance of the work point are the candidates for the road of the job; if they differ in bearing by more than the tolerance the SME is asked which road"
+    }
   }
 }
