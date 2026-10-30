@@ -9,7 +9,11 @@ image, which is the KML point), its size comes from config. The decision is on p
 2. `plan_close_view(...)`: sufficient everywhere -> only a code crop of the wide image (no request). Otherwise the zoom that
    meets the strictest feature, capped at the zoom ceiling (crops.primary_zoom, the tileset maximum).
 3. `fetch_close_view(...)`: the one map request, recorded as evidence with a signature (imagery.evidence_views.view_signature).
-   A failed or blank fetch is recorded as unavailable; it never raises and never invents an image.
+   A view already stored under the same signature is reused with no request (write-once ArtifactStore, key = hash of the
+   signature). A failed or blank fetch is recorded as unavailable; it never raises and never invents an image.
+4. Information only, never gating: the fetched view's detail (variance of the Laplacian, the old sharpness measure) is compared
+   with the same ground area of the wide image enlarged to the view's scale. A ratio below sharpness.min_detail_gain_ratio sets
+   the flag NO_DETAIL_GAIN in the evidence (the view may be upsampled). It costs no request: the wide image is already held.
 """
 import hashlib, io, json, math, os
 from typing import NamedTuple, Optional
@@ -17,7 +21,7 @@ from typing import NamedTuple, Optional
 from PIL import Image, ImageStat
 
 from tcp_planner.config.settings import CONFIG_DIR
-from tcp_planner.contracts import MapProviderError
+from tcp_planner.contracts import MapProviderError, canonical_json, sha256_hex
 from tcp_planner.imagery.evidence_views import view_signature
 from tcp_planner.imagery.map_provider import view_metres_per_pixel
 from tcp_planner.imagery.prepare import JPEG_QUALITY, resize_for_model
@@ -112,20 +116,67 @@ def plan_close_view(lat, lon, mpp_wide, features, pipeline=None, cfg=None):
     return ClosePlan(PLAN_VERSION, True, spec, decisions, tuple(d.feature for d in bad), still and z >= ceiling, mpp_wide, flags)
 
 
+# ---------------------------------------------------------------- information only: does the view hold native detail?
+def _detail(img):
+    """Variance of the 4-neighbour Laplacian of the grey image (the measure of the old sharpness check)."""
+    import numpy as np
+    a = np.asarray(img.convert("L"), dtype=np.float64)
+    lap = a[:-2, 1:-1] + a[2:, 1:-1] + a[1:-1, :-2] + a[1:-1, 2:] - 4 * a[1:-1, 1:-1]
+    return float(lap.var())
+
+
+def detail_gain(view_img, view_center, view_mpp, wide_img, wide_center, wide_mpp, min_ratio):
+    """Information record, or None when the view's footprint is not inside the wide image. Compares the view with the same ground area
+    of the wide image enlarged to the view's size (bicubic): a real higher zoom holds far more detail than the enlargement."""
+    from tcp_planner.geometry.local_frame import enu
+    dx, dy = enu(view_center[0], view_center[1], wide_center[0], wide_center[1])
+    cx, cy = wide_img.size[0] / 2 + dx / wide_mpp, wide_img.size[1] / 2 - dy / wide_mpp
+    side = view_img.size[0] * view_mpp / wide_mpp
+    box = (round(cx - side / 2), round(cy - side / 2), round(cx + side / 2), round(cy + side / 2))
+    if box[0] < 0 or box[1] < 0 or box[2] > wide_img.size[0] or box[3] > wide_img.size[1] or side < 8: return None
+    d_hi = _detail(view_img); d_lo = _detail(wide_img.crop(box).resize(view_img.size, Image.BICUBIC))
+    ratio = d_hi / d_lo if d_lo > 0 else float("inf")
+    return {"measure": "laplacian_variance", "view": round(d_hi, 3), "wide_enlarged": round(d_lo, 3),
+            "ratio": None if math.isinf(ratio) else round(ratio, 3), "min_ratio": min_ratio,
+            "flag": "NO_DETAIL_GAIN" if ratio < min_ratio else "NATIVE_DETAIL", "gating": False}
+
+
 # ---------------------------------------------------------------- the one request, recorded as evidence
-def fetch_close_view(plan, provider, geometry_hash, max_px, pipeline=None):
-    """(image bytes or None, evidence record). Calls provider.fetch_view only when the plan says so. The evidence holds the view
-    signature (provider, scale model, geometry hash, zoom, centre, size), the resize record and the purpose; a failed or
-    near-uniform image gives bytes None and 'unavailable'. Never raises for a provider failure."""
+def view_key(signature):
+    """ArtifactStore key of a view: the hash of its signature (provider, scale model, geometry hash, zoom, centre, size)."""
+    return "views/" + sha256_hex(canonical_json(signature))
+
+
+def fetch_close_view(plan, provider, geometry_hash, max_px, pipeline=None, store=None, wide=None):
+    """(image bytes or None, evidence record). Calls provider.fetch_view only when the plan says so AND no view is stored under the
+    same signature. `store` is an ArtifactStore: the fetched JPEG and its small metadata record are written once, and the next call
+    with the same signature reads them back (evidence 'reused': True, zero requests). The evidence holds the view signature, the
+    resize record and the purpose; a failed or near-uniform image gives bytes None and 'unavailable' (not stored). Never raises
+    for a provider failure. `wide` = (PIL image, centre (lat, lon), metres per pixel) enables the information-only detail check."""
     if not plan.fetch: return None, {"fetched": False, "reason": "enough pixels in the wide image", "plan": plan.version, "mpp_wide": plan.mpp_wide}
     spec = plan.spec; pl = pipeline or _pipeline()
-    ev = {"fetched": True, "plan": plan.version, "purpose": plan.insufficient, "signature": view_signature(provider, spec, geometry_hash),
-          "parent_crop_spec": dict(spec), "at_zoom_ceiling": plan.at_ceiling}
-    try: img, meta = provider.fetch_view(spec["lat"], spec["lon"], spec["zoom"], spec["size_px"])
-    except MapProviderError as e:
-        return None, {**ev, "unavailable": f"{e.code}: {e.message}"}
-    if ImageStat.Stat(img.convert("L")).stddev[0] < pl["sharpness"]["uniform_max_std"]:
-        return None, {**ev, "unavailable": "blank or near-uniform image"}
-    buf = io.BytesIO(); img.convert("RGB").save(buf, "JPEG", quality=JPEG_QUALITY)
-    sent, rec = resize_for_model(buf.getvalue(), max_px, meta["metres_per_pixel"])
-    return sent, {**ev, "image": rec, "mpp_view": meta["metres_per_pixel"], "mpp_sent": rec["mpp_sent"], "center": [spec["lat"], spec["lon"]]}
+    sig = view_signature(provider, spec, geometry_hash); key = view_key(sig)
+    ev = {"fetched": True, "plan": plan.version, "purpose": plan.insufficient, "signature": sig, "view_key": key,
+          "parent_crop_spec": dict(spec), "at_zoom_ceiling": plan.at_ceiling, "reused": False}
+    if store is not None and store.exists(key + ".jpg"):
+        ref = store.stat(key + ".jpg"); raw = store.get(ref); meta = json.loads(store.get(key + ".json"))
+        ev.update(reused=True, artifact={"uri": ref.uri, "sha256": ref.sha256, "size": ref.size, "media_type": ref.media_type})
+        img = Image.open(io.BytesIO(raw)); img.load()
+    else:
+        try: img, meta = provider.fetch_view(spec["lat"], spec["lon"], spec["zoom"], spec["size_px"])
+        except MapProviderError as e:
+            return None, {**ev, "unavailable": f"{e.code}: {e.message}"}
+        if ImageStat.Stat(img.convert("L")).stddev[0] < pl["sharpness"]["uniform_max_std"]:
+            return None, {**ev, "unavailable": "blank or near-uniform image"}
+        buf = io.BytesIO(); img.convert("RGB").save(buf, "JPEG", quality=JPEG_QUALITY); raw = buf.getvalue()
+        if store is not None:
+            ref = store.put(key + ".jpg", raw, "image/jpeg")
+            store.put(key + ".json", json.dumps({"metres_per_pixel": meta["metres_per_pixel"], "signature": sig}, sort_keys=True).encode(), "application/json")
+            ev["artifact"] = {"uri": ref.uri, "sha256": ref.sha256, "size": ref.size, "media_type": ref.media_type}
+    sent, rec = resize_for_model(raw, max_px, meta["metres_per_pixel"])
+    ev.update(image=rec, mpp_view=meta["metres_per_pixel"], mpp_sent=rec["mpp_sent"], center=[spec["lat"], spec["lon"]])
+    if wide is not None:
+        info = detail_gain(img.convert("RGB"), (spec["lat"], spec["lon"]), meta["metres_per_pixel"], wide[0].convert("RGB"), wide[1], wide[2],
+                           pl["sharpness"]["min_detail_gain_ratio"])
+        if info: ev["detail_check"] = info
+    return sent, ev
