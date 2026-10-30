@@ -54,7 +54,7 @@ If code and plan disagree, **stop and report**. Do not silently follow either on
    - A computed check that contradicts one raises a conflict question. It never changes the value.
 5. **Traffic control method (D-68):**
    - It is not a UI start field. When the router picks TA-10, code sets it to Flagger.
-   - Police details are a post-draft SME review action: W20-7 becomes POLICE OFFICER AHEAD and the checks re-run.
+   - Flagger is the default. Police detail instead of flagger is future scope (D-68).
 6. **KML (D-66):** read coordinates only (points, lines, polygons).
    - Ignore all `ExtendedData`, including `tcp:*` and `selected_ta`.
    - Placemark names are display labels only.

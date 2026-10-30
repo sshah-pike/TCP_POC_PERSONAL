@@ -103,7 +103,7 @@ Follow-ups carried into later slices:
 
 **Tasks.**
 1. Fixture recorder and replayer. Key fixtures by a request fingerprint. Replay mode is the default in tests and fails if a fixture is missing. Fixtures go in `tests/fixtures/`.
-2. Seed fixtures from saved evidence (Granite single point P30, Alton Bradford and Exeter demos) with `python -m tests.support.record seed`. Recording the three real KMLs needs live calls and the pipeline cannot take them yet (it rejects more than one Point), so it moves to the post-S6 recording task in S6.
+2. Seed fixtures from saved evidence (Granite single point P30, Alton Bradford and Exeter demos) with `python -m tests.support.record seed`. Recording the three real KMLs needs live calls and the pipeline cannot take them yet (it rejects more than one Point), so it moves to the recording task in S6 (Colorado after S7, the rest after S9, D-98).
 3. Verification report: answer items 1 to 34 of the Section 18 prompt with file and line evidence.
 4. Fix `test_protected_run_dir_untouched` so it checks that `var/runs/20261020-214203-7f7232` is tracked and unchanged (D-79). After this, every suite is green.
 5. Make Foundry the default when `TCP_AI_PROVIDER` is unset, and fail with a clear message when Foundry is not configured (D-78). This is a deliberate behavior change in its own commit.
@@ -217,6 +217,8 @@ Follow-ups carried into later slices:
 
 **Prompt seed.** "Build rule pack v1 per slice S4 from the supplied Chapter 6 PDF in docs/sources. Use AI-assisted extraction only to draft records. Every record must quote its table, section and page. Mark client-layer rules PROPOSED. Produce a review report listing every value and its source for SME sign-off."
 
+**Amendment 2026-10-30.** The S4 scope lines above are kept as merged. The client layer (`rule_pack/client/*.json`, the client 100 ft buffer, the police variant of TA-10, the add-on modules and the 11 ft note) is withdrawn by D-51 and was not built; the buffer is a per-zone choice (D-94) and add-ons come from sourced sections (D-90). The line on 6N.11 ("TA-33 on undivided four-lane roads") is narrowed to a Granite-type case by D-91.
+
 ---
 
 ## S4b. Pack extension round
@@ -290,7 +292,7 @@ Follow-ups carried into later slices:
 
 **Tests.** Mandatory fields are never written by code; a computed remaining width that contradicts `lane_closure` creates a conflict, not a change; no length comes from the AI (a test fails if a length field appears in AI output); length computations against fixtures with known pixel scale; every observed field resolves to RESOLVED or UNKNOWN; fusion disagreement recorded; only the approved sources are called (a mock fails the test otherwise); the remaining-width table as a parametrized test; crop decision with mocked pixel counts.
 
-**Post-S6 recording task (run by the user, `TCP_LIVE=1`).** Record the three real KMLs (Granite, E Second St, Colorado) with `python -m tests.support.record live`, which calls `use_os_trust_store()` first. This is the third live-call exception in CLAUDE.md. Then add replay tests for them: the same request fingerprints twice.
+**Recording task (run by the owner, `TCP_LIVE=1`; changed 2026-10-30, D-97, D-98).** The 9-call check on gpt-5.6-sol and on claude-opus-5-5 comes before any recording. Colorado is recorded once after S7 merges (calls 1 and 2 together); E Second St and Granite after S9. Granite is compared at pole P32 (Phase I) only. Record with `python -m tests.support.record live`, which calls `use_os_trust_store()` first. This is the third live-call exception in CLAUDE.md. Then add replay tests for them: the same request fingerprints twice.
 
 **Prompt seed.** "Extend call 1 and fusion per slice S6. Use only recorded fixtures in tests. Keep the two-AI-call budget per zone."
 
@@ -305,7 +307,7 @@ Follow-ups carried into later slices:
 **In scope.**
 - Router over pack TAs only, with the five outcomes, near match ("did you mean", at most 1 failed condition, at most 2 suggestions) and thresholds (D-33).
 - `TA_SELECTION_CONFLICT` against a TA hypothesis entered in the UI.
-- The routing tree and explicit eligibility (D-60): TA-6 requires `shoulder_present` and a low-speed minor road (note 2; cutoff `SOURCE_REVIEW_REQUIRED` until set) with width to the device face; TA-33 is one OR'd rule citing 6P-33 and 6N.11, so undivided four-lane roads such as Granite qualify.
+- The routing tree and explicit eligibility (D-60): TA-6 requires `shoulder_present` and a low-speed minor road (note 2; cutoff `SOURCE_REVIEW_REQUIRED` until set) with width to the device face; TA-33 is one OR'd rule citing 6P-33 and 6N.11, so a Granite-type case (undivided, two lanes each way, right lane closed; D-91) qualifies. Broader undivided cases are an engineer question.
 - `traffic_control_method` set by code to Flagger when TA-10 is chosen (D-68). Police details are not applied by the router.
 - Call 2 with crops for unresolved TA fields. It never overwrites a resolved fact, and safety-critical facts go through the cross-view check.
 - Spike requirements (D-80): call 2 re-asks `lanes_per_direction` with a lane-marking crop; it requests lane lines, shoulder edge and curb marks from crops; and it resolves `sidewalk_present` and `sidewalk_side` with a crop plus OSM sidewalk tags.
@@ -409,7 +411,6 @@ Follow-ups carried into later slices:
 - The append-only ledger.
 - The SME approval gate `require_sme_approval_for_all_plans`, default true (D-65): every plan waits for a click and shows whether it would have been SUPPORTED_AUTO.
 - Asked-if-needed fields (duration, night work, heavy vehicles and the rest, plan Section 4B) appear only when a rule needs them. `work_side` always appears as an AI suggestion for the SME to confirm (D-69).
-- Review action "switch to police details" for TA-10 zones (D-68): flagger stations become police details, W20-7 becomes POLICE OFFICER AHEAD, checks re-run, a ledger entry is written. Callable from the review screen and from the SME assistant chat.
 
 **Acceptance criteria.**
 - Answering a question resumes with zero new external calls when signatures match.
@@ -457,7 +458,7 @@ Follow-ups carried into later slices:
   - Exact: TA, sheet count, work points per sheet, scale, advance-sign order and code set.
   - Tolerance: position within 15 ft and spacing within 10 ft, using the labelled value where the draft is schematic.
   - Side of road must match.
-- Report categories: RULE\_GAP, CLIENT\_PRACTICE, FIELD\_JUDGMENT, SCHEMATIC\_DRAFT, EXTRACTION\_ERROR, POST\_DRAFT\_VARIANT (for Colorado, compare after applying the police switch, D-68).
+- Report categories: RULE\_GAP, CLIENT\_PRACTICE, FIELD\_JUDGMENT, SCHEMATIC\_DRAFT, EXTRACTION\_ERROR; no post-draft variant category: police detail is future scope (D-68), so the Colorado difference is reported as a known difference.
 - The live full-pipeline test on the three KMLs behind `TCP_LIVE=1`.
 - Golden v0.2 after your SME's corrections.
 

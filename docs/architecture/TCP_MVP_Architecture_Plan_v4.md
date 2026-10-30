@@ -191,7 +191,7 @@ You told me a phase is not a time step. It is the sheet that shows a draft. This
 
 | Job | TA | Sheets | What each sheet shows | Scale |
 | --- | --- | --- | --- | --- |
-| Colorado St, Mattapan MA (WPI 3168057) | TA-10, with police details instead of flaggers | 1 (Phase I, 1 of 1) | One work point, P13 | 1" = 40' |
+| Colorado St, Mattapan MA (WPI 3168057) | TA-10 (the draft shows police details; the tool drafts flaggers, police detail is future scope, D-68) | 1 (Phase I, 1 of 1) | One work point, P13 | 1" = 40' |
 | E Second St, South Boston MA (WPI 3171586) | TA-6, with additions | 2 (Phase I and II) | One manhole each: MH 223, then MH FA. Phase II adds sidewalk-closure signs | 1" = 40' on both |
 | Granite St (US-1), Westerly RI (WPI 3178233) | TA-33 | 6 (Phase I to VI) | Poles P.32 / P.34, P.33, P.36 / P.37, P.38, P.38-50 / P.39 / P.40, P.41, P.42 / P.42-2. Phase V adds detour signs and an arrow panel | 1" = 40' on I, II, IV and VI. 1" = 50' on III and V |
 
@@ -202,7 +202,7 @@ You told me a phase is not a time step. It is the sheet that shows a draft. This
 3. The scale steps from 1" = 40' to 1" = 50' when the layout is wider. This matches your wish to show as much as possible together. Whether other scales are used is unknown.
 4. Every sheet uses the same template. Fixed elements: the traffic legend, the same 12 general notes, the Type III barricade detail, the drum and cone detail, the free-standing sign detail, the title block, the revisions box, the DigSafe box, a notes box with job-specific lines, a scale bar and a north arrow.
 5. There is no cover page. Sheets are numbered "n OF N" in the title block.
-6. Add-ons depend on the site and not on the TA: sidewalk-closure signs (R9-9, R9-11L/R, R9-10L, R9-3BR), temporary no-parking (R8-3), police detail, double-fines signs in RI (R2-11 and RI 27.1.1), detour signs (M4-9 series) and an arrow panel. The codes are as printed on the drawings and must be checked against the MUTCD and RIDOT.
+6. Add-ons depend on the site and not on the TA: sidewalk-closure signs (R9-9, R9-11L/R, R9-10L, R9-3BR), temporary no-parking (R8-3), double-fines signs in RI (R2-11 and RI 27.1.1), detour signs (M4-9 series) and an arrow panel. The codes are as printed on the drawings and must be checked against the MUTCD and RIDOT.
 7. The speed note differs by job. Boston sheets say "25 MPH unless otherwise posted". The Westerly sheets say "25 MPH as observed in the field".
 
 **A mismatch to resolve.** The Granite KML you gave me is WPI 3159540 with poles P28 to P32. The Granite drawing is WPI 3178233 with poles P.32 to P.42-2. Only P32 appears in both. They may be neighbouring jobs on the same road. I can't check the KML's grouping against that drawing until you confirm or send the matching one.
@@ -291,7 +291,7 @@ The Run button stays disabled until these are filled. They are entered once per 
 | `traffic_volume` | High or Low | TA-6 9 ft option (note 4) and TA-10 single flagger (note 2) |
 | `lane_closure` | Yes or No | The main router input that separates TA-1 and TA-6 from TA-10 and TA-33 |
 
-**Traffic control method is not a start field (D-68).** `traffic_control_method` stays in the data model but is not asked in the UI. It is set by code only when it is needed: when the router picks TA-10, it is set to Flagger, and the draft uses the standard MUTCD TA-10 layout with flaggers, the W20-7 Flagger sign and the flagger tapers. Police details are a state-level choice that replaces the flaggers and changes the sign to POLICE OFFICER AHEAD. In the MVP the SME makes that switch after the draft exists, as a review action through the SME assistant (Section 8). Other methods (AFAD, signals) are future scope.
+**Traffic control method is not a start field (D-68).** `traffic_control_method` stays in the data model but is not asked in the UI. It is set by code only when it is needed: when the router picks TA-10, it is set to Flagger, and the draft uses the standard MUTCD TA-10 layout with flaggers, the W20-7 Flagger sign and the flagger tapers. Flagger is the default. Police detail instead of flagger is future scope (D-68, D-86). Other methods (AFAD, signals) are future scope.
 
 **When a computed check disagrees with a mandatory value**, the system never changes the value. It raises a conflict on the SME form instead. Example: the SME enters `lane_closure` = No, but the computed remaining lane width is 8.5 ft. The form says "the computed remaining width of 8.5 ft is below the 9 ft minimum; this needs a lane closure, but you entered No. Change the answer or explain." The SME decides.
 
@@ -314,7 +314,7 @@ The Run button stays disabled until these are filled. They are entered once per 
 | `pedestrian_accessible_route_maintained` | An accessible path exists when a sidewalk closes | When the sidewalk is affected | Accessibility of the pedestrian route |
 | Title block: `wpi_number`, `client_name`, `digsafe_ticket_number`, location | Printed on every sheet | Before the PDF is produced | The location line uses the road name the POC already prints, from the same source; the SME does not type an address (D-71). Point labels come from placemark names (D-72) |
 
-**Why `duration`, `night_work` and the other fields you listed are kept (reverses the earlier D-55).** MUTCD options depend on them. Dropping `duration` would remove three shortcuts your SME may use on short jobs: TA-1 note 4 (signs and devices may be omitted for short-term, short-duration or mobile work with a lit vehicle), TA-6 note 10 (taper and devices may be omitted for short-duration work with a lit shadow vehicle), and TA-10 note 3 (first and last signs may be omitted for short-duration work). Without them every short job would get the full layout, which is more than your SME draws today. `night_work` drives the TA-10 standard that flagger stations are lit at night. The other fields you named (lane closure, flagger or police preference, heavy vehicles, arrow board) each change a rule result. None of them can be read from imagery or open data, so each stays a UI answer, asked when the system cannot determine it.
+**Why `duration`, `night_work` and the other fields you listed are kept (reverses the earlier D-55).** MUTCD options depend on them. Dropping `duration` would remove three shortcuts your SME may use on short jobs: TA-1 note 4 (signs and devices may be omitted for short-term, short-duration or mobile work with a lit vehicle), TA-6 note 10 (taper and devices may be omitted for short-duration work with a lit shadow vehicle), and TA-10 note 3 (first and last signs may be omitted for short-duration work). Without them every short job would get the full layout, which is more than your SME draws today. `night_work` drives the TA-10 standard that flagger stations are lit at night. The other fields you named (lane closure, flagger or police preference [the police part is future scope, D-68], heavy vehicles, arrow board) each change a rule result. None of them can be read from imagery or open data, so each stays a UI answer, asked when the system cannot determine it.
 
 ### Observed and computed fields
 
@@ -343,7 +343,7 @@ The Run button stays disabled until these are filled. They are entered once per 
 | TA-6 | `shoulder_present` | Must be true for TA-6 | AI | Figure title (shoulder work) |
 | TA-6 | `shoulder_width_ft`, `remaining_lane_width_ft` | Widths | Code | Note 1 (10 ft minimum to the device face) |
 | TA-6 | `opposite_shoulder_suitable` | Opposite shoulder can carry shifted traffic | AI, else SME | Note 5 |
-| TA-10 | `traffic_control_method` | Flagger by default; police by SME after the draft | Code, then SME review action | Fig. 6P-10; police is a state-level variant |
+| TA-10 | `traffic_control_method` | Flagger (default) | Code | Fig. 6P-10; police detail is future scope (D-68) |
 | TA-10 | `single_flagger_eligible` | Low volume, short zone, straight road, flagger visible both ways | Code for straightness and length, `traffic_volume` from the SME | Note 2 |
 | TA-10 | `approaching_lanes_one` | Only one approaching lane per controlled direction | AI and OSM | Note 5 (condition for AFAD) |
 | TA-10 | `curve_or_crest_near_zone` | A curve or hill crest near the taper | Code | Note 6 (extend the buffer) |
@@ -545,7 +545,7 @@ Three kinds of input go in on the left. Exactly one of the five outcomes comes o
 | `lanes_per_direction` | TA-33; total lane count is not enough | Imagery |
 | `shoulder_present`, `shoulder_width_ft` | TA-6 and TA-33 | Imagery |
 | `remaining_lane_width_ft` | Decides whether TA-6 holds (10 ft, or 9 ft by exception) or becomes a lane closure | Computed from road width and encroachment |
-| `traffic_control_method` | Set by code to Flagger when TA-10 is chosen. Police detail is applied by the SME after the draft (D-68) | Code; SME review action |
+| `traffic_control_method` | Set by code to Flagger when TA-10 is chosen. Police detail is future scope (D-68) | Code |
 | `traffic_volume` | The 9 ft option and the single-flagger option depend on it | SME or project input |
 
 **No match and near match (D-35).** The router reasons only about TAs that exist in the rule pack. TA-3, TA-11 and TA-12 appeared in the earlier analysis from VS Code Claude's general knowledge, not from the pack \[S3\], so the router never names them.
@@ -580,7 +580,8 @@ flowchart TD
   LC --> D{Road form}
   D -- two-lane, one lane each way --> T10[TA-10<br/>Sect. 6N.09]
   D -- divided --> T33[TA-33<br/>Fig. 6P-33]
-  D -- undivided, 2+ lanes each way --> T33b[TA-33<br/>Sect. 6N.11]
+  D -- undivided, Granite-type case (D-91) --> T33b[TA-33<br/>Sect. 6N.11 para 02, 06]
+  D -- broader undivided cases --> EQ[Engineer question]
   D -- none of these --> N[NO_TA_MATCH]
 ```
 
@@ -588,7 +589,7 @@ flowchart TD
 - TA-6 requires `shoulder_present` = true. The figure is "Shoulder Work".
 - TA-6 requires a low-speed minor road. TA-6 note 2 says the treatment is for minor roads with low speeds and higher speeds should use a lane closure. The condition uses the SME's `road_type` and `posted_speed_mph`. The exact speed cutoff is a rule-pack value that needs a source, marked `SOURCE_REVIEW_REQUIRED` until your SME sets it.
 - TA-6 remaining width is measured to the near face of the channelizing devices (note 1).
-- TA-33 is one rule with an OR: divided highway, or undivided with two or more lanes each way (Sect. 6N.11). It is never two separate checks, so the router cannot double-match.
+- TA-33 is one rule with an OR: divided highway, or a Granite-type undivided case: two lanes each way, right lane closed (Sect. 6N.11 para 02 and para 06, owner-confirmed reading, D-91). Broader cases (three or more lanes each way, left-lane or interior closures on undivided roads) are an engineer question. It is never two separate checks, so the router cannot double-match.
 
 **What the MUTCD figures show, and what your drafts do.** From the Chapter 6 file you supplied \[S6\]:
 
@@ -596,10 +597,10 @@ flowchart TD
 | --- | --- | --- | --- |
 | TA-1 | 6P-1, Work Beyond the Shoulder | W20-1. Note 2 allows SHOULDER WORK instead. Note 3 allows omitting it behind a barrier, more than 24 in behind the curb, or 15 ft or more from the roadway | No reference draft yet |
 | TA-6 | 6P-6, Shoulder Work with Minor Encroachment | W20-1, shoulder taper 1/3 L, optional buffer, optional G20-2. Note 1: lanes at least 10 ft. Note 6: ROAD NARROWS may be added | E Second St: W20-1, W21-5, W5-1 labelled 100 ft MIN, plus no-parking and sidewalk signs |
-| TA-10 | 6P-10, Lane Closure on a Two-Lane Road Using Flaggers | W20-1, W20-4, W20-7 at A, B, C spacing, 50 to 100 ft tapers, optional G20-2 | Colorado St: W20-1, W20-4 and POLICE OFFICER AHEAD at 100 ft, police details instead of flaggers |
-| TA-33 | 6P-33, Stationary Lane Closure on a Divided Highway | W20-1, W20-5R, W4-2R, arrow board, merging taper L, optional buffer, optional G20-2. Section 6N.11 allows a similar layout on undivided or divided four-lane roads when the right lane is closed | Granite St (US-1): W20-1, W20-5R, W4-2R at 100 ft, plus RI double-fines signs |
+| TA-10 | 6P-10, Lane Closure on a Two-Lane Road Using Flaggers | W20-1, W20-4, W20-7 at A, B, C spacing, 50 to 100 ft tapers, optional G20-2 | Colorado St: W20-1, W20-4 and a police sign at 100 ft (the draft uses police details; the tool drafts flaggers, police detail is future scope, D-68) |
+| TA-33 | 6P-33, Stationary Lane Closure on a Divided Highway | W20-1, W20-5R, W4-2R, arrow board, merging taper L, optional buffer, optional G20-2. Section 6N.11 para 02 and para 06 allow a similar layout for a Granite-type case (undivided, two lanes each way, right lane closed; owner-confirmed reading, D-91); broader cases are an engineer question | Granite St (US-1): W20-1, W20-5R, W4-2R at 100 ft, plus RI double-fines signs |
 
-The router must follow your SME's practice, not only the figure titles. Granite is not a divided highway, but Section 6N.11 allows TA-33 there. The TA-33 eligibility in the pack must cite 6N.11 as well as the figure, or the router would refuse Granite.
+The router must follow your SME's practice, not only the figure titles. Granite is not a divided highway, but Section 6N.11 para 02 and para 06 allow TA-33 for a Granite-type case (D-91); broader undivided cases go to the engineer. The TA-33 eligibility in the pack must cite 6N.11 as well as the figure, or the router would refuse Granite.
 
 **Reference drawings for each TA (from you).** TA-6: E Second St, South Boston MA, a shoulder closure with some additions. TA-10: Colorado St, Mattapan MA, flagging with alternating traffic, here with police details instead of flaggers, a common change. TA-33: Granite St (US-1), Westerly RI, used where there is no shoulder. TA-1: no reference draft yet. Please send one \[S6\]. The expected TA for each job is a test expectation, never an input.
 
@@ -728,9 +729,8 @@ The top two rows are the loop. The middle block shows how one answer reveals mor
 - change the TA (it is proposed, then confirmed)
 - mark the TA undetermined
 - regroup points: move a point to another zone, merge zones, split a zone, and reorder, merge or split sheets
-- switch a TA-10 zone from flaggers to police details (D-68). This is a deterministic review action: flagger stations become police details, the W20-7 Flagger sign becomes POLICE OFFICER AHEAD, and the checks re-run. The SME can trigger it from the SME assistant chat; the full pipeline Q&A chatbot stays future scope
 - adjust placement, or add or remove an approved device
-- give a natural-language instruction. The AI only interprets the words. Every action runs through a deterministic function.
+- give a natural-language instruction. The AI only interprets the words. Every action runs through a deterministic function. The full pipeline Q&A chatbot stays future scope.
 
 **The TA-change flow.** Before anything changes, the SME sees the old and new TA, the affected eligibility, the schema difference, the rules affected, the artifacts that become invalid, the earliest stage that will rerun, and the expected extra AI or map calls. After confirmation a new immutable version is written. A confirmed TA change may need one new call 2 because the schema changed. Reused: the common imagery, fused common facts and map data, unless the analysis extent is too small. If it is, `ANALYSIS_EXTENT_INSUFFICIENT` is shown before anything is refetched \[S1\].
 
@@ -787,7 +787,7 @@ The rule pack is a versioned, hashed set of data files (a composed pack) in whic
 ```mermaid
 flowchart TD
   F[Federal base<br/>MUTCD rules, formulas, tables] --> J[Jurisdiction supplement<br/>state or agency requirements]
-  J --> C[Client practice layer<br/>drafts' repeatable practice, D-51]
+  J --> C[Client practice layer<br/>withdrawn 2026-10-30, not built, D-51]
   C --> P[Project reference<br/>statements from an approved project plan]
   P --> E[Effective requirement<br/>for this plan, every source visible]
   D[Pre-approved deviations<br/>separate layer] -.applies only where allowed.-> E
@@ -839,13 +839,13 @@ Effective rules become one view over `rule` and `deviation`, and every run store
 
 **Device catalog (D-31).** Each entry holds an id, MUTCD code, name, category, sizes by road type and speed, legend and units, the TAs that use it, a source citation, a drawing asset reference and a version. Start with the devices used by TA-1, 6, 10 and 33. Fill each from these sources, in this order: the symbols already in your drawing template (extract them if the template is in the repo), then symbols from the MUTCD Chapter 6 file, then symbols found online for now. Your real library files come later. An entry whose symbol is not from your approved library carries `PLACEHOLDER_ASSET`, and any sheet using one shows a visible "placeholder symbols" label and is REVIEW\_REQUIRED. If two sources disagree, the entry is flagged for the approver. Anything a source does not state stays `SOURCE_REVIEW_REQUIRED`, which forces review (D-39). The catalog is versioned and hashed. Validators check each placed device exists, and the renderer stops only when no symbol exists at all. The devices seen on your three drawings are the starting list: W20-1, W20-4, W20-5R, W20-8, W21-5, W5-1, W4-2R, W9-2L, G20-2, R8-3, R9-9, R9-11L/R, R9-10L, R9-3BR, R2-11, RI 27.1.1, R3-7R and the M4-9 detour series, with the codes as printed \[S6\].
 
-**Client practice layer (D-51, proposed).** Your drafts differ from the plain MUTCD figures in repeatable ways. To reproduce them, these become client-layer rules, each citing the draft it came from, and each needs your SME's confirmation:
+**Client practice layer (D-51, withdrawn 2026-10-30).** The owner withdrew the client practice layer; none of it is built. The table below is kept as a record of how the drafts differ from the plain MUTCD figures. What replaces it: the buffer is a per-zone choice with default none (D-94), sidewalk closed and detour add-ons are optional per zone and built from MUTCD sources (D-90), no-parking and RI double fines wait for sources, police detail is future scope (D-68), and the comparison reports a core and a full score (D-89).
 
-| Client practice seen on the drafts | MUTCD position | Proposed client rule |
+| Client practice seen on the drafts | MUTCD position | Former proposal (withdrawn, D-51) |
 | --- | --- | --- |
 | Advance signs 100 ft apart on urban streets | Table 6B-1 gives 100 ft for urban low speed | Same as MUTCD. No client rule needed |
 | Longitudinal buffer 100 ft at 25 mph (Colorado) | Table 6B-2 gives 155 ft at 25 mph, but its use is an Option (Sect. 6B.06 para 11) | Client buffer 100 ft for urban 25 mph |
-| Police detail and POLICE OFFICER AHEAD instead of flaggers and W20-7 (Colorado) | TA-10 shows flaggers | Not applied automatically. The draft uses flaggers; the SME switches to police after the draft (D-68) |
+| Police detail and POLICE OFFICER AHEAD instead of flaggers and W20-7 (Colorado) | TA-10 shows flaggers | Not built. Police detail is future scope (D-68) |
 | No-parking signs (R8-3, TEMPORARY NO PARKING) along the work area | Not in the figures | Add-on module when parking exists |
 | W20-1 and G20-2 on side streets inside the advance area | TA-33 note 2 requires devices on intersecting side roads | Side-street module |
 | Sidewalk-closure signs (R9-9, R9-11) where the sidewalk is affected | Section 6G.10 | Pedestrian module |
@@ -980,7 +980,7 @@ The slices are specified in full, with scope, contracts, acceptance criteria, te
 | S1 | Domain model and KML intake for all geometry types (coordinates only; custom KML keys are future scope) | S0 |
 | S2 | Storage interfaces with local adapters, artifact references, project store | S0 |
 | S3 | Project orchestrator, one child run per zone, engine input extended, location list in the UI | S1, S2 |
-| S4 | Rule pack v1: composed, table-shaped, `RulePackStore`, TA-1, 6, 10 and 33 from Chapter 6, tables 6B-1 to 6B-4, client layer | S0 |
+| S4 | Rule pack v1: composed, table-shaped, `RulePackStore`, TA-1, 6, 10 and 33 from Chapter 6, tables 6B-1 to 6B-4, client layer (withdrawn, D-51) | S0 |
 | S5 | Device catalog and symbol library integration | S4 |
 | S6 | Site understanding: call 1 deciding fields, geometry fusion at low confidence, width uncertainty, hybrid crops | S3 |
 | S7 | Router and call 2 TA fields | S4, S6 |
@@ -1028,7 +1028,7 @@ Delivered with this plan as `tcp_golden_set_v0.1.zip`: one JSON file per job (`g
 
 **What the extraction already shows**
 
-- Colorado: W20-1, W20-4 and the police sign on both approaches, measured 99.8 to 100.6 ft apart, matching the 100 ft labels. The automatic draft will show W20-7 Flagger in that position; the comparator treats it as the expected pre-switch difference (D-68).
+- Colorado: W20-1, W20-4 and the police sign on both approaches, measured 99.8 to 100.6 ft apart, matching the 100 ft labels. The automatic draft will show W20-7 Flagger in that position; the comparator records it as a known difference, because police detail is future scope (D-68).
 - E Second St: W20-1, W21-5 and W5-1 are drawn about 40 ft apart but labelled 100 ft MIN. Your drafts are schematic for advance signs, so the comparator must use the labelled value where one exists.
 - Granite: W20-1, W20-5R and W4-2R about 100 ft apart on sheets I, IV and VI. Sheets near intersections need hand checking, because the automatic approach split mixes in side-street signs.
 
@@ -1038,7 +1038,7 @@ Delivered with this plan as `tcp_golden_set_v0.1.zip`: one JSON file per job (`g
 
 No, and it shouldn't be expected to be byte- or pixel-identical. With the plan as written, the structure should match: TA, signs, order, counts, sheets and dimension values. Positions should match within tolerance. Four things stop an exact match unless we act:
 
-1. **Client practice differs from the MUTCD.** The 100 ft buffer at 25 mph, police instead of flaggers (applied by the SME after the draft, so Colorado compares after that switch), no-parking signs, side-street signs and RI double-fines signs are not in the figures. The client layer in Section 10 encodes them. Without it, the system would draw a 155 ft buffer, flaggers and no extras.
+1. **Client practice differs from the MUTCD.** The 100 ft buffer at 25 mph, police instead of flaggers, no-parking signs, side-street signs and RI double-fines signs are not in the figures. The client layer in Section 10 that was to encode them is withdrawn (D-51). The buffer is a per-zone choice with default none (D-94); sidewalk and detour add-ons are built from sources (D-90); no-parking and RI double fines wait for sources; police detail is future scope (D-68). The comparison reports a core and a full score (D-89).
 2. **Your drafts are partly schematic.** Advance signs are sometimes drawn closer than labelled. The system draws to scale, so drawn positions will differ while the labels agree.
 3. **Field judgment.** Note 9 on every sheet says distances may be adjusted in the field. Sign spots chosen to avoid driveways, trees or intersections will differ.
 4. **Base imagery and drawing style.** Your sheets use a different aerial image and your CAD symbols. Ours use Azure Maps and placeholder symbols until your library arrives.
@@ -1193,14 +1193,14 @@ Slices S0 to S5 can start now. Each item has a default so no slice is blocked.
 | 1 | ~~Foundry error text and the S0 schema spike results~~ Closed: spike done, facts list chosen (D-61, D-80) | S6 | Done |
 | 2 | Default `work_space_length_ft` per `work_type` for single points | S8 | Asked per point on the form |
 | 3 | Does the title block need city, state and ZIP as well as the road name the POC prints? | S12 | Road name only, as the POC does today |
-| 4 | My reading of "taper instead of police": the draft uses the standard TA-10 flagger layout with its tapers, and the SME switches to police after the draft | S7 | As written (D-68) |
+| 4 | Closed 2026-10-30: police detail is future scope (D-68, D-86). Was: my reading of "taper instead of police": the draft uses the standard TA-10 flagger layout with its tapers, and the SME switches to police after the draft | S7 | As written (D-68) |
 | 5 | The TA-6 low-speed cutoff (note 2 gives no number) | S4 | `SOURCE_REVIEW_REQUIRED`, forces review |
 | 6 | TMA suggestion threshold (45 mph proposed) or none | S8 | No automatic suggestion |
 | 7 | Default work-vehicle width and its source | S8 | `UNKNOWN`, asked on the form |
 | 8 | SME check of the golden set v0.1 | S13 | Used as v0.1 with tolerances |
 | 9 | A TA-1 reference draft | S13 | Compared with Figure 6P-1 only |
 | 10 | The Granite drawing matching the KML (WPI 3159540) | S13 | Used for sheet rules only |
-| 11 | Confirm the client practice layer (100 ft buffer, add-on modules) | S8 | Built as proposed, flagged |
+| 11 | Closed 2026-10-30: client practice layer withdrawn (D-51). Was: confirm the client practice layer (100 ft buffer, add-on modules) | S8 | Built as proposed, flagged |
 | 12 | Confirm grouping settings and the case table | S9 | Start values, flagged |
 | 13 | Sign codes to confirm (W20-8 police, M4-A8, M4-9AL, R9-3BR, R9-10L, RI 27.1.1) | S5 | Catalog as listed |
 | 14 | The 11 ft lane-width note against TA-6's 10 ft | S8 | Both checked; the stricter gives a warning |
@@ -1211,7 +1211,7 @@ Slices S0 to S5 can start now. Each item has a default so no slice is blocked.
 | 19 | Push and merge S0a: push `tcp-mvp/s00a-restructure`, review it, merge into `tcp-mvp/base` | Before S0 | Push now, merge after review |
 | 20 | ~~Approve D-78 and D-79~~ Closed: approved and done in S0 | S0 | Done |
 
-**Closed this round:** traffic control method not a start field, flaggers by default, police after the draft (D-68); lengths by code (D-64); JSON only, no TOON (D-61); work side suggested by AI and confirmed (D-69); grade-crossing notification dropped (D-70); title block uses the POC road name (D-71); placemark names as labels (D-72); Select TA dropdown (D-73).
+**Closed this round:** traffic control method not a start field, flaggers by default, police detail is future scope (D-68, D-86); lengths by code (D-64); JSON only, no TOON (D-61); work side suggested by AI and confirmed (D-69); grade-crossing notification dropped (D-70); title block uses the POC road name (D-71); placemark names as labels (D-72); Select TA dropdown (D-73).
 
 ## 16. Deferred: engineer-designed plans
 
@@ -1249,11 +1249,11 @@ This feature is not built now. You approved offering it later and asked for the 
 | Reference-only toggle | The role field is stored. A UI toggle to mark stray points such as a distant yard comes later. Every point is work by default |
 | Cross-run imagery cache | Store Azure Maps imagery and crops and reuse them for the same location. Needs an expiry rule and a scope (per project or shared). The Azure terms check was dropped by your decision |
 | Cloud move | Azure Blob and PostgreSQL adapters, a migration tool, and the client's region, retention and tenancy answers. Out of the MVP (D-40) |
-| Police detail instead of flagger | Flagger is always the default traffic control method; the SME can switch to police detail after the draft (D-68). Nothing in the MVP picks police from the place. A later suggestion from a cited jurisdiction rule, the research so far and what it would depend on are in "Police detail instead of flagger: notes for later" below |
+| Police detail instead of flagger | Flagger is always the default traffic control method; police detail is future scope (D-68). Nothing in the MVP picks police from the place. A later suggestion from a cited jurisdiction rule, the research so far and what it would depend on are in "Police detail instead of flagger: notes for later" below |
 
 ### Police detail instead of flagger: notes for later
 
-**MVP rule.** Flagger is always the default traffic control method. The SME can switch to police detail as a post-draft review action (D-68). There is no jurisdiction logic in the MVP.
+**MVP rule.** Flagger is always the default traffic control method. Police detail instead of flagger is future scope (D-68). There is no jurisdiction logic in the MVP.
 
 **Future idea.** Suggest police detail where a cited jurisdiction or agency rule applies, found from the KML point (state, county and town boundaries). The suggestion carries its citation and the status `SOURCE_REVIEW_REQUIRED` until the SME confirms it, and it never applies automatically. A place that is not listed defaults to flagger.
 
@@ -1433,7 +1433,7 @@ Each record states status, context, decision, consequences and what was rejected
 
 ### ADR-044: Routing tree and explicit eligibility
 
-**Status:** Accepted (D-60). **Decision:** Route by `work_location`, then by road form. TA-6 requires a shoulder and a low-speed minor road (note 2), with width measured to the device face (note 1). TA-33 is one OR'd rule covering divided roads and undivided roads with two or more lanes each way (6N.11). Anything else is NO\_TA\_MATCH. **Rejected:** Implicit preconditions; two separate TA-33 checks.
+**Status:** Accepted (D-60). **Decision:** Route by `work_location`, then by road form. TA-6 requires a shoulder and a low-speed minor road (note 2), with width measured to the device face (note 1). TA-33 is one OR'd rule covering divided roads and undivided roads with two or more lanes each way (6N.11). Anything else is NO\_TA\_MATCH. **Rejected:** Implicit preconditions; two separate TA-33 checks. **Amendment 2026-10-30 (D-91):** the 6N.11 case is limited to a Granite-type case (undivided, two lanes each way, right lane closed; 6N.11 para 02 and para 06). Broader cases are an engineer question. The text above is kept as originally written.
 
 ### ADR-045: AI output format chosen by a spike
 
@@ -1445,7 +1445,7 @@ Each record states status, context, decision, consequences and what was rejected
 
 ### ADR-048: Flaggers by default, police as a post-draft SME action
 
-**Status:** Accepted; police part deferred to future scope 2026-10-30 (D-68; changed: the post-draft police switch is no longer built). **Context:** Police details replace flaggers only as a state-level choice, and they change the sign to POLICE OFFICER AHEAD. **Decision:** `traffic_control_method` is not asked at the start. When the router picks TA-10, code sets Flagger and the draft follows MUTCD Figure 6P-10. The SME switches a zone to police details after the draft, as a deterministic review action from the SME assistant. **Consequences:** One fewer start field. The Colorado golden is compared after the switch. **Rejected:** Asking for the method on every job; making police the default.
+**Status:** Accepted; police part deferred to future scope 2026-10-30 (D-68; changed: the post-draft police switch is no longer built). **Context:** Police details replace flaggers only as a state-level choice, and they change the sign to POLICE OFFICER AHEAD. **Decision:** `traffic_control_method` is not asked at the start. When the router picks TA-10, code sets Flagger and the draft follows MUTCD Figure 6P-10. The SME switches a zone to police details after the draft, as a deterministic review action from the SME assistant. **Consequences:** One fewer start field. The Colorado golden is compared after the switch. **Rejected:** Asking for the method on every job; making police the default. **Amendment 2026-10-30 (D-68, D-86):** the post-draft police switch is not built; flagger is the default and police detail is future scope. The Decision and Consequences above are kept as originally written.
 
 ### ADR-047: Duration, night work and the other listed fields are kept
 
@@ -1461,7 +1461,7 @@ Each record states status, context, decision, consequences and what was rejected
 
 ### ADR-039: Client practice layer
 
-**Status:** Withdrawn 2026-10-30 (D-51; changed: was Proposed). **Context:** Your drafts follow client practice beyond the figures. **Decision:** Client rules live in their own layer, each citing a draft, and never in the federal layer. **Consequences:** Output matches your drafts' practice and stays traceable. **Rejected:** Changing MUTCD values to fit.
+**Status:** Withdrawn 2026-10-30 (D-51; changed: was Proposed). **Context:** Your drafts follow client practice beyond the figures. **Decision:** Client rules live in their own layer, each citing a draft, and never in the federal layer. **Consequences:** Output matches your drafts' practice and stays traceable. **Rejected:** Changing MUTCD values to fit. **Amendment 2026-10-30 (D-51):** withdrawn by the owner; no client layer is built (register: docs/decisions/OWNER_DECISIONS_2026-10-30.md). The text above is kept as originally written.
 
 ## 18. Verification prompt for VS Code Claude
 
@@ -1495,8 +1495,8 @@ DECIDED: zones over 150 m are split automatically with a flag;
 the KML supplies coordinates only (custom keys and selected_ta are
 future scope); mandatory start fields (road type, speed, traffic
 volume, lane closure) are typed by the SME and never calculated;
-traffic control method defaults to Flagger for TA-10 and the SME
-switches to police after the draft; AI output is JSON only; the AI returns positions and code computes lengths;
+traffic control method defaults to Flagger for TA-10
+(police detail is future scope, D-68); AI output is JSON only; the AI returns positions and code computes lengths;
 every plan waits for SME approval by default; the rule pack is
 composed and table-shaped behind a RulePackStore; crops are cut in
 code first and a higher-zoom image is fetched only when pixels are
