@@ -1,9 +1,5 @@
 """RulePackStore for rule pack v1: the only module that reads rule-pack files (D-30, ADR-027).
 
-MERGE NOTE: S2 (tcp-mvp/s02-storage, not merged into this branch) defines the RulePackStore interface. This module
-implements only what S4 needs with the same method names (list_versions, load, content_hash). Reconcile it with S2's
-interface when the branches merge.
-
 Layout under the pack root (`rule_pack/` by default): `pack.json` (manifest) plus the part files it lists
 (`base/*.json`, `ta/*.json`, `jurisdiction/*.json`, `client/*.json`). The POC pack in the same folder is read only by
 the legacy `rule_pack_loader.py`; the pipeline still uses it until the switch-over is approved.
@@ -17,6 +13,7 @@ from tcp_planner.config.settings import RULE_PACK_DIR
 from tcp_planner.contracts import RulePackError, canonical_json, sha256_hex
 from tcp_planner.rules.rule_pack_models import TABLES, Manifest, Part
 from tcp_planner.rules.rule_pack_validator import validate
+from tcp_planner.storage.interfaces import RulePackStore
 
 MANIFEST = "pack.json"
 NO_TA_MATCH = "NO_TA_MATCH"
@@ -101,7 +98,7 @@ class RulePack:
                                 for s in refs]}
 
 
-class JsonRulePackStore:
+class JsonRulePackStore(RulePackStore):
     """Local JSON adapter. A later adapter reads SQL; callers only see these methods."""
 
     def __init__(self, root=None):

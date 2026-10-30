@@ -186,15 +186,15 @@ class StateStore(abc.ABC):
 
 
 class RulePackStore(abc.ABC):
-    """Interface only (S2). S4 implements it and may refine the signatures. Every value read from a rule pack comes
-    with its rule_id, source table, section and page, and the pack version and hash."""
+    """Interface (S2), in the shape S4 implements. Every value read from a rule pack comes with its rule_id, source
+    table, section and page, and the pack version and hash."""
 
     @abc.abstractmethod
-    def list_versions(self, pack_id): ...
+    def list_versions(self): ...
 
     @abc.abstractmethod
-    def load(self, pack_id, version=None):
-        """The pack document. version None means the active version."""
+    def load(self, version=None, validate_pack=True):
+        """The pack. version None means the active version."""
 
     @abc.abstractmethod
-    def content_hash(self, pack_id, version=None): ...
+    def content_hash(self, version=None): ...

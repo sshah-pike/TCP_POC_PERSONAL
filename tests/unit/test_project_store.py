@@ -75,16 +75,15 @@ def test_project_state_lives_in_the_shared_folder(tmp_path, monkeypatch):
     assert (tmp_path / "runs" / "projects" / "P-1" / "input" / "s.kml").is_file()
 
 
-def test_rule_pack_store_is_an_interface_only():
+def test_json_rule_pack_store_conforms_to_the_interface():
+    import inspect
+    from tcp_planner.rules.rule_pack_store import JsonRulePackStore
     assert RulePackStore.__abstractmethods__ == {"list_versions", "load", "content_hash"}
     with pytest.raises(TypeError): RulePackStore()
-    import tcp_planner, pkgutil, importlib
-    impls = []
-    for m in pkgutil.walk_packages(tcp_planner.__path__, "tcp_planner."):
-        try: mod = importlib.import_module(m.name)
-        except Exception: continue
-        impls += [n for n, c in vars(mod).items() if isinstance(c, type) and issubclass(c, RulePackStore) and c is not RulePackStore]
-    assert impls == []  # S4 implements it
+    assert issubclass(JsonRulePackStore, RulePackStore)
+    assert isinstance(JsonRulePackStore(), RulePackStore)
+    for name in RulePackStore.__abstractmethods__:
+        assert inspect.signature(getattr(JsonRulePackStore, name)) == inspect.signature(getattr(RulePackStore, name)), name
 
 
 def test_shared_raw_path_finder():
