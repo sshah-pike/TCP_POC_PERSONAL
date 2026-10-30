@@ -93,5 +93,52 @@
       "value": "crops.primary_zoom",
       "source": "config/pipeline_config.json crops.primary_zoom (the documented maximum of the microsoft.imagery tileset); no higher zoom is ever requested, so the upsampling sharpness check (sharpness.min_detail_gain_ratio) is not needed here"
     }
+  },
+  "osm": {
+    "note": "OSM rules of S6 (owner plan 2026-10-31). Every distance and angle is CALIBRATION_PENDING: a starting value that is used and flagged, not a calibrated one. A missing lanes or shoulder tag is no information; a missing oneway tag counts as not one-way at lower confidence.",
+    "query_radius_m": {
+      "value": 150,
+      "source": "CALIBRATION_PENDING",
+      "note": "radius of the one bounded Overpass query around the work point; must not exceed config/data_sources.json osm_overpass.query_limits.max_radius_m"
+    },
+    "highway_classes": {
+      "value": [
+        "motorway",
+        "trunk",
+        "primary",
+        "secondary",
+        "tertiary",
+        "unclassified",
+        "residential",
+        "living_street",
+        "service",
+        "motorway_link",
+        "trunk_link",
+        "primary_link",
+        "secondary_link",
+        "tertiary_link"
+      ],
+      "source": "OSM wiki Key:highway (road classes a vehicle can use); service included for driveways and parking aisles so they can be told apart, never chosen over a named road"
+    },
+    "max_way_distance_m": {
+      "value": 25,
+      "source": "CALIBRATION_PENDING",
+      "note": "a way farther than this from the work point is not the road of the job"
+    },
+    "divided_max_separation_m": {
+      "value": 60,
+      "source": "CALIBRATION_PENDING",
+      "note": "largest distance between the two carriageways of a divided road"
+    },
+    "divided_parallel_tolerance_deg": {
+      "value": 20,
+      "source": "CALIBRATION_PENDING",
+      "note": "largest angle (mod 180) between the two ways for them to count as parallel"
+    },
+    "divided_require_same_name_or_ref": {
+      "value": true,
+      "source": "CALIBRATION_PENDING",
+      "note": "the opposite way must share the name or the ref of the chosen way"
+    }
   }
 }

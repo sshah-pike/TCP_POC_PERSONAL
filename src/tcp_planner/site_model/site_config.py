@@ -34,3 +34,10 @@ def default_setting(name, cfg=None):
     e = (cfg or load_site_config())["defaults"][name]
     if e.get("source") == "UNKNOWN": return None, ("SOURCE_REVIEW_REQUIRED",), bool(e.get("optional"))
     return e["value"], tuple(e.get("flags", ())), bool(e.get("optional"))
+
+
+def setting(section, name, cfg=None):
+    """(value, flags) of a setting in any section. A CALIBRATION_PENDING value is a starting value that is used and carries that
+    flag, so every result computed from it can say so (same rule as `measurement_setting`)."""
+    entry = (cfg or load_site_config())[section][name]
+    return entry["value"], (("CALIBRATION_PENDING",) if entry.get("source") == "CALIBRATION_PENDING" else ())

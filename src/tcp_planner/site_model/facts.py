@@ -20,7 +20,8 @@ FLAGS = ("DEFAULT_ASSUMED", "POLICY_SUGGESTED", "CALIBRATION_PENDING", "SOURCE_R
 # flags that keep a fact out of every rule input (the value is shown to the SME only)
 BLOCKING_FLAGS = frozenset({"CONTEXT_ONLY", "NEEDS_SECOND_SOURCE"})
 QUESTION_KINDS = ("WIDTH_NEAR_THRESHOLD", "LANES_DISAGREE", "START_FIELD_CONFLICT", "FACT_UNKNOWN", "WORK_SIDE_CONFIRM",
-                  "WORK_LOCATION_CONFLICT", "LAYOUT_NOT_ALLOWED")
+                  "WORK_LOCATION_CONFLICT", "LAYOUT_NOT_ALLOWED", "LANES_UNSPLIT", "WHICH_ROAD", "BEARING_MISMATCH",
+                  "WORK_LOCATION_NEAR_EDGE")
 
 
 class _Rec(BaseModel):
@@ -111,6 +112,13 @@ class Question(_Rec):
     options: tuple = ()
     default_if_skipped: str = "UNKNOWN"
     reveals: tuple = ()
+    # what S7 logs with each question and answer (there is no log store yet): which field, which zone and project, which OSM
+    # way, and the numbers or tags that raised it
+    field: Optional[str] = None
+    zone_id: Optional[str] = None
+    project_id: Optional[str] = None
+    osm_way_id: Optional[int] = None
+    context: dict = {}
 
 
 def question_id(kind, *parts):

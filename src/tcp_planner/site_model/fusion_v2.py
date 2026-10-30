@@ -47,23 +47,26 @@ class SourceReading(NamedTuple):
     source: str
     outcome: str
     value: Optional[object] = None
+    lower_confidence: bool = False          # a stand-in value (a missing oneway tag read as "not one-way"): it can agree, never contradict
+    note: str = ""
+    reason_code: Optional[str] = None       # for UNKNOWN: no_tag, source_failed, ambiguous, ...
 
     @staticmethod
-    def found(source, value): return SourceReading(source, FOUND, value)
+    def found(source, value, lower_confidence=False, note=""): return SourceReading(source, FOUND, value, lower_confidence, note)
 
     @staticmethod
-    def not_present(source, value=False): return SourceReading(source, NOT_PRESENT, value)
+    def not_present(source, value=False, note=""): return SourceReading(source, NOT_PRESENT, value, False, note)
 
     @staticmethod
-    def unknown(source): return SourceReading(source, UNKNOWN, None)
+    def unknown(source, note="", reason_code=None): return SourceReading(source, UNKNOWN, None, False, note, reason_code)
 
 
 def _pair(c, field):
-    """(source_id, value, outcome) from a (source_id, value) pair or a SourceReading. UNKNOWN has no value."""
+    """(source_id, value, outcome, lower_confidence) from a (source_id, value) pair or a SourceReading. UNKNOWN has no value."""
     if isinstance(c, SourceReading):
-        return c.source, (None if c.outcome == UNKNOWN else c.value), c.outcome
+        return c.source, (None if c.outcome == UNKNOWN else c.value), c.outcome, c.lower_confidence
     sid, v = c
-    return sid, v, outcome_for(field, v)
+    return sid, v, outcome_for(field, v), False
 
 
 def compare(field, ai_value, source_candidates, same=None):
@@ -78,12 +81,16 @@ def compare(field, ai_value, source_candidates, same=None):
     same = same or (lambda a, b: a == b)
     readings = [_pair(c, field) for c in source_candidates]
     cands = [Candidate(source="AI", value=ai_value, confidence_class=None, outcome=outcome_for(field, ai_value))]
-    decided = [(sid, v) for sid, v, _ in readings if v is not None]
-    for sid, v, oc in readings:
-        agree = None if v is None or ai_value is None else same(ai_value, v)
-        cands.append(Candidate(source=sid, value=v, confidence_class=confidence_class(sid, agree), outcome=oc))
-    if not source_candidates: return FusionRecord(field=field, candidates=tuple(cands), agreement=SINGLE_SOURCE, note="only the imagery reading exists")
-    if not decided: return FusionRecord(field=field, candidates=tuple(cands), agreement=UNDECIDABLE, note="no source could decide the value")
+    # a lower-confidence reading that differs from the imagery is not evidence against it: kept as a candidate, not decided on
+    ignored = {sid for sid, v, _, weak in readings if weak and v is not None and ai_value is not None and not same(ai_value, v)}
+    decided = [(sid, v) for sid, v, _, _ in readings if v is not None and sid not in ignored]
+    for sid, v, oc, weak in readings:
+        agree = None if v is None or ai_value is None or sid in ignored else same(ai_value, v)
+        cands.append(Candidate(source=sid, value=v, confidence_class=LOW if weak else confidence_class(sid, agree), outcome=oc))
+    if not readings: return FusionRecord(field=field, candidates=tuple(cands), agreement=SINGLE_SOURCE, note="only the imagery reading exists")
+    if not decided:
+        note = ("the only reading is a lower-confidence stand-in that differs from the imagery" if ignored else "no source could decide the value")
+        return FusionRecord(field=field, candidates=tuple(cands), agreement=UNDECIDABLE, note=note)
     if ai_value is None: return FusionRecord(field=field, candidates=tuple(cands), agreement=UNDECIDABLE, note="the imagery reading is unknown")
     bad = [sid for sid, v in decided if not same(ai_value, v)]
     if bad: return FusionRecord(field=field, candidates=tuple(cands), agreement=DISAGREE, note="imagery and " + ", ".join(bad) + " disagree")

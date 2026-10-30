@@ -82,11 +82,12 @@ def test_a_live_request_sends_a_descriptive_user_agent_and_the_source_timeout(tm
     c.request("osm_overpass", URL, {"data": "[out:json];"})
     call = t.calls[0]
     assert call["headers"]["User-Agent"] == B.load_sources()["user_agent"] and "tcp-planner" in call["headers"]["User-Agent"]
-    assert "contact" in call["headers"]["User-Agent"] and call["timeout"] == B.load_sources()["sources"]["osm_overpass"]["timeout_s"]
+    assert call["timeout"] == B.load_sources()["sources"]["osm_overpass"]["timeout_s"]
 
 
-def test_the_user_agent_does_not_carry_an_email_address():
-    assert "@" not in B.load_sources()["user_agent"]
+def test_the_user_agent_carries_no_email_address_no_company_name_and_no_contact():
+    ua = B.load_sources()["user_agent"].lower()                 # owner decision 2026-10-31: descriptive, nothing identifying
+    assert "@" not in ua and "contact" not in ua and "pike" not in ua and "hexaware" not in ua and "http" not in ua
 
 
 def test_an_oversized_response_is_refused_and_not_recorded(tmp_path):

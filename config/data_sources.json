@@ -2,7 +2,7 @@
   "schema_version": "1",
   "config_id": "TCP_S06_DATA_SOURCES",
   "note": "Allow list of external data sources (CLAUDE.md, Data sources: D-53, D-62, D-63). A request to any host not listed under an enabled source is refused before any network use. Session 1 enables Azure Maps and OSM Overpass only; every other source stays disabled with no host until the session 2 discovery is approved. No source fills a mandatory start field.",
-  "user_agent": "tcp-planner/0.2 (traffic control plan drafting tool; S6 site understanding; contact: to be set by the owner in config/data_sources.json)",
+  "user_agent": "tcp-planner/0.2 (research tool; small bounded queries)",
   "sources": {
     "azure_maps": {
       "hosts": [
