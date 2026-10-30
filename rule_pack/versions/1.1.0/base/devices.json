@@ -1,0 +1,46 @@
+{
+  "schema_version": "1",
+  "layer": "FEDERAL",
+  "tables": {
+    "device": [
+      {"id": "DV-W20-1", "code": "W20-1", "name": "ROAD WORK AHEAD (ROAD WORK XX FT / XX MILE)", "catalog_id": "W20-1",
+       "source_ref_ids": ["SR-6P1-FIG-SIGNS", "SR-6P6-FIG-SIGNS", "SR-6P10-FIG-SIGNS", "SR-6P33-FIG-SIGNS"]},
+      {"id": "DV-W20-4", "code": "W20-4", "name": "ONE LANE ROAD XX FT", "catalog_id": "W20-4", "source_ref_ids": ["SR-6P10-FIG-SIGNS"]},
+      {"id": "DV-W20-7", "code": "W20-7", "name": "Flagger (symbol)", "catalog_id": "W20-7", "source_ref_ids": ["SR-6P10-FIG-SIGNS"]},
+      {"id": "DV-W16-2P", "code": "W16-2P", "name": "XX FEET (plaque)", "catalog_id": "W16-2P", "source_ref_ids": ["SR-6P10-FIG-SIGNS"]},
+      {"id": "DV-W20-5R", "code": "W20-5R", "name": "RIGHT LANE CLOSED XX MILE", "catalog_id": "W20-5R", "source_ref_ids": ["SR-6P33-FIG-SIGNS"]},
+      {"id": "DV-W4-2R", "code": "W4-2R", "name": "Lane Ends (right lane)", "catalog_id": "W4-2R", "source_ref_ids": ["SR-6P33-FIG-SIGNS"]},
+      {"id": "DV-G20-2", "code": "G20-2", "name": "END ROAD WORK", "catalog_id": "G20-2",
+       "source_ref_ids": ["SR-6P6-FIG-SIGNS", "SR-6P10-FIG-SIGNS", "SR-6P33-FIG-SIGNS"]},
+      {"id": "DV-ARROW-BOARD", "code": "ARROW_BOARD", "name": "Arrow board", "catalog_id": "DEV-ARROW-BOARD", "source_ref_ids": ["SR-6P33-FIG-SIGNS"]},
+      {"id": "DV-FLAGGER", "code": "FLAGGER", "name": "Flagger station", "catalog_id": "DEV-FLAGGER", "source_ref_ids": ["SR-6P10-FIG-SIGNS"]},
+      {"id": "DV-WORK-VEHICLE", "code": "WORK_VEHICLE", "name": "Work vehicle", "catalog_id": "DEV-WORK-VEHICLE", "source_ref_ids": ["SR-6P6-FIG-SIGNS", "SR-6P33-FIG-SIGNS"]},
+      {"id": "DV-TMA", "code": "TMA", "name": "Truck-mounted attenuator", "catalog_id": "DEV-TMA", "source_ref_ids": ["SR-6P6-FIG-SIGNS", "SR-6P33-FIG-SIGNS"]},
+
+      {"id": "DV-W21-5", "code": "W21-5", "name": "SHOULDER WORK", "catalog_id": "W21-5",
+       "source_ref_ids": ["SR-6H22-P02", "SR-6N05-P03", "SR-6P1-N2", "SR-6H1-W21-5"]},
+      {"id": "DV-W3-4", "code": "W3-4", "name": "BE PREPARED TO STOP", "catalog_id": "W3-4",
+       "source_ref_ids": ["SR-6H15-P02", "SR-6L02-P15", "SR-6P10-N4", "SR-6H1-W3-4"]},
+      {"id": "DV-W5-1", "code": "W5-1", "name": "ROAD NARROWS (code from the Table 6H-1 row only: TA-6 note 6 names a ROAD NARROWS sign but prints no code)", "catalog_id": "W5-1",
+       "source_ref_ids": ["SR-6H1-W5-1", "SR-6P6-N6"]},
+      {"id": "DV-W20-5L", "code": "W20-5L", "name": "LEFT LANE CLOSED XX MILE (INTERPRETATION: the L suffix comes from the catalog, not the MUTCD text; the MUTCD sign is the Lane Closed (W20-5) sign with the LEFT legend, Sect. 6H.07 para 02; owner-approved 2026-10-30)", "catalog_id": "W20-5L",
+       "source_ref_ids": ["SR-6H07-P02", "SR-6P33-N1", "SR-6H1-W20-5-5a"]},
+      {"id": "DV-W4-2L", "code": "W4-2L", "name": "Lane Ends (left lane) (INTERPRETATION: the L suffix comes from the catalog, not the MUTCD text; the MUTCD sign is Lane Ends (W4-2) with no side, Sect. 6H.08; TA-33 note 1 substitutes 'the corresponding Lane Ends signs'; owner-approved 2026-10-30; side naming: R-SIGN-NAMING-W4-2-SIDE)", "catalog_id": "W4-2L",
+       "source_ref_ids": ["SR-6H08-P01", "SR-6P33-N1", "SR-6H1-W4-2"]}
+    ],
+    "source_ref": [
+      {"id": "SR-6H22-P02", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6H.22", "paragraph": "02", "table": null, "figure": null, "note": null,
+       "page_printed": "807", "page_pdf": 43, "strength": "STANDARD", "evidence": "QUOTE", "transcription": null, "figure_render": null,
+       "quote": "The Shoulder Work sign shall have the legend SHOULDER WORK (W21-5), RIGHT (LEFT) SHOULDER CLOSED (W21-5a), or RIGHT (LEFT) SHOULDER CLOSED XX FT or AHEAD (W21-5b)."},
+      {"id": "SR-6N05-P03", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6N.05", "paragraph": "03", "table": null, "figure": null, "note": null,
+       "page_printed": "845", "page_pdf": 81, "strength": "GUIDANCE", "evidence": "QUOTE", "transcription": null, "figure_render": null,
+       "quote": "If work vehicles are on the shoulder, a SHOULDER WORK (W21-5) sign should be used."},
+      {"id": "SR-6H15-P02", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6H.15", "paragraph": "02", "table": null, "figure": null, "note": null,
+       "page_printed": "806", "page_pdf": 42, "strength": "OPTION", "evidence": "QUOTE", "transcription": null, "figure_render": null,
+       "quote": "The sign may be used with appropriate legends or in conjunction with other warning signs, such as the BE PREPARED TO STOP (W3-4) sign (see Figure 6H-1)."},
+      {"id": "SR-6L02-P15", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6L.02", "paragraph": "15", "table": null, "figure": null, "note": null,
+       "page_printed": "826", "page_pdf": 62, "strength": "GUIDANCE", "evidence": "QUOTE", "transcription": null, "figure_render": null,
+       "quote": "When an AFAD is used, the advance warning signing should include a ROAD WORK AHEAD (W20-1) sign, a ONE LANE ROAD (W20-4) sign, and a BE PREPARED TO STOP (W3-4) sign."}
+    ]
+  }
+}

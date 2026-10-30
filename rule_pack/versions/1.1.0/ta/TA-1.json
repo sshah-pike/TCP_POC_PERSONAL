@@ -1,0 +1,83 @@
+{
+  "schema_version": "1",
+  "layer": "FEDERAL",
+  "tables": {
+    "source_ref": [
+      {"id": "SR-6P1-TITLE", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": null, "table": null, "figure": "6P-1", "note": null,
+       "page_printed": "860", "page_pdf": 96, "strength": "SUPPORT", "evidence": "QUOTE", "transcription": null, "figure_render": null,
+       "quote": "Notes for Figure 6P-1—Typical Application 1 Work Beyond the Shoulder"},
+      {"id": "SR-6P1-FIG-TITLE", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": null, "table": null, "figure": "6P-1", "note": null,
+       "page_printed": "861", "page_pdf": 97, "strength": "SUPPORT", "evidence": "QUOTE", "transcription": null, "figure_render": null,
+       "quote": "Figure 6P-1. Work Beyond the Shoulder (TA-1)"},
+      {"id": "SR-6P1-N1", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": null, "table": null, "figure": "6P-1", "note": "1",
+       "page_printed": "860", "page_pdf": 96, "strength": "GUIDANCE", "evidence": "QUOTE", "transcription": null, "figure_render": null,
+       "quote": "If the work space is in the median of a divided highway, an advance warning sign should also be placed on the left-hand side of the directional roadway."},
+      {"id": "SR-6P1-N2", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": null, "table": null, "figure": "6P-1", "note": "2",
+       "page_printed": "860", "page_pdf": 96, "strength": "OPTION", "evidence": "QUOTE", "transcription": null, "figure_render": null,
+       "quote": "The ROAD WORK AHEAD sign may be replaced with other appropriate signs such as the SHOULDER WORK sign. The SHOULDER WORK sign may be used for work adjacent to the shoulder."},
+      {"id": "SR-6P1-N3", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": null, "table": null, "figure": "6P-1", "note": "3",
+       "page_printed": "860", "page_pdf": 96, "strength": "OPTION", "evidence": "QUOTE", "transcription": null, "figure_render": null,
+       "quote": "The ROAD WORK AHEAD sign may be omitted where the work space is behind a barrier, more than 24 inches behind the curb, or 15 feet or more from the edge of any roadway."},
+      {"id": "SR-6P1-N4", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": null, "table": null, "figure": "6P-1", "note": "4",
+       "page_printed": "860", "page_pdf": 96, "strength": "OPTION", "evidence": "QUOTE", "transcription": null, "figure_render": null,
+       "quote": "For short-term, short-duration or mobile operation, all signs and channelizing devices may be eliminated if a vehicle with activated high-intensity rotating, flashing, oscillating, or strobe lights is used."},
+      {"id": "SR-6P1-N5", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": null, "table": null, "figure": "6P-1", "note": "5",
+       "page_printed": "860", "page_pdf": 96, "strength": "OPTION", "evidence": "QUOTE", "transcription": null, "figure_render": null,
+       "quote": "Vehicle hazard warning signals may be used to supplement high-intensity rotating, flashing, oscillating, or strobe lights."},
+      {"id": "SR-6P1-N6", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": null, "table": null, "figure": "6P-1", "note": "6",
+       "page_printed": "860", "page_pdf": 96, "strength": "STANDARD", "evidence": "QUOTE", "transcription": null, "figure_render": null,
+       "quote": "Vehicle hazard warning signals shall not be used instead of the vehicle’s high-intensity rotating, flashing, oscillating, or strobe lights."},
+      {"id": "SR-6P1-FIG-SIGNS", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": null, "table": null, "figure": "6P-1", "note": null,
+       "page_printed": "861", "page_pdf": 97, "strength": "GUIDANCE", "evidence": "FIGURE_TRANSCRIPTION", "quote": null,
+       "transcription": "Figure 6P-1 shows one direction (northbound). A W20-1 ROAD WORK AHEAD sign stands on the right-hand roadside of that approach, at dimension A upstream of the work space, which is drawn as a hatched area beyond the shoulder. No channelizing devices, taper or buffer are drawn.",
+       "figure_render": {"uri": "tests/fixtures/rule_pack_sources/figures/figure_6P-1_p861.png", "sha256": "35dce7e5cd05bd3e0eab7485eda3990b6e92027ceedaed15877a555656182faf", "size": 62377, "media_type": "image/png"}},
+      {"id": "SR-6P1-FIG-ANCHOR", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": null, "table": null, "figure": "6P-1", "note": null, "page_printed": "861", "page_pdf": 97, "strength": "GUIDANCE", "evidence": "FIGURE_TRANSCRIPTION", "quote": null, "transcription": "Figure 6P-1: the only dimension drawn is A, from the W20-1 sign support to a line level with the upstream end of the hatched work space beyond the shoulder. There is one advance sign, no B or C, and no taper or channelizing devices.", "figure_render": {"uri": "tests/fixtures/rule_pack_sources/figures/figure_6P-1_p861.png", "sha256": "35dce7e5cd05bd3e0eab7485eda3990b6e92027ceedaed15877a555656182faf", "size": 62377, "media_type": "image/png"}}
+    ],
+    "ta": [
+      {"id": "TA-1", "title": "Work Beyond the Shoulder", "figure": "6P-1", "source_ref_ids": ["SR-6P1-TITLE", "SR-6P1-FIG-TITLE"]}
+    ],
+    "eligibility_condition": [
+      {"id": "E-TA1-BEYOND-SHOULDER", "ta_id": "TA-1", "description": "The work space is beyond the shoulder (figure title; D-60 tree: beyond shoulder -> TA-1).",
+       "expr": {"field": "work_location", "op": "EQ", "value": "BEYOND_SHOULDER"},
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6P1-TITLE", "SR-6P1-FIG-TITLE"]},
+      {"id": "E-TA1-NO-LANE-CLOSURE", "ta_id": "TA-1", "description": "No lane is closed: TA-1 work stays beyond the shoulder (figure title; D-60 tree).",
+       "expr": {"field": "lane_closure", "op": "EQ", "value": false},
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6P1-TITLE"]}
+    ],
+    "rule": [
+      {"id": "R-TA1-N1", "layer": "FEDERAL", "ta_id": "TA-1", "jurisdiction": null, "topic": "median_work", "strength": "GUIDANCE",
+       "text": "Median work on a divided highway: also place an advance warning sign on the left-hand side.",
+       "condition": {"field": "median_work", "op": "EQ", "value": true}, "action": "ADVANCE_SIGN_ALSO_ON_LEFT",
+       "value": null, "value_max": null, "unit": null, "qualifier": null,
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6P1-N1"]},
+      {"id": "R-TA1-N2", "layer": "FEDERAL", "ta_id": "TA-1", "jurisdiction": null, "topic": "advance_sign_choice", "strength": "OPTION",
+       "text": "ROAD WORK AHEAD may be replaced by another appropriate sign such as SHOULDER WORK (for work adjacent to the shoulder).",
+       "condition": null, "action": "W20-1_MAY_BE_REPLACED", "value": null, "value_max": null, "unit": null, "qualifier": null,
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6P1-N2"]},
+      {"id": "R-TA1-N3", "layer": "FEDERAL", "ta_id": "TA-1", "jurisdiction": null, "topic": "advance_sign_omission", "strength": "OPTION",
+       "text": "ROAD WORK AHEAD may be omitted when the work space is behind a barrier, more than 24 in behind the curb, or 15 ft or more from the edge of any roadway.",
+       "condition": {"any": [{"field": "behind_barrier", "op": "EQ", "value": true}, {"field": "distance_behind_curb_in", "op": "GT", "value": 24},
+                             {"field": "distance_from_edge_ft", "op": "GE", "value": 15}]},
+       "action": "W20-1_MAY_BE_OMITTED", "value": null, "value_max": null, "unit": null, "qualifier": null,
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6P1-N3"]},
+      {"id": "R-TA1-N4", "layer": "FEDERAL", "ta_id": "TA-1", "jurisdiction": null, "topic": "short_or_mobile_work", "strength": "OPTION",
+       "text": "Short-term, short-duration or mobile operation: all signs and channelizing devices may be eliminated if a vehicle with activated high-intensity lights is used.",
+       "condition": {"field": "duration", "op": "IN", "value": ["SHORT_TERM", "SHORT_DURATION", "MOBILE"]},
+       "action": "SIGNS_AND_DEVICES_MAY_BE_ELIMINATED_WITH_LIT_VEHICLE", "value": null, "value_max": null, "unit": null, "qualifier": null,
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6P1-N4"]},
+      {"id": "R-TA1-N5", "layer": "FEDERAL", "ta_id": "TA-1", "jurisdiction": null, "topic": "vehicle_lights", "strength": "OPTION",
+       "text": "Vehicle hazard warning signals may supplement high-intensity lights.",
+       "condition": null, "action": null, "value": null, "value_max": null, "unit": null, "qualifier": null,
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6P1-N5"]},
+      {"id": "R-TA1-N6", "layer": "FEDERAL", "ta_id": "TA-1", "jurisdiction": null, "topic": "vehicle_lights", "strength": "STANDARD",
+       "text": "Vehicle hazard warning signals shall not replace high-intensity lights.",
+       "condition": null, "action": null, "value": null, "value_max": null, "unit": null, "qualifier": null,
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6P1-N6"]},
+      {"id": "R-TA1-ANCHOR-A", "layer": "FEDERAL", "ta_id": "TA-1", "jurisdiction": null, "topic": "advance_sign_anchor", "strength": "GUIDANCE", "text": "TA-1 has one advance sign: only A applies, measured upstream from the upstream end of the work space (no transition is drawn). Owner-accepted, SME confirmation pending.", "condition": null, "action": "A_ENDS_AT_WORK_SPACE_START", "value": null, "value_max": null, "unit": null, "qualifier": null, "status": "SOURCED", "sme_question": null, "interpretation": "INTERPRETATION (owner-accepted reading of the figure render, S4b stage C): the 'point of restriction' of Table 6B-1 is the upstream end of the work space; A is the single gap from it to the W20-1 sign.", "source_ref_ids": ["SR-6P1-FIG-ANCHOR", "SR-6B1-NOTE-ABC"]}
+    ],
+    "ta_device_use": [
+      {"id": "TDU-TA1-W20-1", "ta_id": "TA-1", "device_id": "DV-W20-1", "approach": "approach on the work side (the figure shows one direction; Sect. 6P.01 para 07)",
+       "sequence": 1, "spacing_dimension": "A", "required": true, "source_ref_ids": ["SR-6P1-FIG-SIGNS", "SR-6P01-P07"]}
+    ]
+  }
+}

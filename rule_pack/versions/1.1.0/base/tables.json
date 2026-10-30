@@ -1,0 +1,45 @@
+{
+  "schema_version": "1",
+  "layer": "FEDERAL",
+  "tables": {
+    "table_def": [
+      {"id": "T-6B1", "table": "6B-1", "title": "Recommended Advance Warning Sign Minimum Spacing",
+       "key_fields": {"road_type": null}, "value_fields": {"A": "ft", "B": "ft", "C": "ft"},
+       "source_ref_ids": ["SR-6B1-TITLE", "SR-6B1-NOTE-SPEED", "SR-6B1-NOTE-ABC", "SR-6B04-P07"]},
+      {"id": "T-6B2", "table": "6B-2", "title": "Stopping Sight Distance as a Function of Speed",
+       "key_fields": {"speed_mph": "mph"}, "value_fields": {"distance_ft": "ft"},
+       "source_ref_ids": ["SR-6B2-TITLE", "SR-6B2-NOTE", "SR-6B06-P11"]},
+      {"id": "T-6B3-FIXED", "table": "6B-3", "title": "Taper Length Criteria for Temporary Traffic Control Zones (rows with fixed lengths; the L-based rows are formulas F-6B3-*)",
+       "key_fields": {"taper_type": null}, "value_fields": {"min_ft": "ft", "max_ft": "ft"},
+       "source_ref_ids": ["SR-6B3-TITLE", "SR-6B08-P04"]}
+    ],
+    "table_row": [
+      {"id": "T-6B1-URBAN_LOW_SPEED", "table_def_id": "T-6B1", "key": {"road_type": "URBAN_LOW_SPEED"}, "values": {"A": 100, "B": 100, "C": 100},
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B1-ULS"]},
+      {"id": "T-6B1-URBAN_HIGH_SPEED", "table_def_id": "T-6B1", "key": {"road_type": "URBAN_HIGH_SPEED"}, "values": {"A": 350, "B": 350, "C": 350},
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B1-UHS"]},
+      {"id": "T-6B1-RURAL", "table_def_id": "T-6B1", "key": {"road_type": "RURAL"}, "values": {"A": 500, "B": 500, "C": 500},
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B1-RUR"]},
+      {"id": "T-6B1-EXPRESSWAY_FREEWAY", "table_def_id": "T-6B1", "key": {"road_type": "EXPRESSWAY_FREEWAY"}, "values": {"A": 1000, "B": 1500, "C": 2640},
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B1-EXP"]},
+
+      {"id": "T-6B2-20", "table_def_id": "T-6B2", "key": {"speed_mph": 20}, "values": {"distance_ft": 115}, "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B2-20"]},
+      {"id": "T-6B2-25", "table_def_id": "T-6B2", "key": {"speed_mph": 25}, "values": {"distance_ft": 155}, "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B2-25"]},
+      {"id": "T-6B2-30", "table_def_id": "T-6B2", "key": {"speed_mph": 30}, "values": {"distance_ft": 200}, "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B2-30"]},
+      {"id": "T-6B2-35", "table_def_id": "T-6B2", "key": {"speed_mph": 35}, "values": {"distance_ft": 250}, "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B2-35"]},
+      {"id": "T-6B2-40", "table_def_id": "T-6B2", "key": {"speed_mph": 40}, "values": {"distance_ft": 305}, "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B2-40"]},
+      {"id": "T-6B2-45", "table_def_id": "T-6B2", "key": {"speed_mph": 45}, "values": {"distance_ft": 360}, "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B2-45"]},
+      {"id": "T-6B2-50", "table_def_id": "T-6B2", "key": {"speed_mph": 50}, "values": {"distance_ft": 425}, "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B2-50"]},
+      {"id": "T-6B2-55", "table_def_id": "T-6B2", "key": {"speed_mph": 55}, "values": {"distance_ft": 495}, "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B2-55"]},
+      {"id": "T-6B2-60", "table_def_id": "T-6B2", "key": {"speed_mph": 60}, "values": {"distance_ft": 570}, "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B2-60"]},
+      {"id": "T-6B2-65", "table_def_id": "T-6B2", "key": {"speed_mph": 65}, "values": {"distance_ft": 645}, "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B2-65"]},
+      {"id": "T-6B2-70", "table_def_id": "T-6B2", "key": {"speed_mph": 70}, "values": {"distance_ft": 730}, "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B2-70"]},
+      {"id": "T-6B2-75", "table_def_id": "T-6B2", "key": {"speed_mph": 75}, "values": {"distance_ft": 820}, "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B2-75"]},
+
+      {"id": "T-6B3-ONE_LANE_TWO_WAY", "table_def_id": "T-6B3-FIXED", "key": {"taper_type": "ONE_LANE_TWO_WAY"}, "values": {"min_ft": 50, "max_ft": 100},
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B3-ONE-LANE"]},
+      {"id": "T-6B3-DOWNSTREAM", "table_def_id": "T-6B3-FIXED", "key": {"taper_type": "DOWNSTREAM"}, "values": {"min_ft": 50, "max_ft": 100},
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B3-DOWNSTREAM"]}
+    ]
+  }
+}

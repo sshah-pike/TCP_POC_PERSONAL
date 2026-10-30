@@ -16,6 +16,8 @@ from tcp_planner.rules.rule_pack_validator import validate
 from tcp_planner.storage.interfaces import RulePackStore
 
 MANIFEST = "pack.json"
+VERSIONS_DIR = "versions"
+INDEX = "INDEX.json"
 NO_TA_MATCH = "NO_TA_MATCH"
 
 
@@ -116,21 +118,44 @@ class JsonRulePackStore(RulePackStore):
         return {p["path"]: _read_json(self._part_path(p["path"]), f"rule pack part {p['path']}")
                 for p in manifest_doc.get("parts", [])}
 
+    def _index(self):
+        """Sealed versions in sealing order (rule_pack/versions/INDEX.json); empty when the pack has no versions folder."""
+        path = os.path.join(self.root, VERSIONS_DIR, INDEX)
+        return _read_json(path, "rule pack version index")["versions"] if os.path.isfile(path) else []
+
+    def _store_for(self, version):
+        """The store that holds `version`: this root for the current pack (None or its version), else the frozen copy."""
+        current = self._manifest_doc().get("version")
+        if version in (None, current): return self
+        entry = next((e for e in self._index() if e["version"] == version), None)
+        _need(entry is not None, "RULE_PACK_VERSION_MISSING", f"no rule pack version {version}", version=version)
+        folder = os.path.join(self.root, VERSIONS_DIR, version)
+        _need(os.path.isdir(folder), "RULE_PACK_VERSION_MISSING", f"sealed folder for {version} is missing", version=version)
+        sub = JsonRulePackStore(folder)
+        actual = sub.content_hash()
+        _need(actual == entry["content_sha256"], "RULE_PACK_HASH_MISMATCH", f"sealed version {version} differs from INDEX.json",
+              expected=entry["content_sha256"], actual=actual)
+        return sub
+
     def list_versions(self):
+        """Every sealed version in order, then the current pack's version if it is not sealed yet. The last is the latest."""
         if not os.path.isfile(os.path.join(self.root, MANIFEST)): return []
-        return [self._manifest_doc().get("version")]
+        versions = [e["version"] for e in self._index()]
+        current = self._manifest_doc().get("version")
+        return versions if current in versions else versions + [current]
 
     def content_hash(self, version=None):
         """The pack hash recomputed from the files on disk."""
-        m = self._manifest_doc()
-        _need(version in (None, m.get("version")), "RULE_PACK_VERSION_MISSING", f"no rule pack version {version}")
-        return pack_hash(m, {p: part_hash(d) for p, d in self._part_docs(m).items()})
+        s = self._store_for(version)
+        m = s._manifest_doc()
+        return pack_hash(m, {p: part_hash(d) for p, d in s._part_docs(m).items()})
 
     def load(self, version=None, validate_pack=True):
+        s = self._store_for(version)
+        if s is not self: return s.load(validate_pack=validate_pack)
         m_doc = self._manifest_doc()
         try: manifest = Manifest.model_validate(m_doc)
         except ValueError as e: raise RulePackError("RULE_PACK_HEADER_INCOMPLETE", f"manifest invalid: {e}")
-        _need(version in (None, manifest.version), "RULE_PACK_VERSION_MISSING", f"no rule pack version {version}")
         docs = self._part_docs(m_doc)
         parts = []
         for pref in manifest.parts:
