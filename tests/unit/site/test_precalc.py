@@ -159,15 +159,14 @@ def test_freeway_flag_from_road_type():
     assert P.freeway("EXPRESSWAY_FREEWAY").value is True and P.freeway("RURAL").value is False and P.freeway(None).status == "UNKNOWN"
 
 
-def test_shadow_vehicle_required_when_the_layout_omits_taper_and_devices(pack):
-    f = P.shadow_vehicle(pack, "TA-6", {"duration": "SHORT_DURATION"}, True)
-    assert f.value is True and "R-TA6-N10" in f.evidence
-    assert P.shadow_vehicle(pack, "TA-1", {"duration": "MOBILE"}, True).value is True
-    assert P.shadow_vehicle(pack, "TA-6", {"duration": "LONG_TERM"}, True).status == "UNKNOWN"          # omission not allowed here
-    assert P.shadow_vehicle(pack, "TA-6", {}, True).reason_code == "missing"
-    off = P.shadow_vehicle(pack, "TA-6", {"duration": "SHORT_DURATION"}, False)
+def test_shadow_vehicle_required_when_the_duration_allows_the_omission(pack):
+    f, q = P.shadow_vehicle(pack, "TA-6", {"duration": "SHORT_DURATION"}, True)
+    assert f.value is True and q is None and "R-TA6-N10" in f.evidence and "the taper and channelizing devices may be omitted" in f.evidence
+    assert P.shadow_vehicle(pack, "TA-1", {"duration": "MOBILE"}, True)[0].value is True
+    assert P.shadow_vehicle(pack, "TA-6", {}, True)[0].reason_code == "missing"
+    off, _ = P.shadow_vehicle(pack, "TA-6", {"duration": "SHORT_DURATION"}, False)
     assert off.value is False and "optional" in off.evidence
-    assert P.shadow_vehicle(pack, "TA-6", {}, None).status == "UNKNOWN"
+    assert P.shadow_vehicle(pack, "TA-6", {}, None)[0].status == "UNKNOWN"
 
 
 def test_tma_suggestion_is_off_while_the_pack_has_no_threshold(pack):

@@ -139,7 +139,9 @@ def test_a_result_that_used_the_default_vehicle_width_is_review_required_and_nam
     decision, reasons = rule_inputs([depth, rem, veh]).gate(SUPPORTED_AUTO)
     assert decision == REVIEW_REQUIRED
     assert {r["fact"] for r in reasons} == {"work_vehicle_width_ft", "encroachment_depth_ft", "remaining_lane_width_ft"}
-    assert all(r["flag"] == "DEFAULT_ASSUMED" for r in reasons)
+    assert {(r["fact"], r["flag"]) for r in reasons} == {
+        ("work_vehicle_width_ft", "DEFAULT_ASSUMED"), ("encroachment_depth_ft", "DEFAULT_ASSUMED"), ("encroachment_depth_ft", "PROPOSED"),
+        ("remaining_lane_width_ft", "DEFAULT_ASSUMED"), ("remaining_lane_width_ft", "PROPOSED")}
 
 
 def test_the_gate_names_both_kinds_of_flag_and_leaves_clean_results_alone(pack):

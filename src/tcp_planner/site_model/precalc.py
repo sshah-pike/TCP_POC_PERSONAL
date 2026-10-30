@@ -179,20 +179,55 @@ def freeway(road_type):
     return SiteFact(field="freeway", registry_id="freeway", value=road_type == EXPRESSWAY, source="CODE", status="RESOLVED")
 
 
-def shadow_vehicle(pack, ta_id, context, layout_omits_taper_and_devices):
-    """shadow_vehicle_present. Required when the layout omits the taper and devices and the TA's note allows that only with a lit
-    vehicle (TA-1 note 4, TA-6 note 10; found by their action). Otherwise optional and off by default."""
-    if layout_omits_taper_and_devices is None: return _unknown("shadow_vehicle_present", "missing")
-    if layout_omits_taper_and_devices is False:
-        return SiteFact(field="shadow_vehicle_present", registry_id="shadow_vehicle_present", value=False, source="CODE",
-                        status="RESOLVED", evidence="optional and off by default (TA-6 note 8)")
+# What the input `layout_omits` means per TA. The two notes are the same fact (a lit vehicle replaces what the layout drops), but
+# what is dropped differs: TA-1 note 4 drops the signs and the channelizing devices; TA-6 note 10 drops the taper and the devices.
+OMISSION_MEANING = {"TA-1": "the layout omits signs and devices", "TA-6": "the layout omits taper and devices"}
+
+
+def _quote(pack, rule):
+    """The note's exact text from the pack's source reference."""
+    return " ".join(getattr(pack.get(sid), "quote", "") or "" for sid in rule.source_ref_ids[:1])
+
+
+def _allowed_values(expr, field="duration"):
+    """Values of `field` that the rule condition allows, when it is a plain EQ or IN on that field; else None."""
+    if getattr(expr, "field", None) == field and expr.op in ("EQ", "IN"):
+        return list(expr.value) if isinstance(expr.value, list) else [expr.value]
+    return None
+
+
+def shadow_vehicle(pack, ta_id, context, layout_omits):
+    """(SiteFact shadow_vehicle_present, Question or None). `layout_omits` is whether the layout drops what the TA's note lets a lit
+    vehicle replace (OMISSION_MEANING: TA-1 signs and devices, TA-6 taper and devices); S8 supplies it.
+      None                                 -> UNKNOWN (missing)
+      False                                -> False: optional and off by default
+      True, duration allows it             -> True, required; the trace quotes the note
+      True, duration unknown               -> UNKNOWN (missing)
+      True, duration does NOT allow it, or no note of the TA allows it
+                                           -> UNKNOWN (layout_not_allowed, SOURCE_REVIEW_REQUIRED) and one question naming the note
+                                              and the allowed durations; never True or False."""
+    if layout_omits is None: return _unknown("shadow_vehicle_present", "missing"), None
+    if layout_omits is False:
+        return SiteFact(field="shadow_vehicle_present", registry_id="shadow_vehicle_present", value=False, source="CODE", status="RESOLVED",
+                        evidence="optional and off by default" + (" (TA-6 note 8)" if ta_id == "TA-6" else "")), None
     rules = shadow_rules(pack, ta_id)
-    res = [(r.id, eval_expr(r.condition, dict(context or {}))) for r in rules]
-    if any(v is True for _, v in res):
+    res = [(r, eval_expr(r.condition, dict(context or {}))) for r in rules]
+    ok = [r for r, v in res if v is True]
+    if ok:
+        r = ok[0]
         return SiteFact(field="shadow_vehicle_present", registry_id="shadow_vehicle_present", value=True, source="CODE", status="RESOLVED",
-                        evidence="required: " + ", ".join(i for i, v in res if v is True))
-    return _unknown("shadow_vehicle_present", "missing" if any(v is None for _, v in res) else "ambiguous",
-                    evidence="omission of the taper and devices is not allowed by the notes for these conditions" if res and all(v is False for _, v in res) else "")
+                        evidence=f"required: {r.id}: \"{_quote(pack, r)}\"; {OMISSION_MEANING.get(ta_id, 'the layout omits what the note allows')}"), None
+    if any(v is None for _, v in res): return _unknown("shadow_vehicle_present", "missing"), None
+    if rules:
+        r = rules[0]; allowed = _allowed_values(r.condition)
+        why = (f"{r.id} says: \"{_quote(pack, r)}\" It allows this only for duration {' or '.join(allowed)}; "
+               f"the duration is {(context or {}).get('duration')}." if allowed else f"{r.id} says: \"{_quote(pack, r)}\" The conditions are not met.")
+    else:
+        why = f"no note of {ta_id} allows a lit vehicle to replace omitted devices."
+    q = Question(question_id=question_id("LAYOUT_NOT_ALLOWED", ta_id, "shadow_vehicle_present"), kind="LAYOUT_NOT_ALLOWED",
+                 reason=f"{OMISSION_MEANING.get(ta_id, 'The layout omits devices')}, which is not allowed here. {why} Change the layout or change the duration.",
+                 options=("change the layout", "change the duration"), reveals=("shadow_vehicle_present",))
+    return _unknown("shadow_vehicle_present", "layout_not_allowed", ("SOURCE_REVIEW_REQUIRED",)), q
 
 
 def tma_suggestion(pack, posted_speed_mph):

@@ -12,13 +12,13 @@ Scalar = Union[bool, int, float, str]
 
 REASON_CODES = ("not_visible", "occluded", "low_resolution", "ambiguous", "source_disagreement", "threshold_in_interval",
                 "no_source", "malformed", "missing", "duplicate", "low_confidence", "no_registry_value", "ai_conflict",
-                "not_stated", "single_source")
+                "not_stated", "single_source", "layout_not_allowed")
 FLAGS = ("DEFAULT_ASSUMED", "POLICY_SUGGESTED", "CALIBRATION_PENDING", "SOURCE_REVIEW_REQUIRED", "CONTEXT_ONLY",
          "AI_ONLY_UNCONFIRMED", "NEEDS_SECOND_SOURCE", "EVIDENCE_OVER_15_WORDS", "UNIT_MISMATCH", "AI_CONFLICT", "PROPOSED")
 # flags that keep a fact out of every rule input (the value is shown to the SME only)
 BLOCKING_FLAGS = frozenset({"CONTEXT_ONLY", "NEEDS_SECOND_SOURCE"})
 QUESTION_KINDS = ("WIDTH_NEAR_THRESHOLD", "LANES_DISAGREE", "START_FIELD_CONFLICT", "FACT_UNKNOWN", "WORK_SIDE_CONFIRM",
-                  "WORK_LOCATION_CONFLICT")
+                  "WORK_LOCATION_CONFLICT", "LAYOUT_NOT_ALLOWED")
 
 
 class _Rec(BaseModel):
@@ -111,6 +111,7 @@ def question_id(kind, *parts):
 REVIEW_FLAGS = {
     "AI_ONLY_UNCONFIRMED": "was read from the image only and is not confirmed (marks missing); the SME must confirm it",
     "DEFAULT_ASSUMED": "uses a default value (not measured, not entered); the SME must confirm or override it",
+    "PROPOSED": "uses the proposed footprint (a geometry with no source in the rule pack); the SME must confirm it or enter the encroachment depth",
 }
 
 
@@ -126,7 +127,7 @@ class RuleInputs(dict):
         return self.flagged("AI_ONLY_UNCONFIRMED")
 
     def gate(self, decision, used=None):
-        """(decision, reasons). Any used fact flagged AI_ONLY_UNCONFIRMED or DEFAULT_ASSUMED turns SUPPORTED_AUTO into
+        """(decision, reasons). Any used fact flagged AI_ONLY_UNCONFIRMED, DEFAULT_ASSUMED or PROPOSED turns SUPPORTED_AUTO into
         REVIEW_REQUIRED, and each such fact is named in a reason. `used`: registry ids the result read (default: all)."""
         from tcp_planner.contracts import REVIEW_REQUIRED, SUPPORTED_AUTO
         reasons = [{"fact": k, "flag": flag, "reason": f"{k} {text}"} for flag, text in REVIEW_FLAGS.items()
