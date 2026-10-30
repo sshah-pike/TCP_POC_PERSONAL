@@ -14,7 +14,7 @@ Scalar = Union[bool, int, float, str]
 
 REASON_CODES = ("not_visible", "occluded", "low_resolution", "ambiguous", "source_disagreement", "threshold_in_interval",
                 "no_source", "malformed", "missing", "duplicate", "low_confidence", "no_registry_value", "ai_conflict",
-                "not_stated", "single_source", "layout_not_allowed", "source_failed", "no_tag", "check_failed")
+                "not_stated", "single_source", "layout_not_allowed", "source_failed", "no_tag", "check_failed", "near_edge", "no_road_near")
 FLAGS = ("DEFAULT_ASSUMED", "POLICY_SUGGESTED", "CALIBRATION_PENDING", "SOURCE_REVIEW_REQUIRED", "CONTEXT_ONLY",
          "AI_ONLY_UNCONFIRMED", "NEEDS_SECOND_SOURCE", "EVIDENCE_OVER_15_WORDS", "UNIT_MISMATCH", "AI_CONFLICT", "PROPOSED")
 # flags that keep a fact out of every rule input (the value is shown to the SME only)

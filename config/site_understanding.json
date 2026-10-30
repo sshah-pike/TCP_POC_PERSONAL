@@ -153,5 +153,13 @@
       "source": "CALIBRATION_PENDING",
       "note": "OSM ways (service ways excluded) within this distance of the work point are the candidates for the road of the job; if they differ in bearing by more than the tolerance the SME is asked which road"
     }
+  },
+  "edge_rule": {
+    "note": "Work-location edge rule (owner plan 2026-10-31). The AI's own work_location reading is not trusted close to a road edge: a mark or a pixel is only a few metres wide.",
+    "near_edge_m": {
+      "value": 5,
+      "source": "CALIBRATION_PENDING",
+      "note": "within this distance of the nearest road edge (or with no road near) work_location is UNKNOWN plus one SME question"
+    }
   }
 }
