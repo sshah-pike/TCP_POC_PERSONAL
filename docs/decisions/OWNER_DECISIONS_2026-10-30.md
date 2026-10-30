@@ -101,3 +101,15 @@ Reports: docs/reports/S4b_pack_round_report.md and the "S4b changes" section of 
 ## D-108: Y1, police text
 
 Owner answered Y1 (police text removed from CLAUDE.md, plan and slices) in the docs merge a498adc. The post-draft police switch now reads "police detail is future scope (D-68, D-86)".
+
+## D-109: S5 device catalog merged
+
+S5 device catalog merged. Catalog schema v0.2 (`schema_version` "1"), 56 entries, 20 signs with size_source PACK, all symbols placeholders. Catalog hash 5e9898940a09b7bcf4ba9f318df4a95939b38b247625d6339fc377ddc4a59fc6. size_for uses the PROPOSED road-type column mapping (Conventional for URBAN_LOW_SPEED, URBAN_HIGH_SPEED and RURAL; Freeway for EXPRESSWAY_FREEWAY; Minimum never automatic), pending SME question 38. No pack change in S5 except one-line key renames in S4b files (tests/unit/rules/test_sign_sizes.py and scripts/rule_pack_report.py; the S4 review report was regenerated). Approved by the owner.
+
+Reports: docs/reports/S5_device_catalog_report.md and docs/reports/S5_device_catalog_review.md.
+
+## D-110: Owner decisions of 2026-10-30, after S5
+
+- Add-on signs get device rows and real symbols (M4-9a must show its arrow) before S8's add-on commit.
+- A pack store that keeps sealed versions side by side is built after S5 merges and before S7 starts.
+- Four golden signs with no size row (R8-3, R2-11, R3-7R, W9-2L) stay out of the pack for now.
