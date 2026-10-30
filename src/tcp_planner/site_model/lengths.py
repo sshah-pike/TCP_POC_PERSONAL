@@ -205,8 +205,15 @@ def gate_from(observations):
     return {k: (observations[k].value if observations[k].status == "RESOLVED" else None) for k in ("parking_present", "shoulder_present")}
 
 
-def _lane_question(reason):
-    return Question(question_id=question_id("FACT_UNKNOWN", "lane_width_ft"), kind="FACT_UNKNOWN", reason=reason,
+def _lane_question(reason, tw=None):
+    """Question asking for the lane width in feet. The measured traveled-way range and its source are a HINT in the text only:
+    no fact carries them, so nothing here can reach rule_inputs."""
+    text = reason.rstrip(". ") + ". Enter the lane width in feet."
+    if tw is not None:
+        iv = tw.interval_ft
+        text += (f" Hint only, not used: the traveled way measures about {tw.value_ft:.1f} ft ({iv.lo:.1f} to {iv.hi:.1f} ft), "
+                 f"source {tw.method}.")
+    return Question(question_id=question_id("FACT_UNKNOWN", "lane_width_ft"), kind="FACT_UNKNOWN", reason=text,
                     options=(), reveals=("lane_width_ft",))
 
 
@@ -219,17 +226,17 @@ def lane_width(marks, tw, total_lanes, gate, mpp_sent, cfg=None):
     lo, hi = lane_width_plausible_m()
     if lines is not None:
         if lo <= lines.value_ft * FT <= hi: return lines, None, None
-        return None, "ambiguous", _lane_question("the lane-line spacing is not a plausible lane width; enter the lane width")
-    if why is not None: return None, why, _lane_question("the lane lines could not be measured; enter the lane width")
-    if tw is None: return None, None, _lane_question("the road edges could not be measured; enter the lane width")
+        return None, "ambiguous", _lane_question("the lane-line spacing is not a plausible lane width", tw)
+    if why is not None: return None, why, _lane_question("the lane lines could not be measured", tw)
+    if tw is None: return None, None, _lane_question("the road edges could not be measured")
     if gate.get("parking_present") is not False or gate.get("shoulder_present") is not False:
         return None, "ambiguous", _lane_question(
             "parking or a shoulder may lie between the road edges (read: parking_present=%s, shoulder_present=%s), so the traveled way "
-            "cannot be divided into lanes; enter the lane width" % (gate.get("parking_present"), gate.get("shoulder_present")))
+            "cannot be divided into lanes" % (gate.get("parking_present"), gate.get("shoulder_present")), tw)
     if not isinstance(total_lanes, int) or isinstance(total_lanes, bool) or total_lanes < 1:
-        return None, "missing", _lane_question("the lane count is not decided, so the traveled way cannot be divided; enter the lane width")
+        return None, "missing", _lane_question("the lane count is not decided, so the traveled way cannot be divided", tw)
     per_lane = tw.value_ft / total_lanes
-    if not lo <= per_lane * FT <= hi: return None, "ambiguous", _lane_question("the divided width is not a plausible lane width; enter the lane width")
+    if not lo <= per_lane * FT <= hi: return None, "ambiguous", _lane_question("the divided width is not a plausible lane width", tw)
     iv = Interval(lo=tw.interval_ft.lo / total_lanes, hi=tw.interval_ft.hi / total_lanes, unit="ft")
     notes = (f"total_lanes={total_lanes}", "parking_present=False and shoulder_present=False (AI reading, measurement gate only)")
     return tw.model_copy(update={"name": "lane_width", "value_ft": per_lane, "interval_ft": iv, "inputs": tw.inputs + notes,

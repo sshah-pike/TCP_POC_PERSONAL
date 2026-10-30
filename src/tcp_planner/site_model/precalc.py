@@ -16,6 +16,8 @@ from tcp_planner.site_model.site_config import default_setting
 IN_PER_FT = 12          # unit conversion only
 EXPRESSWAY = "EXPRESSWAY_FREEWAY"        # registry enum value of road_type (checked against the registry in a test)
 LANE_CLOSURE_ACTION = "LANE_CLOSURE_NEEDED"
+SHADOW_SUFFIXES = ("WITH_LIT_VEHICLE", "WITH_LIT_SHADOW_VEHICLE")
+ARROW_ACTION = "ARROW_BOARD_PER_CLOSED_LANE"
 NINE_FT_ACTION = "NINE_FT_LANE_ALLOWED"
 HOLD, HOLD_NINE, CLOSURE, UNKNOWN = "TA6_CAN_HOLD", "TA6_CAN_HOLD_NINE_FT_OPTION", "LANE_CLOSURE_NEEDED", "UNKNOWN"
 
@@ -44,22 +46,43 @@ def work_vehicle_width(measured_ft=None, use_default=True, cfg=None):
                     evidence="default width from config (23 CFR 658.15); no vehicle measured")
 
 
-def encroachment_depth(work_space_depth_ft=None, clearance_ft=None, vehicle=None, include_vehicle=False):
+FOOTPRINT_FORMULA = "encroachment_depth_ft = max(work_space_depth_ft, work_vehicle_width_ft if the vehicle is included) + clearance_ft"
+
+
+def _depth_fact(value, source, flags, inputs, calc):
+    m = MeasuredLength(name="encroachment_depth", value_ft=value, interval_ft=Interval(lo=value, hi=value, unit="ft"), method="GEOMETRY",
+                       mpp=0.0, pixel_error_px=0.0, inputs=tuple(inputs), calculation=calc, flags=tuple(flags))
+    return SiteFact(field="encroachment_depth_ft", registry_id="encroachment_depth_ft", value=value, unit="ft", source=source,
+                    status="RESOLVED", interval=m.interval_ft, measured=m, flags=tuple(flags), evidence=calc)
+
+
+def encroachment_depth(work_space_depth_ft=None, clearance_ft=None, vehicle=None, include_vehicle=False, sme_override_ft=None):
     """(SiteFact encroachment_depth_ft, Question or None). Depth into the travel lane, measured to the near face of the
-    channelizing devices (TA-6 note 1) = the deepest of the work space and, when include_vehicle, the vehicle, plus the
-    clearance to the device face. Work-space depth and clearance have no source: without them the fact is UNKNOWN and one
-    question asks the SME for both. `vehicle` is a work_vehicle_width_ft fact; its DEFAULT_ASSUMED flag is carried."""
+    channelizing devices (TA-6 note 1).
+    - sme_override_ft: the single encroachment-depth number the SME gives for the job. It WINS over everything else; the result
+      is that number (source SME_OVERRIDE, no PROPOSED flag) and the other inputs are only listed in the trace.
+    - otherwise the PROPOSED geometry (no source in the pack, S6 STOP 3): FOOTPRINT_FORMULA. Work-space depth and clearance
+      have no source: without both the fact is UNKNOWN and one question asks for the number (or for both inputs).
+    `vehicle` is a work_vehicle_width_ft fact; its DEFAULT_ASSUMED flag is carried when the vehicle sets the depth."""
+    if sme_override_ft is not None:
+        if isinstance(sme_override_ft, bool) or not isinstance(sme_override_ft, (int, float)) or sme_override_ft < 0:
+            raise ValueError("the encroachment-depth override must be a number of feet, zero or more")
+        ignored = [f"{n}={v} (not used: the override wins)" for n, v in (("work_space_depth_ft", work_space_depth_ft), ("clearance_ft", clearance_ft)) if v is not None]
+        return _depth_fact(float(sme_override_ft), "SME_OVERRIDE", (), [f"sme_override_ft={sme_override_ft}", *ignored],
+                           "encroachment_depth_ft = the number the SME gave for this job"), None
     if work_space_depth_ft is None or clearance_ft is None:
         q = Question(question_id=question_id("FACT_UNKNOWN", "encroachment_depth_ft"), kind="FACT_UNKNOWN",
-                     reason="how far the work space reaches into the lane, and the clearance to the near face of the devices, are not known; enter both",
+                     reason="how far the work space and the near face of the devices reach into the lane is not known; enter the encroachment "
+                            "depth in feet (or the work-space depth and the clearance to the device face)",
                      options=(), reveals=("encroachment_depth_ft", "remaining_lane_width_ft"))
         return _unknown("encroachment_depth_ft", "no_source", ("SOURCE_REVIEW_REQUIRED",), "ft"), q
-    extent, flags = work_space_depth_ft, ()
+    extent, flags, inputs = work_space_depth_ft, ["PROPOSED"], [f"work_space_depth_ft={work_space_depth_ft}", f"clearance_ft={clearance_ft}"]
     if include_vehicle and vehicle is not None and vehicle.status == "RESOLVED":
-        if vehicle.value > extent: extent, flags = vehicle.value, tuple(f for f in vehicle.flags if f == "DEFAULT_ASSUMED")
-    return SiteFact(field="encroachment_depth_ft", registry_id="encroachment_depth_ft", value=extent + clearance_ft, unit="ft",
-                    source="SME_FORM", status="RESOLVED", flags=flags,
-                    evidence="deepest of work space and vehicle, plus clearance to the device face"), None
+        inputs.append(f"work_vehicle_width_ft={vehicle.value} (included)")
+        if vehicle.value > extent:
+            extent = vehicle.value; flags += [f for f in vehicle.flags if f == "DEFAULT_ASSUMED"]
+    else: inputs.append("work vehicle not included")
+    return _depth_fact(extent + clearance_ft, "SME_FORM", flags, inputs, FOOTPRINT_FORMULA + " (PROPOSED: no source in the pack)"), None
 
 
 def remaining_lane_width(pack, lane, depth, context=None):
@@ -85,12 +108,36 @@ class Decision(NamedTuple):
     reason: str
 
 
-def _limits(pack):
-    """(full limit, option limit, option condition) from the shared federal rules, found by action: nothing is typed here."""
+def _sourced_rules(pack):
+    return [r for r in pack.records("rule") if r.status == PackStatus.SOURCED and r.role == "APPLY"]
+
+
+def limit_rules(pack):
+    """(full-limit rule, option-limit rule) or None: the shared federal rules, found by action."""
     def find(action):
-        return next((r for r in pack.records("rule") if r.ta_id is None and r.action == action and r.status == PackStatus.SOURCED
-                     and r.role == "APPLY" and r.value is not None), None)
+        return next((r for r in _sourced_rules(pack) if r.ta_id is None and r.action == action and r.value is not None), None)
     full, opt = find(LANE_CLOSURE_ACTION), find(NINE_FT_ACTION)
+    return (full, opt) if full and opt else None
+
+
+def shadow_rules(pack, ta_id):
+    """Rules of the TA that allow dropping signs, taper or devices only with a lit vehicle (TA-1 note 4, TA-6 note 10)."""
+    return [r for r in _sourced_rules(pack) if r.ta_id == ta_id and r.condition is not None
+            and (r.action or "").endswith(SHADOW_SUFFIXES)]
+
+
+def arrow_rule(pack):
+    return next((r for r in _sourced_rules(pack) if r.action == ARROW_ACTION and r.condition is not None), None)
+
+
+def tma_rule(pack):
+    """The sourced TMA speed-threshold rule, or None while the pack has none."""
+    return next((r for r in _sourced_rules(pack) if r.topic == "truck_mounted_attenuator" and r.unit == "mph" and r.value is not None), None)
+
+
+def _limits(pack):
+    """(full limit, option limit, option condition, ids) from the shared federal rules: nothing is typed here."""
+    lr = limit_rules(pack); full, opt = lr if lr else (None, None)
     return (full.value, opt.value, opt.condition, full.id, opt.id) if full and opt else None
 
 
@@ -139,8 +186,7 @@ def shadow_vehicle(pack, ta_id, context, layout_omits_taper_and_devices):
     if layout_omits_taper_and_devices is False:
         return SiteFact(field="shadow_vehicle_present", registry_id="shadow_vehicle_present", value=False, source="CODE",
                         status="RESOLVED", evidence="optional and off by default (TA-6 note 8)")
-    rules = [r for r in pack.records("rule") if r.ta_id == ta_id and r.status == PackStatus.SOURCED and r.role == "APPLY"
-             and r.condition is not None and (r.action or "").endswith(("WITH_LIT_VEHICLE", "WITH_LIT_SHADOW_VEHICLE"))]
+    rules = shadow_rules(pack, ta_id)
     res = [(r.id, eval_expr(r.condition, dict(context or {}))) for r in rules]
     if any(v is True for _, v in res):
         return SiteFact(field="shadow_vehicle_present", registry_id="shadow_vehicle_present", value=True, source="CODE", status="RESOLVED",
@@ -152,8 +198,7 @@ def shadow_vehicle(pack, ta_id, context, layout_omits_taper_and_devices):
 def tma_suggestion(pack, posted_speed_mph):
     """tma_present as a labelled client policy suggestion (POLICY_SUGGESTED). Off while the pack has no sourced speed threshold
     (R-TMA-SPEED-THRESHOLD is UNKNOWN): the fact stays UNKNOWN and nothing is suggested."""
-    rule = next((r for r in pack.records("rule") if r.topic == "truck_mounted_attenuator" and r.unit == "mph"
-                 and r.status == PackStatus.SOURCED and r.value is not None), None)
+    rule = tma_rule(pack)
     if rule is None: return _unknown("tma_present", "no_source", ("SOURCE_REVIEW_REQUIRED",))
     if posted_speed_mph is None: return _unknown("tma_present", "missing")
     return SiteFact(field="tma_present", registry_id="tma_present", value=posted_speed_mph >= rule.value, source="CODE", status="RESOLVED",
@@ -161,15 +206,16 @@ def tma_suggestion(pack, posted_speed_mph):
 
 
 def arrow_board(pack, context):
-    """arrow_board_present: mandatory when the pack's condition holds (freeway lane closure, TA-33 note 7; one per closed lane,
-    the count stays UNKNOWN with lanes_closed_count); otherwise only if arrow_board_wanted."""
-    rule = next((r for r in pack.records("rule") if r.action == "ARROW_BOARD_PER_CLOSED_LANE" and r.status == PackStatus.SOURCED
-                 and r.condition is not None), None)
+    """arrow_board_present. Where the pack makes it required (TA-33 note 7: a closed freeway or expressway lane; one per closed
+    lane, the count stays UNKNOWN with lanes_closed_count) the answer is REQUIRED, whatever arrow_board_wanted says. Only when it is
+    optional does arrow_board_wanted decide, and an unasked answer means not wanted."""
+    rule = arrow_rule(pack)
     ctx = dict(context or {})
     req = eval_expr(rule.condition, ctx) if rule else None
     if req is True:
         return SiteFact(field="arrow_board_present", registry_id="arrow_board_present", value=True, source="CODE", status="RESOLVED",
-                        evidence=f"required by {rule.id}: one per closed lane, count not known")
+                        evidence=f"REQUIRED by {rule.id}: one per closed lane, count not known")
     if req is None: return _unknown("arrow_board_present", "missing")
-    return SiteFact(field="arrow_board_present", registry_id="arrow_board_present", value=ctx.get("arrow_board_wanted") is True,
-                    source="CODE", status="RESOLVED", evidence="only if wanted")
+    wanted = ctx.get("arrow_board_wanted") is True
+    return SiteFact(field="arrow_board_present", registry_id="arrow_board_present", value=wanted, source="CODE", status="RESOLVED",
+                    evidence="OPTIONAL_WANTED" if wanted else "OPTIONAL_NOT_WANTED (not asked or not wanted)")

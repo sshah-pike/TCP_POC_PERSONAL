@@ -83,7 +83,7 @@ def test_footprint_is_the_deepest_extent_plus_clearance():
     f, _ = P.encroachment_depth(4.0, 1.5, veh, include_vehicle=True)
     assert f.value == pytest.approx(10.0) and "DEFAULT_ASSUMED" in f.flags                 # the default flag follows the number
     assert P.encroachment_depth(4.0, 1.5, veh, include_vehicle=False)[0].value == pytest.approx(5.5)
-    assert P.encroachment_depth(12.0, 1.5, veh, include_vehicle=True)[0].flags == ()       # work space deeper than the vehicle
+    assert P.encroachment_depth(12.0, 1.5, veh, include_vehicle=True)[0].flags == ("PROPOSED",)   # work space deeper: no default flag
 
 
 # ---------------------------------------------------------------- remaining width
@@ -177,7 +177,7 @@ def test_tma_suggestion_is_off_while_the_pack_has_no_threshold(pack):
 
 def test_tma_suggestion_uses_a_sourced_threshold_and_is_labelled_policy(pack):
     class R:  # a pack whose threshold rule has a source
-        id = "R-X"; topic = "truck_mounted_attenuator"; unit = "mph"; value = 45
+        id = "R-X"; topic = "truck_mounted_attenuator"; unit = "mph"; value = 45; role = "APPLY"
         from tcp_planner.rules.rule_pack_models import Status as _S
         status = _S.SOURCED
     class FakePack:

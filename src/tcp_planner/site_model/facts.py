@@ -14,7 +14,7 @@ REASON_CODES = ("not_visible", "occluded", "low_resolution", "ambiguous", "sourc
                 "no_source", "malformed", "missing", "duplicate", "low_confidence", "no_registry_value", "ai_conflict",
                 "not_stated", "single_source")
 FLAGS = ("DEFAULT_ASSUMED", "POLICY_SUGGESTED", "CALIBRATION_PENDING", "SOURCE_REVIEW_REQUIRED", "CONTEXT_ONLY",
-         "AI_ONLY_UNCONFIRMED", "NEEDS_SECOND_SOURCE", "EVIDENCE_OVER_15_WORDS", "UNIT_MISMATCH", "AI_CONFLICT")
+         "AI_ONLY_UNCONFIRMED", "NEEDS_SECOND_SOURCE", "EVIDENCE_OVER_15_WORDS", "UNIT_MISMATCH", "AI_CONFLICT", "PROPOSED")
 # flags that keep a fact out of every rule input (the value is shown to the SME only)
 BLOCKING_FLAGS = frozenset({"CONTEXT_ONLY", "NEEDS_SECOND_SOURCE"})
 QUESTION_KINDS = ("WIDTH_NEAR_THRESHOLD", "LANES_DISAGREE", "START_FIELD_CONFLICT", "FACT_UNKNOWN", "WORK_SIDE_CONFIRM",
@@ -107,23 +107,31 @@ def question_id(kind, *parts):
     return hashlib.sha256("|".join([kind, *map(str, parts)]).encode()).hexdigest()[:16]
 
 
+# flags that make any result using the fact REVIEW_REQUIRED, with the fact named (STOP 1 point 2; D-93 for the default vehicle width)
+REVIEW_FLAGS = {
+    "AI_ONLY_UNCONFIRMED": "was read from the image only and is not confirmed (marks missing); the SME must confirm it",
+    "DEFAULT_ASSUMED": "uses a default value (not measured, not entered); the SME must confirm or override it",
+}
+
+
 class RuleInputs(dict):
     """{registry_id: SiteFact} that a rule may read. The facts keep their flags, so a result built from them can be gated:
-    `gate` is how a decision learns that it used an AI-only, unconfirmed fact (S6 STOP 1, point 2)."""
+    `gate` is how a decision learns that it used an AI-only unconfirmed fact or a default value."""
+
+    def flagged(self, flag):
+        return sorted(k for k, f in self.items() if flag in f.flags)
 
     @property
     def unconfirmed(self):
-        return sorted(k for k, f in self.items() if "AI_ONLY_UNCONFIRMED" in f.flags)
+        return self.flagged("AI_ONLY_UNCONFIRMED")
 
     def gate(self, decision, used=None):
-        """(decision, reasons). Any used fact flagged AI_ONLY_UNCONFIRMED turns SUPPORTED_AUTO into REVIEW_REQUIRED, and
-        each such fact is named in a reason. `used`: registry ids the result read (default: all inputs)."""
+        """(decision, reasons). Any used fact flagged AI_ONLY_UNCONFIRMED or DEFAULT_ASSUMED turns SUPPORTED_AUTO into
+        REVIEW_REQUIRED, and each such fact is named in a reason. `used`: registry ids the result read (default: all)."""
         from tcp_planner.contracts import REVIEW_REQUIRED, SUPPORTED_AUTO
-        names = [k for k in self.unconfirmed if used is None or k in set(used)]
-        reasons = [{"fact": k, "flag": "AI_ONLY_UNCONFIRMED",
-                    "reason": f"{k} was read from the image only and is not confirmed (marks missing); the SME must confirm it"}
-                   for k in names]
-        return (REVIEW_REQUIRED if names and decision == SUPPORTED_AUTO else decision), reasons
+        reasons = [{"fact": k, "flag": flag, "reason": f"{k} {text}"} for flag, text in REVIEW_FLAGS.items()
+                   for k in self.flagged(flag) if used is None or k in set(used)]
+        return (REVIEW_REQUIRED if reasons and decision == SUPPORTED_AUTO else decision), reasons
 
 
 def rule_inputs(facts):
