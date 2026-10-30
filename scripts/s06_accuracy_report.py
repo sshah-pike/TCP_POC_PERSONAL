@@ -107,12 +107,12 @@ def score(truth, results_by_profile, second=None, cfg=None):
     """The numbers: {profile: {"fields": {...}, "width": {...}}}. Deterministic: sorted everywhere."""
     from tcp_planner.ai.call1 import MARKS_MISSING, parse_call1
     from tcp_planner.site_model import lengths as L
-    from tcp_planner.site_model.site_config import call1_setting, load_site_config
+    from tcp_planner.site_model.site_config import call1_setting, confidence_floor, load_site_config
     cfg = cfg or load_site_config(); second = second or {}
-    critical = set(call1_setting("safety_critical_fields", cfg)); floor_wl = call1_setting("work_location_min_confidence", cfg)
-    common_floor = call1_setting("common_fact_min_confidence", cfg)
+    critical = set(call1_setting("safety_critical_fields", cfg))
     report = {}
     for profile in sorted(results_by_profile):
+        floor_wl, common_floor, critical_floor = (confidence_floor(k, profile, cfg)[0] for k in ("work_location", "common", "safety_critical"))
         calls = []
         for r in results_by_profile[profile]:
             if r["site"] not in truth: continue
@@ -127,7 +127,8 @@ def score(truth, results_by_profile, second=None, cfg=None):
                 value, conf, flags = _observation_value(field, res.observations, floor_wl, MARKS_MISSING)
                 if field in critical:
                     s = second.get(r["site"], {}).get(field)
-                    used = value if (value is not None and s is not None and s == value) else None
+                    above = critical_floor is None or (conf is not None and conf >= critical_floor)
+                    used = value if (value is not None and above and s is not None and s == value) else None
                 elif field == "work_location": used = value
                 else: used = value if (value is not None and (common_floor is None or (conf is not None and conf >= common_floor))) else None
                 outcome = "UNKNOWN" if value is None else "correct" if value == t else "wrong"
@@ -162,12 +163,14 @@ def score(truth, results_by_profile, second=None, cfg=None):
 
 
 def render(report, truth, second, cfg=None):
-    from tcp_planner.site_model.site_config import call1_setting, load_site_config
+    from tcp_planner.site_model.site_config import confidence_floor, load_site_config
     cfg = cfg or load_site_config()
+    floors = "; ".join(f"{p}: work_location {confidence_floor('work_location', p, cfg)[0]}, safety-critical {confidence_floor('safety_critical', p, cfg)[0] or 'none'}, "
+                       f"common {confidence_floor('common', p, cfg)[0] or 'none'}" for p in report)
     out = ["# Call 1 accuracy against truth", "",
            f"Truth: {len(truth)} sites ({', '.join(sorted({t['truth_source'] for t in truth.values() if t['truth_source']})) or 'no truth_source given'}). "
            f"Second source (stands in for OSM): {'%d sites' % len(second) if second else 'none supplied: lanes per direction, divided, shoulder and one-way are never passed on'}. "
-           f"Floors applied: work_location {call1_setting('work_location_min_confidence', cfg)}; common facts: none (CALIBRATION_PENDING). "
+           f"Floors applied (per profile, default entry unless the profile has its own; none = CALIBRATION_PENDING): {floors}. "
            "work_location is read with the marks check missing, so a passed-on value carries AI_ONLY_UNCONFIRMED.", ""]
     for profile, rep in report.items():
         out += [f"## {profile}", "", "| field | sites scored | calls | correct | wrong | UNKNOWN | passed on | wrong and used | sites with wrong and used | 95% upper bound on wrong-and-used rate |",

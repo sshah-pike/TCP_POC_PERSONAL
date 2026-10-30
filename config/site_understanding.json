@@ -8,10 +8,6 @@
       "value": 15,
       "source": "S0 prompt tuning proposal P1, approved S6 Q3 B"
     },
-    "work_location_min_confidence": {
-      "value": 0.85,
-      "source": "owner decision, S6 session 1"
-    },
     "safety_critical_fields": {
       "value": [
         "lanes_per_direction",
@@ -20,11 +16,6 @@
         "oneway"
       ],
       "source": "owner decision, S6 session 1 (Q7/Q8): AI plus OSM must agree, otherwise UNKNOWN"
-    },
-    "common_fact_min_confidence": {
-      "value": null,
-      "source": "CALIBRATION_PENDING",
-      "note": "no floor applied until calibrated"
     }
   },
   "measurement": {
@@ -161,5 +152,25 @@
       "source": "CALIBRATION_PENDING",
       "note": "within this distance of the nearest road edge (or with no road near) work_location is UNKNOWN plus one SME question"
     }
+  },
+  "confidence_floors": {
+    "note": "Confidence floors (owner plan 2026-10-31): a default entry plus optional per-profile entries, looked up by the Foundry profile name (for example gpt-5.6-sol). A model reports confidence on its own scale, so one profile may need a different floor; nothing is entered for a profile until it is calibrated. A floor of null applies none. Kinds: work_location, safety_critical (lanes_per_direction, divided_highway, shoulder_present, oneway: the AI plus OSM must still agree), common (every other fact).",
+    "default": {
+      "work_location": {
+        "value": 0.85,
+        "source": "owner decision, S6 session 1"
+      },
+      "safety_critical": {
+        "value": null,
+        "source": "CALIBRATION_PENDING",
+        "note": "no floor applied until calibrated"
+      },
+      "common": {
+        "value": null,
+        "source": "CALIBRATION_PENDING",
+        "note": "no floor applied until calibrated"
+      }
+    },
+    "profiles": {}
   }
 }

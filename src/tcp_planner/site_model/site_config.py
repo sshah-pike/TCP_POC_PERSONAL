@@ -41,3 +41,16 @@ def setting(section, name, cfg=None):
     flag, so every result computed from it can say so (same rule as `measurement_setting`)."""
     entry = (cfg or load_site_config())[section][name]
     return entry["value"], (("CALIBRATION_PENDING",) if entry.get("source") == "CALIBRATION_PENDING" else ())
+
+
+FLOOR_KINDS = ("work_location", "safety_critical", "common")
+
+
+def confidence_floor(kind, profile=None, cfg=None):
+    """(floor or None, flags) for a kind of fact and a Foundry profile name: the profile's own entry when it has one, else the
+    default entry. A floor of None applies no floor. A CALIBRATION_PENDING entry carries that flag."""
+    if kind not in FLOOR_KINDS: raise ValueError(f"unknown floor kind {kind!r}")
+    section = (cfg or load_site_config())["confidence_floors"]
+    entry = ((section.get("profiles") or {}).get(profile) or {}).get(kind) if profile else None
+    entry = entry or section["default"][kind]
+    return entry["value"], (("CALIBRATION_PENDING",) if entry.get("source") == "CALIBRATION_PENDING" else ())

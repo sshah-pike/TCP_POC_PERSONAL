@@ -10,7 +10,7 @@ from typing import NamedTuple, Optional
 from pydantic import BaseModel, ConfigDict, StrictFloat, StrictInt, StrictStr, ValidationError
 from tcp_planner.site_model.outcomes import UNKNOWN, outcome_for
 from tcp_planner.site_model.facts import SiteFact, Mark, Question, Candidate, question_id
-from tcp_planner.site_model.site_config import call1_setting, load_site_config
+from tcp_planner.site_model.site_config import call1_setting, confidence_floor, load_site_config
 
 SOURCE_AI = "AI"
 EVIDENCE_CODES = ("not_visible", "occluded", "low_resolution", "ambiguous")   # P2': fixed reason for UNKNOWN evidence
@@ -241,12 +241,13 @@ def map_work_location(obs, marks_check, floor):
     return unknown("source_disagreement", q)
 
 
-def to_site_facts(result, work_location_marks=MARKS_MISSING, cfg=None):
+def to_site_facts(result, work_location_marks=MARKS_MISSING, cfg=None, profile=None):
     """(facts, questions) for every table row. Safety-critical facts that are RESOLVED carry NEEDS_SECOND_SOURCE until the
-    OSM cross-check (fusion) decides them: no rule input can read them before that."""
+    OSM cross-check (fusion) decides them: no rule input can read them before that. `profile` (the Foundry profile name) picks the
+    confidence floors: its own entry when config has one, else the default; a reading below its floor is UNKNOWN (low_confidence)."""
     cfg = cfg or load_site_config()
     critical = set(call1_setting("safety_critical_fields", cfg))
-    floor = call1_setting("work_location_min_confidence", cfg)
+    floor = confidence_floor("work_location", profile, cfg)[0]
     facts, questions = [], []
     for row in FIELDS:
         obs = result.observations[row.name]
@@ -254,7 +255,11 @@ def to_site_facts(result, work_location_marks=MARKS_MISSING, cfg=None):
             f, q = map_work_location(obs, work_location_marks, floor)
             if q: questions.append(q)
         else:
-            f = _fact(row, obs, flags=("NEEDS_SECOND_SOURCE",) if row.name in critical and obs.status == "RESOLVED" else ())
+            kind_floor = confidence_floor("safety_critical" if row.name in critical else "common", profile, cfg)[0]
+            if obs.status == "RESOLVED" and kind_floor is not None and (obs.confidence is None or obs.confidence < kind_floor):
+                f = _fact(row, obs, status="UNKNOWN", reason="low_confidence")
+            else:
+                f = _fact(row, obs, flags=("NEEDS_SECOND_SOURCE",) if row.name in critical and obs.status == "RESOLVED" else ())
         facts.append(f)
     return facts, questions
 

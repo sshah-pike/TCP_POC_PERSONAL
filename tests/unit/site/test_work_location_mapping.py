@@ -6,9 +6,9 @@ import pytest
 from tcp_planner.ai.call1 import (BEYOND_SHOULDER, IN_LANE, MARKS_AGREE, MARKS_DISAGREE, MARKS_MISSING, ON_SHOULDER, Observation,
                                   map_work_location)
 from tcp_planner.rules.rule_pack_store import JsonRulePackStore
-from tcp_planner.site_model.site_config import call1_setting
+from tcp_planner.site_model.site_config import call1_setting, confidence_floor
 
-FLOOR = call1_setting("work_location_min_confidence")
+FLOOR = confidence_floor("work_location")[0]
 HI, LO = 0.9, 0.84
 
 # (wire value, marks) -> (registry value or None, flags, reason_code, question)

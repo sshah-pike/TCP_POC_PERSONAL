@@ -8,9 +8,9 @@ from tcp_planner.ai.call1 import (MARKS_AGREE, MARKS_DISAGREE, MARKS_MISSING, Ca
                                   map_work_location)
 from tcp_planner.contracts import REVIEW_REQUIRED, SUPPORTED_AUTO, UNSUPPORTED_POC
 from tcp_planner.site_model.facts import RuleInputs, SiteFact, rule_inputs
-from tcp_planner.site_model.site_config import call1_setting
+from tcp_planner.site_model.site_config import call1_setting, confidence_floor
 
-FLOOR = call1_setting("work_location_min_confidence")
+FLOOR = confidence_floor("work_location")[0]
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 
