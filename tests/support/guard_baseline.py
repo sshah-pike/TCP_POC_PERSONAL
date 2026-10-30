@@ -8,11 +8,8 @@ empty APPROVED.
 import os, subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-BASELINE_REF = "b2c95fe56fcb4ed9e43804edae57a5c0bd1013f6"  # last commit of tcp-mvp/s02-storage
-APPROVED = {
-    # S3 Q3/Q4 (owner decision): new "project" section with max_zones 3 and max_parallel_zone_runs 3 only
-    "config/pipeline_config.json": "852c9dcaa2503b938cbf98a251b4daddef178fb4",
-}
+BASELINE_REF = "964948162973f4bfd442b85cec2f3681708af92c"  # merge-base of tcp-mvp/s04b-pack-round with origin/tcp-mvp/base
+APPROVED = {}
 
 
 def _git(*args):
