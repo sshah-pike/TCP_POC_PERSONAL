@@ -116,8 +116,30 @@ If code and plan disagree, **stop and report**. Do not silently follow either on
   expected outputs stay byte-identical. Hashes of the same run differ between Windows and Linux.
 - **Legacy runs.** Runs made before S2 (`ui/*.json`) are read-only: listed and opened, never resumed, revised or compared.
   Assistant event streams written before S2 can be read but not appended to; sessions from before S2 are not read.
-- **Rendered files.** Image, PDF and DWT outputs are registered with the store (SHA-256 and size) only after the renderer
-  wrote them, and the refs are not saved in any index. The raw-path scan reads JSON only, so it does not look inside them.
+- **Rendered files.** Image, PDF and DXF outputs are registered with the store (SHA-256 and size) only after the renderer
+  wrote them. Since S3 the SHA-256 and size of every output file are in the run's `result.output_index`. The raw-path scan
+  reads JSON only. One-time check in S3: PNG, JPEG, PDF and JSON outputs hold no local path; DXF and DWG are unchecked (no ODA
+  converter on the dev machine). `tests/integration/pipeline/test_dxf_local_paths.py` checks them where the converter exists.
+
+### Known limits of projects and zone runs (S3)
+
+- **One process drives a project.** The orchestrator's lock is per process (the web server's threads). Do not run the
+  `project` command and the server on the same project at the same time.
+- **Retry is idempotent, not transactional.** Run reserves run ids in the project record, builds each run, then starts it. A
+  crash in between leaves a reserved id or a built run that the next Run completes; nothing is created twice.
+- **The live UI path is untried.** Projects ran only on offline scenarios, recorded fixtures and fakes. The Azure Maps and AI
+  path through the project UI waits for the real-KML recording after S6 (`TCP_LIVE=1`, run by the owner).
+- **Cap approval is not an identity.** `approved_by` is typed text or "UI click", stored with `verified: false` (S10's
+  approver role replaces it). An approval covers the zone count it was given for, not a bigger set.
+- **A REVIEW_REQUIRED zone has no draft.** The pipeline drafts only SUPPORTED_AUTO; the project status REVIEW_REQUIRED
+  reflects the zone decision. Drafts for review come with S7/S8 and D-65.
+- **No 429 backoff.** Up to `project.max_parallel_zone_runs` zone runs call Foundry, Azure Maps and Overpass at once.
+- **Lineage and labels.** The SME lineage key is `lineage_key(project_id, zone geometry hash)` (D-82). A run outside a
+  project has none, and the assistant answers `NO_PROJECT_LINEAGE`. Label files live in `var/labels/` (ignored by git).
+- **D-59 breaches still in the engine** (fix in S7/S10): the OSM `maxspeed` fallback and the encroachment override of the SME's
+  lane closure, both in `site_model/fusion.py`.
+- Only a project starts runs over HTTP: `POST /api/runs` answers 400.
+
 
 ## Tests
 

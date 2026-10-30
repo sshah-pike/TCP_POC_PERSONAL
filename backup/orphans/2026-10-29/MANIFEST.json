@@ -18,7 +18,7 @@
       "sha256": "770eae78c2dc071310a87851065f5ec564a4999490dc2fdae3a92826376bc44b",
       "git_blob": "3040982d3fafcd08900c37bf99cea1492f088e0f",
       "size": 7350,
-      "moved_in_commit": "FILLED_AFTER_COMMIT",
+      "moved_in_commit": "447e461",
       "commit_before_move": null,
       "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-29 --apply --only \"var/labels/771bbc3d0913044a.json\""
     }
