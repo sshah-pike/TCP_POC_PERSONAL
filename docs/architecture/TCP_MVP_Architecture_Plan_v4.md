@@ -1127,7 +1127,7 @@ Approved means you said yes in this conversation \[S5\]. Proposed means it is in
 | D-48 | Symbol library v0.1 (51 placeholder symbols, catalog from Chapter 6 tables) | Approved, symbols to be replaced later | 10A |
 | D-49 | Grouping uses the case table and per-TA settings, not a single distance, in two passes | Proposed | 4A |
 | D-50 | Golden set from your drafts, with a comparator and a live full-pipeline test | Proposed | 14 |
-| D-51 | Client practice layer from your drafts (100 ft buffer, add-on modules). The police variant is not automatic (D-68) | Proposed | 10 |
+| D-51 | Client practice layer from your drafts (100 ft buffer, add-on modules). The police variant is not automatic (D-68). Changed 2026-10-30: withdrawn by the owner (register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Withdrawn | 10 |
 | D-52 | Orphaned files and code are moved to `backup/` with a manifest, never deleted. You approve the list before anything moves | Approved | 13 |
 | D-53 | Geometry fusion sources, open-source/public only: OSM, MassGIS, RIGIS, USGS, plus city open data as needed. No commercial API in fusion | Proposed | 5 |
 | D-54 | Input schema: a general schema for every TA plus a per-TA schema, each field's source and MUTCD citation listed | Proposed | 4B |
@@ -1136,14 +1136,14 @@ Approved means you said yes in this conversation \[S5\]. Proposed means it is in
 | D-57 | Lane width and encroachment are computed each time placement changes, with escalation to a lane closure proposed automatically and confirmed by the SME | Approved | 4C |
 | D-58 | Road type and speed prior from OSM and state tags | Future scope | 4C |
 | D-59 | Mandatory start fields, typed in the UI before Run: `road_type`, `posted_speed_mph`, `traffic_volume`, `lane_closure`. No code calculates them and no other source fills them in the MVP. A contradicting computed check raises a conflict, never a change | Approved | 4B |
-| D-60 | Routing decision tree and explicit eligibility: TA-6 needs a shoulder and a low-speed minor road; TA-33 is one OR'd rule; only TA-1, 6, 10 and 33 exist | Approved | 6 |
+| D-60 | Routing decision tree and explicit eligibility: TA-6 needs a shoulder and a low-speed minor road; TA-33 is one OR'd rule; only TA-1, 6, 10 and 33 exist. Changed 2026-10-30, 6N.11 line: a Granite-type case (undivided, two lanes each way, right lane closed) is sourced from 6N.11 para 02 and para 06 (owner-confirmed reading); broader cases (three or more lanes each way, left-lane or interior closures on undivided roads) remain an engineer question (D-91) | Approved | 6 |
 | D-61 | AI output as a flat facts list in JSON (no TOON). Decided after the S0 spike: the current per-property schema is rejected by Foundry (HTTP 400, union-type limit), the facts list is accepted | Approved | 5 |
 | D-62 | Azure Maps is allowed alongside open data | Approved | 5 |
 | D-63 | Added sources: HPMS, Census urban areas, USGS 3DEP, MBTA/RIPTA GTFS, FRA crossings, with the full OSM tag list | Approved | 5 |
 | D-64 | The AI returns positions; code computes every length | Approved | 4B |
 | D-65 | SME approval gate config, default on | Approved | 7 |
 | D-66 | The KML supplies coordinates only. Custom KML keys and `selected_ta` are future scope | Approved | 4 |
-| D-68 | `traffic_control_method` is not a UI start field. Code sets Flagger when TA-10 is chosen; police details are a post-draft SME review action | Approved | 4B, 8 |
+| D-68 | `traffic_control_method` is not a UI start field. Code sets Flagger when TA-10 is chosen; police details are a post-draft SME review action. Changed 2026-10-30: the police part is deferred to future scope (D-86); Flagger default stands | Approved; police part deferred | 4B, 8 |
 | D-69 | `work_side`: the AI suggests, the SME confirms on the form | Approved | 4B |
 | D-70 | Grade-crossing notification dropped from the MVP; crossing presence still detected and flagged | Approved | 4B |
 | D-71 | Title-block location uses the road name the POC already prints; the SME does not type an address | Approved | 4A |
@@ -1160,6 +1160,28 @@ Approved means you said yes in this conversation \[S5\]. Proposed means it is in
 | D-82 | The SME lineage key is a composite of the project and the zone geometry hash (`lineage_key(project_id, zone_geometry_hash)`, added in S1). Clean break: POC-era runs are not migrated. In S3 both `site_id_for` and the ground-truth label files switch to it; the one existing label file (`var/labels/771bbc3d0913044a.json`) is re-keyed by hand | Approved | 8, 9 |
 | D-83 | The S0a check that replays the 36 saved runs is dropped. The recorded fixtures and the stored expected outputs of the offline scenarios are the regression proof. A config change, such as S1's `input.duplicate_distance_m`, changes the config hash that check depends on | Approved | 14 |
 | D-84 | State is stored in files only in the MVP (records as `<key>.state.json`, events as `<stream>.events.jsonl`, written under lock files with an ownership re-check). A database adapter is future scope, together with the cloud move. Supersedes the SQLite adapter first built in S2, which moved to `backup/orphans/2026-10-28/` | Approved | 12 |
+| D-85 | Rules come from MUTCD Chapter 6, December 2023 revision only. The Colorado, E Second and Granite drafts are comparison material, not sources. A later revision is a separate re-extraction task; the client is asked which revision applies. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Source edition |
+| D-86 | Flagger is the default traffic control method. Police detail instead of flagger is future scope (entry already in the plan). | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Traffic control method |
+| D-87 | S4 rule pack approved by the owner as the working pack. The manifest stays DRAFT. Approval logged 2026-10-30 against pack content hash 98c18fb207284ae884a28d20e2a5eba56facd74dfbc2aa7aa06797afe9e53d43 (version 1.0.0; computed by JsonRulePackStore.content_hash(), because rule_pack/pack.json stores the part hashes but not the pack hash). The 13 unsourced items and the figure-only values stay as they are. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | S4 rule pack |
+| D-88 | Golden set v0.1 accepted by the owner, used with tolerances. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Golden set |
+| D-89 | Comparison reports two scores: a core score (MUTCD items the tool is meant to produce) and a full score (everything in the draft, unbuilt extras counted as misses). | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Comparison scores |
+| D-90 | Add-ons (owner scope B): sidewalk closed (R9-9, R9-11 family) and detour (M4-9 family) get MUTCD sources in the S4b pack round and are built in S8. No-parking (R8-3) and RI double fines wait for their sources. All add-ons are optional per zone; the engineer turns them on; the tool never adds them by itself. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Add-ons |
+| D-91 | 6N.11: a Granite-type case (undivided, two lanes each way, right lane closed) is treated as sourced from 6N.11 para 02 and para 06 (owner-confirmed reading). Broader cases (three or more lanes each way, left-lane or interior closures on undivided roads) remain an engineer question. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | 6N.11 |
+| D-92 | Safety-critical fields: lanes per direction, divided, shoulder, one-way each need two agreeing sources or become UNKNOWN. The work location uses a confidence of at least 0.85 and the SME confirms the work side. work_location values come from the registry vocabulary. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Safety-critical fields |
+| D-93 | Default work vehicle width 102 in (23 CFR 658.15), kept in the S6 settings file (not the pack), flagged DEFAULT_ASSUMED, optional, overridable per job. A result that used it is REVIEW_REQUIRED. Work space depth and clearance are asked per job. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Default work vehicle width |
+| D-94 | "Decide per job" means the review form asks for that zone, the answer is saved with the plan, and until answered the tool uses the stated safe default and marks the plan "needs review". Defaults: buffer none; taper length unset places no taper; optional devices omitted and listed. A "standing rule" is set only if the SME gives one. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Decide per job |
+| D-95 | Roles: dropdown roles (SME reviewer with full chat assistant; Approver who approves changes and the zone cap), no login for now, every action audited as "role selected, not verified". Real login before client use, in S11. Role-specific pages and components come with the UI slices. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Roles |
+| D-96 | Cutover chain: S6 builds beside the old path, S7 adds a non-gating route stage, S8 cuts over once with regenerated oracles that the owner reviews. The POC output renames happen in that same commit. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Cutover chain |
+| D-97 | S6 call 1 uses gpt-5.6-sol (D-78 default). The same 9-call check is compared against claude-opus-5-5 before any real-KML recording. The safety-critical cross-check rule applies to both. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | S6 call 1 model |
+| D-98 | Recording the real KMLs: Colorado once after S7 merges (calls 1 and 2 together); the rest after S9. Granite is compared at pole P32 (Phase I) only. The owner runs recordings with TCP_LIVE=1. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Real-KML recording |
+| D-99 | S4b pack round before S5 commit 3 and before S8: sign sizes as quoted pack rows, note-only devices, placement anchors, add-on sections, 6N.11 split. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | S4b pack round |
+| D-100 | Title block: street, city, state and ZIP; the street number only if it is in the input. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Title block |
+| D-101 | Merge style: merge commits (--no-ff), no squash. RulePackStore reconciled to S4's shape (list_versions(), load(version=None, validate_pack=True), content_hash(version=None)). Done 2026-10-30, tcp-mvp/base. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Merge style |
+| D-102 | Approver role: dropdown. Grouping settings and the 18-case table are confirmed at S9 planning. Rule management UI is the last slice, S16, read-only browser first, then approval as an append-only record. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Approver role, grouping, S16 |
+| D-103 | Test tiering after the merge: slow marker, impact map, slice-end full run. Pytest-xdist only after measuring. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Test tiering |
+| D-104 | S3 follow-ups: a REVIEW_REQUIRED zone gets a draft in S7; projects get an archive flag later, never delete; max_parallel_zone_runs stays 3 and is measured in S6; the cap approval wording "approved (not verified)" is a cosmetic UI fix. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | S3 follow-ups |
+| D-105 | Granite: the KML (WPI 3159540, points P32 to P28, about north) and the drawing (WPI 3178233, P.32 to P.42, east) are neighbouring stretches sharing P32 (granite-check report, medium confidence). The KML for WPI 3178233 has been requested from the SME. | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Granite |
+| D-106 | Azure: account TCP-Foundary-RR, East US; deployments claude-opus-5-5 and gpt-5.6-sol (5,000 requests and 5,000,000 tokens per minute each) and claude-opus-5-5-fast (2,000 and 2,000,000). | Approved (owner, 2026-10-30; register: docs/decisions/OWNER_DECISIONS_2026-10-30.md) | Azure |
 | D-67 | New fields added to the schema: work side, work type, work length, lane width, direction of travel, bike lane, accessible route, detours, work-zone speed, add-on triggers, title-block fields, median work, and the TA-10 and TA-33 fields | Approved | 4B |
 
 ### Open questions (version 9)
@@ -1182,10 +1204,10 @@ Slices S0 to S5 can start now. Each item has a default so no slice is blocked.
 | 12 | Confirm grouping settings and the case table | S9 | Start values, flagged |
 | 13 | Sign codes to confirm (W20-8 police, M4-A8, M4-9AL, R9-3BR, R9-10L, RI 27.1.1) | S5 | Catalog as listed |
 | 14 | The 11 ft lane-width note against TA-6's 10 ft | S8 | Both checked; the stricter gives a warning |
-| 15 | Who holds the approver role | S10 | Configured list of approver users |
+| 15 | Answered 2026-10-30 (D-95, D-102): approver role is a dropdown; the holder is a client input in docs/OPEN_ITEMS.md. Was: who holds the approver role | S10 | Configured list of approver users |
 | 16 | Taper and buffer: my reading of your clarification | S10 | As written in Section 7 |
-| 17 | Which RIDOT and MassDOT documents apply | Later | MUTCD plus client layer |
-| 18 | SME confirmation that the Section 4B schema misses nothing | S6 | Built as written |
+| 17 | Answered 2026-10-30: asked of the client, tracked in docs/OPEN_ITEMS.md; rules use MUTCD December 2023 only (D-85). Was: which RIDOT and MassDOT documents apply | Later | MUTCD plus client layer |
+| 18 | Answered 2026-10-30: S6 plan Q6 A, built as written (see docs/plans/S6_plan.md). Was: SME confirmation that the Section 4B schema misses nothing | S6 | Built as written |
 | 19 | Push and merge S0a: push `tcp-mvp/s00a-restructure`, review it, merge into `tcp-mvp/base` | Before S0 | Push now, merge after review |
 | 20 | ~~Approve D-78 and D-79~~ Closed: approved and done in S0 | S0 | Done |
 
@@ -1423,7 +1445,7 @@ Each record states status, context, decision, consequences and what was rejected
 
 ### ADR-048: Flaggers by default, police as a post-draft SME action
 
-**Status:** Accepted (D-68). **Context:** Police details replace flaggers only as a state-level choice, and they change the sign to POLICE OFFICER AHEAD. **Decision:** `traffic_control_method` is not asked at the start. When the router picks TA-10, code sets Flagger and the draft follows MUTCD Figure 6P-10. The SME switches a zone to police details after the draft, as a deterministic review action from the SME assistant. **Consequences:** One fewer start field. The Colorado golden is compared after the switch. **Rejected:** Asking for the method on every job; making police the default.
+**Status:** Accepted; police part deferred to future scope 2026-10-30 (D-68; changed: the post-draft police switch is no longer built). **Context:** Police details replace flaggers only as a state-level choice, and they change the sign to POLICE OFFICER AHEAD. **Decision:** `traffic_control_method` is not asked at the start. When the router picks TA-10, code sets Flagger and the draft follows MUTCD Figure 6P-10. The SME switches a zone to police details after the draft, as a deterministic review action from the SME assistant. **Consequences:** One fewer start field. The Colorado golden is compared after the switch. **Rejected:** Asking for the method on every job; making police the default.
 
 ### ADR-047: Duration, night work and the other listed fields are kept
 
@@ -1439,7 +1461,7 @@ Each record states status, context, decision, consequences and what was rejected
 
 ### ADR-039: Client practice layer
 
-**Status:** Proposed (D-51). **Context:** Your drafts follow client practice beyond the figures. **Decision:** Client rules live in their own layer, each citing a draft, and never in the federal layer. **Consequences:** Output matches your drafts' practice and stays traceable. **Rejected:** Changing MUTCD values to fit.
+**Status:** Withdrawn 2026-10-30 (D-51; changed: was Proposed). **Context:** Your drafts follow client practice beyond the figures. **Decision:** Client rules live in their own layer, each citing a draft, and never in the federal layer. **Consequences:** Output matches your drafts' practice and stays traceable. **Rejected:** Changing MUTCD values to fit.
 
 ## 18. Verification prompt for VS Code Claude
 

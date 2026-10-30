@@ -219,11 +219,32 @@ Follow-ups carried into later slices:
 
 ---
 
+## S4b. Pack extension round
+
+**Goal.** Close the pack gaps that S5 commits 3 and 4 and S8 depend on, as quoted, sourced pack rows (owner decisions D-91 and D-99, added 2026-10-30).
+
+**Depends on.** S4.
+
+**In scope.**
+- Sign sizes as quoted pack rows (the work S5 commit 3 was to do).
+- Device rows for note-only signs (the work S5 commit 4 was to do).
+- Placement anchors: what A, B and C are measured from (consecutive gaps ending at the taper start for TA-6 and TA-33, or at the flagger station for TA-10; SME confirms).
+- Add-on sections: sidewalk closed (R9-9, R9-11 family) and detour (M4-9 family). No-parking (R8-3) and RI double fines wait for sources.
+- The 6N.11 split: Granite-type case sourced, broader cases an engineer question.
+
+**Acceptance criteria.** To be set when S4b is planned. Every value is quoted with page and rule id; a value with no source stays `SOURCE_REVIEW_REQUIRED`. The manifest stays DRAFT. The pack hash change is recorded.
+
+**Runs.** Before S5 commit 3 and before S8. S5 resumes after S4b is merged.
+
+---
+
 ## S5. Device catalog and symbol library
 
 **Goal.** Every device a plan can place exists in the catalog, with a symbol, and the renderer can draw it.
 
 **Depends on.** S4.
+
+**Changed 2026-10-30 (D-99):** commits 3 and 4 of the S5 plan (sign sizes as quoted pack rows; device rows for note-only signs) move to slice S4b. S5 resumes after S4b is merged.
 
 **In scope.**
 - Import `assets/symbols/device_catalog.json` (v0.1, 51 entries) into the pack's `device` table.
@@ -246,6 +267,8 @@ Follow-ups carried into later slices:
 ## S6. Site understanding
 
 **Goal.** Call 1 returns the common and deciding facts with confidence and evidence, and geometry, width and crops follow the plan.
+
+**Changed 2026-10-30 (D-96, S6 plan Q1 B):** S6 runs in two sessions (session 1: call 1, measurement, crops, OSM, wiring; session 2: data sources). Cutover chain: S6 builds beside the old path, S7 adds a non-gating route stage, S8 cuts over once with regenerated oracles the owner reviews.
 
 **Depends on.** S3.
 
@@ -305,8 +328,8 @@ Follow-ups carried into later slices:
 
 **In scope.**
 - Strategies for TA-1, TA-6, TA-10 and TA-33 on one common placement core. Advance signs come from Table 6B-1 A, B and C spacing on both approaches where the figure shows them.
-- Tapers from Tables 6B-3 and 6B-4, buffers from the client layer or Table 6B-2, channelizer spacing from 6K.01, and end signs.
-- Add-on modules: no parking, side streets, pedestrian or sidewalk, RI double fines, police detail, arrow board.
+- Tapers from Tables 6B-3 and 6B-4, buffers from Table 6B-2 when chosen per zone (client layer withdrawn, D-51), channelizer spacing from 6K.01, and end signs.
+- Add-on modules, optional per zone (changed 2026-10-30, D-90, D-51 withdrawn, D-68 deferred): sidewalk closed and detour, built from the S4b sections. No-parking and RI double fines wait for sources. Client modules and police detail are out of scope.
 - Validators with independent recomputation.
 - The layout envelope per zone, used by S9.
 
@@ -473,7 +496,7 @@ Follow-ups carried into later slices:
 
 ## Order and parallel work
 
-S0, then S1 and S2 in parallel, then S3. S4 and S5 can run beside S1 to S3. Then S6, S7, S8, S9, then S10 and S12 in parallel, then S11 and S13. S14 can follow S9 at any time. S15 runs once after S3 and again after S14.
+S0, then S1 and S2 in parallel, then S3. S4 and S5 can run beside S1 to S3 (changed 2026-10-30: S4b runs after S4 and before S5 commit 3 and before S8; S5 resumes after S4b). Cutover chain across S6, S7 and S8: S6 builds beside the old path, S7 adds a non-gating route stage, S8 cuts over once (D-96). Then S6, S7, S8, S9, then S10 and S12 in parallel, then S11 and S13. S14 can follow S9 at any time. S15 runs once after S3 and again after S14. S16 (rule management UI) is last.
 
 ---
 
@@ -539,3 +562,11 @@ The known candidates from earlier work are the USGS imagery code and the direct-
 - A check that every allowlisted path still exists.
 
 **Prompt seed.** "Run the orphan sweep per slice S15. Build the candidate list using import graphs from all entry points, vulture, knip or ts-prune, depcheck, coverage from the test suite plus one replayed run per real KML, and a repo-wide string search including configs and CI. Classify each item as CONFIRMED_ORPHAN, SUSPECT or KEEP with its evidence. Write docs/S15_orphan_report.md and STOP for my approval. After approval, git mv approved files and cut approved symbols into backup/orphans/<date>/ with MANIFEST.json and a restore script. Delete nothing. Then rerun all tests and the replayed pipeline and show that outputs are unchanged."
+
+---
+
+## S16. Rule management UI (last slice)
+
+**Goal.** A read-only browser for the rule pack first, then approval of rule changes as an append-only record (owner decision D-102, added 2026-10-30).
+
+**Depends on.** All earlier slices. Planned last. Scope and acceptance criteria are set when S16 is planned (see docs/plans/S16_plan.md).
