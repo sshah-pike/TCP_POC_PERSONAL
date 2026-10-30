@@ -92,7 +92,27 @@ def question_id(kind, *parts):
     return hashlib.sha256("|".join([kind, *map(str, parts)]).encode()).hexdigest()[:16]
 
 
+class RuleInputs(dict):
+    """{registry_id: SiteFact} that a rule may read. The facts keep their flags, so a result built from them can be gated:
+    `gate` is how a decision learns that it used an AI-only, unconfirmed fact (S6 STOP 1, point 2)."""
+
+    @property
+    def unconfirmed(self):
+        return sorted(k for k, f in self.items() if "AI_ONLY_UNCONFIRMED" in f.flags)
+
+    def gate(self, decision, used=None):
+        """(decision, reasons). Any used fact flagged AI_ONLY_UNCONFIRMED turns SUPPORTED_AUTO into REVIEW_REQUIRED, and
+        each such fact is named in a reason. `used`: registry ids the result read (default: all inputs)."""
+        from tcp_planner.contracts import REVIEW_REQUIRED, SUPPORTED_AUTO
+        names = [k for k in self.unconfirmed if used is None or k in set(used)]
+        reasons = [{"fact": k, "flag": "AI_ONLY_UNCONFIRMED",
+                    "reason": f"{k} was read from the image only and is not confirmed (marks missing); the SME must confirm it"}
+                   for k in names]
+        return (REVIEW_REQUIRED if names and decision == SUPPORTED_AUTO else decision), reasons
+
+
 def rule_inputs(facts):
-    """{registry_id: SiteFact} for the facts a rule may read: RESOLVED, a registry id, no blocking flag."""
-    return {f.registry_id: f for f in facts
-            if f.registry_id and f.status == "RESOLVED" and not (set(f.flags) & BLOCKING_FLAGS)}
+    """RuleInputs for the facts a rule may read: RESOLVED, a registry id, no blocking flag. AI_ONLY_UNCONFIRMED facts are
+    included (the value stands until the SME confirms) and stay visible through `RuleInputs.gate`."""
+    return RuleInputs((f.registry_id, f) for f in facts
+                      if f.registry_id and f.status == "RESOLVED" and not (set(f.flags) & BLOCKING_FLAGS))

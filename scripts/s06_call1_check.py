@@ -1,11 +1,13 @@
 """S6 call 1 model check: the same 9 calls (3 sites x 3 repetitions) on one deployment. Run by the OWNER only.
 
-  python scripts/s06_call1_check.py --profile gpt-5.6-sol --dry-run          no network: print the request body of call 1
-  TCP_LIVE=1 python scripts/s06_call1_check.py --profile gpt-5.6-sol --only 1   call 1 alone
-  TCP_LIVE=1 python scripts/s06_call1_check.py --profile gpt-5.6-sol             all 9 calls (or the rest, with --from 2)
+  PowerShell, from the repo root:
+  python scripts/s06_call1_check.py --profile gpt-5.6-sol --dry-run --only 1   no network: print the request body of call 1
+  $env:TCP_LIVE = "1"
+  python scripts/s06_call1_check.py --profile gpt-5.6-sol --only 1             call 1 alone
+  python scripts/s06_call1_check.py --profile gpt-5.6-sol --from 2             calls 2 to 9 (no --only/--from: all 9)
   python scripts/s06_call1_check.py --profile gpt-5.6-sol --summary            table rows from the saved results
 
-Then the same with --profile claude-opus-5-5. Each call prints the exact request body first (no key; every image shown as its
+Then the same with --profile claude-opus-5-5. The nine calls: 1-3 Granite (north-south road) repetitions 1-3, 4-6 E Second St (east-west road) repetitions 1-3, 7-9 Colorado (diagonal road) repetitions 1-3. Each call prints the exact request body first (no key; every image shown as its
 size and SHA-256), then the result. The run STOPS at the first API error and prints the HTTP status and the API's error body
 (key-like strings removed). Results are saved under var/s06_call1_check/<profile>/ (not tracked by git).
 use_os_trust_store() runs first; certificate verification is never turned off. The script writes nothing to the repo's tracked files.
