@@ -7,7 +7,9 @@ PROJECT_ROOT = os.path.dirname(SRC_DIR)
 CONFIG_DIR = os.path.join(PROJECT_ROOT, "config")
 RULE_PACK_DIR = os.path.join(PROJECT_ROOT, "rule_pack")
 ASSETS_DIR = os.path.join(PROJECT_ROOT, "assets")
-VAR_DIR = os.path.join(PROJECT_ROOT, "var")  # run outputs, labels, assistant data, debug dumps (gitignored)
+SYMBOLS_DIR = os.path.join(ASSETS_DIR, "symbols")  # device catalog and symbol files; asset uris are relative to ASSETS_DIR
+DEVICE_CATALOG_PATH = os.path.join(SYMBOLS_DIR, "device_catalog.json")
+VAR_DIR =os.path.join(PROJECT_ROOT, "var")  # run outputs, labels, assistant data, debug dumps (gitignored)
 
 
 def runs_dir():
