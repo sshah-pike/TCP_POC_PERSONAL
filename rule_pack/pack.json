@@ -42,6 +42,11 @@
       "sha256": "f4aa34d0e446968fd08bc3c1a0ed286c9cddca25eff767d734967047b7f5871f"
     },
     {
+      "path": "base/sign_sizes.json",
+      "layer": "FEDERAL",
+      "sha256": "38272f8fbbace449220f50f3f10a3c13fbd673e28a026ba67a5e4f23d7f554c9"
+    },
+    {
       "path": "ta/TA-1.json",
       "layer": "FEDERAL",
       "sha256": "629ce5ccd54ae17184282858a5c7740b792b02f34d8c306aef77003b021a00d8"
@@ -62,5 +67,5 @@
       "sha256": "42300db5ac40848e0fc60edfa1e5fa5c24e388a4514d2bf80931e066c10f2eec"
     }
   ],
-  "content_sha256": "98c18fb207284ae884a28d20e2a5eba56facd74dfbc2aa7aa06797afe9e53d43"
+  "content_sha256": "f175d44c1ef50aaa4a8e40eb57ba9a85fc1a9667e434ede5495ed62c70435ebe"
 }
