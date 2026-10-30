@@ -270,8 +270,8 @@ INSTRUCTIONS = (
     "- lanes_per_direction: count of through lanes in one direction. sidewalk_side: N|S|E|W|BOTH|NONE|UNKNOWN. "
     "obstructions: short list or NONE.\n"
     "- every other field: true|false|UNKNOWN.\n"
-    "- marks: points as 'x1,y1;x2,y2;...' in image pixels; one mark per lane line; road_edge_left and road_edge_right are "
-    "left and right when facing north.\n"
+    "- marks: points as 'x1,y1;x2,y2;...' in image pixels; one mark per lane line; road_edge_left and road_edge_right: "
+    "the two pavement edges, either order.\n"
     "Evidence: at most {words} words. For UNKNOWN, evidence is exactly one of: not_visible, occluded, low_resolution, ambiguous.\n"
     "Report no length or distance. Return the JSON object only.")
 

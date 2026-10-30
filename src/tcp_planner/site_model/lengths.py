@@ -27,10 +27,14 @@ def m_to_ft(m):
     return m / FT
 
 
-def interval_ft(value_ft, spread_ft, mpp, cfg=None):
-    """(Interval, edge pixel error, flags): value +/- (edge error x mpp x edges) plus the section spread (Q9 A).
-    The error values are CALIBRATION_PENDING starting points; their flag is returned so it travels with the number."""
-    err, flags = measurement_setting("edge_pixel_error_px", cfg)
+ERROR_SETTING = {"CROSS_SECTION": "edge_pixel_error_px_cross_section", "AI_MARKS": "edge_pixel_error_px_ai_marks"}
+
+
+def interval_ft(value_ft, spread_ft, mpp, cfg=None, method="AI_MARKS"):
+    """(Interval, edge pixel error, flags): value +/- (edge error x mpp x edges) plus the section spread (Q9 A). The edge
+    error depends on the method (cross-section or AI marks). The values are CALIBRATION_PENDING starting points; their flag
+    is returned so it travels with the number."""
+    err, flags = measurement_setting(ERROR_SETTING[method], cfg)
     edges, _ = measurement_setting("edges_per_width", cfg)
     half = px_to_ft(edges * err, mpp) + spread_ft
     return Interval(lo=max(0.0, value_ft - half), hi=value_ft + half, unit="ft"), err, flags
@@ -59,7 +63,7 @@ def _one(marks, feature):
 
 def _model(name, value_px, spread_px, mpp, method, inputs, calc, cfg):
     value = px_to_ft(value_px, mpp)
-    iv, err, flags = interval_ft(value, px_to_ft(spread_px, mpp), mpp, cfg)
+    iv, err, flags = interval_ft(value, px_to_ft(spread_px, mpp), mpp, cfg, method)
     return MeasuredLength(name=name, value_ft=value, interval_ft=iv, method=method, mpp=mpp, pixel_error_px=err,
                           inputs=tuple(inputs), calculation=calc, flags=flags)
 
@@ -70,7 +74,7 @@ def traveled_way_width(marks, mpp_sent, cross_section=None, cfg=None):
     note = ""
     if cross_section and cross_section.get("status") == "OK" and cross_section.get("width_m") is not None:
         mpp = cross_section["metres_per_pixel"]; spread = cross_section.get("spread_m") or 0.0
-        value = m_to_ft(cross_section["width_m"]); iv, err, flags = interval_ft(value, m_to_ft(spread), mpp, cfg)
+        value = m_to_ft(cross_section["width_m"]); iv, err, flags = interval_ft(value, m_to_ft(spread), mpp, cfg, "CROSS_SECTION")
         return MeasuredLength(
             name="traveled_way_width", value_ft=value, interval_ft=iv, method="CROSS_SECTION", mpp=mpp, pixel_error_px=err,
             inputs=(f"cross_section.width_m={cross_section['width_m']}", f"spread_m={spread}", f"mpp={mpp}"),
@@ -175,9 +179,66 @@ def length_fact(field, m, reason, pack, context=None):
     return SiteFact(**base, value=m.value_ft, status="RESOLVED"), None
 
 
-def measure_lengths(marks, mpp_sent, pack, *, total_lanes=None, cross_section=None, context=None, cfg=None):
+def lane_spacing(marks, mpp_sent, cfg=None):
+    """(MeasuredLength, None), (None, reason), or (None, None) when fewer than two lane-line marks exist. Lane width as the
+    spacing between adjacent lane lines (median of the gaps), measured across the road axis like the edges."""
+    lines = usable(marks, "lane_line")
+    if len(lines) < 2: return None, None
+    u = _axis([p for m in lines for p in m.points])
+    if u is None: return None, "malformed"
+    v = (-u[1], u[0])
+    order = sorted(lines, key=lambda m: sum(p[0] * v[0] + p[1] * v[1] for p in m.points) / len(m.points))
+    pairs = [edge_pair(x.points, y.points) for x, y in zip(order, order[1:])]
+    if any(isinstance(p, EdgeFailure) for p in pairs): return None, "ambiguous"
+    widths = sorted(p.width_px for p in pairs)
+    mid = widths[len(widths) // 2] if len(widths) % 2 else (widths[len(widths) // 2 - 1] + widths[len(widths) // 2]) / 2
+    spread = max(max(widths) - min(widths), max(p.spread_px for p in pairs))
+    inputs = (f"{len(lines)} lane line marks", f"gaps_px={[round(w, 3) for w in widths]}", f"mpp_sent={mpp_sent}")
+    return _model("lane_width", mid, spread, mpp_sent, "AI_MARKS", inputs,
+                  "lane_width_ft = median gap between adjacent lane lines x mpp_sent / 0.3048", cfg), None
+
+
+def gate_from(observations):
+    """The two AI readings the lane width gate may use: {"parking_present": bool|None, "shoulder_present": bool|None}, None
+    unless RESOLVED. A plain dict of values: no SiteFact is made from it and nothing here reaches rule_inputs. After OSM
+    fusion the caller may pass the fused value instead."""
+    return {k: (observations[k].value if observations[k].status == "RESOLVED" else None) for k in ("parking_present", "shoulder_present")}
+
+
+def _lane_question(reason):
+    return Question(question_id=question_id("FACT_UNKNOWN", "lane_width_ft"), kind="FACT_UNKNOWN", reason=reason,
+                    options=(), reveals=("lane_width_ft",))
+
+
+def lane_width(marks, tw, total_lanes, gate, mpp_sent, cfg=None):
+    """(MeasuredLength or None, reason or None, Question or None). Order (S6 STOP 2, point 3):
+    1. two or more lane-line marks: their spacing; 2. no parking and no shoulder inside the edges (both read false) and a lane
+    count: traveled way / total lanes; 3. otherwise UNKNOWN with a question."""
+    gate = gate or {}
+    lines, why = lane_spacing(marks, mpp_sent, cfg)
+    lo, hi = lane_width_plausible_m()
+    if lines is not None:
+        if lo <= lines.value_ft * FT <= hi: return lines, None, None
+        return None, "ambiguous", _lane_question("the lane-line spacing is not a plausible lane width; enter the lane width")
+    if why is not None: return None, why, _lane_question("the lane lines could not be measured; enter the lane width")
+    if tw is None: return None, None, _lane_question("the road edges could not be measured; enter the lane width")
+    if gate.get("parking_present") is not False or gate.get("shoulder_present") is not False:
+        return None, "ambiguous", _lane_question(
+            "parking or a shoulder may lie between the road edges (read: parking_present=%s, shoulder_present=%s), so the traveled way "
+            "cannot be divided into lanes; enter the lane width" % (gate.get("parking_present"), gate.get("shoulder_present")))
+    if not isinstance(total_lanes, int) or isinstance(total_lanes, bool) or total_lanes < 1:
+        return None, "missing", _lane_question("the lane count is not decided, so the traveled way cannot be divided; enter the lane width")
+    per_lane = tw.value_ft / total_lanes
+    if not lo <= per_lane * FT <= hi: return None, "ambiguous", _lane_question("the divided width is not a plausible lane width; enter the lane width")
+    iv = Interval(lo=tw.interval_ft.lo / total_lanes, hi=tw.interval_ft.hi / total_lanes, unit="ft")
+    notes = (f"total_lanes={total_lanes}", "parking_present=False and shoulder_present=False (AI reading, measurement gate only)")
+    return tw.model_copy(update={"name": "lane_width", "value_ft": per_lane, "interval_ft": iv, "inputs": tw.inputs + notes,
+                                 "calculation": "lane_width_ft = traveled_way_width_ft / total_lanes; the interval is divided the same way"}), None, None
+
+
+def measure_lengths(marks, mpp_sent, pack, *, total_lanes=None, gate=None, cross_section=None, context=None, cfg=None):
     """Code-computed lengths from marks and the optional cross-section. Never writes a start field; never reads a length from
-    the AI. `total_lanes` (both directions) comes from the lane facts once decided; None leaves lane width UNKNOWN."""
+    the AI. `total_lanes` (both directions) comes from the lane facts once decided; `gate` is gate_from(observations)."""
     facts, questions, measured = [], [], {}
 
     def add(field, m, reason):
@@ -188,18 +249,9 @@ def measure_lengths(marks, mpp_sent, pack, *, total_lanes=None, cross_section=No
 
     tw, reason = traveled_way_width(marks, mpp_sent, cross_section, cfg)
     if tw is not None: measured[tw.name] = tw
-    lane = None
-    if tw is not None:
-        if not isinstance(total_lanes, int) or isinstance(total_lanes, bool) or total_lanes < 1: reason = "missing"
-        else:
-            per_lane = tw.value_ft / total_lanes; lo, hi = lane_width_plausible_m()
-            if lo <= per_lane * FT <= hi:   # an implausible lane is not accepted, as in the cross-section
-                iv = Interval(lo=tw.interval_ft.lo / total_lanes, hi=tw.interval_ft.hi / total_lanes, unit="ft")
-                lane = tw.model_copy(update={
-                    "name": "lane_width", "value_ft": per_lane, "interval_ft": iv, "inputs": tw.inputs + (f"total_lanes={total_lanes}",),
-                    "calculation": "lane_width_ft = traveled_way_width_ft / total_lanes; the interval is divided the same way"})
-            else: reason = "ambiguous"
-    add("lane_width_ft", lane, reason)
+    lane, lreason, lq = lane_width(marks, tw, total_lanes, gate, mpp_sent, cfg)
+    if lq: questions.append(lq)
+    add("lane_width_ft", lane, lreason or reason)
     sw, rsw = shoulder_width(marks, mpp_sent, cfg); add("shoulder_width_ft", sw, rsw)
     facts.append(SiteFact(field="median_width_ft", registry_id="median_width_ft", unit="ft", source="CODE", status="UNKNOWN",
                           reason_code="no_source"))        # call 1 has no median mark: nothing to measure

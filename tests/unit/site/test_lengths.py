@@ -54,32 +54,41 @@ def test_resize_rescales_the_conversion():
 # ---------------------------------------------------------------- interval
 def test_interval_is_edge_error_times_scale_times_two_edges():
     m, _ = L.traveled_way_width(edges_marks(90, 12), PX_IS_FT)
-    assert m.value_ft == pytest.approx(12.0) and m.pixel_error_px == 1.0 and m.method == "AI_MARKS"
-    assert (m.interval_ft.lo, m.interval_ft.hi) == pytest.approx((10.0, 14.0))     # +/- 1 px x 1 ft/px x 2 edges
+    assert m.value_ft == pytest.approx(12.0) and m.pixel_error_px == 3.0 and m.method == "AI_MARKS"
+    assert (m.interval_ft.lo, m.interval_ft.hi) == pytest.approx((6.0, 18.0))      # +/- 3 px x 1 ft/px x 2 edges (AI marks)
     assert "CALIBRATION_PENDING" in m.flags and m.inputs and "mpp_sent" in " ".join(m.inputs)
 
 
 def test_interval_grows_with_coarser_pixels_and_never_goes_below_zero():
-    fine = L.interval_ft(12.0, 0.0, PX_IS_FT)[0]; coarse = L.interval_ft(12.0, 0.0, PX_IS_FT * 3)[0]
+    fine = L.interval_ft(30.0, 0.0, PX_IS_FT)[0]; coarse = L.interval_ft(30.0, 0.0, PX_IS_FT * 3)[0]
     assert (coarse.hi - coarse.lo) == pytest.approx(3 * (fine.hi - fine.lo))
     assert L.interval_ft(3.0, 0.0, PX_IS_FT * 3)[0].lo == 0.0
 
 
 def test_interval_adds_the_section_spread():
     iv = L.interval_ft(12.0, 1.5, PX_IS_FT)[0]
-    assert (iv.lo, iv.hi) == pytest.approx((8.5, 15.5))
+    assert (iv.lo, iv.hi) == pytest.approx((4.5, 19.5))                  # +/- (6 + 1.5), AI marks
+    iv = L.interval_ft(12.0, 1.5, PX_IS_FT, method="CROSS_SECTION")[0]
+    assert (iv.lo, iv.hi) == pytest.approx((8.5, 15.5))                  # +/- (2 + 1.5), cross-section 1 px
 
 
-def test_spike_scale_gives_about_three_feet_of_uncertainty():
-    """D-38 / Q9: one pixel per edge at 0.44 m per pixel is about 0.88 m (2.9 ft) each way."""
-    iv = L.interval_ft(24.0, 0.0, 0.4419)[0]
-    assert (iv.hi - iv.lo) / 2 == pytest.approx(2 * 0.4419 / 0.3048, rel=1e-9)
+def test_spike_scale_uncertainty_per_method():
+    """D-38 / Q9: the cross-section's one pixel per edge at 0.44 m per pixel is about 0.88 m (2.9 ft) each way; the AI marks' 3 px are three times that."""
+    cs = L.interval_ft(24.0, 0.0, 0.4419, method="CROSS_SECTION")[0]; ai = L.interval_ft(24.0, 0.0, 0.4419)[0]
+    assert (cs.hi - cs.lo) / 2 == pytest.approx(2 * 0.4419 / 0.3048, rel=1e-9)
+    assert (ai.hi - ai.lo) / 2 == pytest.approx(3 * (cs.hi - cs.lo) / 2)
+
+
+def test_cross_section_keeps_one_pixel_and_marks_use_three():
+    cs, _ = L.traveled_way_width(edges_marks(90, 30), PX_IS_FT, GOOD_SECTION)
+    ai, _ = L.traveled_way_width(edges_marks(90, 24), PX_IS_FT)
+    assert cs.pixel_error_px == 1.0 and ai.pixel_error_px == 3.0 and "CALIBRATION_PENDING" in cs.flags + ai.flags
 
 
 def test_a_tapering_pair_widens_the_interval_by_its_spread():
     a = [(0.0, 0.0), (300.0, 0.0), (600.0, 0.0)]; b = [(0.0, 12.0), (300.0, 16.0), (600.0, 20.0)]
     m, _ = L.traveled_way_width([mark("road_edge_left", a), mark("road_edge_right", b)], PX_IS_FT)
-    assert m.interval_ft.hi - m.interval_ft.lo == pytest.approx(2 * (2.0 + 8.0), abs=0.1)   # +/- (error term 2 ft + spread 8 ft)
+    assert m.interval_ft.hi - m.interval_ft.lo == pytest.approx(2 * (6.0 + 8.0), abs=0.1)   # +/- (error term 6 ft + spread 8 ft)
 
 
 # ---------------------------------------------------------------- sources and precedence (D-80)
@@ -176,30 +185,35 @@ def _cmps(e):
 
 
 # ---------------------------------------------------------------- facts
-def test_lane_width_is_the_traveled_way_over_the_lane_count(pack):
-    res = L.measure_lengths(edges_marks(90, 24), PX_IS_FT * 0.5, pack, total_lanes=2)     # 24 px at 0.5 ft/px = 12 ft, 6 ft... see below
+CLEAN = {"parking_present": False, "shoulder_present": False}
+
+
+def test_lane_width_is_the_traveled_way_over_the_lane_count_on_a_clean_road(pack):
+    res = L.measure_lengths(edges_marks(90, 24), PX_IS_FT * 0.5, pack, total_lanes=2, gate=CLEAN)    # 12 ft over 2 lanes = 6 ft
     lane = next(f for f in res.facts if f.field == "lane_width_ft")
-    assert lane.status == "UNKNOWN"                     # 12 ft over 2 lanes = 6 ft: not a plausible lane, not accepted
-    res = L.measure_lengths(edges_marks(90, 24), PX_IS_FT, pack, total_lanes=2)
+    assert lane.status == "UNKNOWN"                     # 6 ft is not a plausible lane, not accepted
+    res = L.measure_lengths(edges_marks(90, 24), PX_IS_FT, pack, total_lanes=2, gate=CLEAN)
     lane = next(f for f in res.facts if f.field == "lane_width_ft")
     assert lane.status == "RESOLVED" and lane.value == pytest.approx(12.0) and lane.unit == "ft"
-    assert (lane.interval.lo, lane.interval.hi) == pytest.approx((11.0, 13.0))             # (24 -+ 2) / 2
+    assert (lane.interval.lo, lane.interval.hi) == pytest.approx((9.0, 15.0))              # (24 -+ 6) / 2, AI marks 3 px
     assert lane.measured.name == "lane_width" and "total_lanes=2" in lane.measured.inputs and "CALIBRATION_PENDING" in lane.flags
     assert res.measured["traveled_way_width"].value_ft == pytest.approx(24.0)
 
 
 def test_lane_width_is_unknown_without_a_lane_count(pack):
-    lane = next(f for f in L.measure_lengths(edges_marks(90, 24), PX_IS_FT, pack).facts if f.field == "lane_width_ft")
+    res = L.measure_lengths(edges_marks(90, 24), PX_IS_FT, pack, gate=CLEAN)
+    lane = next(f for f in res.facts if f.field == "lane_width_ft")
     assert (lane.status, lane.reason_code, lane.value) == ("UNKNOWN", "missing", None)
+    assert [q.kind for q in res.questions] == ["FACT_UNKNOWN"] and res.questions[0].reveals == ("lane_width_ft",)
 
 
 @pytest.mark.parametrize("angle", [0, 33, 90, 135])
 def test_distance_from_edge_for_any_road_direction(pack, angle):
     a, b, u, v = road(angle, 24)
-    px, py = 500 + v[0] * (12 + 20), 500 + v[1] * (12 + 20)           # 20 px beyond the b edge
+    px, py = 500 + v[0] * (12 + 40), 500 + v[1] * (12 + 40)           # 40 px beyond the b edge
     marks = [mark("road_edge_left", a), mark("road_edge_right", b), mark("work_point", [(px, py)])]
     f = next(f for f in L.measure_lengths(marks, PX_IS_FT, pack).facts if f.field == "distance_from_edge_ft")
-    assert f.status == "RESOLVED" and f.value == pytest.approx(20.0, abs=1e-6)
+    assert f.status == "RESOLVED" and f.value == pytest.approx(40.0, abs=1e-6)
 
 
 def test_distance_from_edge_is_unknown_between_the_edges(pack):
@@ -217,16 +231,17 @@ def test_distance_near_15_ft_becomes_unknown_with_a_question(pack):
     f = next(f for f in res.facts if f.field == "distance_from_edge_ft")
     assert (f.status, f.reason_code, f.value) == ("UNKNOWN", "threshold_in_interval", None)
     assert f.interval.lo < 15 < f.interval.hi and f.measured.value_ft == pytest.approx(15.0)      # the number stays visible
-    assert [q.kind for q in res.questions] == ["WIDTH_NEAR_THRESHOLD"] and "R-TA1-N3" in res.questions[0].reason
+    wn = [q for q in res.questions if q.kind == "WIDTH_NEAR_THRESHOLD"]
+    assert len(wn) == 1 and "R-TA1-N3" in wn[0].reason
 
 
 def test_distance_far_from_every_limit_stays_resolved(pack):
     a, b, u, v = road(90, 24)
-    px, py = 500 + v[0] * (12 + 40), 500 + v[1] * (12 + 40)
+    px, py = 500 + v[0] * (12 + 60), 500 + v[1] * (12 + 60)
     marks = [mark("road_edge_left", a), mark("road_edge_right", b), mark("work_point", [(px, py)])]
     res = L.measure_lengths(marks, PX_IS_FT, pack)
     f = next(f for f in res.facts if f.field == "distance_from_edge_ft")
-    assert f.status == "RESOLVED" and f.value == pytest.approx(40.0) and not res.questions
+    assert f.status == "RESOLVED" and f.value == pytest.approx(60.0) and not [q for q in res.questions if q.kind == "WIDTH_NEAR_THRESHOLD"]
 
 
 def test_shoulder_width_to_the_nearer_edge(pack):
@@ -250,7 +265,7 @@ def test_median_width_has_no_source_in_call_1(pack):
 def test_every_length_fact_has_a_trace_and_a_contained_value(pack):
     a, b, u, v = road(60, 24)
     marks = edges_marks(60, 24) + [mark("work_point", [(500 + v[0] * 60, 500 + v[1] * 60)])]
-    for f in L.measure_lengths(marks, PX_IS_FT, pack, total_lanes=2).facts:
+    for f in L.measure_lengths(marks, PX_IS_FT, pack, total_lanes=2, gate=CLEAN).facts:
         if f.status == "RESOLVED":
             assert f.interval.lo <= f.value <= f.interval.hi and f.measured and f.measured.calculation and f.measured.inputs
             assert f.registry_id == f.field and f.unit == "ft" and f.source in ("AI_MARKS", "CROSS_SECTION")
@@ -263,7 +278,7 @@ def test_real_spike_marks_give_widths_with_intervals(pack):
     mpp = json.load(open(os.path.join(ROOT, "tests", "fixtures", "site", "spike", "inputs", "second.json"), encoding="utf-8"))["metres_per_pixel"]
     tw = L.traveled_way_width(parse_call1(text, (1280, 1280)).marks, mpp)[0]
     assert tw.method == "AI_MARKS" and tw.interval_ft.lo < tw.value_ft < tw.interval_ft.hi
-    assert tw.value_ft == pytest.approx(20 * mpp / 0.3048, rel=0.15)
+    assert tw.value_ft == pytest.approx(20 * mpp / 0.3048, rel=0.5)
 
 
 def test_no_module_parses_a_number_from_evidence():

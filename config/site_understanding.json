@@ -28,10 +28,15 @@
     }
   },
   "measurement": {
-    "edge_pixel_error_px": {
+    "edge_pixel_error_px_cross_section": {
       "value": 1.0,
       "source": "CALIBRATION_PENDING",
-      "note": "D-38 example: one pixel of error on each edge. Starting value only: the SME reviews it at S6 STOP 2 and calibrates it on the reference drawings (Q20)."
+      "note": "D-38 example: one pixel of error on each edge. Starting value for the deterministic cross-section. S6 STOP 2: accepted as the starting model."
+    },
+    "edge_pixel_error_px_ai_marks": {
+      "value": 3.0,
+      "source": "CALIBRATION_PENDING",
+      "note": "Derived from the nine recorded spike widths (claude-opus-5-5, pre-tuning prompt, 3 sites x 3 repetitions): at the spike scale (about 0.44 m per pixel) all nine traveled-way widths fall inside the band (3.0 px x 2 edges) around their site's median, which 1.0 px and 2.0 px do not achieve. NOT calibrated against drawings (Q20). gpt-5.6-sol has not run; its marks may differ. Recorded as a test (test_ai_mark_error_evidence)."
     },
     "edges_per_width": {
       "value": 2,
