@@ -79,7 +79,7 @@ def test_every_part_file_on_disk_is_in_the_manifest(pack):
 
 
 def test_stored_hash_is_the_recomputed_hash(pack):
-    assert JsonRulePackStore().content_hash() == pack.hash and JsonRulePackStore().list_versions() == ["1.1.0"]
+    assert JsonRulePackStore().content_hash() == pack.hash and JsonRulePackStore().list_versions() == ["1.0.0", "1.1.0"]
 
 
 def test_unsourced_items_are_exactly_the_known_list(pack):

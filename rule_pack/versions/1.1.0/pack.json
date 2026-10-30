@@ -1,0 +1,76 @@
+{
+  "schema_version": "1",
+  "pack_id": "TCP_MUTCD_CH6_RULE_PACK",
+  "version": "1.1.0",
+  "status": "DRAFT",
+  "source_edition_note": "Source edition: MUTCD Chapter 6, December 2023 revision (file sha256 recorded). The edition the client applies is not yet confirmed.",
+  "ta_scope": [
+    "TA-1",
+    "TA-6",
+    "TA-10",
+    "TA-33"
+  ],
+  "parts": [
+    {
+      "path": "base/sources.json",
+      "layer": "FEDERAL",
+      "sha256": "02e9be6a5304de7b5a32f34e39006970b0ec6577d67f1cf9131efcd880da3690"
+    },
+    {
+      "path": "base/registry.json",
+      "layer": "FEDERAL",
+      "sha256": "c3dad89cf9fdd01047ce51e45e1fc61894945463ad8d93a0ff20f341b2443d1f"
+    },
+    {
+      "path": "base/tables.json",
+      "layer": "FEDERAL",
+      "sha256": "ad2f6fbbcf4a3eecd2fed8a384701d5373363ba482e1a744df923299e2fdfb39"
+    },
+    {
+      "path": "base/formulas.json",
+      "layer": "FEDERAL",
+      "sha256": "0fc3cdcce2640fd7833ab29b3ce5221d150d4a6ecb69b65953b6fe9bec5fb75a"
+    },
+    {
+      "path": "base/rules.json",
+      "layer": "FEDERAL",
+      "sha256": "05434ca9fbe3b88fa9cc2e49bf24ae1e179bfe2cc31169773466c6f4abc96aac"
+    },
+    {
+      "path": "base/devices.json",
+      "layer": "FEDERAL",
+      "sha256": "c1063c0e02c4c5c36401408a7145d3987ba110dcfb10b3fafd087ae20fcfc7cf"
+    },
+    {
+      "path": "base/sign_sizes.json",
+      "layer": "FEDERAL",
+      "sha256": "d8d53bc2fc09a2f2f4a56082ca34cc417be436c9d95b2cd5e989df75e06b9ed8"
+    },
+    {
+      "path": "base/sidewalk_detour.json",
+      "layer": "FEDERAL",
+      "sha256": "d027781e3ee900b747ca0d5cc0752a4ce81571959c6ff3796d63bf222f0dad76"
+    },
+    {
+      "path": "ta/TA-1.json",
+      "layer": "FEDERAL",
+      "sha256": "cfec997491d09bc49d197aa1ad15e1458ac26387ac74d82a012d51180cd28926"
+    },
+    {
+      "path": "ta/TA-6.json",
+      "layer": "FEDERAL",
+      "sha256": "5a7a25f8ea3c1d8e2113019cf637196f93afa1d1f5a533890f38a4313318726b"
+    },
+    {
+      "path": "ta/TA-10.json",
+      "layer": "FEDERAL",
+      "sha256": "8b4d7dfd1c1fbcc6018a2a0744ea5d23c747ca337dc95fe733b9d78357ef9d38"
+    },
+    {
+      "path": "ta/TA-33.json",
+      "layer": "FEDERAL",
+      "sha256": "b59a13d4346effd8d35ac8d3481e1cdd1bfc7905a5d7077350c604d614dc51fc"
+    }
+  ],
+  "content_sha256": "80c25240ab584974f40f4f17205a8490127549837a30f7b69e9d11dd95a18b0a"
+}

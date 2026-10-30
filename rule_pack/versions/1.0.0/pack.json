@@ -1,0 +1,66 @@
+{
+  "schema_version": "1",
+  "pack_id": "TCP_MUTCD_CH6_RULE_PACK",
+  "version": "1.0.0",
+  "status": "DRAFT",
+  "source_edition_note": "Source edition: MUTCD Chapter 6, December 2023 revision (file sha256 recorded). The edition the client applies is not yet confirmed.",
+  "ta_scope": [
+    "TA-1",
+    "TA-6",
+    "TA-10",
+    "TA-33"
+  ],
+  "parts": [
+    {
+      "path": "base/sources.json",
+      "layer": "FEDERAL",
+      "sha256": "02e9be6a5304de7b5a32f34e39006970b0ec6577d67f1cf9131efcd880da3690"
+    },
+    {
+      "path": "base/registry.json",
+      "layer": "FEDERAL",
+      "sha256": "644d1527c8cacbdd87e33da55fd40a8c27845049d607219e8e24fa9dbc0501e3"
+    },
+    {
+      "path": "base/tables.json",
+      "layer": "FEDERAL",
+      "sha256": "ad2f6fbbcf4a3eecd2fed8a384701d5373363ba482e1a744df923299e2fdfb39"
+    },
+    {
+      "path": "base/formulas.json",
+      "layer": "FEDERAL",
+      "sha256": "0fc3cdcce2640fd7833ab29b3ce5221d150d4a6ecb69b65953b6fe9bec5fb75a"
+    },
+    {
+      "path": "base/rules.json",
+      "layer": "FEDERAL",
+      "sha256": "f70f48fd1caab0c960a146b4821e43b81ff590d97e16076d91443f60c0da285d"
+    },
+    {
+      "path": "base/devices.json",
+      "layer": "FEDERAL",
+      "sha256": "f4aa34d0e446968fd08bc3c1a0ed286c9cddca25eff767d734967047b7f5871f"
+    },
+    {
+      "path": "ta/TA-1.json",
+      "layer": "FEDERAL",
+      "sha256": "629ce5ccd54ae17184282858a5c7740b792b02f34d8c306aef77003b021a00d8"
+    },
+    {
+      "path": "ta/TA-6.json",
+      "layer": "FEDERAL",
+      "sha256": "a13219a4f4c88a5263b35c8654beca2703d7d8febc70907d995edc92ceedc294"
+    },
+    {
+      "path": "ta/TA-10.json",
+      "layer": "FEDERAL",
+      "sha256": "e5808bfebd3194f0e6b68d206647fdcfa64080b3ec9447489594414e480f3bd2"
+    },
+    {
+      "path": "ta/TA-33.json",
+      "layer": "FEDERAL",
+      "sha256": "42300db5ac40848e0fc60edfa1e5fa5c24e388a4514d2bf80931e066c10f2eec"
+    }
+  ],
+  "content_sha256": "98c18fb207284ae884a28d20e2a5eba56facd74dfbc2aa7aa06797afe9e53d43"
+}

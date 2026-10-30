@@ -1,0 +1,20 @@
+{
+  "schema_version": "1",
+  "versions": [
+    {
+      "version": "1.0.0",
+      "content_sha256": "98c18fb207284ae884a28d20e2a5eba56facd74dfbc2aa7aa06797afe9e53d43",
+      "sealed_on": "2026-10-31",
+      "source_commit": "964948162973f4bfd442b85cec2f3681708af92c",
+      "status": "DRAFT",
+      "note": "Backfilled from git (git show 9649481); sealing date is the backfill date"
+    },
+    {
+      "version": "1.1.0",
+      "content_sha256": "80c25240ab584974f40f4f17205a8490127549837a30f7b69e9d11dd95a18b0a",
+      "sealed_on": "2026-10-31",
+      "source_commit": "fb022dbc9b29c4c93216e9b0bfae175219704327",
+      "status": "DRAFT"
+    }
+  ]
+}
