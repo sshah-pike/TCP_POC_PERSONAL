@@ -6,6 +6,8 @@
   python scripts/s06_call1_check.py --profile gpt-5.6-sol --only 1             call 1 alone
   python scripts/s06_call1_check.py --profile gpt-5.6-sol --from 2             calls 2 to 9 (no --only/--from: all 9)
   python scripts/s06_call1_check.py --profile gpt-5.6-sol --summary            table rows from the saved results
+  python scripts/s06_call1_check.py --profile gpt-5.6-sol --parallel 3         D-104: 3 calls at once; prints wall time, per-call time,
+                                                                               any 429 or error body (no call is skipped after an error)
 
 Then the same with --profile claude-opus-5-5. The nine calls: 1-3 Granite (north-south road) repetitions 1-3, 4-6 E Second St (east-west road) repetitions 1-3, 7-9 Colorado (diagonal road) repetitions 1-3. Each call prints the exact request body first (no key; every image shown as its
 size and SHA-256), then the result. The run STOPS at the first API error and prints the HTTP status and the API's error body
@@ -49,14 +51,52 @@ def summary(profile):
     print("\n".join(rows) or "(no saved calls)")
 
 
+def _call(call1, profile, ProviderError, name, n, site, rep, req):
+    """One live call. Returns (result dict, None) or (None, error text). Saves the result file. Runs in a worker thread when parallel."""
+    t0 = time.perf_counter()
+    try:
+        reply = call1.send_call1(profile, req)
+    except ProviderError as e:
+        return None, {"call": n, "seconds": round(time.perf_counter() - t0, 2), "code": e.code, "status": e.details.get("http_status"),
+                      "body": e.details.get("api_error_text") or e.message}
+    secs = round(time.perf_counter() - t0, 2)
+    if reply.truncated or not reply.text:
+        return None, {"call": n, "seconds": secs, "code": "TRUNCATED" if reply.truncated else "EMPTY", "status": None,
+                      "body": f"{'response hit the output limit' if reply.truncated else 'empty response'}; usage {reply.usage}"}
+    res = call1.parse_call1(reply.text, tuple(req["image"]["sent_px"]))
+    problems = call1.schema_problems(reply.text, res)
+    lanes = res.observations["lanes_per_direction"]
+    out = {"call": n, "site": site, "rep": rep, "profile": name, "seconds": secs, "model": reply.model, "request_id": reply.request_id,
+           "input_tokens": reply.usage.get("input_tokens"), "output_tokens": reply.usage.get("output_tokens"),
+           "reasoning_tokens": reply.usage.get("reasoning_tokens", 0), "schema_valid": not problems, "schema_problems": problems,
+           "unknown_facts": sum(o.status == "UNKNOWN" for o in res.observations.values()), "marks": len(res.marks),
+           "lanes_per_direction": {"value": lanes.value, "status": lanes.status, "confidence": lanes.confidence},
+           "fingerprint": call1.request_fingerprint(req, profile), "image": req["image"], "raw_response": reply.text}
+    with open(os.path.join(OUT, name, f"call{n}.json"), "w", encoding="utf-8") as f: json.dump(out, f, indent=2, ensure_ascii=False)
+    return out, None
+
+
+def _print_error(err):
+    print(f"\nSTOP: call {err['call']} failed: {err['code']}\n  HTTP status: {err['status']}\n  API error body: {err['body']}")
+
+
+def _print_result(out):
+    print(f"\nresult: call {out['call']}, {out['seconds']} s,{out['input_tokens']} in / {out['output_tokens']} out tokens, "
+          f"schema valid {out['schema_valid']} {out['schema_problems'] or ''}")
+    print("lanes_per_direction:", out["lanes_per_direction"], "| unknown facts:", out["unknown_facts"], "| marks:", out["marks"])
+    print(_row(out))
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--profile", required=True, help="profile name in config/foundry_profiles.json")
     ap.add_argument("--only", type=int, choices=range(1, 10), metavar="N", help="run call N alone (1-9)")
     ap.add_argument("--from", dest="start", type=int, choices=range(1, 10), default=1, metavar="N", help="start at call N")
+    ap.add_argument("--parallel", type=int, default=1, metavar="N", help="run N calls at once on this profile (default 1, one after the other)")
     ap.add_argument("--dry-run", action="store_true", help="print the request body of the selected call(s); no network")
     ap.add_argument("--summary", action="store_true", help="print table rows from the saved results and exit")
     a = ap.parse_args(argv)
+    if a.parallel < 1: print("--parallel must be at least 1"); return 2
     if a.summary: summary(a.profile); return 0
 
     from tcp_planner.orchestration.pipeline import load_env_file, use_os_trust_store
@@ -70,36 +110,42 @@ def main(argv=None):
 
     todo = [c for c in CALLS if (c[0] == a.only if a.only else c[0] >= a.start)]
     os.makedirs(os.path.join(OUT, a.profile), exist_ok=True)
-    for n, site, rep in todo:
-        req = _prepare(profile, site)
+
+    def show(n, site, rep, req):
         print(f"\n=== call {n}: {site} repetition {rep} on {a.profile} ({profile.deployment}, {profile.api}, effort {profile.effort}) ===")
         print("image:", json.dumps(req["image"]))
         print("request body (no key; images as size and sha256):")
         print(json.dumps(call1.describe_body(call1.wire_body(profile, req)), indent=2, ensure_ascii=False))
-        if a.dry_run: continue
-        t0 = time.perf_counter()
-        try:
-            reply = call1.send_call1(profile, req)
-        except ProviderError as e:
-            print(f"\nSTOP: call {n} failed: {e.code}\n  HTTP status: {e.details.get('http_status')}\n  API error body: {e.details.get('api_error_text') or e.message}")
-            return 1
-        secs = round(time.perf_counter() - t0, 2)
-        if reply.truncated or not reply.text:
-            print(f"\nSTOP: call {n}: {'response hit the output limit' if reply.truncated else 'empty response'}; usage {reply.usage}"); return 1
-        res = call1.parse_call1(reply.text, tuple(req["image"]["sent_px"]))
-        problems = call1.schema_problems(reply.text, res)
-        lanes = res.observations["lanes_per_direction"]
-        out = {"call": n, "site": site, "rep": rep, "profile": a.profile, "seconds": secs, "model": reply.model, "request_id": reply.request_id,
-               "input_tokens": reply.usage.get("input_tokens"), "output_tokens": reply.usage.get("output_tokens"),
-               "reasoning_tokens": reply.usage.get("reasoning_tokens", 0), "schema_valid": not problems, "schema_problems": problems,
-               "unknown_facts": sum(o.status == "UNKNOWN" for o in res.observations.values()), "marks": len(res.marks),
-               "lanes_per_direction": {"value": lanes.value, "status": lanes.status, "confidence": lanes.confidence},
-               "fingerprint": call1.request_fingerprint(req, profile), "image": req["image"], "raw_response": reply.text}
-        with open(os.path.join(OUT, a.profile, f"call{n}.json"), "w", encoding="utf-8") as f: json.dump(out, f, indent=2, ensure_ascii=False)
-        print(f"\nresult: {secs} s, {out['input_tokens']} in / {out['output_tokens']} out tokens, schema valid {not problems} {problems or ''}")
-        print("lanes_per_direction:", out["lanes_per_direction"], "| unknown facts:", out["unknown_facts"], "| marks:", out["marks"])
-        print(_row(out))
-    return 0
+
+    if a.parallel == 1:                        # one after the other; stops at the first error
+        for n, site, rep in todo:
+            req = _prepare(profile, site); show(n, site, rep, req)
+            if a.dry_run: continue
+            out, err = _call(call1, profile, ProviderError, a.profile, n, site, rep, req)
+            if err: _print_error(err); return 1
+            _print_result(out)
+        return 0
+
+    # parallel: every request body first, then N calls at once; no call is skipped after an error, so a 429 shows up in full
+    reqs = {}
+    for n, site, rep in todo:
+        reqs[n] = _prepare(profile, site); show(n, site, rep, reqs[n])
+    if a.dry_run: return 0
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    print(f"\n=== running {len(todo)} calls, {a.parallel} at a time, on {a.profile} ===")
+    outs, errs, t0 = [], [], time.perf_counter()
+    with ThreadPoolExecutor(max_workers=a.parallel) as pool:
+        futs = [pool.submit(_call, call1, profile, ProviderError, a.profile, n, site, rep, reqs[n]) for n, site, rep in todo]
+        for f in as_completed(futs):
+            out, err = f.result()
+            if err: errs.append(err); _print_error(err)
+            else: outs.append(out); _print_result(out)
+    wall = round(time.perf_counter() - t0, 2)
+    per = sorted([(o["call"], o["seconds"]) for o in outs] + [(e["call"], e["seconds"]) for e in errs])
+    n429 = sum(1 for e in errs if e["status"] == 429 or e["code"] == "AI_RATE_LIMITED")
+    print(f"\nparallel {a.parallel}: wall time {wall} s for {len(todo)} calls; per-call seconds {dict(per)}; "
+          f"sum of per-call seconds {round(sum(s for _, s in per), 2)}; ok {len(outs)}, errors {len(errs)} (HTTP 429: {n429})")
+    return 1 if errs else 0
 
 
 if __name__ == "__main__":
