@@ -61,7 +61,8 @@
       {"id": "SR-6P10-FIG-TAPER", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": null, "table": null, "figure": "6P-10", "note": null,
        "page_printed": "879", "page_pdf": 115, "strength": "GUIDANCE", "evidence": "FIGURE_TRANSCRIPTION", "quote": null,
        "transcription": "Figure 6P-10: the one-lane, two-way taper of channelizing devices at each end of the work space is dimensioned '50 to 100 ft'.",
-       "figure_render": {"uri": "tests/fixtures/rule_pack_sources/figures/figure_6P-10_p879.png", "sha256": "2cc22142fd8d86e7a2f338a5873894dfd5bf5530e938a296ddaf72cc62fe13d9", "size": 207421, "media_type": "image/png"}}
+       "figure_render": {"uri": "tests/fixtures/rule_pack_sources/figures/figure_6P-10_p879.png", "sha256": "2cc22142fd8d86e7a2f338a5873894dfd5bf5530e938a296ddaf72cc62fe13d9", "size": 207421, "media_type": "image/png"}},
+      {"id": "SR-6P10-FIG-ANCHOR", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": null, "table": null, "figure": "6P-10", "note": null, "page_printed": "879", "page_pdf": 115, "strength": "GUIDANCE", "evidence": "FIGURE_TRANSCRIPTION", "quote": null, "transcription": "Figure 6P-10, both approaches: C runs from the W20-1 sign support to the W20-4 support, B from the W20-4 support to the W20-7 support, and A from the W20-7 support to a line level with the flagger. The one-lane, two-way taper ('50 to 100 ft') starts at that line and runs toward the work space. C, B and A are consecutive and do not overlap.", "figure_render": {"uri": "tests/fixtures/rule_pack_sources/figures/figure_6P-10_p879.png", "sha256": "2cc22142fd8d86e7a2f338a5873894dfd5bf5530e938a296ddaf72cc62fe13d9", "size": 207421, "media_type": "image/png"}}
     ],
     "ta": [
       {"id": "TA-10", "title": "Lane Closure on a Two-Lane Road Using Flaggers", "figure": "6P-10", "source_ref_ids": ["SR-6P10-TITLE", "SR-6P10-FIG-TITLE", "SR-6N09-P07"]}
@@ -160,7 +161,8 @@
        "text": "The figure dimensions each one-lane, two-way taper '50 to 100 ft'. Cited only: Table 6B-3 (T-6B3-ONE_LANE_TWO_WAY) applies.",
        "condition": null, "action": null, "value": 50, "value_max": 100, "unit": "ft", "qualifier": null,
        "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6P10-FIG-TAPER"],
-       "role": "CITED_ONLY", "overlaps": ["T-6B3-ONE_LANE_TWO_WAY"]}
+       "role": "CITED_ONLY", "overlaps": ["T-6B3-ONE_LANE_TWO_WAY"]},
+      {"id": "R-TA10-ANCHOR-A", "layer": "FEDERAL", "ta_id": "TA-10", "jurisdiction": null, "topic": "advance_sign_anchor", "strength": "GUIDANCE", "text": "Each approach: A is measured upstream from the flagger station, which stands at the upstream end of the one-lane, two-way taper; B and C follow consecutively.", "condition": null, "action": "A_ENDS_AT_FLAGGER_STATION", "value": null, "value_max": null, "unit": null, "qualifier": null, "status": "SOURCED", "sme_question": null, "interpretation": "INTERPRETATION (owner-accepted reading of the figure render, S4b stage C): A ends at the flagger station (the line level with the flagger), not at the work space; the taper lies downstream of that line.", "source_ref_ids": ["SR-6P10-FIG-ANCHOR", "SR-6B1-NOTE-ABC"]}
     ],
     "ta_device_use": [
       {"id": "TDU-TA10-W20-7", "ta_id": "TA-10", "device_id": "DV-W20-7", "approach": "each approach", "sequence": 1, "spacing_dimension": "A", "required": true, "source_ref_ids": ["SR-6P10-FIG-SIGNS"]},

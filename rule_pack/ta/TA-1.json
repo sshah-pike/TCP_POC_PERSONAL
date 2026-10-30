@@ -30,7 +30,8 @@
       {"id": "SR-6P1-FIG-SIGNS", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": null, "table": null, "figure": "6P-1", "note": null,
        "page_printed": "861", "page_pdf": 97, "strength": "GUIDANCE", "evidence": "FIGURE_TRANSCRIPTION", "quote": null,
        "transcription": "Figure 6P-1 shows one direction (northbound). A W20-1 ROAD WORK AHEAD sign stands on the right-hand roadside of that approach, at dimension A upstream of the work space, which is drawn as a hatched area beyond the shoulder. No channelizing devices, taper or buffer are drawn.",
-       "figure_render": {"uri": "tests/fixtures/rule_pack_sources/figures/figure_6P-1_p861.png", "sha256": "35dce7e5cd05bd3e0eab7485eda3990b6e92027ceedaed15877a555656182faf", "size": 62377, "media_type": "image/png"}}
+       "figure_render": {"uri": "tests/fixtures/rule_pack_sources/figures/figure_6P-1_p861.png", "sha256": "35dce7e5cd05bd3e0eab7485eda3990b6e92027ceedaed15877a555656182faf", "size": 62377, "media_type": "image/png"}},
+      {"id": "SR-6P1-FIG-ANCHOR", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": null, "table": null, "figure": "6P-1", "note": null, "page_printed": "861", "page_pdf": 97, "strength": "GUIDANCE", "evidence": "FIGURE_TRANSCRIPTION", "quote": null, "transcription": "Figure 6P-1: the only dimension drawn is A, from the W20-1 sign support to a line level with the upstream end of the hatched work space beyond the shoulder. There is one advance sign, no B or C, and no taper or channelizing devices.", "figure_render": {"uri": "tests/fixtures/rule_pack_sources/figures/figure_6P-1_p861.png", "sha256": "35dce7e5cd05bd3e0eab7485eda3990b6e92027ceedaed15877a555656182faf", "size": 62377, "media_type": "image/png"}}
     ],
     "ta": [
       {"id": "TA-1", "title": "Work Beyond the Shoulder", "figure": "6P-1", "source_ref_ids": ["SR-6P1-TITLE", "SR-6P1-FIG-TITLE"]}
@@ -71,7 +72,8 @@
       {"id": "R-TA1-N6", "layer": "FEDERAL", "ta_id": "TA-1", "jurisdiction": null, "topic": "vehicle_lights", "strength": "STANDARD",
        "text": "Vehicle hazard warning signals shall not replace high-intensity lights.",
        "condition": null, "action": null, "value": null, "value_max": null, "unit": null, "qualifier": null,
-       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6P1-N6"]}
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6P1-N6"]},
+      {"id": "R-TA1-ANCHOR-A", "layer": "FEDERAL", "ta_id": "TA-1", "jurisdiction": null, "topic": "advance_sign_anchor", "strength": "GUIDANCE", "text": "TA-1 has one advance sign: only A applies, measured upstream from the upstream end of the work space (no transition is drawn).", "condition": null, "action": "A_ENDS_AT_WORK_SPACE_START", "value": null, "value_max": null, "unit": null, "qualifier": null, "status": "SOURCED", "sme_question": null, "interpretation": "INTERPRETATION (owner-accepted reading of the figure render, S4b stage C): the 'point of restriction' of Table 6B-1 is the upstream end of the work space; A is the single gap from it to the W20-1 sign.", "source_ref_ids": ["SR-6P1-FIG-ANCHOR", "SR-6B1-NOTE-ABC"]}
     ],
     "ta_device_use": [
       {"id": "TDU-TA1-W20-1", "ta_id": "TA-1", "device_id": "DV-W20-1", "approach": "approach on the work side (the figure shows one direction; Sect. 6P.01 para 07)",

@@ -34,7 +34,7 @@
     {
       "path": "base/rules.json",
       "layer": "FEDERAL",
-      "sha256": "f70f48fd1caab0c960a146b4821e43b81ff590d97e16076d91443f60c0da285d"
+      "sha256": "181c79e429693ba5bc9792b7315c62fb84e3304f72deddd640da13b73337efe1"
     },
     {
       "path": "base/devices.json",
@@ -49,23 +49,23 @@
     {
       "path": "ta/TA-1.json",
       "layer": "FEDERAL",
-      "sha256": "629ce5ccd54ae17184282858a5c7740b792b02f34d8c306aef77003b021a00d8"
+      "sha256": "30b04774904ad04f0408513f80653ae2bc0788b28ee96505a813b1ad85d10365"
     },
     {
       "path": "ta/TA-6.json",
       "layer": "FEDERAL",
-      "sha256": "a13219a4f4c88a5263b35c8654beca2703d7d8febc70907d995edc92ceedc294"
+      "sha256": "adbf76448cac832d9e2847e6c31d79f91fc2b202612a948b222c4368281fac62"
     },
     {
       "path": "ta/TA-10.json",
       "layer": "FEDERAL",
-      "sha256": "e5808bfebd3194f0e6b68d206647fdcfa64080b3ec9447489594414e480f3bd2"
+      "sha256": "8b4d7dfd1c1fbcc6018a2a0744ea5d23c747ca337dc95fe733b9d78357ef9d38"
     },
     {
       "path": "ta/TA-33.json",
       "layer": "FEDERAL",
-      "sha256": "42300db5ac40848e0fc60edfa1e5fa5c24e388a4514d2bf80931e066c10f2eec"
+      "sha256": "e53a02e23b4afe2b4aaddb184af32ec68c1594cd740fb4e7911055b837653ce9"
     }
   ],
-  "content_sha256": "e5a0984c677d3060d56f02fd0130dd194e6a9096e13371bb62929abf487514d5"
+  "content_sha256": "494dbf6d168bd429e48dfcffcb7656109dd1efee40ef3b15fdb8b57504dfc339"
 }

@@ -41,7 +41,8 @@
       {"id": "SR-6P33-FIG-100FT", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": null, "table": null, "figure": "6P-33", "note": null,
        "page_printed": "925", "page_pdf": 161, "strength": "GUIDANCE", "evidence": "FIGURE_TRANSCRIPTION", "quote": null,
        "transcription": "Figure 6P-33, panel A only: a dimension labelled '100 ft (optional)' runs along the downstream taper, from the downstream end of the work space to the end of the taper.",
-       "figure_render": {"uri": "tests/fixtures/rule_pack_sources/figures/figure_6P-33_p925.png", "sha256": "f80515afbc2e0f99d35fe915beb000e1c8c1a9ad45c447210bc54821780bb44b", "size": 173574, "media_type": "image/png"}}
+       "figure_render": {"uri": "tests/fixtures/rule_pack_sources/figures/figure_6P-33_p925.png", "sha256": "f80515afbc2e0f99d35fe915beb000e1c8c1a9ad45c447210bc54821780bb44b", "size": 173574, "media_type": "image/png"}},
+      {"id": "SR-6P33-FIG-ANCHOR", "source_document_id": "SD-MUTCD11-CH6-2023-12", "section": "6P.01", "paragraph": null, "table": null, "figure": "6P-33", "note": null, "page_printed": "925", "page_pdf": 161, "strength": "GUIDANCE", "evidence": "FIGURE_TRANSCRIPTION", "quote": null, "transcription": "Figure 6P-33, panels A and B: C runs from the W20-1 sign support to the W20-5R support, B from the W20-5R support to the W4-2R support, and A from the W4-2R support to the upstream end of the merging taper (where dimension L starts), where the arrow board stands. The 'Shoulder taper (see Note 3)' begins inside dimension A and ends where the merging taper begins. C, B and A are consecutive and do not overlap.", "figure_render": {"uri": "tests/fixtures/rule_pack_sources/figures/figure_6P-33_p925.png", "sha256": "f80515afbc2e0f99d35fe915beb000e1c8c1a9ad45c447210bc54821780bb44b", "size": 173574, "media_type": "image/png"}}
     ],
     "ta": [
       {"id": "TA-33", "title": "Stationary Lane Closure on a Divided Highway", "figure": "6P-33", "source_ref_ids": ["SR-6P33-TITLE", "SR-6P33-FIG-TITLE"]}
@@ -109,7 +110,8 @@
        "condition": null, "action": null, "value": null, "value_max": null, "unit": "ft", "qualifier": null,
        "status": "SOURCE_REVIEW_REQUIRED", "interpretation": null,
        "sme_question": "Figure 6P-33 panel A shows a downstream taper labelled '100 ft (optional)' (render, page 925). Confirm the reading and whether the draft should use it.",
-       "source_ref_ids": ["SR-6P33-FIG-100FT"], "overlaps": ["T-6B3-DOWNSTREAM"]}
+       "source_ref_ids": ["SR-6P33-FIG-100FT"], "overlaps": ["T-6B3-DOWNSTREAM"]},
+      {"id": "R-TA33-ANCHOR-A", "layer": "FEDERAL", "ta_id": "TA-33", "jurisdiction": null, "topic": "advance_sign_anchor", "strength": "GUIDANCE", "text": "A is measured upstream from the upstream end of the merging taper (start of L, arrow-board position); B and C follow consecutively. The shoulder taper (note 3) lies inside A.", "condition": null, "action": "A_ENDS_AT_MERGING_TAPER_START", "value": null, "value_max": null, "unit": null, "qualifier": null, "status": "SOURCED", "sme_question": null, "interpretation": "INTERPRETATION (owner-accepted reading of the figure render, S4b stage C): the 'transition' of Table 6B-1 is the merging taper; A ends at its upstream end, not at the shoulder taper.", "source_ref_ids": ["SR-6P33-FIG-ANCHOR", "SR-6B1-NOTE-ABC"]}
     ],
     "ta_device_use": [
       {"id": "TDU-TA33-W4-2R", "ta_id": "TA-33", "device_id": "DV-W4-2R", "approach": "approach with the right lane closed; posted on both sides of the roadway", "sequence": 1, "spacing_dimension": "A", "required": true, "source_ref_ids": ["SR-6P33-FIG-SIGNS"]},
