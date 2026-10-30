@@ -1,0 +1,13 @@
+{
+ "ai_profile": "gpt-5.6-sol",
+ "kml_file": "demo3) RI-165 Ten Rod Rd Exeter - single point (demo, not a real pole).kml",
+ "name": "exeter_ten_rod",
+ "operator": {
+  "options": {},
+  "requires_lane_closure": false,
+  "road_type": "RURAL",
+  "speed_mph": null
+ },
+ "schema_version": 1,
+ "source": "seeded from saved run 20261020-214203-7f7232"
+}

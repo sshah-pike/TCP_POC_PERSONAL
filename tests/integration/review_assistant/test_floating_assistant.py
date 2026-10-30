@@ -172,7 +172,7 @@ def test_accepted_exceptions_are_not_blocking_after_regeneration(aenv, runs, mon
     """A regenerated DRAFT_WITH_ENGINEERING_EXCEPTION must not show its accepted conflicts as new blocking items."""
     from tcp_planner.review.assistant.services import pipeline_controller
     from tests.integration.web_api import inproc
-    monkeypatch.setattr(pipeline_controller, "LAUNCHER", lambda rid, rdir: inproc.run(rdir))
+    monkeypatch.setattr(pipeline_controller, "LAUNCHER", lambda rid: inproc.run(rid))
     t, cid = conv(runs, "supported")
     mv = {"object_id": "S1", "direction": "UPSTREAM", "distance": 10, "unit": "FT"}
     assert call("POST", f"conversations/{cid}/placements/evaluate", mv, token=t)[0] == 200

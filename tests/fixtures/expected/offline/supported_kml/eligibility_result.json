@@ -1,0 +1,76 @@
+{
+  "decision": "SUPPORTED_AUTO",
+  "detected_facts": {
+    "facility_type": {
+      "status": "RESOLVED",
+      "value": "CONVENTIONAL_ROAD"
+    },
+    "road.divided": {
+      "status": "RESOLVED",
+      "value": false
+    },
+    "road.lane_count": {
+      "status": "RESOLVED",
+      "value": 2
+    },
+    "road.traffic_direction": {
+      "status": "RESOLVED",
+      "value": "TWO_WAY"
+    },
+    "site.complex_intersection_conflict": {
+      "status": "RESOLVED",
+      "value": false
+    },
+    "work.affects_pedestrian_route": {
+      "status": "RESOLVED",
+      "value": false
+    },
+    "work.encroaches_traveled_way": {
+      "status": "RESOLVED",
+      "value": false
+    },
+    "work.location": {
+      "status": "RESOLVED",
+      "value": "BEYOND_SHOULDER"
+    },
+    "work.requires_alternating_one_lane_traffic": {
+      "status": "RESOLVED",
+      "value": false
+    },
+    "work.requires_lane_closure": {
+      "status": "RESOLVED",
+      "value": false
+    }
+  },
+  "failed_conditions": [],
+  "generate_draft": true,
+  "intersection_analysis": {
+    "features_in_window": [],
+    "window_m": 182.4
+  },
+  "message": "Site matches the approved two-lane TA-1 POC scope.",
+  "passed_conditions": [
+    "facility_type",
+    "road.divided",
+    "road.lane_count",
+    "road.traffic_direction",
+    "site.complex_intersection_conflict",
+    "work.affects_pedestrian_route",
+    "work.encroaches_traveled_way",
+    "work.location",
+    "work.requires_alternating_one_lane_traffic",
+    "work.requires_lane_closure"
+  ],
+  "reason_codes": [],
+  "rule_pack": {
+    "hash": "9402591080b1b03cec63c2aa4b0a022760c960015967b975b2adc11e8e64f3d4",
+    "id": "APPROVED_TWO_LANE_POC_RULE_PACK",
+    "version": "1.0.0"
+  },
+  "selected_typical_application": "TA-1",
+  "site_model": {
+    "id": "SITE-10321F6FF0366D77",
+    "version": 1
+  },
+  "unresolved_fields": []
+}

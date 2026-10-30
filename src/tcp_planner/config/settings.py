@@ -8,3 +8,13 @@ CONFIG_DIR = os.path.join(PROJECT_ROOT, "config")
 RULE_PACK_DIR = os.path.join(PROJECT_ROOT, "rule_pack")
 ASSETS_DIR = os.path.join(PROJECT_ROOT, "assets")
 VAR_DIR = os.path.join(PROJECT_ROOT, "var")  # run outputs, labels, assistant data, debug dumps (gitignored)
+
+
+def runs_dir():
+    """The runs folder: the root of the artifact store, and the home of every run's own state files. Run records hold
+    paths relative to this folder (D-77)."""
+    return os.environ.get("TCP_UI_RUNS_DIR") or os.path.join(VAR_DIR, "runs")
+
+
+# A state lock file older than this many seconds is stale (its owner died) and may be taken over (D-84, file state).
+STATE_LOCK_STALE_S = float(os.environ.get("TCP_STATE_LOCK_STALE_S") or 30)

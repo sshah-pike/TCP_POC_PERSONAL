@@ -1,0 +1,14 @@
+{
+  "input_feature_count": 1,
+  "input_hash": "sha256:98eb90cb259f5fbe97d4e577989ff129024854c8524ba51631cc57d208a978bd",
+  "input_type": "KML",
+  "non_authoritative_metadata": {
+    "ignored_element_count": 2
+  },
+  "source_file": "offline_work_point.kml",
+  "work_path": [],
+  "work_reference": {
+    "latitude": 33.0,
+    "longitude": -97.0
+  }
+}

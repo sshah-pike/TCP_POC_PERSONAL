@@ -1,75 +1,46 @@
-"""Global protection tests: no-revision pipeline output is byte-identical to the committed (pre-assistant) pipeline,
-with the assistant flag off and on; validators / rule pack untouched; protected untracked run directory untouched."""
-import hashlib, io, os, re, subprocess, sys, tarfile
+"""Global protection tests: no-revision pipeline output is byte-identical to the stored expected output of the 13 offline
+scenarios (pre-assistant pipeline), with the assistant flag off and on; validators / rule pack untouched; protected run directory tracked and unchanged."""
+import os, subprocess
 
 import pytest
 
+from tests.support.guard_baseline import unapproved_changes
+from tests.support.make_expected import SCENARIOS, json_files, run_offline, stored
+
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-VOLATILE = re.compile(rb'"(generated_at|retrieved_at)": "[^"]*"')
-SCENARIOS = ("supported", "four_lane", "one_way", "missing_lane_count", "missing_road_type", "lane_conflict", "poor_image",
-             "encroach", "lane_closure", "intersection", "sidewalk", "ai_unavailable", "driveway_at_sign")
 PROTECTED = "var/runs/20261020-214203-7f7232"
 
 
-def _head_tree(dest):
-    data = subprocess.run(["git", "archive", "--format=tar", "HEAD", "src", "config", "rule_pack", "assets"], cwd=ROOT,
-                          capture_output=True, check=True).stdout
-    with tarfile.open(fileobj=io.BytesIO(data)) as t: t.extractall(dest, filter="data")
-
-
-def _run(cwd, out, sc, flag, extra=()):
-    env = {k: v for k, v in os.environ.items() if not k.startswith(("TCP_", "AZURE", "ANTHROPIC"))}
-    env["TCP_SME_ASSISTANT_ENABLED"] = flag; env["PYTHONIOENCODING"] = "utf-8"
-    env["PYTHONPATH"] = os.path.join(str(cwd), "src")  # the tree under test, never an installed copy
-    r = subprocess.run([sys.executable, "-m", "tcp_planner.orchestration.pipeline", "--offline", sc, "--no-dwt",
-                        "--out", str(out), *extra], cwd=cwd, env=env, capture_output=True, text=True)
-    return r.returncode
-
-
-def _json_files(d):
-    out = {}
-    for n in sorted(os.listdir(d)):
-        if n.endswith(".json"):
-            with open(os.path.join(d, n), "rb") as f: out[n] = VOLATILE.sub(rb'"\1": "<volatile>"', f.read())
-    return out
-
-
-@pytest.fixture(scope="module")
-def head_root(tmp_path_factory):
-    d = tmp_path_factory.mktemp("head"); _head_tree(d)
-    return d
-
-
 @pytest.mark.parametrize("sc", SCENARIOS)
-def test_no_revision_outputs_byte_identical_to_head(head_root, tmp_path, sc):
-    codes = {}
-    for label, cwd, flag in (("head", head_root, "false"), ("off", ROOT, "false"), ("on", ROOT, "true")):
-        codes[label] = _run(cwd, tmp_path / label, sc, flag)
-    assert codes["head"] == codes["off"] == codes["on"]
-    head = _json_files(tmp_path / "head")
-    assert head and head == _json_files(tmp_path / "off") == _json_files(tmp_path / "on")
+def test_no_revision_outputs_match_stored_expected(tmp_path, sc):
+    """Assistant flag off and on both reproduce the stored expected output (tests/fixtures/expected/offline/)."""
+    code, files = stored(sc)
+    for label, flag in (("off", "false"), ("on", "true")):
+        assert run_offline(tmp_path / label, sc, flag) == code
+        got = json_files(tmp_path / label)
+        assert got == files
     assert not (tmp_path / "on" / "machine_site_model.json").exists()
 
 
-def test_kml_input_byte_identical(head_root, tmp_path):
-    for label, cwd in (("head", head_root), ("now", ROOT)):
-        _run(cwd, tmp_path / label, "supported", "true", ("--offline-input", "kml"))
-    assert _json_files(tmp_path / "head") == _json_files(tmp_path / "now")
+def test_kml_input_matches_stored_expected(tmp_path):
+    code, files = stored("supported_kml")
+    assert run_offline(tmp_path / "now", "supported", "true", ("--offline-input", "kml")) == code
+    assert json_files(tmp_path / "now") == files
 
 
 def test_validators_rule_pack_and_core_rules_unchanged():
-    r = subprocess.run(["git", "diff", "--name-only", "HEAD", "--", "src/tcp_planner/validation/validators.py",
-                        "src/tcp_planner/layout/rule_engine.py", "src/tcp_planner/geometry/local_frame.py",
-                        "src/tcp_planner/site_model/fusion.py", "rule_pack/APPROVED_TWO_LANE_POC_RULE_PACK.json",
-                        "config/pipeline_config.json"], cwd=ROOT, capture_output=True, text=True)
-    assert r.stdout.strip() == ""
+    """Compared with the previous slice's last commit, not HEAD (tests/support/guard_baseline.py)."""
+    assert unapproved_changes(["src/tcp_planner/validation/validators.py", "src/tcp_planner/layout/rule_engine.py",
+                               "src/tcp_planner/geometry/local_frame.py", "src/tcp_planner/site_model/fusion.py",
+                               "rule_pack/APPROVED_TWO_LANE_POC_RULE_PACK.json", "config/pipeline_config.json"]) == []
 
 
-def test_protected_untracked_run_directory_untouched():
-    """The pre-existing untracked run directory still has exactly the files recorded before implementation."""
+def test_protected_run_directory_tracked_and_unchanged():
+    """The protected run directory is tracked (since b94fafd) and still equals HEAD (the 16 files committed in
+    b94fafd; the rest of the folder is gitignored under var/) (D-79)."""
     d = os.path.join(ROOT, PROTECTED)
     if not os.path.isdir(d): pytest.skip("protected run directory not present on this machine")
-    files = sorted(os.path.relpath(os.path.join(a, n), d).replace("\\", "/") for a, _, ns in os.walk(d) for n in ns)
-    assert len(files) == 27 and "output/plan.json" in files
+    tracked = subprocess.run(["git", "ls-files", "--", PROTECTED], cwd=ROOT, capture_output=True, text=True).stdout.splitlines()
+    assert len(tracked) == 16 and all(os.path.isfile(os.path.join(ROOT, t)) for t in tracked)   # none deleted
     r = subprocess.run(["git", "status", "--porcelain", "--", PROTECTED], cwd=ROOT, capture_output=True, text=True)
-    assert r.stdout.strip().startswith("??")
+    assert r.stdout.strip() == ""   # no tracked file modified or deleted, nothing staged

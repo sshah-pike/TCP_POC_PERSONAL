@@ -1,0 +1,109 @@
+{
+  "decision": "UNSUPPORTED_POC",
+  "detected_facts": {
+    "facility_type": {
+      "status": "RESOLVED",
+      "value": "CONVENTIONAL_ROAD"
+    },
+    "road.divided": {
+      "status": "RESOLVED",
+      "value": false
+    },
+    "road.lane_count": {
+      "status": "RESOLVED",
+      "value": 2
+    },
+    "road.traffic_direction": {
+      "status": "RESOLVED",
+      "value": "TWO_WAY"
+    },
+    "site.complex_intersection_conflict": {
+      "status": "RESOLVED",
+      "value": true
+    },
+    "work.affects_pedestrian_route": {
+      "status": "RESOLVED",
+      "value": false
+    },
+    "work.encroaches_traveled_way": {
+      "status": "RESOLVED",
+      "value": false
+    },
+    "work.location": {
+      "status": "RESOLVED",
+      "value": "BEYOND_SHOULDER"
+    },
+    "work.requires_alternating_one_lane_traffic": {
+      "status": "RESOLVED",
+      "value": false
+    },
+    "work.requires_lane_closure": {
+      "status": "RESOLVED",
+      "value": false
+    }
+  },
+  "failed_conditions": [
+    {
+      "actual": true,
+      "expected": false,
+      "field": "site.complex_intersection_conflict",
+      "operator": "EQ",
+      "reason_code": "INTERSECTION_CONFLICT"
+    }
+  ],
+  "generate_draft": false,
+  "intersection_analysis": {
+    "features_in_window": [
+      {
+        "highway": "residential",
+        "name": "Side St",
+        "side": "BOTH",
+        "source": "OSM",
+        "station_m": 326.18,
+        "way_id": "2"
+      },
+      {
+        "highway": "traffic_signals",
+        "node_id": "9",
+        "source": "OSM",
+        "station_m": 326.18
+      },
+      {
+        "confidence": 0.85,
+        "description": "side street crossing",
+        "distance_from_centerline_m": 0.22,
+        "kind": "intersections",
+        "side": "BOTH",
+        "source": "AI",
+        "station_m": 326.21
+      }
+    ],
+    "window_m": 182.4
+  },
+  "message": "This POC currently processes only two-lane, two-way, undivided conventional roads with work beyond the shoulder and no lane or pedestrian impact.",
+  "passed_conditions": [
+    "facility_type",
+    "road.divided",
+    "road.lane_count",
+    "road.traffic_direction",
+    "work.affects_pedestrian_route",
+    "work.encroaches_traveled_way",
+    "work.location",
+    "work.requires_alternating_one_lane_traffic",
+    "work.requires_lane_closure"
+  ],
+  "reason_codes": [
+    "INTERSECTION_CONFLICT"
+  ],
+  "rule_pack": {
+    "hash": "9402591080b1b03cec63c2aa4b0a022760c960015967b975b2adc11e8e64f3d4",
+    "id": "APPROVED_TWO_LANE_POC_RULE_PACK",
+    "version": "1.0.0"
+  },
+  "selected_typical_application": null,
+  "site_model": {
+    "id": "SITE-2FC95FABAEFD05D0",
+    "version": 1
+  },
+  "unresolved_fields": []
+}

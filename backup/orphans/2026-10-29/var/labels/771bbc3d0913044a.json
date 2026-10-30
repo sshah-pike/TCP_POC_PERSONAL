@@ -1,0 +1,209 @@
+{
+  "confirm_reason": null,
+  "confirmed_at": null,
+  "confirmed_by": null,
+  "drafted_at": "2026-10-16T17:31:25+00:00",
+  "drafted_by": "Claude (assistant draft - not ground truth)",
+  "fields": {
+    "road.divided": {
+      "evidence": [
+        {
+          "artifact": "map_1",
+          "file": "map_1.png",
+          "run": "20261016-213622-483ff4",
+          "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1"
+        },
+        {
+          "artifact": "map_view_2",
+          "file": "map_view_2.png",
+          "run": "20261016-221800-2b4518",
+          "sha256": "1c36bfdb37470eaf2ea8d8d59b3f23b2e0ea1f8ef0b58cf2b350951c6d022fe0"
+        },
+        {
+          "artifact": "map_view_3",
+          "file": "map_view_3.png",
+          "run": "20261016-221800-2b4518",
+          "sha256": "7668f4aed72814e73f5177894c645c3740f4a2fc82583ae744b87445080158a3"
+        }
+      ],
+      "note": "no median or barrier anywhere in the corridor",
+      "tolerance": null,
+      "value": false
+    },
+    "road.lane_count": {
+      "evidence": [
+        {
+          "artifact": "map_view_1",
+          "file": "map_view_1.png",
+          "run": "20261016-221800-2b4518",
+          "sha256": "959768acb820394177caddc81758ec4af20d3660c34a508337ff19645cf6ebe0"
+        },
+        {
+          "artifact": "map_view_2",
+          "file": "map_view_2.png",
+          "run": "20261016-221800-2b4518",
+          "sha256": "1c36bfdb37470eaf2ea8d8d59b3f23b2e0ea1f8ef0b58cf2b350951c6d022fe0"
+        },
+        {
+          "artifact": "map_view_3",
+          "file": "map_view_3.png",
+          "run": "20261016-221800-2b4518",
+          "sha256": "7668f4aed72814e73f5177894c645c3740f4a2fc82583ae744b87445080158a3"
+        }
+      ],
+      "note": "one lane each way; double yellow centre line, white edge lines visible in close-ups",
+      "tolerance": null,
+      "value": 2
+    },
+    "road.traveled_way_width_m": {
+      "evidence": [
+        {
+          "artifact": "map_view_1",
+          "file": "map_view_1.png",
+          "run": "20261016-221800-2b4518",
+          "sha256": "959768acb820394177caddc81758ec4af20d3660c34a508337ff19645cf6ebe0"
+        }
+      ],
+      "note": "edge line to edge line, measured 8.4-15.7 m along a perpendicular brightness profile through the work reference in the zoom-19 close-up (0.112 m/px); reviewer should verify",
+      "tolerance": 1.0,
+      "value": 7.3
+    },
+    "road.two_way": {
+      "evidence": [
+        {
+          "artifact": "map_view_1",
+          "file": "map_view_1.png",
+          "run": "20261016-221800-2b4518",
+          "sha256": "959768acb820394177caddc81758ec4af20d3660c34a508337ff19645cf6ebe0"
+        },
+        {
+          "artifact": "map_view_2",
+          "file": "map_view_2.png",
+          "run": "20261016-221800-2b4518",
+          "sha256": "1c36bfdb37470eaf2ea8d8d59b3f23b2e0ea1f8ef0b58cf2b350951c6d022fe0"
+        },
+        {
+          "artifact": "map_view_3",
+          "file": "map_view_3.png",
+          "run": "20261016-221800-2b4518",
+          "sha256": "7668f4aed72814e73f5177894c645c3740f4a2fc82583ae744b87445080158a3"
+        }
+      ],
+      "note": "double yellow centre line along the corridor",
+      "tolerance": null,
+      "value": true
+    },
+    "site.complex_intersection_conflict": {
+      "evidence": [
+        {
+          "artifact": "map_1",
+          "file": "map_1.png",
+          "run": "20261016-213622-483ff4",
+          "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1"
+        },
+        {
+          "artifact": "map_view_2",
+          "file": "map_view_2.png",
+          "run": "20261016-221800-2b4518",
+          "sha256": "1c36bfdb37470eaf2ea8d8d59b3f23b2e0ea1f8ef0b58cf2b350951c6d022fe0"
+        },
+        {
+          "artifact": "map_view_3",
+          "file": "map_view_3.png",
+          "run": "20261016-221800-2b4518",
+          "sha256": "7668f4aed72814e73f5177894c645c3740f4a2fc82583ae744b87445080158a3"
+        }
+      ],
+      "note": "UNCERTAIN - access points within the corridor (parking-lot entrance, house driveways, paved lanes ~180 m NE) appear private; OSM maps them as service ways. Needs local knowledge to confirm none is a public road.",
+      "tolerance": null,
+      "value": false
+    },
+    "work.affects_pedestrian_route": {
+      "evidence": [
+        {
+          "artifact": "map_view_1",
+          "file": "map_view_1.png",
+          "run": "20261016-221800-2b4518",
+          "sha256": "959768acb820394177caddc81758ec4af20d3660c34a508337ff19645cf6ebe0"
+        },
+        {
+          "artifact": "map_view_2",
+          "file": "map_view_2.png",
+          "run": "20261016-221800-2b4518",
+          "sha256": "1c36bfdb37470eaf2ea8d8d59b3f23b2e0ea1f8ef0b58cf2b350951c6d022fe0"
+        },
+        {
+          "artifact": "map_view_3",
+          "file": "map_view_3.png",
+          "run": "20261016-221800-2b4518",
+          "sha256": "7668f4aed72814e73f5177894c645c3740f4a2fc82583ae744b87445080158a3"
+        },
+        {
+          "artifact": "map_1",
+          "file": "map_1.png",
+          "run": "20261016-213622-483ff4",
+          "sha256": "ed8d6efe0d64f91435eee5122b6ebbd812c1555b5f6fe897e1104d00e45926e1"
+        }
+      ],
+      "note": "no sidewalks on either side and no crosswalks visible in any view",
+      "tolerance": null,
+      "value": false
+    },
+    "work.encroaches_traveled_way": {
+      "evidence": [
+        {
+          "artifact": "map_view_1",
+          "file": "map_view_1.png",
+          "run": "20261016-221800-2b4518",
+          "sha256": "959768acb820394177caddc81758ec4af20d3660c34a508337ff19645cf6ebe0"
+        }
+      ],
+      "note": "follows from the location above",
+      "tolerance": null,
+      "value": false
+    },
+    "work.location": {
+      "evidence": [
+        {
+          "artifact": "map_view_1",
+          "file": "map_view_1.png",
+          "run": "20261016-221800-2b4518",
+          "sha256": "959768acb820394177caddc81758ec4af20d3660c34a508337ff19645cf6ebe0"
+        }
+      ],
+      "note": "grass yard ~8.4 m from the nearest edge line; paved shoulder ends ~5.7 m from the point",
+      "tolerance": null,
+      "value": "BEYOND_SHOULDER"
+    },
+    "work.side": {
+      "evidence": [
+        {
+          "artifact": "map_view_1",
+          "file": "map_view_1.png",
+          "run": "20261016-221800-2b4518",
+          "sha256": "959768acb820394177caddc81758ec4af20d3660c34a508337ff19645cf6ebe0"
+        }
+      ],
+      "note": "work reference is north-west of the road; LEFT for travel at the 63 deg reference bearing",
+      "tolerance": null,
+      "value": "LEFT"
+    }
+  },
+  "history": [
+    {
+      "action": "draft",
+      "at": "2026-10-16T17:31:25+00:00",
+      "by": "Claude (assistant draft - not ground truth)",
+      "reason": "drafted from saved Azure evidence close-ups for evaluation; requires confirmation by a person"
+    }
+  ],
+  "name": "RI-91 Alton Bradford Rd (demo point)",
+  "site_id": "771bbc3d0913044a",
+  "source_run_id": "20261016-213622-483ff4",
+  "status": "DRAFT",
+  "work_path": [],
+  "work_reference": {
+    "latitude": 41.4151206,
+    "longitude": -71.741541
+  }
+}

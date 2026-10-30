@@ -9,7 +9,7 @@ import requests
 from tcp_planner.orchestration import offline_scenarios as offline
 from tcp_planner.ai import foundry_provider as fp
 from tcp_planner.imagery.map_provider import AzureMapsProvider
-from tcp_planner.storage import run_store as store
+from tcp_planner.storage import run_store as store, run_records as records
 from tcp_planner.orchestration import run_relations as relations
 from tcp_planner.storage.evidence_store import load_manifest, sha256_file
 from tests.integration.web_api import inproc
@@ -75,10 +75,12 @@ def stage(st, key):
 def test_azure_image_persisted_immediately_and_kept_after_review(env, monkeypatch):
     h = http(monkeypatch, osm_error=requests.exceptions.ReadTimeout("Read timed out."))
     rid, st = azure_run()
-    assert st["decision"] == "ERROR" and st["reason_codes"] == ["OSM_CONTEXT_UNAVAILABLE", "OSM_REQUEST_FAILED"]
-    [m] = [e for e in load_manifest(store.run_path(rid)) if e["kind"] == "map"]
+    assert st["decision"] == "REVIEW_REQUIRED" and st["exit_code"] == 3           # exit 3 is REVIEW_REQUIRED, not ERROR (S3 Q12-B)
+    assert st["reason_codes"] == ["OSM_CONTEXT_UNAVAILABLE", "OSM_REQUEST_FAILED"]
+    assert st["service_error"] == ["OSM_CONTEXT_UNAVAILABLE"]                    # shown as a badge next to the decision
+    [m] = [e for e in load_manifest(rid) if e["kind"] == "map"]
     assert m["producer_span"] == "tcp.map.retrieve" and m["mode"] == "saved"
-    path = store.run_path(rid, "evidence", m["file"])
+    path = store.run_path(rid, "evidence", m["file"])  # same layout on disk: <runs>/<run_id>/evidence/<file>
     assert os.path.isfile(path) and sha256_file(path) == m["sha256"]
     meta = m["metadata"]["meta"]
     for k in ("bounding_box", "metres_per_pixel", "center", "ground_extent_m", "zoom"): assert k in meta
@@ -133,7 +135,7 @@ def test_resume_from_ai_calls_neither_azure_nor_osm(env, monkeypatch):
 def test_changed_kml_invalidates_map_and_osm_reuse(env, monkeypatch):
     http(monkeypatch); parent, _ = azure_run(kml=kml_bytes(LAT, LON))
     rid, rdir = relations.create_resume_run(parent, "vision", ai_profile="fake-a", ai_provider="foundry")
-    with open(json.load(open(os.path.join(rdir, "ui", "request.json")))["request"]["kml_saved_path"], "wb") as f:
+    with open(records.resolve(records.read(rid, "request")["request"]["kml_key"]), "wb") as f:  # a run-relative key
         f.write(kml_bytes(LAT + 0.0003, LON))  # the input changed after the resume was prepared
     h = http(monkeypatch); inproc.run(rdir); st = store.build_state(rid)
     assert analysis_requests(h) == 1 and h.count("api.openstreetmap.org") == 1
@@ -155,7 +157,7 @@ def test_changed_map_configuration_invalidates_map_evidence(env, monkeypatch):
 @pytest.mark.parametrize("damage", ["corrupt", "missing"])
 def test_damaged_artifacts_are_not_reused(env, monkeypatch, damage):
     http(monkeypatch); parent, _ = azure_run()
-    m = next(e for e in load_manifest(store.run_path(parent)) if e["kind"] == "map")
+    m = next(e for e in load_manifest(parent) if e["kind"] == "map")
     p = store.run_path(parent, "evidence", m["file"])
     if damage == "corrupt":
         with open(p, "ab") as f: f.write(b"tamper")
@@ -222,7 +224,7 @@ def test_model_comparison_identical_inputs_independent_results(env, monkeypatch)
     assert conf["below_threshold"][1] is True
     assert rep["totals"]["new_map_calls"] == h.count("atlas.microsoft.com")  # agent crops only
     assert rep["totals"]["analysis_map_calls_in_children"] == 0 and rep["totals"]["estimated_cost_usd"] is None
-    assert os.path.isfile(store.run_path(cid, "ui", "report.json"))
+    assert records.read(cid, "report") is not None
     text = json.dumps(rep).lower()
     assert "best" not in text and "winner" not in text and "rank" not in text.replace("ranked", "")
 
@@ -271,11 +273,11 @@ def test_azure_sheet_mosaic_within_limits_and_georeferenced(monkeypatch):
 def test_azure_non_image_response_fails_closed_as_map_failure(env, monkeypatch, response):
     http(monkeypatch, azure=response)
     rid, st = azure_run()
-    assert st["decision"] == "ERROR" and st["exit_code"] == 3
+    assert st["decision"] == "REVIEW_REQUIRED" and st["service_error"]  # exit 3 stays REVIEW_REQUIRED (S3 Q12-B) and st["exit_code"] == 3
     assert st["reason_codes"] == ["MAP_CONTEXT_UNAVAILABLE", "MAP_REQUEST_FAILED"]
     d = stage(st, "imagery")["diagnostics"][0]
     assert d["pipeline_error_code"] == "MAP_REQUEST_FAILED" and d["http_status"] == 200
-    assert not [e for e in load_manifest(store.run_path(rid)) if e["kind"] == "map"]  # nothing persisted on failure
+    assert not [e for e in load_manifest(rid) if e["kind"] == "map"]  # nothing persisted on failure
     inproc.assert_no_secret(store.run_path(rid))
 
 
@@ -311,9 +313,10 @@ def test_api_endpoints_and_no_credentials(env, monkeypatch):
         runs = {r["run_id"]: r for r in json.loads(bodies[1])}
         assert runs[children[0]]["parent_run_id"] == source and runs[children[0]]["comparison_id"] == cid
         assert json.loads(bodies[3])["complete"] and json.loads(bodies[5])["predicted_actual_stage"] == "vision"
-        m = next(e for e in load_manifest(store.run_path(source)) if e["kind"] == "map")
+        m = next(e for e in load_manifest(source) if e["kind"] == "map")
         code, img = get(f"/api/runs/{source}/evidence/{m['file']}"); assert code == 200 and img[:8] == b"\x89PNG\r\n\x1a\n"
         assert get(f"/api/runs/{source}/evidence/manifest.json")[0] == 404  # only artifacts the manifest lists
+        assert get(f"/api/runs/{source}/evidence/..%2Fui%2Frequest.state.json")[0] in (400, 404)
         assert get(f"/api/runs/{source}/evidence/..%2Fui%2Frequest.json")[0] in (400, 404)
         assert post(f"/api/runs/{source}/resume", {"stage": "nonsense"})[0] == 400
         assert post(f"/api/runs/{source}/resume", {"stage": "vision", "ai_profile": "disabled-one"})[0] == 400
@@ -338,7 +341,7 @@ def test_fully_reused_run_reports_zero_provider_calls(env, monkeypatch):
 def prep(cid):
     from tcp_planner.orchestration import run_worker as runner
     with inproc.isolated():
-        return runner.prepare_views(store.run_path(cid))
+        return runner.prepare_views(cid)
 
 
 def test_comparison_multi_resolution_views_acquired_once_and_identical(env, monkeypatch):
@@ -360,7 +363,7 @@ def test_comparison_multi_resolution_views_acquired_once_and_identical(env, monk
     assert len(call1) == 4 and len({x[1:] for x in call1}) == 1
     rep = relations.comparison_state(cid)
     assert rep["complete"] and {c["evidence_mode"] for c in rep["columns"]} == {"single", "multi"}
-    for e in load_manifest(store.run_path(cid)):  # views keep their own georeference at the corrected scale
+    for e in load_manifest(cid):  # views keep their own georeference at the corrected scale
         m = e["metadata"]["meta"]
         assert e["kind"] == "map_view" and m["scale_model"] == "azure-static-512px-v2" and "bounding_box" in m
     inproc.assert_no_secret(store.runs_dir(), secrets=(FAKE_AZURE_KEY, "foundry-test-key-SENTINEL"))
@@ -392,11 +395,13 @@ def test_multi_mode_switch_does_not_change_the_agent_path(env, monkeypatch):
 
 def test_legacy_azure_evidence_not_eligible(env, monkeypatch):
     http(monkeypatch); parent, _ = azure_run()
-    mpath = store.run_path(parent, "evidence", "manifest.json")
-    doc = json.load(open(mpath, encoding="utf-8"))
+    from tcp_planner.storage import stores
+    from tcp_planner.storage.evidence_store import MANIFEST_KEY
+    st = stores.run_state(parent)
+    rec = st.get(MANIFEST_KEY); doc = rec.value
     for e in doc["artifacts"]:
         if e["kind"] == "map": e["signature"]["scale_model"] = None  # as recorded before the scale fix
-    json.dump(doc, open(mpath, "w", encoding="utf-8"))
+    st.compare_and_set(MANIFEST_KEY, rec.version, doc, rec.schema_version)
     prev = relations.resume_preview(parent, "vision", "fake-a", "foundry")
     assert prev["legacy"] and "LEGACY EVIDENCE" in prev["legacy_reason"]
     assert store.build_state(parent)["evidence_compat"]["status"] == "LEGACY"

@@ -38,7 +38,7 @@ def inproc(tmp_path, monkeypatch):
         monkeypatch.setattr(requests, "get", fake_get)
         rid, rdir = store.create_run({"input_type": "coordinates", "lat": lat, "lon": lon,
                                       "advanced": {"map_provider": "usgs_naip", "no_dwt": True}}, set())
-        code = runner.main([rdir])
+        code = runner.main([os.path.basename(rdir)])
         return code, store.build_state(rid), rdir
 
     yield run
@@ -61,7 +61,7 @@ class FakeResponse:
 
 
 def assert_fail_closed(code, st, rdir):
-    assert code == 3 and st["decision"] == "ERROR"
+    assert code == 3 and st["decision"] == "REVIEW_REQUIRED" and st["service_error"]  # exit 3 stays REVIEW_REQUIRED (S3 Q12-B)
     assert st["reason_codes"] == EXPECTED_CODES
     assert not st["draft_generated"] and not ({o["name"] for o in st["outputs"]} & DRAFT)
     stages = {s["key"]: s for s in st["stages"]}
@@ -159,7 +159,7 @@ def test_osm_tls_failure_after_imagery_succeeds(inproc):
                           "certificate chain (_ssl.c:1032)')))")
 
     code, st, rdir = inproc(fake_get)
-    assert code == 3 and st["decision"] == "ERROR"
+    assert code == 3 and st["decision"] == "REVIEW_REQUIRED" and st["service_error"]  # exit 3 stays REVIEW_REQUIRED (S3 Q12-B)
     assert st["reason_codes"] == ["OSM_CONTEXT_UNAVAILABLE", "OSM_REQUEST_FAILED"]
     stages = {s["key"]: s for s in st["stages"]}
     assert stages["imagery"]["status"] == "COMPLETED" and stages["imagery"]["diagnostics"] == []

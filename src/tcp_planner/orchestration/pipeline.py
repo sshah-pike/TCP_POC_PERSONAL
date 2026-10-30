@@ -2,7 +2,7 @@
 
 Exit codes: 0 draft exported | 3 REVIEW_REQUIRED | 4 UNSUPPORTED_POC | 2 configuration/rule-pack failure.
 """
-import argparse, datetime, json, os, sys, tempfile
+import argparse, datetime, io, json, os, sys, tempfile
 
 from tcp_planner.intake import kml_reader as kml_input
 from tcp_planner.data_sources import osm_overpass as osm_adapter
@@ -11,6 +11,8 @@ from tcp_planner.contracts import (APP_VERSION, FT, SUPPORTED_AUTO, REVIEW_REQUI
                                    UNSUPPORTED_MESSAGE, REVIEW_MESSAGE, TcpError, InputRejected, RulePackError,
                                    ProviderError, MapProviderError, OsmError, DwtRenderError, content_hash, write_json,
                                    r, redact)
+from tcp_planner.storage.interfaces import media_type_for_key
+from tcp_planner.storage.local_fs import LocalFsArtifactStore
 from tcp_planner.ai.foundry_provider import debug_sent_enabled, DEBUG_SENT_ENV, DEBUG_SENT_DIR, ERROR_TEXT_LIMIT
 from tcp_planner.audit.telemetry import Telemetry, confidence_band
 from tcp_planner.rules.rule_pack_loader import load_rule_pack
@@ -64,19 +66,46 @@ def _blocked(decision, reason_codes, message, details=None):
             "message": message, "details": details or {}}
 
 
+def check_out_dir(out_dir, overwrite=False):
+    """A non-empty output folder is an error unless overwrite is set (artifacts are write-once). Returns the folder."""
+    out = os.path.abspath(out_dir)
+    if os.path.isdir(out) and os.listdir(out) and not overwrite:
+        raise TcpError("OUT_DIR_NOT_EMPTY", f"output folder {out} is not empty; add --overwrite to replace the files "
+                       "of a previous run, or choose an empty folder with --out")
+    return out
+
+
+def _text_bytes(text):
+    """Bytes exactly as the former text-mode file write produced them (OS line ending), so stored outputs stay identical."""
+    return text.replace(chr(10), os.linesep).encode("utf-8")
+
+
 class Run:
-    def __init__(self, out_dir, exact_coords=False):
-        self.out = os.path.abspath(out_dir); os.makedirs(self.out, exist_ok=True)
-        for name in OUTPUT_FILES:  # never leave stale artifacts from a previous run
+    """One run's output folder, written through an ArtifactStore (write-once, SHA-256 refs). Keys are file names."""
+    def __init__(self, out_dir, exact_coords=False, overwrite=False):
+        self.out = check_out_dir(out_dir, overwrite)
+        self.store = LocalFsArtifactStore(self.out)
+        for name in OUTPUT_FILES:  # --overwrite only: never leave stale artifacts from a previous run
             p = os.path.join(self.out, name)
             if os.path.isfile(p): os.remove(p)
-        self.tel = Telemetry(); self.log = []; self.written = []; self.exact = exact_coords
+        self.tel = Telemetry(); self.log = []; self.written = []; self.refs = {}; self.exact = exact_coords
 
     def say(self, s):
         print(s, flush=True); self.log.append(s)
 
+    def put(self, name, data, media_type):
+        self.refs[name] = self.store.put(name, data, media_type)
+        if name not in self.written: self.written.append(name)
+
     def write(self, name, obj):
-        write_json(os.path.join(self.out, name), obj); self.written.append(name)
+        buf = io.StringIO(); json.dump(obj, buf, indent=2, sort_keys=True, ensure_ascii=False); buf.write(chr(10))
+        self.put(name, _text_bytes(buf.getvalue()), "application/json")
+
+    def adopt(self, *names):
+        """Files a renderer wrote at self.path(name): register them with the store (same bytes, so nothing is rewritten)."""
+        for name in names:
+            with open(self.path(name), "rb") as f: data = f.read()
+            self.put(name, data, media_type_for_key(name))
 
     def path(self, name):
         return os.path.join(self.out, name)
@@ -86,14 +115,28 @@ class Run:
         return f"{lat:.{nd}f}, {lon:.{nd}f}" + ("" if self.exact else " (rounded)")
 
 
-def run_pipeline(*, out_dir, kml=None, lat=None, lon=None, operator=None, map_provider=None, vision_provider=None,
-                 osm_source=None, rule_pack_path=None, config_path=None, dwt_config=None, dwt_mode="PLAN",
-                 exact_coords=False, sme_revision=None):
+def _read_zone(path):
+    with open(path, encoding="utf-8") as f: return json.load(f)
+
+
+def zone_operator(zone_input, options=None):
+    """The operator inputs of a zone run: the SME's start fields from the zone input, nothing else (D-59). traffic
+    volume and the TA selection are carried for the router (S7); this version records them and does not use them."""
+    sf = zone_input["start_fields"]
+    return {"road_type": sf["road_type"], "speed_mph": sf["posted_speed_mph"],
+            "requires_lane_closure": sf["lane_closure"] is True, "traffic_volume": sf["traffic_volume"],
+            "ta_hypothesis": zone_input["zone"]["ta_hypothesis"], "options": dict(options or {})}
+
+
+def run_pipeline(*, out_dir, kml=None, lat=None, lon=None, zone=None, operator=None, map_provider=None,
+                 vision_provider=None, osm_source=None, rule_pack_path=None, config_path=None, dwt_config=None,
+                 dwt_mode="PLAN", exact_coords=False, sme_revision=None, overwrite=False):
     """Run Pipeline 2 end-to-end. Returns a result dict; never raises for site-level outcomes.
 
+    zone: optional path of a zone engine input (S3 project runs); it replaces kml / lat / lon.
     sme_revision: optional path of an SME revision (src/tcp_planner/review/sme_revision.py; SME Review Assistant only). When None
     the pipeline runs exactly as before."""
-    run = Run(out_dir, exact_coords); tel = run.tel
+    run = Run(out_dir, exact_coords, overwrite); tel = run.tel
     operator = operator or {}
     result = {"decision": None, "outputs": [], "plan_hash": None}
     run.say(f"TCP POC Pipeline 2  ({APP_VERSION})")
@@ -101,9 +144,11 @@ def run_pipeline(*, out_dir, kml=None, lat=None, lon=None, operator=None, map_pr
         config = load_config(config_path)
 
         # ---- input ----
-        with tel.span("tcp.input.parse", input_type="KML" if kml else "COORDINATES") as sp:
+        with tel.span("tcp.input.parse", input_type="ZONE" if zone else "KML" if kml else "COORDINATES") as sp:
             try:
-                pg = kml_input.parse_kml(kml, config["input"]["max_work_path_m"]) if kml else kml_input.from_coordinates(lat, lon)
+                if zone: pg = kml_input.from_zone(_read_zone(zone))
+                elif kml: pg = kml_input.parse_kml(kml, config["input"]["max_work_path_m"], config["input"]["duplicate_distance_m"])
+                else: pg = kml_input.from_coordinates(lat, lon)
             except InputRejected as e:
                 tel.set(sp, decision=UNSUPPORTED_POC, reason_codes=e.reason_codes)
                 elig = _blocked(UNSUPPORTED_POC, e.reason_codes, f"Input rejected: {e.message}. {UNSUPPORTED_MESSAGE}", e.details)
@@ -114,6 +159,11 @@ def run_pipeline(*, out_dir, kml=None, lat=None, lon=None, operator=None, map_pr
         ref = pg["work_reference"]
         run.say(f"1 Input: {pg['input_type']}  work reference {run.where(ref['latitude'], ref['longitude'])}  "
                 f"path points {len(pg['work_path'])}")
+        if zone:
+            z = pg["zone"]; sf = z["start_fields"]
+            run.say(f"   Zone {z['zone_id']} v{z['version']}  Select TA {z['ta_hypothesis']} (recorded; checked from S7)  "
+                    f"start fields: road type {sf['road_type']}, {sf['posted_speed_mph']} mph, volume {sf['traffic_volume']}, "
+                    f"lane closure {'yes' if sf['lane_closure'] else 'no'}")
 
         # ---- approved rule pack (fail closed) ----
         with tel.span("tcp.rulepack.load") as sp:
@@ -261,12 +311,12 @@ def run_pipeline(*, out_dir, kml=None, lat=None, lon=None, operator=None, map_pr
         plan["plan_id"] = "TCP-" + plan["plan_hash"][:16].upper()
         validation["plan_ref"] = {"plan_id": plan["plan_id"], "plan_hash": plan["plan_hash"]}
         run.write("plan.json", plan); run.write("validation_results.json", validation)
-        image.save(run.path("aerial_image.jpg"), format="JPEG", quality=92); run.written.append("aerial_image.jpg")
+        image.save(run.path("aerial_image.jpg"), format="JPEG", quality=92); run.adopt("aerial_image.jpg")
         result["plan_hash"] = plan["plan_hash"]; result["plan_id"] = plan["plan_id"]
 
         with tel.span("tcp.debug.render", plan_id=plan["plan_id"]):
             DebugRenderer().render(plan, image, run.path("debug_plan.png"), run.path("debug_plan.pdf"))
-        run.written += ["debug_plan.png", "debug_plan.pdf"]
+        run.adopt("debug_plan.png", "debug_plan.pdf")
 
         sheet = SheetRenderer()
         with tel.span("tcp.sheet.render", plan_id=plan["plan_id"]) as sp:
@@ -281,11 +331,11 @@ def run_pipeline(*, out_dir, kml=None, lat=None, lon=None, operator=None, map_pr
                         if config["imagery"].get("sheet_single_request"):  # display-only: one request, not an n x n tile mosaic
                             sheet_px = min(sheet_px, getattr(mp, "MAX_REQUEST_PX", sheet_px))
                         s_img, s_meta = mp.fetch_context(pg, need, sheet_px)
-                        s_img.save(run.path("sheet_aerial.jpg"), format="JPEG", quality=90); run.written.append("sheet_aerial.jpg")
+                        s_img.save(run.path("sheet_aerial.jpg"), format="JPEG", quality=90); run.adopt("sheet_aerial.jpg")
                     except MapProviderError as e:
                         tel.set(sp, sheet_aerial=e.code)
                 info = sheet.render(plan, s_img, run.path("tcp_sheet.pdf"), run.path("tcp_sheet.png"), image_meta=s_meta)
-                run.written += ["tcp_sheet.pdf", "tcp_sheet.png"]
+                run.adopt("tcp_sheet.pdf", "tcp_sheet.png")
                 tel.set(sp, status_code="RENDERED", scale_ft_per_in=info["scale_ft_per_in"])
 
         with tel.span("tcp.dwt.render") as sp:
@@ -294,7 +344,7 @@ def run_pipeline(*, out_dir, kml=None, lat=None, lon=None, operator=None, map_pr
             else:
                 try:
                     info = DwtRenderer(dwt_config, pack, dwt_mode).render(plan, run.path("aerial_image.jpg"), meta, run.out)
-                    run.written += info["outputs"]; result["dwt"] = info
+                    run.adopt(*info["outputs"]); result["dwt"] = info
                     tel.set(sp, status_code="RENDERED", mode=dwt_mode, dwt_version=info["dwt_version"])
                 except DwtRenderError as e:
                     tel.set(sp, status_code=e.code, mode=dwt_mode); result["dwt"] = e.to_dict()
@@ -404,6 +454,9 @@ def _finish(run, result, elig):
     result["eligibility"] = elig
     _write_report(run, result, elig)
     result["outputs"] = sorted(set(run.written)); result["out_dir"] = run.out
+    # SHA-256 and size of every output file as the store registered it, rendered files included (kept in the run's result
+    # record by the worker as `output_index`)
+    result["output_refs"] = [dict(run.refs[n].to_dict(), name=n) for n in sorted(run.refs)]
     return result
 
 
@@ -427,8 +480,7 @@ def _write_report(run, result, elig):
         lines += ["", f"Privacy: request debug dump was OFF ({DEBUG_SENT_ENV} not set to 1); no request images or "
                       "prompts were written to disk by the pipeline."]
     lines += ["", "Outputs: " + ", ".join(sorted(set(run.written + ["run_report.txt"])))]
-    with open(run.path("run_report.txt"), "w", encoding="utf-8") as f: f.write("\n".join(lines) + "\n")
-    run.written.append("run_report.txt")
+    run.put("run_report.txt", _text_bytes("\n".join(lines) + "\n"), "text/plain")
 
 
 def _parse_option(text):
@@ -463,7 +515,9 @@ def main(argv=None):
     ap.add_argument("--requires-lane-closure", action="store_true", help="operator declares the work needs a lane closure")
     ap.add_argument("--option", action="append", type=_parse_option, default=[],
                     help="confirmed TA-1 option fact, e.g. behind_barrier=true, distance_from_edge_of_roadway_ft=20")
-    ap.add_argument("--out", default=os.path.join(VAR_DIR, "output")); ap.add_argument("--rule-pack"); ap.add_argument("--config")
+    ap.add_argument("--out", default=os.path.join(VAR_DIR, "output"))
+    ap.add_argument("--overwrite", action="store_true", help="replace the output files of a previous run in --out (default: a non-empty --out is an error)")
+    ap.add_argument("--rule-pack"); ap.add_argument("--config")
     ap.add_argument("--dwt-config", default=DWT_CONFIG_PATH if os.path.isfile(DWT_CONFIG_PATH) else None,
                     help="DWT renderer configuration JSON (default: config/dwt_config.json)")
     ap.add_argument("--dwt-mode", choices=["PLAN", "AERIAL_BASE"], default="PLAN",
@@ -473,31 +527,47 @@ def main(argv=None):
     ap.add_argument("--log-exact-coordinates", action="store_true")
     ap.add_argument("--sme-revision", help="SME revision JSON from the SME Review Assistant (requires "
                                            "TCP_SME_ASSISTANT_ENABLED=true); omit for the normal pipeline")
+    ap.add_argument("--zone", help="zone engine input JSON written by the project orchestrator (one zone of a project); "
+                                   "its start fields are the only source of road type, speed, volume and lane closure")
     a = ap.parse_args(argv)
+    if a.zone and (a.kml or a.lat is not None or a.lon is not None):
+        ap.error("--zone takes its location from the zone input; do not add --kml, --lat or --lon")
+    if a.zone and (a.road_type or a.speed is not None or a.requires_lane_closure):
+        ap.error("--zone carries the SME's start fields; --road-type, --speed and --requires-lane-closure are not allowed")
+    try: check_out_dir(a.out, a.overwrite)
+    except TcpError as e:
+        print(f"error: {e.message}", file=sys.stderr); return 2
 
     operator = {"road_type": a.road_type, "speed_mph": a.speed, "requires_lane_closure": a.requires_lane_closure,
                 "options": dict(a.option)}
-    kw = dict(out_dir=a.out, rule_pack_path=a.rule_pack, config_path=a.config,
+    if a.zone:
+        try: operator = zone_operator(_read_zone(a.zone), dict(a.option))
+        except (OSError, ValueError, KeyError) as e:
+            print(f"error: cannot read the zone input ({type(e).__name__})", file=sys.stderr); return 2
+    kw = dict(out_dir=a.out, overwrite=a.overwrite, rule_pack_path=a.rule_pack, config_path=a.config,
               dwt_config=None if a.no_dwt else a.dwt_config, dwt_mode=a.dwt_mode,
               exact_coords=a.log_exact_coordinates)
     if a.offline:
         sc = offline.build(a.offline)
-        op = dict(sc["operator"]); op.update({k: v for k, v in operator.items() if v not in (None, False, {})})
+        if a.zone:  # an offline project: the scenario's simulated providers, the zone's location and start fields only
+            op = operator; kw["zone"] = a.zone
+        else:
+            op = dict(sc["operator"]); op.update({k: v for k, v in operator.items() if v not in (None, False, {})})
         kw.update(operator=op, map_provider=sc["map_provider"], vision_provider=sc["vision_provider"],
                   osm_source=lambda lat, lon, radius: sc["osm_elements"])
-        if a.offline_input == "kml":
+        if not a.zone and a.offline_input == "kml":
             kw["kml"] = offline.write_kml(os.path.join(tempfile.mkdtemp(), "offline_work_point.kml"), sc["lat"], sc["lon"])
-        else:
+        elif not a.zone:
             kw.update(lat=sc["lat"], lon=sc["lon"])
         print(f"OFFLINE scenario '{sc['name']}' - simulated road, imagery, OSM and AI observation (not real data)")
     else:
-        if not a.kml and (a.lat is None or a.lon is None):
-            ap.error("give --kml PATH, or --lat and --lon, or --offline SCENARIO")
+        if not a.zone and not a.kml and (a.lat is None or a.lon is None):
+            ap.error("give --kml PATH, or --lat and --lon, or --offline SCENARIO, or --zone ZONE_INPUT")
         if a.ai_provider:
             try: kw["vision_provider"] = get_vision_provider(a.ai_provider)
             except ProviderError as e: kw["vision_provider"] = e
         if a.map_provider: kw["map_provider"] = get_map_provider(a.map_provider)
-        kw.update(operator=operator, kml=a.kml, lat=a.lat, lon=a.lon)
+        kw.update(operator=operator, kml=a.kml, lat=a.lat, lon=a.lon, zone=a.zone)
     if a.sme_revision: kw["sme_revision"] = a.sme_revision
     res = run_pipeline(**kw)
     if res.get("error"): return 2

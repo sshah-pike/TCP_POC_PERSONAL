@@ -7,7 +7,8 @@ Read this file at the start of every session. It applies to every slice.
 The tool takes a KML of work locations and produces draft traffic control plans (TCPs): PDF sheets with imagery, signs, tapers, buffers and dimensions, plus a full audit trail. An SME reviews and approves every plan.
 
 - **MVP scope:** TA-1, TA-6, TA-10 and TA-33 only. Anything else returns `NO_TA_MATCH`.
-- **Branch:** `tcp-mvp/base`. The old POC is backed up and is not a regression oracle. There is no separate legacy TA-1 path.
+- **Branches:** base `tcp-mvp/base`; one branch per slice, `tcp-mvp/sNN-short-name`. The old POC is backed up and is not a regression oracle. There is no separate legacy TA-1 path.
+- **Setup, once per environment:** `pip install -e . --no-build-isolation` inside `.venv`.
 
 ## Documents (source of truth)
 
@@ -16,23 +17,23 @@ The tool takes a KML of work locations and produces draft traffic control plans 
 | `docs/architecture/TCP_MVP_Architecture_Plan_v4.md` | The plan, decisions (D-xx) and ADRs |
 | `docs/slices/TCP_MVP_Development_Slices.md` | Slice specs S0 to S15: scope, acceptance criteria, tests |
 | `docs/slices/schema_spike_prompt.md` | AI output-format spike, run in S0 |
+| `docs/reports/` | Slice reports (S0a done; S0 next) |
 | `docs/sources/` | MUTCD 11th Edition, Chapter 6, December 2023 revision |
-| `docs/references/` | The three reference TMP PDFs; their three KMLs (plus TA-6/10/33 examples) in `docs/references/kml/` |
+| `docs/references/` | The three reference TMP PDFs; KMLs in `docs/references/kml/` |
 | `tests/golden/` | Golden set v0.1 extracted from the reference drafts |
 | `assets/symbols/` | Device catalog and placeholder symbols v0.1 |
-| `docs/reports/` | Slice reports (S0a restructure plan, baseline, report); `poc/` holds POC-era notes |
 
-## Repository layout and setup
+## Where code lives
 
-- Python package `tcp_planner` lives in `src/tcp_planner/`; the web UI in `apps/web/`.
-- Data outside code: `config/` (settings JSON), `rule_pack/`, `assets/`. Paths resolve through
-  `tcp_planner.config.settings`; never build paths from `__file__` elsewhere.
-- `var/` holds run outputs, labels, assistant data and debug dumps (gitignored; `var/runs/` keeps the
-  tracked POC-era runs). `backup/orphans/<date>/` holds moved-out files with a `MANIFEST.json`.
-- Setup once per environment: `pip install -r requirements.txt`, then `pip install -e . --no-build-isolation`
-  (editable install; needs `setuptools` in the venv). Without it `tcp_planner` is not importable outside pytest.
-- Tests: `python -m pytest tests/integration/pipeline`, `tests/integration/web_api`,
-  `tests/integration/review_assistant`, `tests/unit` (run suites separately); UI: `cd apps/web && npm test`.
+| Area | Folder |
+| --- | --- |
+| Pipeline package | `src/tcp_planner/` (paths resolved only through `src/tcp_planner/config/settings.py`) |
+| UI | `apps/web/` |
+| Config, rule pack, assets | `config/`, `rule_pack/`, `assets/` |
+| Tests | `tests/unit/`, `tests/integration/...`, `tests/golden/` |
+| Run data | `var/` (new runs are not tracked) |
+| Backups | `backup/orphans/<date>/` with `MANIFEST.json`; `scripts/restore_backup.py` restores them |
+| Experiments | `spikes/` (never imported by `src/`) |
 
 If code and plan disagree, **stop and report**. Do not silently follow either one.
 
@@ -100,25 +101,67 @@ If code and plan disagree, **stop and report**. Do not silently follow either on
 - Every persisted record carries a `schema_version`.
 - Artifacts are write-once.
 
+### Known limits of the file stores (S2, D-84)
+
+- **Lock gap.** A state write checks that it still owns its lock file and then calls `os.replace`. A lock can be taken
+  over in the gap between the check and the replace, so two writers can in rare cases both write; the version number
+  (compare-and-set) catches most of these.
+- **PID reuse.** A lock records the owner's PID and timestamp. After the owner dies, a new process may reuse the PID and
+  the lock looks alive until it goes stale (`TCP_STATE_LOCK_STALE_S`, default 30 s).
+- **OneDrive.** The repo sits in OneDrive. It may sync or hold `.lock`, `.tmp-*` and `*.lock.stale-*` files, which makes
+  a write wait or retry. These names are in `.gitignore`. Local disks only; no network shares.
+- **Event durability.** Only events the caller marks `durable=True` (process started and finished, result) are fsynced.
+  A progress event (span start/end) survives a process crash but can be lost in a power cut.
+- **Line endings.** Pipeline output files keep the OS line ending (CRLF on Windows), exactly as before S2, so stored
+  expected outputs stay byte-identical. Hashes of the same run differ between Windows and Linux.
+- **Legacy runs.** Runs made before S2 (`ui/*.json`) are read-only: listed and opened, never resumed, revised or compared.
+  Assistant event streams written before S2 can be read but not appended to; sessions from before S2 are not read.
+- **Rendered files.** Image, PDF and DXF outputs are registered with the store (SHA-256 and size) only after the renderer
+  wrote them. Since S3 the SHA-256 and size of every output file are in the run's `result.output_index`. The raw-path scan
+  reads JSON only. One-time check in S3: PNG, JPEG, PDF and JSON outputs hold no local path; DXF and DWG are unchecked (no ODA
+  converter on the dev machine). `tests/integration/pipeline/test_dxf_local_paths.py` checks them where the converter exists.
+
+### Known limits of projects and zone runs (S3)
+
+- **One process drives a project.** The orchestrator's lock is per process (the web server's threads). Do not run the
+  `project` command and the server on the same project at the same time.
+- **Retry is idempotent, not transactional.** Run reserves run ids in the project record, builds each run, then starts it. A
+  crash in between leaves a reserved id or a built run that the next Run completes; nothing is created twice.
+- **The live UI path is untried.** Projects ran only on offline scenarios, recorded fixtures and fakes. The Azure Maps and AI
+  path through the project UI waits for the real-KML recording after S6 (`TCP_LIVE=1`, run by the owner).
+- **Cap approval is not an identity.** `approved_by` is typed text or "UI click", stored with `verified: false` (S10's
+  approver role replaces it). An approval covers the zone count it was given for, not a bigger set.
+- **A REVIEW_REQUIRED zone has no draft.** The pipeline drafts only SUPPORTED_AUTO; the project status REVIEW_REQUIRED
+  reflects the zone decision. Drafts for review come with S7/S8 and D-65.
+- **No 429 backoff.** Up to `project.max_parallel_zone_runs` zone runs call Foundry, Azure Maps and Overpass at once.
+- **Lineage and labels.** The SME lineage key is `lineage_key(project_id, zone geometry hash)` (D-82). A run outside a
+  project has none, and the assistant answers `NO_PROJECT_LINEAGE`. Label files live in `var/labels/` (ignored by git).
+- **D-59 breaches still in the engine** (fix in S7/S10): the OSM `maxspeed` fallback and the encroachment override of the SME's
+  lane closure, both in `site_model/fusion.py`.
+- Only a project starts runs over HTTP: `POST /api/runs` answers 400.
+
+
 ## Tests
 
 - **Unit and integration tests make no live calls.** Use recorded fixtures and fakes. The network is blocked in tests, and a missing fixture is an error.
 - **Live Azure Maps and AI calls** are allowed only in:
   - the S13 full-pipeline test;
-  - the S0 schema spike.
-  Both run only when `TCP_LIVE=1` and only when the user runs them.
+  - the S0 schema spike;
+  - recording real-KML fixtures with `python -m tests.support.record live`, once, after S6.
+  All run only when `TCP_LIVE=1` and only when the user runs them.
+- **Every script that can make live calls** (the recorder, the spike, the S13 test) calls `use_os_trust_store()` first, as the pipeline CLI does. Certificate verification is never turned off.
 - **Gate for every slice:** applicable suites green, new slice tests green, replay deterministic. From S13 on, the golden comparator report must not get worse.
 
 ## How to work
 
-1. **One slice per session.** Branch: `tcp-mvp/sNN-short-name`, off `tcp-mvp/base`.
+1. **One slice per session.** Branch: `tcp-mvp/sNN-short-name`, off the previous slice (`tcp-mvp/base` for the first).
 2. **Plan first.** Before writing code, show the plan for the slice against its acceptance criteria, and wait for approval.
 3. **Stop and ask** when:
    - the repo differs from the plan;
    - a value has no source;
    - a decision is not covered by the docs.
    List options with trade-offs and a recommendation.
-4. **Never delete files.** Unused code goes to `backup/orphans/<date>/` with a manifest, and only in slice S15 after approval.
+4. **Never delete files.** Unused code goes to `backup/orphans/<date>/` with a manifest, and only in slice S15 after approval. S0a's 16 backups were an approved early exception to "only in S15".
 5. **Finish every session with:**
    - files changed;
    - tests added;

@@ -1,0 +1,1906 @@
+{
+  "audit": [
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "RESOLVED",
+      "field": "road.lane_count",
+      "group": "lane_count",
+      "model_confidence": 0.9,
+      "model_value": 4,
+      "osm": {
+        "age_years": null,
+        "agreement_eligible": false,
+        "edit_date": null,
+        "max_age_years": 5,
+        "not_eligible_because": "OSM way edit date unknown",
+        "tags": {
+          "lanes": "4"
+        }
+      },
+      "path": "NORMAL",
+      "source_call": "CALL_1",
+      "value": 4
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "RESOLVED",
+      "field": "road.two_way",
+      "group": "two_way",
+      "model_confidence": 0.9,
+      "model_value": true,
+      "osm": {
+        "age_years": null,
+        "agreement_eligible": false,
+        "edit_date": null,
+        "max_age_years": 5,
+        "not_eligible_because": "no explicit OSM tag on the target way",
+        "tags": {}
+      },
+      "path": "NORMAL",
+      "source_call": "CALL_1",
+      "value": true
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "RESOLVED",
+      "field": "road.divided",
+      "group": "divided",
+      "model_confidence": 0.9,
+      "model_value": false,
+      "path": "NORMAL",
+      "source_call": "CALL_1",
+      "value": false
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "RESOLVED",
+      "field": "road.road_edges",
+      "group": "road_edges",
+      "model_confidence": 0.85,
+      "model_value": 14.602,
+      "path": "NORMAL",
+      "source_call": "CALL_1",
+      "value": 14.602
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "RESOLVED",
+      "field": "work.side",
+      "group": "work_side",
+      "image_resolvable": true,
+      "model_confidence": 0.9,
+      "model_value": "LEFT",
+      "path": "NORMAL",
+      "source_call": "CALL_1",
+      "value": "LEFT"
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "config_geometry": {
+        "centerline_error_allowance_m": 2.5,
+        "encroachment_tolerance_m": 1.5,
+        "lane_width_plausible_m": [
+          2.4,
+          5.5
+        ]
+      },
+      "decision": "RESOLVED",
+      "distance_to_centerline_m": 9.056,
+      "field": "work.encroaches_traveled_way",
+      "group": "work_location",
+      "model_confidence": 0.9,
+      "model_value": true,
+      "outer_limit_m": 11.301,
+      "path": "GEOMETRY",
+      "source_call": "CALL_1",
+      "value": true
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "RESOLVED",
+      "field": "work.location",
+      "group": "work_location",
+      "model_confidence": 0.9,
+      "model_value": "BEYOND_SHOULDER",
+      "path": "GEOMETRY",
+      "source_call": "CALL_1",
+      "value": "TRAVELED_WAY"
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "RESOLVED",
+      "derived_from": "operator declaration / work.encroaches_traveled_way",
+      "field": "work.requires_lane_closure",
+      "group": null,
+      "model_confidence": null,
+      "model_value": null,
+      "path": "DERIVED",
+      "source_call": null,
+      "value": true
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "RESOLVED",
+      "derived_from": "operator declaration / work.encroaches_traveled_way",
+      "field": "work.requires_alternating_one_lane_traffic",
+      "group": null,
+      "model_confidence": null,
+      "model_value": null,
+      "note": "closing a lane of a two-lane two-way road requires alternating one-lane operation",
+      "path": "DERIVED",
+      "source_call": null,
+      "value": true
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "RESOLVED",
+      "field": "work.affects_pedestrian_route",
+      "group": "pedestrian",
+      "model_confidence": 0.85,
+      "model_value": false,
+      "osm": {
+        "age_years": null,
+        "agreement_eligible": false,
+        "edit_date": null,
+        "max_age_years": 5,
+        "not_eligible_because": "no explicit OSM tag on the target way",
+        "tags": {}
+      },
+      "path": "NORMAL",
+      "source_call": "CALL_1",
+      "value": false
+    },
+    {
+      "config": {
+        "agreement_floor": 0.5,
+        "min_critical_confidence": 0.7
+      },
+      "decision": "RESOLVED",
+      "field": "features",
+      "group": "features",
+      "model_confidence": 0.85,
+      "model_value": null,
+      "note": "intersection conflict itself is decided in eligibility (intersection_analysis)",
+      "path": "NORMAL",
+      "source_call": "CALL_1",
+      "unplaced_features": [],
+      "value": {
+        "crosswalks": 0,
+        "driveways": 1,
+        "intersections": 0,
+        "obstructions": 0,
+        "ramps": 0,
+        "roundabouts": 0
+      }
+    }
+  ],
+  "critical_conflicts": [],
+  "critical_field_status": {
+    "road.centerline_status": "UNRESOLVED",
+    "road.divided": "RESOLVED",
+    "road.facility_type": "RESOLVED",
+    "road.lane_count": "RESOLVED",
+    "road.road_edges": "RESOLVED",
+    "road.road_type": "RESOLVED",
+    "road.two_way": "RESOLVED",
+    "work.affects_pedestrian_route": "RESOLVED",
+    "work.encroaches_traveled_way": "RESOLVED",
+    "work.location": "RESOLVED",
+    "work.requires_alternating_one_lane_traffic": "RESOLVED",
+    "work.requires_lane_closure": "RESOLVED",
+    "work.side": "RESOLVED"
+  },
+  "eligibility_inputs_complete": false,
+  "escalations": [],
+  "evidence": {
+    "ai": {
+      "agent": {
+        "calls": [
+          {
+            "call": 1,
+            "debug_sent": null,
+            "images": 1,
+            "mode": "agent_call1",
+            "model": "simulated-observation",
+            "request_id": null,
+            "status": "OK",
+            "usage": null
+          }
+        ],
+        "checks": {
+          "call1": [
+            {
+              "detail": {
+                "appears_outside": true,
+                "distance_to_nearest_edge_m": null,
+                "relative_position": "BEYOND_SHOULDER"
+              },
+              "id": "C1_WORK_VS_DISTANCE",
+              "result": "NOT_CHECKABLE"
+            },
+            {
+              "detail": {
+                "lane_count_total": 4,
+                "reasons": [],
+                "traveled_way_width_m": 14.602
+              },
+              "id": "C2_WIDTH_VS_EDGES",
+              "result": "PASS"
+            },
+            {
+              "detail": {
+                "action": null,
+                "geometry_side": "LEFT",
+                "model_side": "LEFT"
+              },
+              "id": "C3_SIDE_VS_GEOMETRY",
+              "result": "PASS"
+            },
+            {
+              "detail": {
+                "note": "OSM claims switch off"
+              },
+              "id": "C4_JUNCTIONS_VS_OSM",
+              "result": "NOT_APPLICABLE"
+            }
+          ]
+        },
+        "consistency": [],
+        "crops": [],
+        "crops_dropped": [],
+        "group_source": {},
+        "unresolved_after_call1": {}
+      },
+      "available": true,
+      "error_code": null,
+      "model": "simulated-observation",
+      "observation": {
+        "attribute_confidence": {
+          "divided_road": 0.9,
+          "intersection_conflict": 0.85,
+          "lane_count_total": 0.9,
+          "outside_traveled_way": 0.9,
+          "pedestrian_impact": 0.85,
+          "road_edges": 0.85,
+          "two_way_visible": 0.9,
+          "work_side": 0.9
+        },
+        "divided_road_visible": false,
+        "features": {
+          "crosswalks": [],
+          "driveways": [
+            {
+              "confidence": 0.8,
+              "description": "driveway",
+              "image_x": 512.0,
+              "image_y": 730.0,
+              "side": "RIGHT"
+            }
+          ],
+          "intersections": [],
+          "obstructions": [],
+          "ramps": [],
+          "roundabouts": []
+        },
+        "image_quality": "GOOD",
+        "lane_count_total": 4,
+        "lane_markings_visible": true,
+        "notes": "SIMULATED AI OUTPUT (offline self-test)",
+        "osm_conflicts": [],
+        "road_edges": {
+          "left_visible": true,
+          "right_visible": true,
+          "traveled_way_width_px": 37.38
+        },
+        "shoulders": {
+          "left_present": true,
+          "right_present": true
+        },
+        "sidewalks": {
+          "left_present": false,
+          "right_present": false
+        },
+        "two_way_visible": true,
+        "work_reference": {
+          "appears_outside_traveled_way": true,
+          "appears_roadside": true,
+          "relative_position": "BEYOND_SHOULDER",
+          "side": "LEFT"
+        }
+      },
+      "provider": "offline_static"
+    },
+    "osm": {
+      "centerline_length_m": 601.98,
+      "chain_tag_variation": [],
+      "divider_tag": null,
+      "dual_carriageway_tag": null,
+      "facility_type": "CONVENTIONAL_ROAD",
+      "features": {
+        "crosswalks": [],
+        "driveways": [
+          {
+            "highway": "service",
+            "name": null,
+            "side": "RIGHT",
+            "source": "OSM",
+            "station_m": 250.61,
+            "way_id": "3"
+          }
+        ],
+        "intersections": [
+          {
+            "highway": "residential",
+            "name": "Side St",
+            "side": "BOTH",
+            "source": "OSM",
+            "station_m": 526.96,
+            "way_id": "2"
+          }
+        ],
+        "ramps": [],
+        "roundabouts": []
+      },
+      "highway": "secondary",
+      "lanes_tag": 4,
+      "maxspeed_mph": 45,
+      "maxspeed_raw": "45 mph",
+      "maxspeed_unit": "mph",
+      "name": "Demo Road",
+      "oneway_tag": null,
+      "sidewalks": {
+        "left": null,
+        "right": null
+      },
+      "target_way": {
+        "explicit_tags": {
+          "lanes": "4"
+        },
+        "id": "1",
+        "tag_is_explicit": {
+          "divider": false,
+          "dual_carriageway": false,
+          "lanes": true,
+          "oneway": false,
+          "sidewalk": false,
+          "sidewalk:left": false,
+          "sidewalk:right": false,
+          "width": false
+        },
+        "timestamp": null,
+        "version": null
+      },
+      "target_way_ids": [
+        "1"
+      ],
+      "width_m": null
+    }
+  },
+  "extras": [],
+  "feature_confidence": {
+    "intersection_conflict": 0.85,
+    "pedestrian_impact": 0.85
+  },
+  "features": {
+    "crosswalks": [],
+    "driveways": [
+      {
+        "highway": "service",
+        "name": null,
+        "side": "RIGHT",
+        "source": "OSM",
+        "station_m": 250.61,
+        "way_id": "3"
+      },
+      {
+        "confidence": 0.8,
+        "description": "driveway",
+        "distance_from_centerline_m": 19.75,
+        "kind": "driveways",
+        "side": "RIGHT",
+        "source": "AI",
+        "station_m": 248.33
+      }
+    ],
+    "intersections": [
+      {
+        "highway": "residential",
+        "name": "Side St",
+        "side": "BOTH",
+        "source": "OSM",
+        "station_m": 526.96,
+        "way_id": "2"
+      }
+    ],
+    "obstructions": [],
+    "ramps": [],
+    "roundabouts": [],
+    "sidewalks": [
+      {
+        "present": null,
+        "side": "LEFT",
+        "source": "OSM"
+      },
+      {
+        "present": null,
+        "side": "RIGHT",
+        "source": "OSM"
+      },
+      {
+        "present": false,
+        "side": "LEFT",
+        "source": "AI"
+      },
+      {
+        "present": false,
+        "side": "RIGHT",
+        "source": "AI"
+      }
+    ]
+  },
+  "imagery": {
+    "ai_image_px": 1280,
+    "ai_metres_per_pixel": 0.390625,
+    "metadata": {
+      "bounding_box": {
+        "max_latitude": 33.0022458,
+        "max_longitude": -96.9973222,
+        "min_latitude": 32.9977542,
+        "min_longitude": -97.0026778
+      },
+      "center": {
+        "latitude": 33.0,
+        "longitude": -97.0
+      },
+      "georeference_model": "LOCAL_TANGENT_PLANE_AT_CENTER",
+      "ground_extent_m": {
+        "height": 500.0,
+        "width": 500.0
+      },
+      "height_pixels": 1280,
+      "metres_per_pixel": 0.390625,
+      "orientation": "NORTH_UP",
+      "provider": "OFFLINE_SYNTHETIC",
+      "retrieved_at": "<volatile>",
+      "width_pixels": 1280
+    },
+    "quality": "GOOD",
+    "reference_bearing_deg": 82.9
+  },
+  "project_geometry": {
+    "input_feature_count": 1,
+    "input_hash": "sha256:2ac5a76d2bf4511381534d73dd423fdf1082fc4d8cf1e50bdaeb2c8e4ca1c7f8",
+    "input_type": "COORDINATES",
+    "non_authoritative_metadata": {
+      "ignored_element_count": 0
+    },
+    "source_file": null,
+    "work_path": [],
+    "work_reference": {
+      "latitude": 33.0,
+      "longitude": -97.0
+    }
+  },
+  "road": {
+    "centerline": [
+      {
+        "latitude": 32.9997466,
+        "longitude": -97.0032134
+      },
+      {
+        "latitude": 32.9997454,
+        "longitude": -97.0031601
+      },
+      {
+        "latitude": 32.9997441,
+        "longitude": -97.0031069
+      },
+      {
+        "latitude": 32.9997429,
+        "longitude": -97.0030536
+      },
+      {
+        "latitude": 32.9997416,
+        "longitude": -97.0030003
+      },
+      {
+        "latitude": 32.9997404,
+        "longitude": -97.0029471
+      },
+      {
+        "latitude": 32.9997399,
+        "longitude": -97.0028937
+      },
+      {
+        "latitude": 32.9997396,
+        "longitude": -97.0028405
+      },
+      {
+        "latitude": 32.9997392,
+        "longitude": -97.0027872
+      },
+      {
+        "latitude": 32.9997388,
+        "longitude": -97.0027339
+      },
+      {
+        "latitude": 32.9997384,
+        "longitude": -97.0026806
+      },
+      {
+        "latitude": 32.9997388,
+        "longitude": -97.0026273
+      },
+      {
+        "latitude": 32.9997393,
+        "longitude": -97.002574
+      },
+      {
+        "latitude": 32.9997398,
+        "longitude": -97.0025207
+      },
+      {
+        "latitude": 32.9997403,
+        "longitude": -97.0024674
+      },
+      {
+        "latitude": 32.9997408,
+        "longitude": -97.0024141
+      },
+      {
+        "latitude": 32.999742,
+        "longitude": -97.0023609
+      },
+      {
+        "latitude": 32.9997434,
+        "longitude": -97.0023076
+      },
+      {
+        "latitude": 32.9997447,
+        "longitude": -97.0022543
+      },
+      {
+        "latitude": 32.9997461,
+        "longitude": -97.0022011
+      },
+      {
+        "latitude": 32.9997474,
+        "longitude": -97.0021478
+      },
+      {
+        "latitude": 32.9997495,
+        "longitude": -97.0020945
+      },
+      {
+        "latitude": 32.9997516,
+        "longitude": -97.0020413
+      },
+      {
+        "latitude": 32.9997538,
+        "longitude": -97.0019881
+      },
+      {
+        "latitude": 32.999756,
+        "longitude": -97.0019349
+      },
+      {
+        "latitude": 32.9997581,
+        "longitude": -97.0018816
+      },
+      {
+        "latitude": 32.999761,
+        "longitude": -97.0018284
+      },
+      {
+        "latitude": 32.9997639,
+        "longitude": -97.0017753
+      },
+      {
+        "latitude": 32.9997668,
+        "longitude": -97.0017221
+      },
+      {
+        "latitude": 32.9997698,
+        "longitude": -97.0016689
+      },
+      {
+        "latitude": 32.9997727,
+        "longitude": -97.0016157
+      },
+      {
+        "latitude": 32.9997762,
+        "longitude": -97.0015626
+      },
+      {
+        "latitude": 32.9997798,
+        "longitude": -97.0015095
+      },
+      {
+        "latitude": 32.9997835,
+        "longitude": -97.0014564
+      },
+      {
+        "latitude": 32.9997871,
+        "longitude": -97.0014033
+      },
+      {
+        "latitude": 32.9997907,
+        "longitude": -97.0013502
+      },
+      {
+        "latitude": 32.9997949,
+        "longitude": -97.0012971
+      },
+      {
+        "latitude": 32.9997991,
+        "longitude": -97.001244
+      },
+      {
+        "latitude": 32.9998033,
+        "longitude": -97.001191
+      },
+      {
+        "latitude": 32.9998076,
+        "longitude": -97.0011379
+      },
+      {
+        "latitude": 32.9998118,
+        "longitude": -97.0010849
+      },
+      {
+        "latitude": 32.9998164,
+        "longitude": -97.0010319
+      },
+      {
+        "latitude": 32.9998212,
+        "longitude": -97.0009789
+      },
+      {
+        "latitude": 32.9998259,
+        "longitude": -97.0009259
+      },
+      {
+        "latitude": 32.9998306,
+        "longitude": -97.0008729
+      },
+      {
+        "latitude": 32.9998354,
+        "longitude": -97.0008199
+      },
+      {
+        "latitude": 32.9998404,
+        "longitude": -97.000767
+      },
+      {
+        "latitude": 32.9998455,
+        "longitude": -97.000714
+      },
+      {
+        "latitude": 32.9998506,
+        "longitude": -97.0006611
+      },
+      {
+        "latitude": 32.9998558,
+        "longitude": -97.0006081
+      },
+      {
+        "latitude": 32.9998609,
+        "longitude": -97.0005552
+      },
+      {
+        "latitude": 32.9998662,
+        "longitude": -97.0005023
+      },
+      {
+        "latitude": 32.9998716,
+        "longitude": -97.0004494
+      },
+      {
+        "latitude": 32.999877,
+        "longitude": -97.0003965
+      },
+      {
+        "latitude": 32.9998823,
+        "longitude": -97.0003436
+      },
+      {
+        "latitude": 32.9998877,
+        "longitude": -97.0002907
+      },
+      {
+        "latitude": 32.9998932,
+        "longitude": -97.0002378
+      },
+      {
+        "latitude": 32.9998987,
+        "longitude": -97.0001849
+      },
+      {
+        "latitude": 32.9999042,
+        "longitude": -97.000132
+      },
+      {
+        "latitude": 32.9999098,
+        "longitude": -97.0000792
+      },
+      {
+        "latitude": 32.9999153,
+        "longitude": -97.0000263
+      },
+      {
+        "latitude": 32.9999208,
+        "longitude": -96.9999734
+      },
+      {
+        "latitude": 32.9999263,
+        "longitude": -96.9999205
+      },
+      {
+        "latitude": 32.9999318,
+        "longitude": -96.9998676
+      },
+      {
+        "latitude": 32.9999374,
+        "longitude": -96.9998148
+      },
+      {
+        "latitude": 32.9999429,
+        "longitude": -96.9997619
+      },
+      {
+        "latitude": 32.9999483,
+        "longitude": -96.999709
+      },
+      {
+        "latitude": 32.9999537,
+        "longitude": -96.9996561
+      },
+      {
+        "latitude": 32.9999591,
+        "longitude": -96.9996032
+      },
+      {
+        "latitude": 32.9999645,
+        "longitude": -96.9995503
+      },
+      {
+        "latitude": 32.9999699,
+        "longitude": -96.9994974
+      },
+      {
+        "latitude": 32.9999752,
+        "longitude": -96.9994445
+      },
+      {
+        "latitude": 32.9999803,
+        "longitude": -96.9993916
+      },
+      {
+        "latitude": 32.9999854,
+        "longitude": -96.9993386
+      },
+      {
+        "latitude": 32.9999906,
+        "longitude": -96.9992857
+      },
+      {
+        "latitude": 32.9999957,
+        "longitude": -96.9992327
+      },
+      {
+        "latitude": 33.0000007,
+        "longitude": -96.9991798
+      },
+      {
+        "latitude": 33.0000054,
+        "longitude": -96.9991268
+      },
+      {
+        "latitude": 33.0000102,
+        "longitude": -96.9990738
+      },
+      {
+        "latitude": 33.0000149,
+        "longitude": -96.9990208
+      },
+      {
+        "latitude": 33.0000197,
+        "longitude": -96.9989679
+      },
+      {
+        "latitude": 33.0000243,
+        "longitude": -96.9989149
+      },
+      {
+        "latitude": 33.0000285,
+        "longitude": -96.9988618
+      },
+      {
+        "latitude": 33.0000327,
+        "longitude": -96.9988088
+      },
+      {
+        "latitude": 33.000037,
+        "longitude": -96.9987557
+      },
+      {
+        "latitude": 33.0000412,
+        "longitude": -96.9987027
+      },
+      {
+        "latitude": 33.0000453,
+        "longitude": -96.9986496
+      },
+      {
+        "latitude": 33.000049,
+        "longitude": -96.9985965
+      },
+      {
+        "latitude": 33.0000526,
+        "longitude": -96.9985434
+      },
+      {
+        "latitude": 33.0000562,
+        "longitude": -96.9984903
+      },
+      {
+        "latitude": 33.0000598,
+        "longitude": -96.9984372
+      },
+      {
+        "latitude": 33.0000634,
+        "longitude": -96.9983841
+      },
+      {
+        "latitude": 33.0000663,
+        "longitude": -96.9983309
+      },
+      {
+        "latitude": 33.0000692,
+        "longitude": -96.9982777
+      },
+      {
+        "latitude": 33.0000722,
+        "longitude": -96.9982246
+      },
+      {
+        "latitude": 33.0000751,
+        "longitude": -96.9981714
+      },
+      {
+        "latitude": 33.0000779,
+        "longitude": -96.9981182
+      },
+      {
+        "latitude": 33.0000801,
+        "longitude": -96.998065
+      },
+      {
+        "latitude": 33.0000823,
+        "longitude": -96.9980118
+      },
+      {
+        "latitude": 33.0000844,
+        "longitude": -96.9979586
+      },
+      {
+        "latitude": 33.0000866,
+        "longitude": -96.9979053
+      },
+      {
+        "latitude": 33.0000887,
+        "longitude": -96.9978521
+      },
+      {
+        "latitude": 33.00009,
+        "longitude": -96.9977989
+      },
+      {
+        "latitude": 33.0000913,
+        "longitude": -96.9977456
+      },
+      {
+        "latitude": 33.0000927,
+        "longitude": -96.9976923
+      },
+      {
+        "latitude": 33.000094,
+        "longitude": -96.9976391
+      },
+      {
+        "latitude": 33.0000953,
+        "longitude": -96.9975858
+      },
+      {
+        "latitude": 33.0000958,
+        "longitude": -96.9975325
+      },
+      {
+        "latitude": 33.0000963,
+        "longitude": -96.9974793
+      },
+      {
+        "latitude": 33.0000967,
+        "longitude": -96.997426
+      },
+      {
+        "latitude": 33.0000972,
+        "longitude": -96.9973727
+      },
+      {
+        "latitude": 33.0000977,
+        "longitude": -96.9973194
+      },
+      {
+        "latitude": 33.0000973,
+        "longitude": -96.9972661
+      },
+      {
+        "latitude": 33.0000969,
+        "longitude": -96.9972129
+      },
+      {
+        "latitude": 33.0000965,
+        "longitude": -96.9971596
+      },
+      {
+        "latitude": 33.0000961,
+        "longitude": -96.9971063
+      },
+      {
+        "latitude": 33.0000957,
+        "longitude": -96.997053
+      },
+      {
+        "latitude": 33.0000944,
+        "longitude": -96.9969998
+      },
+      {
+        "latitude": 33.0000932,
+        "longitude": -96.9969465
+      },
+      {
+        "latitude": 33.0000919,
+        "longitude": -96.9968932
+      },
+      {
+        "latitude": 33.0000907,
+        "longitude": -96.99684
+      },
+      {
+        "latitude": 33.0000894,
+        "longitude": -96.9967867
+      }
+    ],
+    "centerline_correction": {
+      "applied": true,
+      "measured": [
+        {
+          "centre_offset_m": null,
+          "centre_source": null,
+          "reason": "sections disagree by 0.53 m",
+          "role": "work_point",
+          "station_m": 302.1,
+          "status": "INCONCLUSIVE",
+          "width_m": null
+        },
+        {
+          "centre_offset_m": -0.125,
+          "centre_source": "YELLOW_LINE",
+          "reason": null,
+          "role": "sign_increasing_station",
+          "station_m": 149.7,
+          "status": "OK",
+          "width_m": 14.425
+        },
+        {
+          "centre_offset_m": -0.125,
+          "centre_source": "YELLOW_LINE",
+          "reason": null,
+          "role": "sign_decreasing_station",
+          "station_m": 454.5,
+          "status": "OK",
+          "width_m": 14.425
+        }
+      ],
+      "note": "road centre not verified at the work point (cross-section measurement inconclusive or not made)"
+    },
+    "centerline_length_m": 601.98,
+    "centerline_status": "UNRESOLVED",
+    "divided": {
+      "confidence": 0.9,
+      "observations": [
+        {
+          "confidence": 0.9,
+          "source": "AI",
+          "value": false
+        }
+      ],
+      "status": "RESOLVED",
+      "value": false
+    },
+    "facility_type": {
+      "confidence": 0.9,
+      "note": "road class from OSM; ramps/roundabouts checked from both sources in eligibility",
+      "observations": [
+        {
+          "detail": "highway=secondary",
+          "source": "OSM",
+          "value": "CONVENTIONAL_ROAD"
+        },
+        {
+          "ramps_seen": 0,
+          "roundabouts_seen": 0,
+          "source": "AI"
+        }
+      ],
+      "status": "RESOLVED",
+      "value": "CONVENTIONAL_ROAD"
+    },
+    "lane_count": {
+      "confidence": 0.9,
+      "observations": [
+        {
+          "confidence": 0.9,
+          "detail": "lanes tag",
+          "source": "OSM",
+          "value": 4
+        },
+        {
+          "confidence": 0.9,
+          "source": "AI",
+          "value": 4
+        }
+      ],
+      "status": "RESOLVED",
+      "value": 4
+    },
+    "name": "Demo Road",
+    "osm_way_ids": [
+      "1"
+    ],
+    "road_edges": {
+      "left": [
+        {
+          "latitude": 32.9998122,
+          "longitude": -97.0032112
+        },
+        {
+          "latitude": 32.9998103,
+          "longitude": -97.0031296
+        },
+        {
+          "latitude": 32.9998083,
+          "longitude": -97.003048
+        },
+        {
+          "latitude": 32.9998064,
+          "longitude": -97.0029664
+        },
+        {
+          "latitude": 32.9998055,
+          "longitude": -97.0028863
+        },
+        {
+          "latitude": 32.9998049,
+          "longitude": -97.0028047
+        },
+        {
+          "latitude": 32.9998043,
+          "longitude": -97.0027231
+        },
+        {
+          "latitude": 32.9998043,
+          "longitude": -97.0026429
+        },
+        {
+          "latitude": 32.999805,
+          "longitude": -97.0025614
+        },
+        {
+          "latitude": 32.9998057,
+          "longitude": -97.0024798
+        },
+        {
+          "latitude": 32.9998067,
+          "longitude": -97.0023996
+        },
+        {
+          "latitude": 32.9998087,
+          "longitude": -97.0023181
+        },
+        {
+          "latitude": 32.9998108,
+          "longitude": -97.0022365
+        },
+        {
+          "latitude": 32.9998128,
+          "longitude": -97.0021549
+        },
+        {
+          "latitude": 32.9998159,
+          "longitude": -97.0020749
+        },
+        {
+          "latitude": 32.9998192,
+          "longitude": -97.0019933
+        },
+        {
+          "latitude": 32.9998226,
+          "longitude": -97.0019118
+        },
+        {
+          "latitude": 32.9998265,
+          "longitude": -97.0018317
+        },
+        {
+          "latitude": 32.999831,
+          "longitude": -97.0017502
+        },
+        {
+          "latitude": 32.9998355,
+          "longitude": -97.0016688
+        },
+        {
+          "latitude": 32.9998403,
+          "longitude": -97.0015884
+        },
+        {
+          "latitude": 32.9998458,
+          "longitude": -97.0015073
+        },
+        {
+          "latitude": 32.9998514,
+          "longitude": -97.0014259
+        },
+        {
+          "latitude": 32.999857,
+          "longitude": -97.0013454
+        },
+        {
+          "latitude": 32.9998633,
+          "longitude": -97.0012644
+        },
+        {
+          "latitude": 32.9998698,
+          "longitude": -97.0011831
+        },
+        {
+          "latitude": 32.9998763,
+          "longitude": -97.0011019
+        },
+        {
+          "latitude": 32.9998833,
+          "longitude": -97.0010216
+        },
+        {
+          "latitude": 32.9998906,
+          "longitude": -97.0009404
+        },
+        {
+          "latitude": 32.9998978,
+          "longitude": -97.0008592
+        },
+        {
+          "latitude": 32.9999053,
+          "longitude": -97.0007786
+        },
+        {
+          "latitude": 32.9999131,
+          "longitude": -97.0006977
+        },
+        {
+          "latitude": 32.999921,
+          "longitude": -97.0006166
+        },
+        {
+          "latitude": 32.9999289,
+          "longitude": -97.0005359
+        },
+        {
+          "latitude": 32.9999371,
+          "longitude": -97.000455
+        },
+        {
+          "latitude": 32.9999453,
+          "longitude": -97.000374
+        },
+        {
+          "latitude": 32.9999536,
+          "longitude": -97.0002931
+        },
+        {
+          "latitude": 32.999962,
+          "longitude": -97.0002122
+        },
+        {
+          "latitude": 32.9999704,
+          "longitude": -97.0001312
+        },
+        {
+          "latitude": 32.9999789,
+          "longitude": -97.0000502
+        },
+        {
+          "latitude": 32.9999873,
+          "longitude": -96.9999692
+        },
+        {
+          "latitude": 32.9999958,
+          "longitude": -96.9998882
+        },
+        {
+          "latitude": 33.0000042,
+          "longitude": -96.9998072
+        },
+        {
+          "latitude": 33.0000127,
+          "longitude": -96.9997261
+        },
+        {
+          "latitude": 33.0000209,
+          "longitude": -96.999645
+        },
+        {
+          "latitude": 33.0000292,
+          "longitude": -96.9995639
+        },
+        {
+          "latitude": 33.0000374,
+          "longitude": -96.9994827
+        },
+        {
+          "latitude": 33.0000454,
+          "longitude": -96.9994014
+        },
+        {
+          "latitude": 33.0000532,
+          "longitude": -96.9993203
+        },
+        {
+          "latitude": 33.0000611,
+          "longitude": -96.999239
+        },
+        {
+          "latitude": 33.0000687,
+          "longitude": -96.9991574
+        },
+        {
+          "latitude": 33.0000759,
+          "longitude": -96.9990763
+        },
+        {
+          "latitude": 33.0000832,
+          "longitude": -96.9989951
+        },
+        {
+          "latitude": 33.0000903,
+          "longitude": -96.998913
+        },
+        {
+          "latitude": 33.0000968,
+          "longitude": -96.9988318
+        },
+        {
+          "latitude": 33.0001033,
+          "longitude": -96.9987505
+        },
+        {
+          "latitude": 33.0001097,
+          "longitude": -96.9986691
+        },
+        {
+          "latitude": 33.0001154,
+          "longitude": -96.9985869
+        },
+        {
+          "latitude": 33.000121,
+          "longitude": -96.9985055
+        },
+        {
+          "latitude": 33.0001265,
+          "longitude": -96.998424
+        },
+        {
+          "latitude": 33.0001314,
+          "longitude": -96.9983415
+        },
+        {
+          "latitude": 33.0001359,
+          "longitude": -96.9982601
+        },
+        {
+          "latitude": 33.0001404,
+          "longitude": -96.9981787
+        },
+        {
+          "latitude": 33.0001445,
+          "longitude": -96.9980958
+        },
+        {
+          "latitude": 33.0001478,
+          "longitude": -96.9980143
+        },
+        {
+          "latitude": 33.0001511,
+          "longitude": -96.9979328
+        },
+        {
+          "latitude": 33.0001543,
+          "longitude": -96.9978498
+        },
+        {
+          "latitude": 33.0001564,
+          "longitude": -96.9977682
+        },
+        {
+          "latitude": 33.0001584,
+          "longitude": -96.9976867
+        },
+        {
+          "latitude": 33.0001605,
+          "longitude": -96.997605
+        },
+        {
+          "latitude": 33.0001615,
+          "longitude": -96.997522
+        },
+        {
+          "latitude": 33.0001622,
+          "longitude": -96.9974404
+        },
+        {
+          "latitude": 33.0001629,
+          "longitude": -96.9973587
+        },
+        {
+          "latitude": 33.0001629,
+          "longitude": -96.9972756
+        },
+        {
+          "latitude": 33.0001623,
+          "longitude": -96.997194
+        },
+        {
+          "latitude": 33.0001617,
+          "longitude": -96.9971124
+        },
+        {
+          "latitude": 33.0001607,
+          "longitude": -96.9970293
+        },
+        {
+          "latitude": 33.0001588,
+          "longitude": -96.9969477
+        },
+        {
+          "latitude": 33.0001569,
+          "longitude": -96.9968661
+        },
+        {
+          "latitude": 33.000155,
+          "longitude": -96.9967845
+        }
+      ],
+      "left_offset_m": 7.301,
+      "model": "symmetric about OSM centerline",
+      "note": null,
+      "observations": [
+        {
+          "confidence": 0.85,
+          "left_visible": true,
+          "right_visible": true,
+          "source": "AI",
+          "width_m": 14.602
+        }
+      ],
+      "right": [
+        {
+          "latitude": 32.9996811,
+          "longitude": -97.0032156
+        },
+        {
+          "latitude": 32.9996791,
+          "longitude": -97.003134
+        },
+        {
+          "latitude": 32.9996772,
+          "longitude": -97.0030524
+        },
+        {
+          "latitude": 32.9996753,
+          "longitude": -97.0029708
+        },
+        {
+          "latitude": 32.9996743,
+          "longitude": -97.0028877
+        },
+        {
+          "latitude": 32.9996737,
+          "longitude": -97.0028061
+        },
+        {
+          "latitude": 32.9996731,
+          "longitude": -97.0027245
+        },
+        {
+          "latitude": 32.9996731,
+          "longitude": -97.0026414
+        },
+        {
+          "latitude": 32.9996739,
+          "longitude": -97.0025597
+        },
+        {
+          "latitude": 32.9996746,
+          "longitude": -97.0024781
+        },
+        {
+          "latitude": 32.9996756,
+          "longitude": -97.0023951
+        },
+        {
+          "latitude": 32.9996776,
+          "longitude": -97.0023134
+        },
+        {
+          "latitude": 32.9996797,
+          "longitude": -97.0022318
+        },
+        {
+          "latitude": 32.9996817,
+          "longitude": -97.0021503
+        },
+        {
+          "latitude": 32.9996849,
+          "longitude": -97.0020673
+        },
+        {
+          "latitude": 32.9996882,
+          "longitude": -97.0019858
+        },
+        {
+          "latitude": 32.9996916,
+          "longitude": -97.0019042
+        },
+        {
+          "latitude": 32.9996956,
+          "longitude": -97.0018214
+        },
+        {
+          "latitude": 32.9997001,
+          "longitude": -97.00174
+        },
+        {
+          "latitude": 32.9997046,
+          "longitude": -97.0016585
+        },
+        {
+          "latitude": 32.9997095,
+          "longitude": -97.0015761
+        },
+        {
+          "latitude": 32.9997151,
+          "longitude": -97.0014945
+        },
+        {
+          "latitude": 32.9997206,
+          "longitude": -97.0014132
+        },
+        {
+          "latitude": 32.9997264,
+          "longitude": -97.001331
+        },
+        {
+          "latitude": 32.9997328,
+          "longitude": -97.0012495
+        },
+        {
+          "latitude": 32.9997393,
+          "longitude": -97.0011683
+        },
+        {
+          "latitude": 32.9997458,
+          "longitude": -97.001087
+        },
+        {
+          "latitude": 32.9997529,
+          "longitude": -97.001005
+        },
+        {
+          "latitude": 32.9997601,
+          "longitude": -97.0009238
+        },
+        {
+          "latitude": 32.9997674,
+          "longitude": -97.0008427
+        },
+        {
+          "latitude": 32.9997749,
+          "longitude": -97.0007611
+        },
+        {
+          "latitude": 32.9997828,
+          "longitude": -97.0006798
+        },
+        {
+          "latitude": 32.9997907,
+          "longitude": -97.0005987
+        },
+        {
+          "latitude": 32.9997986,
+          "longitude": -97.0005173
+        },
+        {
+          "latitude": 32.9998068,
+          "longitude": -97.0004361
+        },
+        {
+          "latitude": 32.9998151,
+          "longitude": -97.0003551
+        },
+        {
+          "latitude": 32.9998234,
+          "longitude": -97.000274
+        },
+        {
+          "latitude": 32.9998318,
+          "longitude": -97.0001929
+        },
+        {
+          "latitude": 32.9998403,
+          "longitude": -97.0001119
+        },
+        {
+          "latitude": 32.9998487,
+          "longitude": -97.0000309
+        },
+        {
+          "latitude": 32.9998572,
+          "longitude": -96.9999499
+        },
+        {
+          "latitude": 32.9998656,
+          "longitude": -96.9998689
+        },
+        {
+          "latitude": 32.9998741,
+          "longitude": -96.9997879
+        },
+        {
+          "latitude": 32.9998825,
+          "longitude": -96.999707
+        },
+        {
+          "latitude": 32.9998907,
+          "longitude": -96.9996261
+        },
+        {
+          "latitude": 32.999899,
+          "longitude": -96.9995451
+        },
+        {
+          "latitude": 32.9999072,
+          "longitude": -96.9994642
+        },
+        {
+          "latitude": 32.9999151,
+          "longitude": -96.9993834
+        },
+        {
+          "latitude": 32.9999229,
+          "longitude": -96.9993024
+        },
+        {
+          "latitude": 32.9999308,
+          "longitude": -96.9992215
+        },
+        {
+          "latitude": 32.9999382,
+          "longitude": -96.9991408
+        },
+        {
+          "latitude": 32.9999455,
+          "longitude": -96.9990597
+        },
+        {
+          "latitude": 32.9999527,
+          "longitude": -96.9989785
+        },
+        {
+          "latitude": 32.9999597,
+          "longitude": -96.9988982
+        },
+        {
+          "latitude": 32.9999662,
+          "longitude": -96.998817
+        },
+        {
+          "latitude": 32.9999727,
+          "longitude": -96.9987357
+        },
+        {
+          "latitude": 32.9999791,
+          "longitude": -96.9986547
+        },
+        {
+          "latitude": 32.9999847,
+          "longitude": -96.9985742
+        },
+        {
+          "latitude": 32.9999902,
+          "longitude": -96.9984928
+        },
+        {
+          "latitude": 32.9999957,
+          "longitude": -96.9984117
+        },
+        {
+          "latitude": 33.0000005,
+          "longitude": -96.9983313
+        },
+        {
+          "latitude": 33.000005,
+          "longitude": -96.9982498
+        },
+        {
+          "latitude": 33.0000095,
+          "longitude": -96.9981684
+        },
+        {
+          "latitude": 33.0000135,
+          "longitude": -96.9980883
+        },
+        {
+          "latitude": 33.0000168,
+          "longitude": -96.9980067
+        },
+        {
+          "latitude": 33.0000201,
+          "longitude": -96.9979252
+        },
+        {
+          "latitude": 33.0000232,
+          "longitude": -96.9978451
+        },
+        {
+          "latitude": 33.0000253,
+          "longitude": -96.9977636
+        },
+        {
+          "latitude": 33.0000273,
+          "longitude": -96.997682
+        },
+        {
+          "latitude": 33.0000293,
+          "longitude": -96.9976005
+        },
+        {
+          "latitude": 33.0000303,
+          "longitude": -96.9975203
+        },
+        {
+          "latitude": 33.000031,
+          "longitude": -96.9974387
+        },
+        {
+          "latitude": 33.0000318,
+          "longitude": -96.9973571
+        },
+        {
+          "latitude": 33.0000318,
+          "longitude": -96.997277
+        },
+        {
+          "latitude": 33.0000312,
+          "longitude": -96.9971953
+        },
+        {
+          "latitude": 33.0000306,
+          "longitude": -96.9971137
+        },
+        {
+          "latitude": 33.0000296,
+          "longitude": -96.9970336
+        },
+        {
+          "latitude": 33.0000277,
+          "longitude": -96.996952
+        },
+        {
+          "latitude": 33.0000258,
+          "longitude": -96.9968705
+        },
+        {
+          "latitude": 33.0000239,
+          "longitude": -96.9967889
+        }
+      ],
+      "right_offset_m": 7.301,
+      "status": "RESOLVED",
+      "traveled_way_width_m": 14.602
+    },
+    "road_type": {
+      "confidence": 1.0,
+      "observations": [
+        {
+          "source": "OPERATOR",
+          "value": "RURAL"
+        }
+      ],
+      "source": "OPERATOR",
+      "status": "RESOLVED",
+      "value": "RURAL"
+    },
+    "speed_mph": {
+      "note": "informational; TA-1 spacing in the approved pack is keyed by road type, not speed",
+      "required_by_selected_ta": false,
+      "source": "OSM",
+      "status": "RESOLVED",
+      "value": 45
+    },
+    "traffic_direction": {
+      "status": "RESOLVED",
+      "value": "TWO_WAY"
+    },
+    "two_way": {
+      "confidence": 0.9,
+      "observations": [
+        {
+          "confidence": 0.6,
+          "detail": "implicit (no oneway tag)",
+          "source": "OSM",
+          "value": true
+        },
+        {
+          "confidence": 0.9,
+          "source": "AI",
+          "value": true
+        }
+      ],
+      "status": "RESOLVED",
+      "value": true
+    }
+  },
+  "site_model_id": "SITE-2B82A688BF101098",
+  "version": 1,
+  "work": {
+    "affects_pedestrian_route": {
+      "confidence": 0.85,
+      "observations": [
+        {
+          "crosswalks_near_work": 0,
+          "source": "OSM",
+          "work_side_sidewalk": null
+        },
+        {
+          "confidence": 0.85,
+          "crosswalks_near_work": 0,
+          "source": "AI",
+          "work_side_sidewalk": false
+        }
+      ],
+      "status": "RESOLVED",
+      "value": false
+    },
+    "distance_to_centerline_m": 9.056,
+    "encroaches_traveled_way": {
+      "confidence": 1.0,
+      "observations": [
+        {
+          "detail": "work point/path vs bounded traveled-way limit",
+          "distance_to_centerline_m": 9.056,
+          "outer_limit_m": 11.301,
+          "per_lane_width_m": 3.65,
+          "source": "GEOMETRY",
+          "value": true,
+          "width_m": 14.602
+        },
+        {
+          "confidence": 0.9,
+          "source": "AI",
+          "value": false
+        }
+      ],
+      "status": "RESOLVED",
+      "value": true
+    },
+    "lateral_offset_from_centerline_m": 9.056,
+    "location": {
+      "confidence": 1.0,
+      "observations": [
+        {
+          "confidence": 0.9,
+          "source": "AI",
+          "value": "BEYOND_SHOULDER"
+        }
+      ],
+      "status": "RESOLVED",
+      "value": "TRAVELED_WAY"
+    },
+    "reference_point": {
+      "latitude": 33.0,
+      "longitude": -97.0
+    },
+    "reference_station_m": 302.118,
+    "requires_alternating_one_lane_traffic": {
+      "confidence": 1.0,
+      "note": "closing a lane of a two-lane two-way road requires alternating one-lane operation",
+      "observations": [
+        {
+          "from": "work.requires_lane_closure",
+          "source": "DERIVED",
+          "value": true
+        }
+      ],
+      "status": "RESOLVED",
+      "value": true
+    },
+    "requires_lane_closure": {
+      "confidence": 1.0,
+      "observations": [
+        {
+          "source": "OPERATOR",
+          "value": false
+        },
+        {
+          "from": "work.encroaches_traveled_way",
+          "source": "DERIVED",
+          "value": true
+        }
+      ],
+      "status": "RESOLVED",
+      "value": true
+    },
+    "side": {
+      "confidence": 1.0,
+      "observations": [
+        {
+          "confidence": 1.0,
+          "detail": "KML/coordinate vs OSM centerline, 9.06 m > 3.0 m",
+          "source": "GEOMETRY",
+          "value": "LEFT"
+        },
+        {
+          "confidence": 0.9,
+          "source": "AI",
+          "value": "LEFT"
+        }
+      ],
+      "source": "AI+GEOMETRY",
+      "status": "RESOLVED",
+      "value": "LEFT"
+    },
+    "ta1_option_facts": {}
+  }
+}

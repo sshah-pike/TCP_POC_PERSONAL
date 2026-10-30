@@ -8,7 +8,8 @@ from tcp_planner.ai import grounded_vision as G
 from tcp_planner.ai import foundry_provider as fp
 from tcp_planner.contracts import ProviderError
 from tcp_planner.ai.vision_provider import OBSERVATION_SCHEMA
-from tcp_planner.storage import run_store as store
+from tcp_planner.intake.lineage import lineage_key
+from tcp_planner.storage import run_store as store, run_records as records
 from tcp_planner.orchestration import run_relations as relations
 from tcp_planner.evaluation import ground_truth_labels as labels
 from tcp_planner.evaluation import comparison_scoring as evaluation
@@ -197,16 +198,14 @@ def http(monkeypatch):
 
 
 def source_run():
-    rid, rdir = store.create_run({"input_type": "coordinates", "lat": str(SC["lat"]), "lon": str(SC["lon"]),
-                                  "operator": {"road_type": "RURAL"},
-                                  "advanced": {"map_provider": "azure_maps", "ai_provider": "foundry", "no_dwt": True}}, set())
-    inproc.run(rdir)
-    return rid
+    """The comparison's source run: one point as a one-zone project (only project runs have a lineage key, D-82)."""
+    from tests.support.project_runs import zone_run
+    return zone_run(SC["lat"], SC["lon"], advanced={"map_provider": "azure_maps", "ai_provider": "foundry", "no_dwt": True})
 
 
 def compare(source, profiles, variants):
     cid = relations.create_comparison(source, profiles, variants=variants)
-    with inproc.isolated(): runner.prepare_views(store.run_path(cid))
+    with inproc.isolated(): runner.prepare_views(cid)
     for c in relations.create_children(cid): inproc.run(store.run_path(c))
     return cid
 
@@ -259,7 +258,7 @@ def test_osm_claims_and_centerline_switches(env, monkeypatch):
     # explicitly (here road_edges, and the fake OSM way has no width tag -> no claims)
     assert not with_claims["grounding"]["claims"]
     assert {x["id"]: x for x in with_claims["grounding"]["checks"]}["C4_JUNCTIONS_VS_OSM"]["result"] in ("PASS", "NOT_APPLICABLE")
-    plans = {e["signature"]["plan"] for e in load_manifest(store.run_path(cid)) if e["kind"] == "map_view"}
+    plans = {e["signature"]["plan"] for e in load_manifest(cid) if e["kind"] == "map_view"}
     assert plans == {"views-v1", "views-cl-v1"}  # both view plans prepared once, separately
     # centerline corridor views sit on the OSM centerline
     from tcp_planner.orchestration import pipeline as app
@@ -267,23 +266,27 @@ def test_osm_claims_and_centerline_switches(env, monkeypatch):
     from tcp_planner.geometry.local_frame import signed_lateral
     pg = store._read_json(store.run_path(src, "output", "project_geometry.json"))
     cl = osm_adapter.extract_evidence(SC["osm_elements"], pg, app.load_config())["centerline_enu"]
-    for e in load_manifest(store.run_path(cid)):
+    for e in load_manifest(cid):
         if e["kind"] == "map_view" and e["signature"]["plan"] == "views-cl-v1" and e["metadata"]["role"] != "work_area":
             assert signed_lateral(cl, tuple(e["metadata"]["offset_m"]))[0] < 0.5
 
 
 # ---------------------------------------------------------------- labels + evaluation
+SID = lineage_key("PRJ-test", "sha256:" + "0" * 64)   # a zone's lineage key (16 hex characters)
+
+
 def test_label_workflow_requires_a_person(env):
     pg = {"work_reference": {"latitude": 41.0, "longitude": -71.0}, "work_path": []}
-    d = labels.save_draft(pg, {"road.lane_count": {"value": 2}}, "assistant draft", "drafted from close-up", "run-x")
+    d = labels.save_draft(SID, pg, {"road.lane_count": {"value": 2}}, "assistant draft", "drafted from close-up", "run-x")
+    assert d["site_id"] == SID
     assert d["status"] == "DRAFT" and d["confirmed_by"] is None
     with pytest.raises(store.BadRequest): labels.confirm(d["site_id"], "", "ok")
     with pytest.raises(store.BadRequest): labels.confirm(d["site_id"], "Jane", " ")
-    with pytest.raises(store.BadRequest): labels.save_draft(pg, {"road.lane_count": {"value": "two"}}, "a", "b", "r")
+    with pytest.raises(store.BadRequest): labels.save_draft(SID, pg, {"road.lane_count": {"value": "two"}}, "a", "b", "r")
     c = labels.confirm(d["site_id"], "Jane Reviewer", "checked on site photos", {"road.lane_count": 2, "road.two_way": True})
     assert c["status"] == "CONFIRMED" and c["confirmed_by"] == "Jane Reviewer" and c["confirmed_at"]
     assert [h["action"] for h in c["history"]] == ["draft", "confirm"]
-    with pytest.raises(store.BadRequest): labels.save_draft(pg, {}, "assistant", "redo", "r")  # cannot overwrite confirmed
+    with pytest.raises(store.BadRequest): labels.save_draft(SID, pg, {}, "assistant", "redo", "r")  # cannot overwrite confirmed
 
 
 def test_evaluation_scores_only_confirmed_labels(env, monkeypatch):
@@ -294,10 +297,12 @@ def test_evaluation_scores_only_confirmed_labels(env, monkeypatch):
               "road.traveled_way_width_m": {"value": 7.3, "tolerance": 1.0}, "work.side": {"value": "RIGHT"},  # deliberately wrong
               "work.location": {"value": "BEYOND_SHOULDER"}, "work.encroaches_traveled_way": {"value": False},
               "work.affects_pedestrian_route": {"value": False}, "site.complex_intersection_conflict": {"value": False}}
-    labels.save_draft(pg, fields, "assistant draft", "test", src)
+    sid = labels.site_id_for(records.read(src, "request")["request"])
+    assert sid == records.read(src, "request")["request"]["project"]["lineage_key"]
+    labels.save_draft(sid, pg, fields, "assistant draft", "test", src)
     ev = evaluation.evaluate_comparison(cid)
     assert ev["scored"] is False and all(not r["scored"] for c in ev["columns"] for r in c["rows"])
-    labels.confirm(labels.site_id_for(pg), "Jane Reviewer", "verified")
+    labels.confirm(sid, "Jane Reviewer", "verified")
     ev = evaluation.evaluate_comparison(cid)
     assert ev["scored"] is True
     a = next(c for c in ev["columns"] if c["profile"] == "fake-a")

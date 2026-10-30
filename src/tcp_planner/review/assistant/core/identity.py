@@ -92,11 +92,14 @@ def provider():
 
 
 # ---------------------------------------------------------------- opaque sessions (only the token hash is stored)
-_LOCK = threading.Lock()
+# A session is a state record sessions/<sha256 of the token>.state.json. Ending a session marks the record (ended_at); the
+# file stays. Sessions from before S2 (sessions/<hash>.json) are not read: those users sign in again.
+SCHEMA_VERSION = 1
 
 
-def _sessions_dir():
-    return os.path.join(data_dir(), "sessions")
+def _sessions():
+    from tcp_planner.storage import stores
+    return stores._file_state(data_dir())
 
 
 def _token_hash(token):
@@ -117,20 +120,15 @@ def create_session(subject_id, idp=None):
     rec = {"session_id": session_id, "subject_id": subject_id, "identity_provider": idp.name,
            "created_at": _now().isoformat(timespec="seconds"),
            "expires_at": (_now() + datetime.timedelta(hours=SESSION_TTL_HOURS)).isoformat(timespec="seconds")}
-    with _LOCK:
-        os.makedirs(_sessions_dir(), exist_ok=True)
-        path = os.path.join(_sessions_dir(), _token_hash(token) + ".json")
-        with open(path, "x", encoding="utf-8") as f: json.dump(rec, f, sort_keys=True)
+    _sessions().put_new("sessions/" + _token_hash(token), rec, SCHEMA_VERSION)
     return token, ident
 
 
 def resolve(token, idp=None):
     if not token or not isinstance(token, str) or len(token) > 200: raise unauthenticated()
-    path = os.path.join(_sessions_dir(), _token_hash(token) + ".json")
-    try:
-        with open(path, encoding="utf-8") as f: rec = json.load(f)
-    except (OSError, ValueError):
-        raise unauthenticated()
+    got = _sessions().get("sessions/" + _token_hash(token))
+    if got is None or got.value.get("ended_at"): raise unauthenticated()
+    rec = got.value
     if datetime.datetime.fromisoformat(rec["expires_at"]) < _now():
         end_session(token); raise unauthenticated()
     ident = (idp or provider()).identity(rec["subject_id"], rec["session_id"])
@@ -139,5 +137,13 @@ def resolve(token, idp=None):
 
 
 def end_session(token):
-    try: os.remove(os.path.join(_sessions_dir(), _token_hash(token) + ".json"))
-    except OSError: pass
+    from tcp_planner.storage.interfaces import StaleHead
+    st, key = _sessions(), "sessions/" + _token_hash(token)
+    for _ in range(5):
+        got = st.get(key)
+        if got is None or got.value.get("ended_at"): return
+        try:
+            st.compare_and_set(key, got.version, {**got.value, "ended_at": _now().isoformat(timespec="seconds")}, SCHEMA_VERSION)
+            return
+        except StaleHead:
+            continue

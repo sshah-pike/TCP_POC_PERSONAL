@@ -8,7 +8,7 @@ import pytest
 from tcp_planner.orchestration import offline_scenarios as offline
 from tcp_planner.orchestration.pipeline import run_pipeline, DWT_CONFIG_PATH, EXIT
 from tcp_planner.web_api import server
-from tcp_planner.storage import run_store as store
+from tcp_planner.storage import run_store as store, run_records as records
 
 DRAFT_FILES = {"plan.json", "aerial_image.jpg", "debug_plan.png", "debug_plan.pdf", "tcp_sheet.png", "tcp_sheet.pdf",
                "plan.dxf", "plan.dwg"}
@@ -33,9 +33,10 @@ def api(tmp_path, monkeypatch):
             return e.code, e.read()
 
     def run(payload, timeout=180):
-        code, body = call("POST", "/api/runs", payload)
-        assert code == 201, body
-        rid = json.loads(body)["run_id"]; t0 = time.time()
+        """A single run created and launched directly: POST /api/runs is closed (only a project starts runs, S3), but
+        these tests check that the UI reports exactly what the pipeline decided for a single location."""
+        rid, _ = store.create_run(payload, set(offline.SCENARIOS) | set(offline.ALIASES))
+        server.launch(rid); t0 = time.time()
         while True:
             code, body = call("GET", f"/api/runs/{rid}")
             st = json.loads(body)
@@ -62,8 +63,9 @@ def test_ui_reports_existing_decision(api, tmp_path, name):
     st = run({"input_type": "offline", "offline_scenario": name})
     ref = direct(name, tmp_path / "ref")
 
-    shown = "ERROR" if ref["decision"] == "REVIEW_REQUIRED" and store._is_error(ref["reason_codes"]) else ref["decision"]
-    assert st["decision"] == shown  # service/API failures are shown as ERROR, not REVIEW_REQUIRED
+    shown = ref["decision"]
+    assert st["decision"] == shown  # the pipeline's decision is always shown (exit 3 is REVIEW_REQUIRED); S3 Q12-B
+    assert st["service_error"] == (store.service_codes(ref["reason_codes"]) or None)  # service failures are a badge
     assert st["reason_codes"] == ref["reason_codes"]
     assert st["exit_code"] == EXIT[ref["decision"]]
     outputs = {o["name"] for o in st["outputs"]}
@@ -83,7 +85,7 @@ def test_ui_reports_existing_decision(api, tmp_path, name):
         if ref["decision"] == "REVIEW_REQUIRED":
             assert by["validation"]["status"] == "REVIEW" and by["render"]["status"] == "NOT_RUN"
     else:
-        assert elig["status"] == {"REVIEW_REQUIRED": "REVIEW", "ERROR": "ERROR", "UNSUPPORTED_POC": "UNSUPPORTED"}[shown]
+        assert elig["status"] == {"REVIEW_REQUIRED": "REVIEW", "UNSUPPORTED_POC": "UNSUPPORTED"}[shown]
         assert all(by[k]["status"] == "NOT_RUN" for k in ("rules", "validation", "render"))
     if ref["decision"] == "SUPPORTED_AUTO":
         a, b = (json.load(open(os.path.join(d, "plan.json"), encoding="utf-8"))
@@ -111,16 +113,15 @@ def test_ui_supported_with_tcp_sheet(api, monkeypatch):
     assert st["dwt"] == {"status": "SKIPPED"}
 
 
-def test_invalid_kml_is_unsupported_at_input(api):
-    _, run = api
-    st = run({"input_type": "kml", "kml": {"filename": "bad.kml",
-                                           "content_base64": base64.b64encode(b"<notkml/>").decode()}})
-    assert st["decision"] == "UNSUPPORTED_POC" and st["exit_code"] == 4 and "INVALID_KML" in st["reason_codes"]
-    stages = {s["key"]: s for s in st["stages"]}
-    assert stages["input"]["status"] == "UNSUPPORTED"
-    assert "eligibility_result.json" in stages["input"]["artifacts"]
-    assert all(s["status"] == "NOT_RUN" for k, s in stages.items() if k != "input")
-    assert os.path.isfile(st["request"]["kml_saved_path"]) and not st["draft_generated"]
+def test_invalid_kml_makes_no_project(api):
+    """A KML that cannot be read is refused at the project route: NO_USABLE_LOCATION with the file's reason, no project and
+    no run (it used to start a run that ended UNSUPPORTED_POC at input)."""
+    call, _ = api
+    code, body = call("POST", "/api/projects", {"input_type": "kml", "kml": {"filename": "bad.kml",
+                                                "content_base64": base64.b64encode(b"<notkml/>").decode()}})
+    out = json.loads(body)
+    assert code == 422 and out["error_code"] == "NO_USABLE_LOCATION" and out["file_reasons"] == ["INVALID_KML"]
+    assert out["locations"] == [] and call("GET", "/api/projects") == (200, b"[]") and call("GET", "/api/runs") == (200, b"[]")
 
 
 def test_out_of_range_coordinates_rejected_by_pipeline(api):
@@ -146,18 +147,29 @@ def test_no_secrets_and_no_path_escape(api):
     for path in ("/api/meta", "/api/runs", f"/api/runs/{rid}"):
         code, body = call("GET", path)
         assert code == 200 and SECRET.encode() not in body
-    for bad in ("..%2F..%2Fui%2Frequest.json", "..%5Cui%5Crequest.json", "%2E%2E"):
+    for bad in ("..%2F..%2Fui%2Frequest.state.json", "..%2F..%2Fui%2Frequest.json", "..%5Cui%5Crequest.json", "%2E%2E"):
         assert call("GET", f"/api/runs/{rid}/files/{bad}")[0] in (400, 404)
     assert call("GET", "/api/runs/..%2F..%2Fetc")[0] in (400, 404)
     assert call("GET", "/api/meta", headers={"Host": "evil.example"})[0] == 403
 
 
-def test_bad_requests_rejected_before_running(api):
+def test_only_a_project_starts_runs(api):
+    """POST /api/runs is closed for every input type: the four start fields are typed per project before Run (D-59)."""
     call, _ = api
-    assert call("POST", "/api/runs", {"input_type": "offline", "offline_scenario": "nope"})[0] == 400
-    assert call("POST", "/api/runs", {"input_type": "coordinates", "lat": "", "lon": "1"})[0] == 400
-    assert call("POST", "/api/runs", {"input_type": "offline", "offline_scenario": "supported",
-                                      "operator": {"options": [{"key": "a b", "value": "1"}]}})[0] == 400
+    for payload in ({"input_type": "offline", "offline_scenario": "supported"},
+                    {"input_type": "coordinates", "lat": "41.4", "lon": "-71.7", "operator": {"road_type": "RURAL"}},
+                    {"input_type": "kml", "kml": {"filename": "a.kml", "content_base64": base64.b64encode(b"<kml/>").decode()}},
+                    {"input_type": "offline", "offline_scenario": "nope"}):
+        code, body = call("POST", "/api/runs", payload)
+        assert code == 400 and b"POST /api/projects" in body
+    assert call("GET", "/api/runs") == (200, b"[]")
+
+
+def test_bad_run_payloads_are_rejected_before_running(api):
+    """The internal run creation (used for resume and tests) still validates its payload."""
+    for payload in ({"input_type": "offline", "offline_scenario": "nope"}, {"input_type": "coordinates", "lat": "", "lon": "1"},
+                    {"input_type": "offline", "offline_scenario": "supported", "operator": {"options": [{"key": "a b", "value": "1"}]}}):
+        with pytest.raises(store.BadRequest): store.create_run(payload, set(offline.SCENARIOS))
 
 
 def test_cost_is_estimated_only_from_configured_prices():
@@ -187,7 +199,8 @@ def test_anthropic_usage_recorder_observes_only(tmp_path, monkeypatch):
     monkeypatch.setattr(Messages, "create", lambda self, **k: sentinel)
     orig = anthropic.Anthropic
     try:
-        rec = runner.Recorder(str(tmp_path))
+        monkeypatch.setenv("TCP_UI_RUNS_DIR", str(tmp_path))
+        rec = runner.Recorder("20261029-120000-abcdef")
         runner._install_anthropic_usage(rec)
         client = anthropic.Anthropic(api_key="test")
         assert client.messages.create(model="claude-test", max_tokens=1, messages=[]) is sentinel  # unchanged

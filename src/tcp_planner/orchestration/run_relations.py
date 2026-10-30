@@ -7,9 +7,10 @@ all reusing the same source imagery and OSM evidence.
 """
 import json, os, shutil
 
-from tcp_planner.storage import run_store as store
+from tcp_planner.storage import run_store as store, run_records as records, stores, uploads
 from tcp_planner.storage.evidence_store import (ANALYSIS_SPANS, KIND_STAGE, load_manifest, resolve, verify_file,
-                                                sha256_file)
+                                                sha256_file, read_bytes)
+from tcp_planner.storage.interfaces import StorageError
 
 STAGE_ORDER = [s[0] for s in store.STAGES]  # input .. render
 REUSE_ORDER = ["map", "osm", "ai"]
@@ -46,7 +47,7 @@ LEGACY = "LEGACY EVIDENCE"
 def evidence_compat(run_id, state=None):
     """Whether a run's imagery evidence may be reused: OK, LEGACY (pre-scale-fix / pre-evidence Azure imagery) or NONE."""
     from tcp_planner.imagery.map_provider import AzureMapsProvider
-    maps = [e for e in load_manifest(store.run_path(run_id))
+    maps = [e for e in load_manifest(run_id)
             if e.get("kind") == "map" and e.get("producer_span") == ANALYSIS_SPANS["map"]]
     for e in maps:
         sig = e.get("signature") or {}
@@ -69,16 +70,16 @@ def _analysis_artifact(parent_id, kind):
     if kind == "map":
         compat = evidence_compat(parent_id)
         if compat["status"] == "LEGACY": return None, compat["reason"]
-    cands = [e for e in load_manifest(rdir) if e.get("kind") == kind and e.get("producer_span") == ANALYSIS_SPANS[kind]]
+    cands = [e for e in load_manifest(parent_id) if e.get("kind") == kind and e.get("producer_span") == ANALYSIS_SPANS[kind]]
     if not cands: return None, f"source run has no saved {kind} artifact from {STAGE_TITLE[KIND_STAGE[kind]]}"
-    r = resolve(store.runs_dir(), parent_id, cands[-1])
+    r = resolve(parent_id, cands[-1])
     problem = verify_file(r)
     if problem: return None, problem
     if kind == "ai":
         try:
-            with open(r["path"], encoding="utf-8") as f:
-                if json.load(f).get("status") != "OK": return None, "source AI result is a failure, nothing to reuse"
-        except (OSError, ValueError):
+            if json.loads(read_bytes(r).decode("utf-8")).get("status") != "OK":
+                return None, "source AI result is a failure, nothing to reuse"
+        except (StorageError, ValueError):
             return None, "source AI artifact cannot be read"
     return r, None
 
@@ -87,8 +88,8 @@ def _dependency_changes(parent_id, parent_state):
     """Inputs of the map/OSM requests that changed since the parent ran (conservative prediction)."""
     from tcp_planner.orchestration.pipeline import CONFIG_PATH
     from tcp_planner.rules.rule_pack_loader import load_rule_pack
-    ui = store.run_path(parent_id, "ui"); changes = []
-    deps = store._read_json(os.path.join(ui, "deps.json")) or {}
+    changes = []
+    deps = records.read(parent_id, "deps") or {}
     if deps.get("config_sha256") and deps["config_sha256"] != sha256_file(CONFIG_PATH):
         changes.append("implementation config (poc_config.json) changed")
     pack = parent_state.get("rule_pack") or {}
@@ -107,7 +108,9 @@ def _dependency_changes(parent_id, parent_state):
 
 def _input_file(parent_id, parent_state):
     r = parent_state.get("request") or {}
-    return r.get("kml_saved_path") if r.get("input_type") == "kml" else None
+    saved = (r.get("kml_key") or r.get("kml_saved_path")) if r.get("input_type") == "kml" else None  # kml_saved_path: runs from S2
+    if not saved: return None
+    return saved if os.path.isabs(saved) else records.resolve(saved)  # new runs hold a run-relative key (D-77)
 
 
 def resume_preview(parent_id, stage, ai_profile=None, ai_provider=None, evidence_mode="single"):
@@ -132,9 +135,9 @@ def resume_preview(parent_id, stage, ai_profile=None, ai_provider=None, evidence
                        "source_run": r["origin_run"], "artifact": r["origin_artifact_id"], "file": r["origin_file"],
                        "sha256": r["sha256"], "api_call": False})
     if usable.get("map"):  # a saved sheet aerial is reused too when the render request matches it
-        for e in load_manifest(store.run_path(parent_id)):
+        for e in load_manifest(parent_id):
             if e.get("kind") == "map" and e.get("producer_span") == "tcp.sheet.render":
-                r = resolve(store.runs_dir(), parent_id, e)
+                r = resolve(parent_id, e)
                 if verify_file(r) is None:
                     reused.append({"stage": "render", "title": "Render / Export (sheet aerial)", "kind": "map",
                                    "source_run": r["origin_run"], "artifact": r["origin_artifact_id"],
@@ -159,7 +162,7 @@ def resume_preview(parent_id, stage, ai_profile=None, ai_provider=None, evidence
             rerun.append({"stage": key, "title": STAGE_TITLE[key], "external_call": ext, "reason": reason})
     if evidence_mode == "multi" and "map" in kinds:
         kinds = kinds + ["map_view"]
-        saved = [e for e in load_manifest(store.run_path(parent_id)) if e.get("kind") == "map_view"]
+        saved = [e for e in load_manifest(parent_id) if e.get("kind") == "map_view"]
         for x in rerun:
             if x["stage"] == "vision":
                 x["external_call"] = (x["external_call"] or "") + ("; multi-resolution views reused if verified" if saved
@@ -183,24 +186,26 @@ def create_resume_run(parent_id, stage, ai_profile=None, ai_provider=None, compa
     """sme_revision (SME Review Assistant only): revision dict written create-only to input/sme_revision.json and passed
     as --sme-revision; strict_replay: every external artifact must replay from verified evidence or the run fails closed."""
     if vision_mode not in VISION_MODES: raise store.BadRequest("vision_mode must be baseline or grounded_v2")
+    if records.is_legacy(parent_id): raise records.LegacyRunReadOnly(parent_id)
     st = _parent(parent_id)
     preview = resume_preview(parent_id, stage, ai_profile, ai_provider, evidence_mode)
     if preview["legacy"] and "map" in preview["reuse_kinds"]:
         raise store.BadRequest(str(preview["legacy_reason"]) + " - not eligible for resume; re-run from Imagery "
                                "to acquire new evidence")
-    parent_req = store._read_json(store.run_path(parent_id, "ui", "request.json"))
+    parent_req = records.read(parent_id, "request")
     run_id, rdir = store.new_run_dirs()
-    out_dir = os.path.join(rdir, "output")
+    out_dir = f"{run_id}/output"  # run-relative key (D-77)
     argv, src_argv, i = [], list(parent_req["argv"]), 0
     request = json.loads(json.dumps(parent_req.get("request") or {}))
     while i < len(src_argv):
         a = src_argv[i]
         if a in ("--out", "--kml", "--ai-provider", "--sme-revision") and i + 1 < len(src_argv):
             if a == "--kml":
-                src = src_argv[i + 1]
+                src = records.resolve(src_argv[i + 1])
                 if not os.path.isfile(src): raise store.BadRequest("source input file is missing")
-                dst = os.path.join(rdir, "input", os.path.basename(src)); shutil.copyfile(src, dst)
-                argv += ["--kml", dst]; request["kml_saved_path"] = dst
+                with open(src, "rb") as f: data = f.read()
+                ref = uploads.store_upload(stores.artifacts(), run_id, request.get("kml_filename") or os.path.basename(src), data)
+                argv += ["--kml", ref.uri]; request["kml_key"] = ref.uri; request.pop("kml_saved_path", None)
             i += 2; continue
         argv.append(a); i += 1
     offline = request.get("input_type") == "offline"
@@ -209,9 +214,9 @@ def create_resume_run(parent_id, stage, ai_profile=None, ai_provider=None, compa
     if ai_provider and not offline: argv += ["--ai-provider", ai_provider]
     if sme_revision is not None:
         import json as _json
-        rev_path = os.path.join(rdir, "input", "sme_revision.json")
-        with open(rev_path, "x", encoding="utf-8") as f: _json.dump(sme_revision, f, indent=2, sort_keys=True)
-        argv += ["--sme-revision", rev_path]
+        rev = stores.artifacts().put(f"{run_id}/input/sme_revision.json",
+                                     _json.dumps(sme_revision, indent=2, sort_keys=True).encode("utf-8"), "application/json")
+        argv += ["--sme-revision", rev.uri]
         request["sme_revision"] = {k: sme_revision.get(k) for k in ("plan_version_id", "change_set_id", "content_sha256")}
     argv += ["--out", out_dir]
     request.setdefault("advanced", {})["ai_provider"] = ai_provider or request.get("advanced", {}).get("ai_provider")
@@ -228,9 +233,8 @@ def create_resume_run(parent_id, stage, ai_profile=None, ai_provider=None, compa
     if sme_revision is not None or strict_replay:
         resume.update(strict_replay=bool(strict_replay), sme_revision={k: sme_revision.get(k) for k in (
             "plan_version_id", "change_set_id", "content_sha256", "site_evidence_version")} if sme_revision else None)
-    store._write_json(os.path.join(rdir, "ui", "resume.json"), resume)
-    store._write_json(os.path.join(rdir, "ui", "request.json"),
-                      {"run_id": run_id, "created_at": store._now(), "argv": argv, "request": request})
+    records.create(run_id, "resume", resume)
+    records.create(run_id, "request", {"run_id": run_id, "created_at": store._now(), "argv": argv, "request": request})
     return run_id, rdir
 
 
@@ -255,6 +259,7 @@ def variant_label(v):
 def create_comparison(source_id, profiles, modes=("single",), variants=None):
     """Plan a comparison. Children are created by create_children() after any evidence preparation."""
     from tcp_planner.ai.foundry_provider import profile_catalog
+    if records.is_legacy(source_id): raise records.LegacyRunReadOnly(source_id)
     available = {p["name"]: p for p in profile_catalog() if p["available"]}
     modes = list(dict.fromkeys(modes or ["single"]))
     if not profiles: raise store.BadRequest("select at least one model profile")
@@ -269,8 +274,8 @@ def create_comparison(source_id, profiles, modes=("single",), variants=None):
     if preview["moved_earlier"]:
         raise store.BadRequest("source run has no reusable imagery/OSM evidence: " + str(preview["move_reason"]))
     cid, cdir = store.new_run_dirs(subdirs=("ui",))
-    store._write_json(os.path.join(cdir, "ui", "comparison.json"),
-                      {"type": "comparison", "comparison_id": cid, "source_run_id": source_id, "created_at": store._now(),
+    records.create(cid, "comparison",
+                   {"type": "comparison", "comparison_id": cid, "source_run_id": source_id, "created_at": store._now(),
                        "profiles": list(profiles), "modes": modes, "columns": columns, "children": [], "skipped": [],
                        "reused": preview["reused"], "needs_views": any(v["evidence_mode"] == "multi" for v in variants),
                        "variants": variants,
@@ -281,8 +286,8 @@ def create_comparison(source_id, profiles, modes=("single",), variants=None):
 
 def create_children(cid):
     """One resumed child run per column; multi-resolution columns only when the shared views were prepared."""
-    path = store.run_path(cid, "ui", "comparison.json"); doc = store._read_json(path)
-    prep = store._read_json(store.run_path(cid, "ui", "prep.json")) or {}
+    doc = records.read(cid, "comparison")
+    prep = records.read(cid, "prep") or {}
     children, skipped = [], []
     for col in doc["columns"]:
         multi = col["evidence_mode"] == "multi"
@@ -294,14 +299,16 @@ def create_children(cid):
                                    extra_sources=[cid] if multi else [], vision_mode=col.get("vision_mode", "baseline"),
                                    osm_claims=col.get("osm_claims", False), centerline_views=col.get("centerline_views", False))
         children.append({**col, "run_id": rid})
-    doc.update(children=children, skipped=skipped); store._write_json(path, doc)
+    doc.update(children=children, skipped=skipped); records.write(cid, "comparison", doc)
     return [c["run_id"] for c in children]
 
 
 def _ai_doc(run_id):
-    for e in reversed(load_manifest(store.run_path(run_id))):
+    for e in reversed(load_manifest(run_id)):
         if e.get("kind") == "ai" and e.get("mode") == "saved":
-            return store._read_json(store.run_path(run_id, "evidence", e["file"])), e
+            r = resolve(run_id, e)
+            try: return json.loads(read_bytes(r).decode("utf-8")), e
+            except (StorageError, ValueError, TypeError): return None, e
     return None, None
 
 
@@ -316,7 +323,7 @@ def _flatten(obj, prefix=""):
 
 def comparison_state(cid, live_ids=()):
     from tcp_planner.orchestration.pipeline import load_config
-    doc = store._read_json(store.run_path(cid, "ui", "comparison.json"))
+    doc = records.read(cid, "comparison")
     if not doc: return None
     threshold = load_config()["fusion"]["min_critical_confidence"]
     cols = []
@@ -388,7 +395,7 @@ def comparison_state(cid, live_ids=()):
         for k, v in (c["usage"] or {}).items():
             if isinstance(v, int): tokens[k] = tokens.get(k, 0) + v
     done = all(c["state"] in ("FINISHED", "INTERRUPTED") for c in cols)
-    prep = store._read_json(store.run_path(cid, "ui", "prep.json"))
+    prep = records.read(cid, "prep")
     started = bool(doc["children"]) or bool(doc.get("skipped"))
     done = done and started
     report = {**{k: doc[k] for k in ("comparison_id", "source_run_id", "created_at", "profiles", "reused")},
@@ -402,11 +409,11 @@ def comparison_state(cid, live_ids=()):
                          else "Not Available - at least one model's price is not configured or its call failed",
                          "new_map_calls": sum(x.get("requests", 1) for c in cols for x in c["new_external_calls"] if x.get("service") == "map"),
                          "new_osm_calls": sum(x.get("requests", 1) for c in cols for x in c["new_external_calls"] if x.get("service") == "osm"),
-                         "evidence_prep_map_requests": sum(x.get("requests", 1) for x in (store._read_json(store.run_path(cid, "ui", "calls.json")) or [])),
+                         "evidence_prep_map_requests": sum(x.get("requests", 1) for x in (records.read(cid, "calls") or [])),
                          "analysis_map_calls_in_children": sum(x.get("requests", 1) for c in cols for x in c["new_external_calls"]
                                                                if x.get("service") == "map" and x.get("span") == "tcp.map.retrieve")},
               "note": "Factual per-model metrics; no model is ranked or selected."}
-    if done: store._write_json(store.run_path(cid, "ui", "report.json"), report)
+    if done and not records.is_legacy(cid): records.write(cid, "report", report)
     return report
 
 
@@ -415,7 +422,7 @@ def list_comparisons():
     try: ids = sorted((n for n in os.listdir(store.runs_dir()) if store.RUN_ID_RE.match(n)), reverse=True)
     except OSError: return out
     for i in ids:
-        d = store._read_json(store.run_path(i, "ui", "comparison.json"))
+        d = records.read(i, "comparison")
         if d: out.append({"comparison_id": i, "source_run_id": d["source_run_id"], "created_at": d["created_at"],
                           "profiles": d["profiles"], "children": d["children"]})
     return out
@@ -424,4 +431,4 @@ def list_comparisons():
 def evidence_holders(source_id):
     """Comparisons of this source whose shared views were prepared (their views may be reused by hash)."""
     return [c["comparison_id"] for c in list_comparisons() if c["source_run_id"] == source_id
-            and (store._read_json(store.run_path(c["comparison_id"], "ui", "prep.json")) or {}).get("ok")]
+            and (records.read(c["comparison_id"], "prep") or {}).get("ok")]

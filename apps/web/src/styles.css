@@ -293,3 +293,23 @@ table.cmp td.below { color: var(--red); font-weight: 650; }
 .sme-lightbox-body img.fit { max-width: 100%; max-height: calc(100vh - 70px); object-fit: contain; cursor: zoom-in; background: #fff; }
 .sme-lightbox-body img.actual { max-width: none; max-height: none; cursor: zoom-out; background: #fff; }
 .sme-resolve { margin-top: 6px; padding-top: 4px; border-top: 1px dashed #f3b4b4; color: #333; }
+
+/* ---- projects (S3) ---- */
+.pill.idle { background: #eef2f7; color: var(--muted); box-shadow: inset 0 0 0 1px var(--border); }
+.pill.badge { font-size: 10px; padding: 2px 7px; }
+table.grid { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+table.grid th, table.grid td { border-bottom: 1px solid var(--border); padding: 6px 8px; text-align: left; vertical-align: top; }
+table.grid thead th { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 650; }
+table.grid th[scope="row"] { font-weight: 600; min-width: 150px; }
+table.startgrid select, table.startgrid input { width: 100%; min-width: 96px; }
+table.startgrid input[inputmode="numeric"] { min-width: 70px; }
+table.startgrid tr.projrow { background: var(--blue-soft); }
+.err { color: var(--red); }
+.warnText { color: var(--amber); }
+ul.reasons { margin: 4px 0 0; padding-left: 18px; }
+ul.reasons li { margin: 2px 0; }
+.optrow2 { display: flex; gap: 8px; align-items: center; }
+.optrow2 input { flex: 1; }
+.runbar { display: flex; gap: 10px; align-items: center; margin-top: 14px; flex-wrap: wrap; }
+.hist-sep { margin: 10px 0 4px; text-transform: uppercase; letter-spacing: 0.06em; font-size: 10.5px; }
+.hist.proj { border-left: 3px solid var(--blue-line); }

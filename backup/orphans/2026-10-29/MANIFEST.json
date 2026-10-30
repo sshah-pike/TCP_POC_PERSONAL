@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "slice": "S3",
+  "date": "2026-10-29",
+  "note": "One-off exception to 'moves only in S15', approved by the owner in S3 (Q10b). The file is ground-truth label data that was never tracked (var/ is ignored); it was moved with a plain file move, never deleted, then committed here. restore_backup.py verifies git_blob; its git mv makes the restored file tracked (git rm --cached to undo).",
+  "entries": [
+    {
+      "original_path": "var/labels/771bbc3d0913044a.json",
+      "new_path": "backup/orphans/2026-10-29/var/labels/771bbc3d0913044a.json",
+      "label": "REKEYED_LABEL",
+      "reason": "D-82: the SME lineage key is now lineage_key(project_id, zone geometry hash). The label was re-keyed by hand to 04bf2dc90e9c3cac (project PRJ-f46419bbc77c92b5, zone ZONE-c0690d642bc7); this is the pre-S3 file, unchanged.",
+      "evidence": [
+        "demo KML point -71.741541,41.4151206 equals the label's work_reference (checked before the move)",
+        "new label var/labels/04bf2dc90e9c3cac.state.json holds identical fields and a 'rekey' history entry",
+        "before and after JSON: docs/reports/S3_label_rekey.md",
+        "decision: S3 plan Q10a and Q10b, approved by the owner"
+      ],
+      "sha256": "770eae78c2dc071310a87851065f5ec564a4999490dc2fdae3a92826376bc44b",
+      "git_blob": "3040982d3fafcd08900c37bf99cea1492f088e0f",
+      "size": 7350,
+      "moved_in_commit": "447e461",
+      "commit_before_move": null,
+      "restore_command": "python scripts/restore_backup.py backup/orphans/2026-10-29 --apply --only \"var/labels/771bbc3d0913044a.json\""
+    }
+  ]
+}

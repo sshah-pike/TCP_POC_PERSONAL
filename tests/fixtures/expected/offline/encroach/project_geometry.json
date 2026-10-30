@@ -1,0 +1,14 @@
+{
+  "input_feature_count": 1,
+  "input_hash": "sha256:2ac5a76d2bf4511381534d73dd423fdf1082fc4d8cf1e50bdaeb2c8e4ca1c7f8",
+  "input_type": "COORDINATES",
+  "non_authoritative_metadata": {
+    "ignored_element_count": 0
+  },
+  "source_file": null,
+  "work_path": [],
+  "work_reference": {
+    "latitude": 33.0,
+    "longitude": -97.0
+  }
+}

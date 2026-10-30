@@ -249,6 +249,25 @@ def test_selected_by_name(env, monkeypatch):
     assert isinstance(p, FoundryVisionProvider) and p.deployment == "gpt-dep" and p.api == "openai_responses"
 
 
+def test_unset_provider_selects_foundry(env, monkeypatch):
+    """D-78: with TCP_AI_PROVIDER unset the default is Foundry; an explicit 'anthropic' still works."""
+    monkeypatch.delenv("TCP_AI_PROVIDER", raising=False)
+    assert isinstance(get_vision_provider(), FoundryVisionProvider)
+    monkeypatch.setenv("TCP_AI_PROVIDER", "anthropic")
+    assert get_vision_provider().name != "foundry"
+
+
+def test_default_foundry_not_configured_fails_clearly(env, monkeypatch):
+    from tcp_planner.contracts import ProviderError
+    monkeypatch.delenv("TCP_AI_PROVIDER", raising=False)
+    monkeypatch.delenv("TCP_FOUNDRY_API_KEY")
+    with pytest.raises(ProviderError) as e:
+        get_vision_provider()
+    assert e.value.code == "AI_CREDENTIALS_MISSING"
+    assert "TCP_AI_PROVIDER is not set" in e.value.message and "Foundry is the default" in e.value.message
+    assert "TCP_FOUNDRY_API_KEY" in e.value.message
+
+
 def to_call1_wire(obs):
     """What a compliant model returns in agent call 1 (metres, IMAGE_1 positions, extras, no osm_conflicts)."""
     mpp = 2 * offline.HALF / offline.SIZE
@@ -315,6 +334,6 @@ def test_canonical_validation_still_applies(env, monkeypatch, mutate):
 
 def test_failure_gives_review_and_no_plan(env, monkeypatch, tmp_path):
     fake_messages(monkeypatch, AResp("", stop="refusal"), {})
-    res = run(FoundryVisionProvider("claude"), tmp_path)
+    res = run(FoundryVisionProvider("claude"), tmp_path / "out")  # not tmp_path: it holds profiles.json (--out must be empty)
     assert res["decision"] == REVIEW_REQUIRED and "AI_OBSERVATION_UNAVAILABLE" in res["reason_codes"]
-    assert not (tmp_path / "plan.json").exists()
+    assert not (tmp_path / "out" / "plan.json").exists()

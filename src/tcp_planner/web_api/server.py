@@ -7,7 +7,8 @@ process loads .env itself exactly as the CLI does.
 
 GET  /api/meta                          form choices (from the rule pack, config and offline module)
 GET  /api/runs                          run history
-POST /api/runs                          start a run (JSON body)
+POST /api/runs                          refused (400): only a project starts runs
+GET|POST /api/projects[/...]            projects: one run per zone (tcp_planner.web_api.project_routes)
 POST /api/runs/<id>/stop                stop a running run (ends its runner process; recorded as STOPPED)
 GET  /api/runs/<id>                     run state (stages, decision, outputs, cost)
 GET  /api/runs/<id>/files/<name>        a file the pipeline wrote to runs/<id>/output/
@@ -18,7 +19,8 @@ import argparse, json, mimetypes, os, shutil, subprocess, sys, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit, parse_qs, unquote
 
-from tcp_planner.storage import run_store as store
+from tcp_planner.storage import run_store as store, run_records as records, stores
+from tcp_planner.storage.interfaces import ArtifactMissing
 
 WEB_DIST = os.path.join(store.PROJECT_ROOT, "apps", "web", "dist")
 MAX_BODY = 10 * 1024 * 1024
@@ -38,12 +40,35 @@ def live_ids():
     with LIVE_LOCK: return set(LIVE)
 
 
+class _ServerLauncher:
+    """What the project orchestrator needs from this server: start a run's worker, and which runs are alive."""
+    def launch(self, run_id): return launch(run_id)
+
+    def live_ids(self): return live_ids()
+
+
+_RUNNER = None
+
+
+def project_runner():
+    """The one project orchestrator of this server process (S3 Q5-A: its threads run here)."""
+    global _RUNNER
+    with LIVE_LOCK:
+        if _RUNNER is None:
+            from tcp_planner.orchestration.project_runner import ProjectRunner
+            _RUNNER = ProjectRunner(_ServerLauncher())
+    return _RUNNER
+
+
+def _check_ai_profile(adv):
+    _ai_choice({"ai_profile": adv["ai_profile"]})
+
+
 def start_run(payload):
-    from tcp_planner.orchestration import offline_scenarios as offline
-    adv = payload.get("advanced") or {} if isinstance(payload, dict) else {}
-    if adv.get("ai_profile"): _ai_choice({"ai_profile": adv["ai_profile"]})  # must be a configured, available profile
-    run_id, rdir = store.create_run(payload, set(offline.SCENARIOS) | set(offline.ALIASES))
-    return launch(run_id, rdir)
+    """Only a project starts runs (S3, D-59): road type, speed, traffic volume and lane closure are typed per project and
+    Run stays closed until every one is. Resume and comparison runs start from an existing run, not from here."""
+    raise store.BadRequest("runs start from a project: POST /api/projects with the KML, point or offline scenario, type the "
+                           "four start fields with POST /api/projects/<id>/inputs, then POST /api/projects/<id>/run")
 
 
 def _ai_choice(payload):
@@ -66,7 +91,7 @@ def start_resume(parent_id, payload):
                                                vision_mode=str(payload.get("vision_mode") or "baseline"),
                                                osm_claims=payload.get("osm_claims") is True,
                                                centerline_views=payload.get("centerline_views") is True)
-    return launch(run_id, rdir)
+    return launch(run_id)
 
 
 def start_comparison(payload):
@@ -82,14 +107,14 @@ def start_comparison(payload):
                                       [str(m) for m in modes], variants)
 
     def run():  # shared multi-resolution views first (one acquisition), then every model as its own child run
-        doc = store._read_json(store.run_path(cid, "ui", "comparison.json"))
+        doc = records.read(cid, "comparison")
         if doc.get("needs_views"):
             with open(store.run_path(cid, "ui", "prep.log"), "w", encoding="utf-8") as log:
                 subprocess.call([sys.executable, "-m", "tcp_planner.orchestration.run_worker", "--prepare-views",
-                                 store.run_path(cid)],
+                                 cid],  # the worker takes a run id and finds the folder itself
                                 cwd=store.PROJECT_ROOT, stdout=log, stderr=subprocess.STDOUT,
                                 env=dict(os.environ, PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8"))
-        for rid in relations.create_children(cid): launch(rid, store.run_path(rid))
+        for rid in relations.create_children(cid): launch(rid)
 
     threading.Thread(target=run, daemon=True).start()
     return cid
@@ -107,23 +132,27 @@ def stop_run(run_id):
     return {"run_id": run_id, "stopping": True}
 
 
-def launch(run_id, rdir):
-    log = open(os.path.join(rdir, "ui", "stdout.log"), "w", encoding="utf-8")
+def launch(run_id):
+    """Start the worker for a run by its id; the worker resolves the run folder under the runs folder itself (D-77)."""
+    log = open(os.path.join(store.run_path(run_id, "ui"), "stdout.log"), "w", encoding="utf-8")
     env = dict(os.environ, PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8")
-    proc = subprocess.Popen([sys.executable, "-m", "tcp_planner.orchestration.run_worker", rdir],
+    proc = subprocess.Popen([sys.executable, "-m", "tcp_planner.orchestration.run_worker", run_id],
                             cwd=store.PROJECT_ROOT, stdout=log, stderr=subprocess.STDOUT, env=env)
     with LIVE_LOCK: LIVE[run_id] = proc
 
     def reap():
         proc.wait(); log.close()
-        pj = os.path.join(rdir, "ui", "process.json")
         with LIVE_LOCK: stopped = run_id in STOPPED
-        if stopped or (store._read_json(pj) or {}).get("state") != "FINISHED":  # runner died before recording its end
-            prev = store._read_json(pj) or {}
-            err = ({"error_code": store.RUN_STOPPED, "message": "run stopped by the user"} if stopped else
-                   {"error_code": "RUNNER_TERMINATED", "message": f"runner process exited with code {proc.returncode}"})
-            store._write_json(pj, {**prev, "state": "FINISHED", "exit_code": proc.returncode,
-                                   "ended_at": store._now(), "unhandled_error": err})
+        err = ({"error_code": store.RUN_STOPPED, "message": "run stopped by the user"} if stopped else
+               {"error_code": "RUNNER_TERMINATED", "message": f"runner process exited with code {proc.returncode}"})
+
+        def finish(prev):  # runner died before recording its end (or the user stopped it): record the end, once
+            prev = prev or {}
+            if not stopped and prev.get("state") == "FINISHED": return None
+            return {**prev, "state": "FINISHED", "exit_code": proc.returncode, "ended_at": store._now(),
+                    "unhandled_error": err}
+        try: records.update(run_id, "process", finish)  # compare-and-set: never overwrites the runner's own record
+        except Exception as e: print(f"[server] could not record the end of run {run_id}: {type(e).__name__}: {e}", flush=True)
         with LIVE_LOCK: LIVE.pop(run_id, None); STOPPED.discard(run_id)
 
     threading.Thread(target=reap, daemon=True).start()
@@ -136,7 +165,9 @@ def meta():
     from tcp_planner.sheets.dwt_renderer import MODES
     from tcp_planner.contracts import APP_VERSION
     from tcp_planner.rules.rule_pack_loader import load_rule_pack
+    from tcp_planner.orchestration import projects as P
     out = {"app_version": APP_VERSION, "offline_scenarios": list(offline.SCENARIOS), "offline_aliases": offline.ALIASES,
+           "start_fields": list(P.START_FIELDS), "traffic_volumes": list(P.TRAFFIC_VOLUMES), "ta_choices": list(P.TA_CHOICES),
            "map_providers": list(store.UI_MAP_PROVIDERS), "ai_providers": list(store.UI_AI_PROVIDERS),
            "dwt_modes": list(MODES), "dwt_config_present": os.path.isfile(DWT_CONFIG_PATH),
            "road_types": [], "supported_road_types": [], "rule_pack": None, "rule_pack_error": None,
@@ -147,7 +178,9 @@ def meta():
         out["foundry_profiles"] = profile_catalog()
     except Exception as e:
         out["foundry_profiles_error"] = type(e).__name__
-    try: out["supported_road_types"] = load_config()["supported_road_types"]
+    try:
+        cfg = load_config(); out["supported_road_types"] = cfg["supported_road_types"]
+        out["max_zones"] = cfg["project"]["max_zones"]; out["max_parallel_zone_runs"] = cfg["project"]["max_parallel_zone_runs"]
     except Exception as e: out["config_error"] = getattr(e, "code", type(e).__name__)
     try:
         pack = load_rule_pack()
@@ -178,16 +211,24 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.end_headers(); self.wfile.write(body)
 
-    def _file(self, path, download=False):
-        ext = os.path.splitext(path)[1].lower()
-        ctype = CONTENT_TYPES.get(ext) or mimetypes.guess_type(path)[0] or "application/octet-stream"
+    def _send(self, name, data, download=False):
+        ext = os.path.splitext(name)[1].lower()
+        ctype = CONTENT_TYPES.get(ext) or mimetypes.guess_type(name)[0] or "application/octet-stream"
         self.send_response(200)
-        self.send_header("Content-Type", ctype); self.send_header("Content-Length", str(os.path.getsize(path)))
+        self.send_header("Content-Type", ctype); self.send_header("Content-Length", str(len(data)))
         self.send_header("Cache-Control", "no-store"); self.send_header("X-Content-Type-Options", "nosniff")
         if download or ext in ATTACHMENT_EXT:
-            self.send_header("Content-Disposition", f'attachment; filename="{os.path.basename(path)}"')
+            self.send_header("Content-Disposition", f'attachment; filename="{os.path.basename(name)}"')
         self.end_headers()
-        with open(path, "rb") as f: shutil.copyfileobj(f, self.wfile)
+        self.wfile.write(data)
+
+    def _file(self, path, download=False):
+        with open(path, "rb") as f: data = f.read()
+        return self._send(path, data, download)
+
+    def _artifact(self, uri, download=False):
+        """Serve a stored artifact by key, hash-free (the manifest check happens in the caller)."""
+        return self._send(uri, stores.artifacts().get(uri), download)
 
     # ---------------- routes ----------------
     def do_GET(self):
@@ -195,6 +236,8 @@ class Handler(BaseHTTPRequestHandler):
         url = urlsplit(self.path); parts = [unquote(p) for p in url.path.split("/") if p]
         if parts[:2] == ["api", "assistant"]:
             return self._assistant("GET", parts[2:], url.query, None)
+        if parts[:2] == ["api", "projects"]:
+            return self._project("GET", parts[2:], None)
         try:
             if parts[:1] == ["api"]:
                 if parts == ["api", "meta"]: return self._json(meta())
@@ -228,12 +271,12 @@ class Handler(BaseHTTPRequestHandler):
                     rep = relations.comparison_state(parts[2], live_ids())
                     return self._json(rep) if rep else self._json({"error": "comparison not found"}, 404)
                 if len(parts) == 5 and parts[1] == "runs" and parts[3] == "evidence":
-                    from tcp_planner.storage.evidence_store import load_manifest
-                    name = parts[4]; rdir = store.run_path(parts[2])
-                    saved = {e["file"] for e in load_manifest(rdir) if e.get("mode") == "saved"}
-                    path = os.path.join(rdir, "evidence", name)
-                    if name in saved and os.path.isfile(path):  # only files this run's manifest lists
-                        return self._file(path, "download" in parse_qs(url.query))
+                    from tcp_planner.storage.evidence_store import load_manifest, evidence_key
+                    name = parts[4]; store.run_path(parts[2])  # validates the run id
+                    saved = {e["file"] for e in load_manifest(parts[2]) if e.get("mode") == "saved"}
+                    if name in saved:  # only files this run's manifest lists
+                        try: return self._artifact(evidence_key(parts[2], name), "download" in parse_qs(url.query))
+                        except ArtifactMissing: pass
                     return self._json({"error": "file not found"}, 404)
                 if len(parts) == 5 and parts[1] == "runs" and parts[3] == "files":
                     out_dir = store.run_path(parts[2], "output"); name = parts[4]
@@ -262,6 +305,15 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"error": "invalid JSON"}, 400)
             if not isinstance(payload, dict): return self._json({"error": "JSON object expected"}, 400)
             return self._assistant("POST", parts[2:], urlsplit(self.path).query, payload)
+        if parts[:2] == ["api", "projects"]:
+            if not (self.headers.get("Content-Type") or "").startswith("application/json"):
+                return self._json({"error": "Content-Type must be application/json"}, 415)
+            n = int(self.headers.get("Content-Length") or 0)
+            if n > MAX_BODY: return self._json({"error": "request body too large"}, 413)
+            try: payload = json.loads(self.rfile.read(n).decode("utf-8")) if n else {}
+            except (ValueError, UnicodeDecodeError): return self._json({"error": "invalid JSON"}, 400)
+            if not isinstance(payload, dict): return self._json({"error": "JSON object expected"}, 400)
+            return self._project("POST", parts[2:], payload)
         route =("run" if path == "/api/runs" else "comparison" if path == "/api/comparisons"
                  else "stop" if len(parts) == 4 and parts[:2] == ["api", "runs"] and parts[3] == "stop"
                  else "resume" if len(parts) == 4 and parts[:2] == ["api", "runs"] and parts[3] == "resume"
@@ -288,8 +340,15 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"run_id": start_run(payload)}, 201)
         except (ValueError, UnicodeDecodeError):
             return self._json({"error": "invalid JSON"}, 400)
+        except records.LegacyRunReadOnly as e:
+            return self._json({"error": str(e), "error_code": e.code}, 409)
         except store.BadRequest as e:
             return self._json({"error": str(e)}, 400)
+
+    def _project(self, method, parts, payload):
+        from tcp_planner.web_api import project_routes
+        status, body = project_routes.dispatch(method, parts, payload, project_runner(), check_ai=_check_ai_profile)
+        return self._json(body, status)
 
     def _assistant(self, method, parts, query, payload):
         """SME Review Assistant routes (tcp_planner.review.assistant.routes); unavailable unless TCP_SME_ASSISTANT_ENABLED=true."""

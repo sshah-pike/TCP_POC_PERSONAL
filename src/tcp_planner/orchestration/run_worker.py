@@ -1,17 +1,19 @@
-"""Execute ONE pipeline run for the UI, in its own process:   python -m tcp_planner.orchestration.run_worker <run_dir>
+"""Execute ONE pipeline run for the UI, in its own process:   python -m tcp_planner.orchestration.run_worker <run_id>
 
 The run is the unmodified CLI entry point `tcp_planner.orchestration.pipeline.main(argv)` with the argv stored in
-<run_dir>/ui/request.json, so argument handling, .env loading, TLS setup, offline scenarios, outputs
+the run's request record (ui/request, see storage/run_records.py), so argument handling, .env loading, TLS setup, offline scenarios, outputs
 and exit codes are exactly those of `python -m tcp_planner.cli ...`.
 
 Observation only (installed in this child process, nothing in tcp_planner is edited):
-  - Telemetry subclass: the existing spans, additionally streamed to ui/events.jsonl as they start/end
+  - Telemetry subclass: the existing spans, additionally streamed to the run's event stream as they start/end
   - run_pipeline / load_rule_pack wrappers: record the returned result / rule-pack identity, return them unchanged
   - Anthropic client subclass: records response.usage and response.model of each Messages call
   - map provider / OSM fetch wrappers: on failure record a sanitized diagnostic, then re-raise the SAME
     exception unchanged (the pipeline still decides MAP_REQUEST_FAILED -> REVIEW_REQUIRED itself)
   - TLS: the CLI's own app.use_os_trust_store() runs first; the trust store actually in effect is recorded
-Every recorder swallows its own errors, so observation can never alter a decision or an output.
+A recorder write or event that fails never alters a decision or an output: the failure is printed once per distinct
+error to stdout.log (nothing is silently dropped) and the run goes on. Only the final process record is different: it is
+retried and, if it still fails, raises, so a run never ends looking as if it were still running.
 """
 import contextlib, datetime, io, json, os, sys, threading, time, traceback
 
@@ -20,45 +22,95 @@ def now_iso():
     return datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="milliseconds")
 
 
-class Recorder:
-    def __init__(self, ui_dir):
-        self.ui = ui_dir; self.lock = threading.Lock(); self.usage = []; self.diagnostics = []
-        self.open_spans = []  # names of telemetry spans currently running (innermost last)
+class RecorderWriteError(Exception):
+    pass
 
-    def event(self, **ev):
+
+def _plain(obj):
+    """obj as plain JSON data (what the former json.dump(default=str) wrote): unknown types as text, tuples as lists,
+    NaN and Infinity as text."""
+    return json.loads(json.dumps(obj, default=str, sort_keys=True), parse_constant=str)
+
+
+class Recorder:
+    """Writes the run's UI records and events through run_records (state records in the run's own folder)."""
+
+    def __init__(self, run_id):
+        self.run_id = run_id; self.lock = threading.Lock(); self.usage = []; self.diagnostics = []
+        self.open_spans = []  # names of telemetry spans currently running (innermost last)
+        self._reported = set()
+
+    def _fail(self, what, error):
+        """One line per distinct error per run, to stdout (= stdout.log)."""
+        from tcp_planner.audit.provider_diagnostics import sanitize
+        text = sanitize(f"{type(error).__name__}: {error}")
+        if (what, text) in self._reported: return
+        self._reported.add((what, text))
+        print(f"[recorder] {what} failed: {text}", flush=True)
+
+    def note(self, what, error):
+        """For an observer that could not record something: reported once per distinct error, the run goes on."""
+        self._fail(what, error)
+
+    def event(self, durable=False, **ev):
+        """durable=True for state-changing events (fsynced); progress events are flushed only."""
+        from tcp_planner.storage import run_records
         try:
             ev["t"] = now_iso()
-            line = json.dumps(ev, default=str, sort_keys=True)
-            with self.lock, open(os.path.join(self.ui, "events.jsonl"), "a", encoding="utf-8") as f:
-                f.write(line + "\n")
-        except Exception:
-            pass
+            with self.lock: run_records.append_event(self.run_id, _plain(ev), durable=durable)
+        except Exception as e:
+            self._fail("event " + str(ev.get("event")), e)
+
+    def _put(self, name, obj):
+        from tcp_planner.storage import run_records
+        with self.lock: run_records.write(self.run_id, name, _plain(obj))
 
     def write(self, name, obj):
         try:
-            path = os.path.join(self.ui, name); tmp = path + ".tmp"
-            with self.lock:
-                with open(tmp, "w", encoding="utf-8") as f: json.dump(obj, f, indent=2, default=str, sort_keys=True)
-                os.replace(tmp, path)
-        except Exception:
-            pass
+            self._put(name, obj)
+            return True
+        except Exception as e:
+            self._fail("write " + name, e)
+            return False
+
+    def write_final(self, name, obj, attempts=3):
+        """The record that ends the run: retried, and raised if it still fails."""
+        last = None
+        for i in range(attempts):
+            try:
+                self._put(name, obj)
+                return
+            except Exception as e:
+                last = e; self._fail("write " + name, e); time.sleep(0.2 * (i + 1))
+        raise RecorderWriteError(f"could not write the {name} record after {attempts} tries: {last}") from last
 
     def add_usage(self, item):
-        self.usage.append(item); self.write("usage.json", self.usage)
+        self.usage.append(item); self.write("usage", self.usage)
 
     def add_diagnostic(self, item):
         item["span"] = self.span()
-        self.diagnostics.append(item); self.write("diagnostics.json", self.diagnostics)
+        self.diagnostics.append(item); self.write("diagnostics", self.diagnostics)
 
     def add_call(self, item):
         """A provider call this run actually made (reused artifacts are not calls)."""
         item["span"] = self.span()
-        self.calls = getattr(self, "calls", []); self.calls.append(item); self.write("calls.json", self.calls)
+        self.calls = getattr(self, "calls", []); self.calls.append(item); self.write("calls", self.calls)
 
     def span(self):
         """Innermost open pipeline-stage span. The agent's step spans (tcp.agent.*) run inside tcp.vision.analyze;
         evidence, calls and diagnostics belong to the stage, so they are skipped here."""
         return next((s for s in reversed(self.open_spans) if not s.startswith("tcp.agent.")), None)
+
+
+def _result_record(res, run_id):
+    """The pipeline result as the run's result record: no absolute path (D-77). out_dir becomes the run-relative key."""
+    rec = dict(res)
+    if "out_dir" in rec: rec["out_key"] = f"{run_id}/output"; del rec["out_dir"]
+    refs = rec.pop("output_refs", None)
+    if refs is not None:  # the output index: {name, uri (run-relative key), sha256, size, media_type} per output file
+        rec["output_index"] = [{"name": x["name"], "uri": f"{run_id}/output/{x['uri']}", "sha256": x["sha256"],
+                                "size": x["size"], "media_type": x["media_type"]} for x in refs]
+    return rec
 
 
 def install_observers(rec, run=None):
@@ -101,7 +153,8 @@ def install_observers(rec, run=None):
             if vp is not None and not isinstance(vp, (Exception, EvidenceVisionProvider)):
                 kw["vision_provider"] = EvidenceVisionProvider(vp, ev)
         res = orig_run(**kw)
-        rec.write("result.json", res)
+        rec.write("result", _result_record(res, rec.run_id))
+        rec.event(event="run_result", durable=True)
         return res
 
     app.run_pipeline = observed_run_pipeline
@@ -111,11 +164,11 @@ def install_observers(rec, run=None):
     def observed_load_rule_pack(*a, **k):
         pack = orig_load(*a, **k)
         try:
-            rec.write("rule_pack.json", {"id": pack.id, "version": pack.version, "status": pack.status,
+            rec.write("rule_pack", {"id": pack.id, "version": pack.version, "status": pack.status,
                                          "hash": pack.hash, "selected_ta": pack.selected_ta(),
                                          "file": os.path.basename(pack.path)})
-        except Exception:
-            pass
+        except Exception as e:
+            rec.note("rule pack record", e)
         return pack
 
     app.load_rule_pack = observed_load_rule_pack
@@ -129,11 +182,11 @@ def install_observers(rec, run=None):
         try:
             import ssl
             mod = ssl.SSLContext.__module__
-            rec.write("tls.json", {"ssl_context": f"{mod}.SSLContext",
+            rec.write("tls", {"ssl_context": f"{mod}.SSLContext",
                                    "trust_store": "WINDOWS_SYSTEM_STORE (truststore)" if mod.startswith("truststore")
                                    else "PYTHON_DEFAULT (truststore not active)"})
-        except Exception:
-            pass
+        except Exception as e:
+            rec.note("tls record", e)
         _install_anthropic_usage(rec)
 
     app.use_os_trust_store = trust_then_observe
@@ -154,8 +207,8 @@ def _record(rec, error, provider, t0):
     try:
         from tcp_planner.audit.provider_diagnostics import describe
         rec.add_diagnostic(describe(error, provider, round((time.perf_counter() - t0) * 1000, 1)))
-    except Exception:
-        pass
+    except Exception as e:
+        rec.note("provider diagnostic record", e)
 
 
 class _Evidence:
@@ -174,7 +227,7 @@ class _Evidence:
         self._osm_geo = None
         if run:
             from tcp_planner.storage.evidence_store import EvidenceStore
-            self.store = EvidenceStore(run["run_dir"], run["run_id"], rec.event)
+            self.store = EvidenceStore(run["run_id"], rec.event)
             self.replay = run.get("replay")
 
     def views(self, context):
@@ -200,7 +253,7 @@ class _Evidence:
             found = self.try_reuse(V.VIEW_KIND, sig) if self.store else None
             if found is not None:
                 try:
-                    with Image.open(found["path"]) as im: img = im.convert("RGB")
+                    with Image.open(io.BytesIO(E.read_bytes(found))) as im: img = im.convert("RGB")
                     if E.pixel_hash(img) != found["metadata"].get("pixel_sha256"): raise ValueError("pixel hash mismatch")
                     self.accept(found)
                     out.append({**spec, "image": img, "meta": found["metadata"]["meta"]}); continue
@@ -322,7 +375,7 @@ class EvidenceMapProvider:
         if found is not None:
             try:
                 from PIL import Image
-                with Image.open(found["path"]) as im: img = im.convert("RGB")
+                with Image.open(io.BytesIO(E.read_bytes(found))) as im: img = im.convert("RGB")
                 meta = found["metadata"]["meta"]
                 if img.size != (int(size_px), int(size_px)) or any(k not in meta for k in E.MAP_META_REQUIRED) \
                         or E.pixel_hash(img) != found["metadata"].get("pixel_sha256"):
@@ -364,7 +417,7 @@ class EvidenceMapProvider:
         if found is not None:
             try:
                 from PIL import Image
-                with Image.open(found["path"]) as im: img = im.convert("RGB")
+                with Image.open(io.BytesIO(E.read_bytes(found))) as im: img = im.convert("RGB")
                 if E.pixel_hash(img) != found["metadata"].get("pixel_sha256"): raise ValueError("pixel hash mismatch")
                 ev.accept(found); self.last_reused = True
                 return img, dict(found["metadata"]["meta"])
@@ -400,7 +453,7 @@ class EvidenceOsmSource:
         found = ev.try_reuse("osm", sig) if sig else None
         if found is not None:
             try:
-                with open(found["path"], encoding="utf-8") as f: elements = json.load(f)
+                elements = json.loads(E.read_bytes(found).decode("utf-8"))
                 if not isinstance(elements, list): raise ValueError("not a list of OSM elements")
                 ev.accept(found); ev.osm_elements = elements
                 return elements
@@ -464,7 +517,7 @@ class EvidenceVisionProvider:
         found = ev.try_reuse("ai", sig) if sig else None
         if found is not None:
             try:
-                with open(found["path"], encoding="utf-8") as f: doc = json.load(f)
+                doc = json.loads(E.read_bytes(found).decode("utf-8"))
                 if doc.get("status") != "OK": raise ValueError("saved AI result is a failure")
                 result = doc["result"]; validate_observation(result["observation"])
                 ev.accept(found)
@@ -512,7 +565,8 @@ class EvidenceVisionProvider:
 def _install_anthropic_usage(rec):
     try:
         import anthropic
-    except Exception:
+    except Exception as e:
+        rec.note("usage recording (anthropic SDK)", e)
         return
     def wrap(create, endpoint, provider):
         def observed_create(*a, **k):
@@ -531,8 +585,8 @@ def _install_anthropic_usage(rec):
                                "stop_reason": getattr(resp, "stop_reason", None),
                                "usage": u.model_dump(mode="json") if u is not None else None,
                                "duration_ms": round((time.perf_counter() - t0) * 1000, 1)})
-            except Exception:
-                pass
+            except Exception as e:
+                rec.note("usage record", e)
             return resp
         return observed_create
 
@@ -543,15 +597,15 @@ def _install_anthropic_usage(rec):
                 try:
                     self.messages.create = wrap(self.messages.create, "messages", provider)
                     self.beta.messages.create = wrap(self.beta.messages.create, "beta.messages", provider)
-                except Exception:
-                    pass
+                except Exception as e:
+                    rec.note("usage recording (client wrap)", e)
         return UsageRecording
 
     anthropic.Anthropic = recording(anthropic.Anthropic, "anthropic")
     # Foundry usage is recorded from the provider result (EvidenceVisionProvider), not by wrapping its SDK client.
 
 
-def _run_context(run_dir, req, rec):
+def _run_context(run_dir, req, rec):  # run_dir is only kept as a label of the context; records are read by run_id
     """Evidence context for this run; resumed runs (ui/resume.json) also get a verified replay source."""
     from tcp_planner.storage.evidence_store import ReplaySource, sha256_file
     adv = (req.get("request") or {}).get("advanced") or {}
@@ -562,13 +616,13 @@ def _run_context(run_dir, req, rec):
     if adv.get("ai_profile"): os.environ["TCP_FOUNDRY_PROFILE"] = adv["ai_profile"]
     try:
         from tcp_planner.orchestration.pipeline import CONFIG_PATH
-        rec.write("deps.json", {"config_sha256": sha256_file(CONFIG_PATH)})
-    except Exception:
-        pass
-    resume_path = os.path.join(run_dir, "ui", "resume.json")
-    if os.path.isfile(resume_path):
-        with open(resume_path, encoding="utf-8") as f: resume = json.load(f)
-        ctx["replay"] = ReplaySource(os.path.dirname(run_dir), resume["parent_run_id"], resume.get("reuse_kinds", []),
+        rec.write("deps", {"config_sha256": sha256_file(CONFIG_PATH)})
+    except Exception as e:
+        rec.note("deps record", e)
+    from tcp_planner.storage import run_records
+    resume = run_records.read(ctx["run_id"], "resume")
+    if resume:
+        ctx["replay"] = ReplaySource(resume["parent_run_id"], resume.get("reuse_kinds", []),
                                      resume.get("extra_sources", []))
         ctx["ai_provider"] = resume.get("ai_provider")
         ctx["evidence_mode"] = resume.get("evidence_mode") or ctx["evidence_mode"]
@@ -579,7 +633,7 @@ def _run_context(run_dir, req, rec):
     return ctx
 
 
-def prepare_views(comparison_dir):
+def prepare_views(comparison_id):
     """Acquire the fixed multi-resolution view set ONCE for a comparison, before any model runs, so every
     multi-resolution child reuses identical images. Uses the source run's verified analysis imagery request and
     OSM evidence (no new analysis-imagery or OSM call). Same .env / TLS initialisation as the CLI."""
@@ -589,29 +643,29 @@ def prepare_views(comparison_dir):
     from tcp_planner.site_model.fusion import reference_bearing
     from tcp_planner.storage import evidence_store as E
     from tcp_planner.audit.provider_diagnostics import sanitize
-    cdir = os.path.abspath(comparison_dir); ui = os.path.join(cdir, "ui"); rec = Recorder(ui)
-    with open(os.path.join(ui, "comparison.json"), encoding="utf-8") as f: doc = json.load(f)
-    src = doc["source_run_id"]; root = os.path.dirname(cdir); src_dir = os.path.join(root, src)
-    rec.write("prep.json", {"state": "RUNNING", "started_at": now_iso()})
+    from tcp_planner.storage import run_records
+    cid = comparison_id; cdir = run_records.run_root(cid); rec = Recorder(cid)
+    doc = run_records.read(cid, "comparison")
+    src = doc["source_run_id"]; src_dir = run_records.run_root(src)
+    rec.write("prep", {"state": "RUNNING", "started_at": now_iso()})
     try:
         app.load_env_file(); app.use_os_trust_store()
 
         def analysis(kind):
-            cands = [e for e in E.load_manifest(src_dir) if e.get("kind") == kind
+            cands = [e for e in E.load_manifest(src) if e.get("kind") == kind
                      and e.get("producer_span") == E.ANALYSIS_SPANS[kind]]
-            r = E.resolve(root, src, cands[-1]) if cands else None
+            r = E.resolve(src, cands[-1]) if cands else None
             problem = E.verify_file(r) if cands else "no saved %s artifact" % kind
             if problem: raise RuntimeError("source %s evidence: %s" % (kind, problem))
             return r
         m, o = analysis("map"), analysis("osm")
         with open(os.path.join(src_dir, "output", "project_geometry.json"), encoding="utf-8") as f: pg = json.load(f)
         if E.geometry_hash(pg) != m["signature"]["geometry_hash"]: raise RuntimeError("source geometry hash mismatch")
-        with open(o["path"], encoding="utf-8") as f: elements = json.load(f)
+        elements = json.loads(E.read_bytes(o).decode("utf-8"))
         bearing = round(reference_bearing(osm_adapter.extract_evidence(elements, pg, app.load_config())), 1)
         name = m["signature"]["provider"]
         if name == "offline_synthetic":
-            with open(os.path.join(src_dir, "ui", "request.json"), encoding="utf-8") as f:
-                provider = offline.build(json.load(f)["request"]["offline_scenario"])["map_provider"]
+            provider = offline.build(run_records.read(src, "request")["request"]["offline_scenario"])["map_provider"]
         else:
             provider = app.get_map_provider(name)
         for k in ("scale_model", "api_version"):
@@ -620,37 +674,56 @@ def prepare_views(comparison_dir):
         from tcp_planner.orchestration.run_relations import evidence_holders
         others = [c for c in evidence_holders(src) if c != os.path.basename(cdir)]
         ev = _Evidence(rec, {"run_dir": cdir, "run_id": os.path.basename(cdir), "evidence_mode": "multi",
-                             "replay": E.ReplaySource(root, src, ["map_view"], others)})
+                             "replay": E.ReplaySource(src, ["map_view"], others)})
         ev.analysis = (provider, pg, m["signature"]["half_extent_m"]); ev.osm_elements = elements
         rec.open_spans.append("tcp.prep.views")
         views = []
         for centerline in doc.get("view_plans") or [False]:  # every plan a variant needs, acquired (or reused) once
             ev.centerline_views = bool(centerline); ev._osm_geo = None
             views += ev.views({"reference_bearing_deg": bearing})
-        rec.write("prep.json", {"state": "FINISHED", "ok": True, "ended_at": now_iso(), "bearing_deg": bearing,
+        rec.write("prep", {"state": "FINISHED", "ok": True, "ended_at": now_iso(), "bearing_deg": bearing,
                                 "views": [v["role"] for v in views]})
         return True
     except Exception as e:
-        rec.write("prep.json", {"state": "FINISHED", "ok": False, "ended_at": now_iso(),
+        rec.write("prep", {"state": "FINISHED", "ok": False, "ended_at": now_iso(),
                                 "error": sanitize("%s: %s" % (getattr(e, "code", type(e).__name__), getattr(e, "message", e)))})
         return False
 
 
+PATH_FLAGS = ("--out", "--kml", "--sme-revision", "--zone")
+
+
+def resolve_argv(argv):
+    """The stored argv holds run-relative keys after the path flags (D-77); give the pipeline real paths under the
+    current runs folder."""
+    from tcp_planner.storage import run_records
+    return [run_records.resolve(a) if i and argv[i - 1] in PATH_FLAGS else a for i, a in enumerate(argv)]
+
+
 def main(argv=None):
     argv = argv if argv is not None else sys.argv[1:]
-    if argv and argv[0] == "--prepare-views":
-        return 0 if prepare_views(argv[1]) else 1
-    run_dir = os.path.abspath(argv[0]); ui = os.path.join(run_dir, "ui")
-    with open(os.path.join(ui, "request.json"), encoding="utf-8") as f: req = json.load(f)
-    rec = Recorder(ui)
+    from tcp_planner.storage import run_records
+    from tcp_planner.storage.run_store import RUN_ID_RE
+    prepare = bool(argv) and argv[0] == "--prepare-views"
+    target = argv[1] if prepare and len(argv) > 1 else argv[0] if argv and not prepare else None
+    if not target or not RUN_ID_RE.match(target):  # a run id, never a folder: the folder is found under the runs folder
+        print("error: the runner takes a run id (for example 20261029-120000-abcdef), not a folder", file=sys.stderr)
+        return 2
+    if prepare: return 0 if prepare_views(target) else 1
+    run_id = target; run_dir = run_records.run_root(run_id)
+    if run_records.is_legacy(run_id):
+        print(run_records.LEGACY_MESSAGE); return 2
+    req = run_records.read(run_id, "request")
+    rec = Recorder(run_id)
     started = now_iso(); t0 = time.perf_counter()
-    rec.write("process.json", {"state": "RUNNING", "started_at": started, "pid": os.getpid()})
+    rec.write("process", {"state": "RUNNING", "started_at": started, "pid": os.getpid()})
+    rec.event(event="process_started", durable=True)
     exit_code, unhandled = None, None
     try:
         install_observers(rec, _run_context(run_dir, req, rec))
         from tcp_planner.orchestration import pipeline as app
         sys.argv[0] = "cli.py"  # argparse names the program from argv[0]; match the CLI in its messages
-        exit_code = app.main(req["argv"])
+        exit_code = app.main(resolve_argv(req["argv"]))
     except SystemExit as e:  # argparse usage errors exit here, exactly as on the CLI
         exit_code = 0 if e.code is None else e.code if isinstance(e.code, int) else 1
     except BaseException as e:  # an unhandled exception ends the CLI with exit code 1; same here
@@ -660,9 +733,10 @@ def main(argv=None):
         exit_code, unhandled = 1, {"error_code": "UNHANDLED_EXCEPTION", "message": sanitize(f"{type(e).__name__}: {e}")}
     finally:
         sys.stdout.flush()
-        rec.write("process.json", {"state": "FINISHED", "started_at": started, "ended_at": now_iso(),
-                                   "runtime_ms": round((time.perf_counter() - t0) * 1000, 1),
-                                   "exit_code": exit_code, "unhandled_error": unhandled})
+        rec.write_final("process", {"state": "FINISHED", "started_at": started, "ended_at": now_iso(),
+                                    "runtime_ms": round((time.perf_counter() - t0) * 1000, 1),
+                                    "exit_code": exit_code, "unhandled_error": unhandled})
+        rec.event(event="process_finished", exit_code=exit_code, durable=True)
     return exit_code
 
 

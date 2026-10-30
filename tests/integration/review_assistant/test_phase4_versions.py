@@ -2,6 +2,7 @@ import json, os
 
 import pytest
 
+from tcp_planner.storage import run_records as records
 from .conftest import call, login, tree_hash
 
 
@@ -11,8 +12,8 @@ def inproc_launch(monkeypatch):
     from tests.integration.web_api import inproc
     launched = []
 
-    def launch(rid, rdir):
-        launched.append(rid); inproc.run(rdir)
+    def launch(rid):
+        launched.append(rid); inproc.run(rid)
     monkeypatch.setattr(pipeline_controller, "LAUNCHER", launch)
     return launched
 
@@ -48,8 +49,7 @@ def out(aenv, rid, name):
 
 
 def events(rdir):
-    with open(os.path.join(rdir, "ui", "events.jsonl"), encoding="utf-8") as f:
-        return [json.loads(x) for x in f if x.strip()]
+    return records.events(os.path.basename(str(rdir)))
 
 
 def test_confirm_and_regenerate_end_to_end(aenv, runs, inproc_launch):
@@ -79,8 +79,7 @@ def test_confirm_and_regenerate_end_to_end(aenv, runs, inproc_launch):
     evs = [e for e in events(aenv / "runs" / child) if e.get("event") == "evidence"]
     assert not any(e.get("action") in ("strict_replay_blocked", "saved") for e in evs)
     assert {e["kind"] for e in evs if e.get("action") == "reused"} >= {"map", "osm", "ai"}
-    calls_path = aenv / "runs" / child / "ui" / "calls.json"
-    assert not calls_path.exists() or json.loads(calls_path.read_text()) == []
+    assert not records.read(child, "calls")
     titles = [m["body"].get("title") or "" for m in v["messages"] if m["kind"] == "SUMMARY"]
     assert any("Regenerated draft" in x for x in titles)
     lin = v["lineage"]
@@ -133,7 +132,7 @@ def test_save_proposed_revision_then_regenerate_and_roles(aenv, runs, inproc_lau
 def test_failed_regeneration_keeps_parent_and_allows_retry(aenv, runs, monkeypatch):
     from tcp_planner.review.assistant.services import pipeline_controller
 
-    def boom(rid, rdir): raise RuntimeError("cannot start")
+    def boom(rid): raise RuntimeError("cannot start")
     monkeypatch.setattr(pipeline_controller, "LAUNCHER", boom)
     t, cid = conv(runs, "missing_road_type")
     stage_fact(t, cid, "road.road_type", "CORRECT", "RURAL")
@@ -201,17 +200,16 @@ def test_strict_replay_fails_closed_instead_of_calling_provider(aenv, runs):
     from tcp_planner.orchestration import run_relations as relations
     from tests.integration.web_api import inproc
     parent = runs["supported"]
-    man = json.loads((aenv / "runs" / parent / "evidence" / "manifest.json").read_text())
-    ai = next(e for e in man["artifacts"] if e["kind"] == "ai")
+    from tcp_planner.storage.evidence_store import load_manifest
+    ai = next(e for e in load_manifest(parent) if e["kind"] == "ai")
     os.remove(aenv / "runs" / parent / "evidence" / ai["file"])
     rid, rdir = relations.create_resume_run(parent, "fusion", strict_replay=True)
     inproc.run(rdir)
     evs = events(rdir)
     assert any(e.get("action") == "strict_replay_blocked" and e["kind"] == "ai" for e in evs)
-    cp = os.path.join(rdir, "ui", "calls.json")
-    calls = json.load(open(cp)) if os.path.exists(cp) else []
+    calls = records.read(rid, "calls") or []
     assert all(c["service"] != "ai" for c in calls)
-    with open(os.path.join(rdir, "ui", "result.json")) as f: res = json.load(f)
+    res = records.read(rid, "result")
     assert res["decision"] == "REVIEW_REQUIRED" and "AI_OBSERVATION_UNAVAILABLE" in res["reason_codes"]
 
 
@@ -220,13 +218,13 @@ def test_running_regeneration_is_not_finalized(aenv, runs, monkeypatch):
     import sys, types
     from tcp_planner.review.assistant.services import pipeline_controller
     started = []
-    monkeypatch.setattr(pipeline_controller, "LAUNCHER", lambda rid, rdir: started.append((rid, rdir)))  # launched, not finished
+    monkeypatch.setattr(pipeline_controller, "LAUNCHER", lambda rid: started.append(rid))  # launched, not finished
     t, cid = conv(runs, "missing_road_type")
     call("POST", f"conversations/{cid}/decisions", {"type": "FACT", "field": "road.road_type", "action": "CORRECT",
                                                     "value": "RURAL", "reason": "x"}, token=t)
     r = review(t, cid)
     st, _, res = call("POST", f"conversations/{cid}/confirm", {"review_sha256": r["review_sha256"], "mode": "CONFIRM_AND_REGENERATE"}, token=t)
-    rid, rdir = started[0]
+    rid = started[0]
     fake = types.SimpleNamespace(live_ids=lambda: {rid})
     monkeypatch.setitem(sys.modules, "tcp_planner.web_api.server", fake)
     call("GET", f"conversations/{cid}", token=t)
@@ -234,7 +232,7 @@ def test_running_regeneration_is_not_finalized(aenv, runs, monkeypatch):
     st2, _, dup = call("POST", f"plan-versions/{res['plan_version_id']}/regenerate", {"conversation_id": cid}, token=t)
     assert st2 == 409                                  # no second attempt while one is running
     from tests.integration.web_api import inproc
-    inproc.run(rdir)                                  # the run finishes
+    inproc.run(rid)                                   # the run finishes
     monkeypatch.setitem(sys.modules, "tcp_planner.web_api.server", types.SimpleNamespace(live_ids=lambda: set()))
     call("GET", f"conversations/{cid}", token=t)
     assert call("GET", f"plan-versions/{res['plan_version_id']}", token=t)[2]["current_status"] == "DRAFT_COMPLIANT"

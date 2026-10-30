@@ -1,6 +1,9 @@
 """Human ground-truth labels for evaluation sites (draft -> confirmed by a person).
 
-labels/<site_id>.json   site_id = first 16 hex chars of the work-reference geometry hash
+labels/<site_id>.state.json   a state record (versioned, compare-and-set); site_id = the SME lineage key of the zone
+                              (D-82, S3): lineage_key(project_id, zone geometry hash), 16 hex characters. Labels from
+                              before S2 (labels/<site_id>.json) are read as they are; the first change copies one into a
+                              state record and leaves the old file alone.
 Only CONFIRMED labels count as evaluation ground truth. A draft (for example prepared from evidence by an
 assistant) is shown but never scored. Confirmation requires a reviewer name and a reason; every change is
 appended to the label's history with a timestamp. No credentials or URLs are stored.
@@ -8,7 +11,8 @@ appended to the label's history with a timestamp. No credentials or URLs are sto
 import datetime, json, os, re
 
 from tcp_planner.config.settings import VAR_DIR
-from tcp_planner.storage import run_store as store
+from tcp_planner.storage import run_store as store, stores
+from tcp_planner.storage.interfaces import StateExists, StaleHead
 
 FIELDS = {  # label field -> (type, allowed values) ; compared against the pipeline's resolved site facts
     "road.lane_count": (int, None),
@@ -32,28 +36,48 @@ def _now():
     return datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
 
 
-def site_id_for(project_geometry):
-    from tcp_planner.storage.evidence_store import geometry_hash
-    return geometry_hash(project_geometry)[:16]
+def site_id_for(run_request):
+    """The label id of a run: the lineage key of its zone (D-82), from the project link in the run's request record.
+    None for a run outside a project: such a run has no lineage and no label."""
+    return ((run_request or {}).get("project") or {}).get("lineage_key")
 
 
-def _path(site_id):
+SCHEMA_VERSION = 1
+
+
+def _check_site(site_id):
     if not SITE_RE.match(site_id or ""): raise store.BadRequest("invalid site id")
-    return os.path.join(labels_dir(), f"{site_id}.json")
+    return site_id
+
+
+def _state():
+    return stores._file_state(labels_dir())
+
+
+def _legacy_path(site_id):
+    return os.path.join(labels_dir(), f"{_check_site(site_id)}.json")
+
+
+def _load(site_id):
+    """(label document or None, state version or None when it only exists in the pre-S2 file)."""
+    rec = _state().get(_check_site(site_id))
+    if rec is not None: return rec.value, rec.version
+    try:
+        with open(_legacy_path(site_id), encoding="utf-8") as f: return json.load(f), None
+    except (OSError, ValueError):
+        return None, None
 
 
 def get(site_id):
-    try:
-        with open(_path(site_id), encoding="utf-8") as f: return json.load(f)
-    except (OSError, ValueError):
-        return None
+    return _load(site_id)[0]
 
 
 def list_labels():
     d = labels_dir()
-    try: names = sorted(n for n in os.listdir(d) if n.endswith(".json"))
-    except OSError: return []
-    return [x for x in (get(n[:-5]) for n in names) if x]
+    ids = {r.key for r in _state().list()}
+    try: ids |= {n[:-5] for n in os.listdir(d) if n.endswith(".json") and SITE_RE.match(n[:-5])}
+    except OSError: pass
+    return [x for x in (get(i) for i in sorted(ids)) if x]
 
 
 def _check_value(field, value):
@@ -67,17 +91,20 @@ def _check_value(field, value):
     return value
 
 
-def _write(doc):
-    os.makedirs(labels_dir(), exist_ok=True)
-    tmp = _path(doc["site_id"]) + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f: json.dump(doc, f, indent=2, sort_keys=True)
-    os.replace(tmp, _path(doc["site_id"]))
+def _commit(doc, version):
+    """Write the document if nobody changed the label since it was loaded; otherwise ask the caller to retry."""
+    try:
+        if version is None: _state().put_new(doc["site_id"], doc, SCHEMA_VERSION)
+        else: _state().compare_and_set(doc["site_id"], version, doc, SCHEMA_VERSION)
+    except (StateExists, StaleHead):
+        raise store.BadRequest("the label was changed by someone else; reload it and try again") from None
 
 
-def save_draft(project_geometry, fields, drafted_by, reason, source_run_id, name=None):
-    """Create or replace a DRAFT label. A confirmed label is never overwritten by a draft."""
-    sid = site_id_for(project_geometry)
-    existing = get(sid)
+def save_draft(site_id, project_geometry, fields, drafted_by, reason, source_run_id, name=None):
+    """Create or replace a DRAFT label of the zone with lineage key site_id. A confirmed label is never overwritten
+    by a draft. project_geometry only supplies the location stored with the label."""
+    sid = _check_site(site_id)
+    existing, version = _load(sid)
     if existing and existing["status"] == "CONFIRMED":
         raise store.BadRequest("label is already confirmed; drafts cannot overwrite it")
     if not drafted_by or not reason: raise store.BadRequest("drafted_by and reason are required")
@@ -90,13 +117,13 @@ def save_draft(project_geometry, fields, drafted_by, reason, source_run_id, name
            "status": "DRAFT", "fields": out, "drafted_by": drafted_by, "drafted_at": _now(),
            "confirmed_by": None, "confirmed_at": None, "confirm_reason": None,
            "history": (existing or {}).get("history", []) + [{"action": "draft", "by": drafted_by, "at": _now(), "reason": reason}]}
-    _write(doc)
+    _commit(doc, version)
     return doc
 
 
 def confirm(site_id, reviewer, reason, edits=None):
     """A PERSON confirms (optionally correcting values first). Required: reviewer and reason."""
-    doc = get(site_id)
+    doc, version = _load(site_id)
     if not doc: raise store.BadRequest("label not found")
     reviewer, reason = (reviewer or "").strip(), (reason or "").strip()
     if not reviewer or not reason: raise store.BadRequest("reviewer and reason are required to confirm a label")
@@ -109,15 +136,15 @@ def confirm(site_id, reviewer, reason, edits=None):
             changes.append({"field": k, "from": old, "to": v})
     doc.update(status="CONFIRMED", confirmed_by=reviewer, confirmed_at=_now(), confirm_reason=reason)
     doc["history"].append({"action": "confirm", "by": reviewer, "at": doc["confirmed_at"], "reason": reason, "changes": changes})
-    _write(doc)
+    _commit(doc, version)
     return doc
 
 
 def revoke(site_id, reviewer, reason):
-    doc = get(site_id)
+    doc, version = _load(site_id)
     if not doc: raise store.BadRequest("label not found")
     if not (reviewer or "").strip() or not (reason or "").strip(): raise store.BadRequest("reviewer and reason are required")
     doc.update(status="DRAFT", confirmed_by=None, confirmed_at=None, confirm_reason=None)
     doc["history"].append({"action": "revoke", "by": reviewer.strip(), "at": _now(), "reason": reason.strip()})
-    _write(doc)
+    _commit(doc, version)
     return doc

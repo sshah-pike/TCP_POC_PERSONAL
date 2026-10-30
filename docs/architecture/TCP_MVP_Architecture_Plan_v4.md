@@ -1,12 +1,12 @@
 # TCP Multi-Work-Location Architecture: Plan, ADRs and Verification Prompt
 
-*Prepared for Sahil (approver). Developer: VS Code Claude. Version 4, October 26, 2026. Adds TA-1 to the MVP, the symbol library, the golden set from your drafts, a case-based grouping rule, and the full slice plan (separate file: TCP_MVP_Development_Slices.md). Items marked Approved in Section 15 are decided. Everything else is PROPOSED or OPEN.*
+*Prepared for Sahil (approver). Developer: VS Code Claude. Version 4.1, October 28, 2026 (paths updated after slice S0a). Version 4, October 26, 2026. Adds TA-1 to the MVP, the symbol library, the golden set from your drafts, a case-based grouping rule, and the full slice plan (separate file: TCP_MVP_Development_Slices.md). Items marked Approved in Section 15 are decided. Everything else is PROPOSED or OPEN.*
 
 This is the handover for letting the TCP tool read a KML with any number of work points, choose the right Typical Application (TA) for each, and produce draft plans whose every value traces to a source. Every stage below has a diagram, a plain explanation and an example. Section 15 shows what is approved, proposed and open, and explains every open question with an example.
 
 ## 1. Start here: what this change is about
 
-This change lets the tool take a KML with any number of work points, decide the right Typical Application (TA) for each stretch of work, and produce draft plans with a full audit trail. The old POC handled one work point and one TA (TA-1) \[S2\]\[S3\]. This is now the MVP: you backed up the POC, and the MVP is built on a new branch `TCP-MVP` with one pipeline that every TA follows, with no separate old TA-1 path (D-41). TA-1 is part of the MVP as an ordinary TA (D-47).
+This change lets the tool take a KML with any number of work points, decide the right Typical Application (TA) for each stretch of work, and produce draft plans with a full audit trail. The old POC handled one work point and one TA (TA-1) \[S2\]\[S3\]. This is now the MVP: you backed up the POC, and the MVP is built on a new branch `tcp-mvp/base` with one pipeline that every TA follows, with no separate old TA-1 path (D-41). TA-1 is part of the MVP as an ordinary TA (D-47).
 
 |  | Today | After this change |
 | --- | --- | --- |
@@ -477,7 +477,7 @@ Folding the TA fields into call 2 saves one AI call per zone and keeps the two-c
 - A fact that is missing or malformed becomes UNKNOWN.
 - Fallback on a 400 "too complex" error: retry once without strict mode and validate in code.
 
-JSON only (your decision). TOON is not used. None of this is built until a spike in slice S0 compares two variants on your three KMLs: the current per-property schema and the facts-list schema.
+JSON only (your decision). TOON is not used. The S0 spike compared the two variants (`spikes/schema_spike/REPORT.md` on branch `tcp-mvp/s00-schema-spike`): the current per-property schema was rejected by Foundry (23 union-type parameters; with the 18 call 1 fields added, 24; limit 16), and the facts list was accepted and schema-valid in 9 of 9 calls. D-61 is decided: the flat facts list. The spike findings that shape S6 and S7 are D-80.
 
 **Confidence thresholds.** The POC used 0.70 for common facts, and that carries over as a starting value. New TAs start at 0.80 for safety-critical facts \[S1\]. The router package suggests 0.85 for auto-routing \[S3\]. All of these are set per field in the registry, not hardcoded. The router's own starting values are in Section 6.
 
@@ -955,7 +955,7 @@ A project is SUPPORTED\_AUTO only if every zone is, the cross-zone check passes,
 
 **Storage rules for the MVP (the cloud itself is deferred)**
 
-1. All reads and writes go through `ArtifactStore` (blobs) and `StateStore` (index, events, heads). First implementations: local filesystem and SQLite.
+1. All reads and writes go through `ArtifactStore` (blobs) and `StateStore` (index, events, heads). First implementations: local filesystem, files only: blobs as files, state as one file per record and one append-only file per event stream (D-84).
 2. Persisted data never holds a raw path. It holds an artifact reference `{uri, sha256, size, media_type}`.
 3. Artifacts are write-once and content-addressed. A change creates a new artifact with a new hash.
 4. Mutable state (SME heads, selection events, project status) uses versioned compare-and-set writes.
@@ -975,7 +975,8 @@ The slices are specified in full, with scope, contracts, acceptance criteria, te
 
 | Slice | Scope | Depends on |
 | --- | --- | --- |
-| S0 | Branch `TCP-MVP`, repo verification report (Section 18), fixture harness, golden set imported | none |
+| S0a | Done: production layout (`src/tcp_planner/`, `apps/web/`, `config/`, `rule_pack/`, `assets/`, `var/`, `backup/orphans/`), behavior unchanged, report in `docs/reports/S0a_restructure_report.md` | none |
+| S0 | Repo verification report (Section 18), fixture harness, schema spike, the two S0a follow-ups (protected-run test, Foundry default) | S0a |
 | S1 | Domain model and KML intake for all geometry types (coordinates only; custom KML keys are future scope) | S0 |
 | S2 | Storage interfaces with local adapters, artifact references, project store | S0 |
 | S3 | Project orchestrator, one child run per zone, engine input extended, location list in the UI | S1, S2 |
@@ -1072,7 +1073,7 @@ The comparator (slice S13) reports each difference with its cause, so every mism
 
 ## 15. Decision log
 
-Approved means you said yes in this conversation \[S5\]. Proposed means it is in this plan but still needs your approval. Open means no decision yet. Updated October 26, 2026.
+Approved means you said yes in this conversation \[S5\]. Proposed means it is in this plan but still needs your approval. Open means no decision yet. Updated October 28, 2026.
 
 | ID | Decision | Status | Section |
 | --- | --- | --- | --- |
@@ -1100,7 +1101,7 @@ Approved means you said yes in this conversation \[S5\]. Proposed means it is in
 | D-22 | KML `tcp:` keys and legacy `selected_ta` | Future scope (D-66) | 4 |
 | D-23 | The engine input may change freely, because there is no legacy path | Approved | 12 |
 | D-24 | Adjustment bands. A sign may move to a nearby available space. Taper and buffer are never in the pre-approved list. The SME may still move them by hand as a one-off exception (my reading, to confirm). Band values come from sources. Who holds the approver role is not set | Partly decided | 7, 10 |
-| D-25 | Cost estimates and caps, the reference-only toggle and cross-run cache are future scope. Only a max-zones cap in config now. Work happens on branch `TCP-MVP` | Approved | 4, 13 |
+| D-25 | Cost estimates and caps, the reference-only toggle and cross-run cache are future scope. Only a max-zones cap in config now. Work happens on branch `tcp-mvp/base` | Approved | 4, 13 |
 | D-26 | Grouping and sheet packing: case table, per-TA settings, ordering, two-TA sheets | **Open** (proposal in 4A, D-49) | 4A |
 | D-27 | Hybrid crops: crop in code first, fetch higher zoom only when pixels are insufficient. Images resized in code to the model limit | Approved | 5 |
 | D-28 | A permanent deviation is proposed by the SME and approved by a named approver role | Approved | 7, 12 |
@@ -1116,7 +1117,7 @@ Approved means you said yes in this conversation \[S5\]. Proposed means it is in
 | D-38 | Road width stored with an uncertainty; a threshold inside the interval becomes UNKNOWN and asks the SME | Approved | 5 |
 | D-39 | A plan that uses a `SOURCE_REVIEW_REQUIRED` rule is forced to REVIEW\_REQUIRED, with the item in the audit trail | Approved (option A) | 10 |
 | D-40 | The cloud move is out of the MVP. Storage is local | Approved | 12, 16 |
-| D-41 | The POC is backed up. The MVP is built on branch `TCP-MVP` with one pipeline for all TAs, and no TA-1 goldens | Approved | 1, 13 |
+| D-41 | The POC is backed up. The MVP is built on branch `tcp-mvp/base` with one pipeline for all TAs, and no TA-1 goldens | Approved | 1, 13 |
 | D-42 | Rule source: MUTCD 11th Edition, Chapter 6, December 2023 revision. References: E Second St for TA-6, Colorado St for TA-10, Granite St for TA-33 | Approved | 10, 4A |
 | D-43 | Live Azure Maps and AI calls only in the final full-pipeline test, not in unit or integration tests | Approved | 13, 14 |
 | D-44 | Device symbols: your template first, then the MUTCD, then online, marked `PLACEHOLDER_ASSET` until your real library arrives | Approved | 10 |
@@ -1136,7 +1137,7 @@ Approved means you said yes in this conversation \[S5\]. Proposed means it is in
 | D-58 | Road type and speed prior from OSM and state tags | Future scope | 4C |
 | D-59 | Mandatory start fields, typed in the UI before Run: `road_type`, `posted_speed_mph`, `traffic_volume`, `lane_closure`. No code calculates them and no other source fills them in the MVP. A contradicting computed check raises a conflict, never a change | Approved | 4B |
 | D-60 | Routing decision tree and explicit eligibility: TA-6 needs a shoulder and a low-speed minor road; TA-33 is one OR'd rule; only TA-1, 6, 10 and 33 exist | Approved | 6 |
-| D-61 | AI output as a flat facts list in JSON (no TOON), tested in an S0 spike against the current schema before anything is built | Approved (test first) | 5 |
+| D-61 | AI output as a flat facts list in JSON (no TOON). Decided after the S0 spike: the current per-property schema is rejected by Foundry (HTTP 400, union-type limit), the facts list is accepted | Approved | 5 |
 | D-62 | Azure Maps is allowed alongside open data | Approved | 5 |
 | D-63 | Added sources: HPMS, Census urban areas, USGS 3DEP, MBTA/RIPTA GTFS, FRA crossings, with the full OSM tag list | Approved | 5 |
 | D-64 | The AI returns positions; code computes every length | Approved | 4B |
@@ -1148,6 +1149,17 @@ Approved means you said yes in this conversation \[S5\]. Proposed means it is in
 | D-71 | Title-block location uses the road name the POC already prints; the SME does not type an address | Approved | 4A |
 | D-72 | Placemark names used as display labels on the sheet | Approved | 4 |
 | D-73 | "Select TA" dropdown in the UI (Auto, TA-1, TA-6, TA-10, TA-33), per project and per point | Approved | 4B |
+| D-74 | Slice S0a done: production layout, one package `src/tcp_planner`, UI in `apps/web`, data in `config/`, `rule_pack/`, `assets/`, run data in `var/`, 16 files in `backup/orphans/2026-10-28/` with a manifest and restore script. Behavior unchanged (all suites, 13 offline scenarios and 36 saved-run replays identical) | Done | 13 |
+| D-75 | Branches: base `tcp-mvp/base`, one branch per slice `tcp-mvp/sNN-short-name` (the `TCP-MVP` name collides with `tcp-mvp/` on Windows) | Approved | 13 |
+| D-76 | Editable install required once per environment: `pip install -e . --no-build-isolation` | Approved | 13 |
+| D-77 | `runs/` moved to `var/runs/`; old POC runs stay tracked but cannot be resumed, because they store absolute paths. Store run paths relative to the runs folder in S2 | Approved | 12 |
+| D-78 | Default AI provider becomes Foundry in S0 (the code used to fall back to the direct Anthropic provider when `TCP_AI_PROVIDER` is unset); with no Foundry configuration the error says so. The direct provider module moves to backup in S15 | Approved | 5 |
+| D-79 | The pre-existing failing protected-run test is fixed in S0 to check that the run folder is tracked and unchanged, which is its real intent | Approved | 14 |
+| D-80 | Spike findings are requirements for S6 and S7: (1) `lanes_per_direction` is unstable (Granite 2/1/1) and safety-critical: cross-check with OSM lanes and state data, a disagreement makes it UNKNOWN and raises an SME question, and call 2 re-asks it with a lane-marking crop. (2) Marks are weak (`lane_line`, `shoulder_edge`, `curb`): the deterministic `cross_section.py` is the primary width source and AI marks are secondary; an invalid or missing mark makes the width UNKNOWN; marks are requested again from call 2 crops. (3) `sidewalk_present` and `sidewalk_side` are often UNKNOWN on the wide image: resolve them in call 2 with a crop plus OSM sidewalk tags. (4) Call 1 output is about 2,300 tokens (about 700 of them thinking): cap each evidence string at 15 words and use a short fixed reason for UNKNOWN (see `docs/reports/S0_prompt_tuning_proposal.md`) | Approved | 5, 6 |
+| D-81 | Rule pack v1 (S4) covers TA-1, TA-6, TA-10 and TA-33 and replaces the POC pack. Until then `rule_pack/` holds only `APPROVED_TWO_LANE_POC_RULE_PACK.json` | Approved | 10 |
+| D-82 | The SME lineage key is a composite of the project and the zone geometry hash (`lineage_key(project_id, zone_geometry_hash)`, added in S1). Clean break: POC-era runs are not migrated. In S3 both `site_id_for` and the ground-truth label files switch to it; the one existing label file (`var/labels/771bbc3d0913044a.json`) is re-keyed by hand | Approved | 8, 9 |
+| D-83 | The S0a check that replays the 36 saved runs is dropped. The recorded fixtures and the stored expected outputs of the offline scenarios are the regression proof. A config change, such as S1's `input.duplicate_distance_m`, changes the config hash that check depends on | Approved | 14 |
+| D-84 | State is stored in files only in the MVP (records as `<key>.state.json`, events as `<stream>.events.jsonl`, written under lock files with an ownership re-check). A database adapter is future scope, together with the cloud move. Supersedes the SQLite adapter first built in S2, which moved to `backup/orphans/2026-10-28/` | Approved | 12 |
 | D-67 | New fields added to the schema: work side, work type, work length, lane width, direction of travel, bike lane, accessible route, detours, work-zone speed, add-on triggers, title-block fields, median work, and the TA-10 and TA-33 fields | Approved | 4B |
 
 ### Open questions (version 9)
@@ -1156,7 +1168,7 @@ Slices S0 to S5 can start now. Each item has a default so no slice is blocked.
 
 | # | Question | Needed by | Default if unanswered |
 | --- | --- | --- | --- |
-| 1 | Foundry error text and the S0 schema spike results (current schema against the facts list, JSON only) | S6 | Facts-list JSON if the spike passes |
+| 1 | ~~Foundry error text and the S0 schema spike results~~ Closed: spike done, facts list chosen (D-61, D-80) | S6 | Done |
 | 2 | Default `work_space_length_ft` per `work_type` for single points | S8 | Asked per point on the form |
 | 3 | Does the title block need city, state and ZIP as well as the road name the POC prints? | S12 | Road name only, as the POC does today |
 | 4 | My reading of "taper instead of police": the draft uses the standard TA-10 flagger layout with its tapers, and the SME switches to police after the draft | S7 | As written (D-68) |
@@ -1174,6 +1186,8 @@ Slices S0 to S5 can start now. Each item has a default so no slice is blocked.
 | 16 | Taper and buffer: my reading of your clarification | S10 | As written in Section 7 |
 | 17 | Which RIDOT and MassDOT documents apply | Later | MUTCD plus client layer |
 | 18 | SME confirmation that the Section 4B schema misses nothing | S6 | Built as written |
+| 19 | Push and merge S0a: push `tcp-mvp/s00a-restructure`, review it, merge into `tcp-mvp/base` | Before S0 | Push now, merge after review |
+| 20 | ~~Approve D-78 and D-79~~ Closed: approved and done in S0 | S0 | Done |
 
 **Closed this round:** traffic control method not a start field, flaggers by default, police after the draft (D-68); lengths by code (D-64); JSON only, no TOON (D-61); work side suggested by AI and confirmed (D-69); grade-crossing notification dropped (D-70); title block uses the POC road name (D-71); placemark names as labels (D-72); Select TA dropdown (D-73).
 
@@ -1213,6 +1227,23 @@ This feature is not built now. You approved offering it later and asked for the 
 | Reference-only toggle | The role field is stored. A UI toggle to mark stray points such as a distant yard comes later. Every point is work by default |
 | Cross-run imagery cache | Store Azure Maps imagery and crops and reuse them for the same location. Needs an expiry rule and a scope (per project or shared). The Azure terms check was dropped by your decision |
 | Cloud move | Azure Blob and PostgreSQL adapters, a migration tool, and the client's region, retention and tenancy answers. Out of the MVP (D-40) |
+| Police detail instead of flagger | Flagger is always the default traffic control method; the SME can switch to police detail after the draft (D-68). Nothing in the MVP picks police from the place. A later suggestion from a cited jurisdiction rule, the research so far and what it would depend on are in "Police detail instead of flagger: notes for later" below |
+
+### Police detail instead of flagger: notes for later
+
+**MVP rule.** Flagger is always the default traffic control method. The SME can switch to police detail as a post-draft review action (D-68). There is no jurisdiction logic in the MVP.
+
+**Future idea.** Suggest police detail where a cited jurisdiction or agency rule applies, found from the KML point (state, county and town boundaries). The suggestion carries its citation and the status `SOURCE_REVIEW_REQUIRED` until the SME confirms it, and it never applies automatically. A place that is not listed defaults to flagger.
+
+**Research notes (unverified: web summaries, the owner to confirm before any use)**
+
+- MUTCD allows a flagger or a uniformed law enforcement officer and sets no rule for choosing between them. The flagger chapter is 6E in the 2009 edition and 6D in the 2023 text.
+- Massachusetts: a 2008 law and the state rules (cited as 700 CMR 6.00 in one source and 701 CMR 7 in another; confirm which) call for road flaggers on low-speed roads and on low-traffic high-speed roads, and for police details on high-speed roads, with exceptions. Many towns and utilities still use police by local practice or labour contract. The 45 mph figure for Massachusetts comes from a 2008 news report on the draft rules, not from the final rule; do not use it.
+- Rhode Island: RIDOT uses state police on limited-access projects and for statewide striping, and local police or flaggers elsewhere (RIDOT Standard Specifications, Section 913).
+- Ohio: an officer is required for full closures and for signal installation.
+- Nothing was found for Connecticut, New Jersey, New York or California.
+
+**Dependencies if built later.** The S6 data sources (Census boundaries); S8 and S11 (traffic control method); and the police sign code question (W20-8), which stays an SME question.
 
 ## 17. Architecture Decision Records
 
@@ -1240,11 +1271,11 @@ Each record states status, context, decision, consequences and what was rejected
 
 ### ADR-006: Thin storage interfaces; cloud deferred
 
-**Status:** Accepted. **Context:** The cloud move is out of the MVP (D-40). **Decision:** Keep `ArtifactStore`, `StateStore` and `RulePackStore` as thin interfaces with local adapters only. **Consequences:** A later cloud move is an adapter swap. No cloud adapters, migration tool or client-limit questions now. **Rejected:** Building cloud adapters now.
+**Status:** Accepted. **Context:** The cloud move is out of the MVP (D-40). **Decision:** Keep `ArtifactStore`, `StateStore` and `RulePackStore` as thin interfaces with local adapters only. The MVP adapters are files only (D-84); a database adapter is deferred together with the cloud. **Consequences:** A later cloud move is an adapter swap. No cloud adapters, migration tool or client-limit questions now. **Rejected:** Building cloud adapters now.
 
-### ADR-007: Immutable, content-addressed artifacts and artifact references
+### ADR-007: Immutable, key-addressed artifacts and artifact references
 
-**Status:** Proposed. **Context:** Audit and replay need artifacts that never change. **Decision:** Artifacts are write-once and referenced by `{uri, sha256, size, media_type}`. No raw paths in persisted data. **Consequences:** Cheap verification, and migration can verify hashes. **Rejected:** Mutable files addressed by path.
+**Status:** Accepted (S2, decision 1 option A). **Context:** Audit and replay need artifacts that never change, and existing outputs keep their human file names. **Decision:** Artifacts are write-once and addressed by a store-relative key such as `<run_id>/output/plan.json`. They are referenced by `{uri, sha256, size, media_type}`, where `uri` is that key, and the sha256 is verified on every read. Writing the same bytes to a key is idempotent; writing different bytes fails. A change creates a new artifact at a new key. No raw paths in persisted data. `schema_version` lives in the index and reference records, not inside output files. **Consequences:** Output names and bytes stay unchanged; migration can verify hashes. No deduplication by content. **Rejected:** Mutable files addressed by path; a hash-named blob store with a name index (renames every output).
 
 ### ADR-008: Zone-level reuse keys
 
@@ -1336,7 +1367,7 @@ Each record states status, context, decision, consequences and what was rejected
 
 ### ADR-030: No separate TA-1 path; one pipeline for every TA
 
-**Status:** Accepted. **Context:** TA-1 was the basic POC. You backed it up and want every TA to follow one pipeline \[S5\]. **Decision:** The MVP is built on `TCP-MVP` with one pipeline. TA-1 has no special handling and is built in the MVP as an ordinary entry from Figure 6P-1. This replaces the earlier plan to migrate TA-1 later. **Consequences:** Simpler, with no old goldens. The POC code is not a regression oracle. **Rejected:** Keeping TA-1 separate; migrating it later.
+**Status:** Accepted. **Context:** TA-1 was the basic POC. You backed it up and want every TA to follow one pipeline \[S5\]. **Decision:** The MVP is built on `tcp-mvp/base` with one pipeline. TA-1 has no special handling and is built in the MVP as an ordinary entry from Figure 6P-1. This replaces the earlier plan to migrate TA-1 later. **Consequences:** Simpler, with no old goldens. The POC code is not a regression oracle. **Rejected:** Keeping TA-1 separate; migrating it later.
 
 ### ADR-031: Fused geometry is low confidence; imagery decides
 
@@ -1384,7 +1415,7 @@ Each record states status, context, decision, consequences and what was rejected
 
 ### ADR-045: AI output format chosen by a spike
 
-**Status:** Accepted, test first (D-61). **Context:** A 15+ field per-property schema failed in Azure Foundry. **Decision:** JSON only. An S0 spike compares the current schema with a flat facts list before anything is built. TOON is not used. **Rejected:** Building on an untested schema; TOON.
+**Status:** Accepted (D-61). **Context:** A 15+ field per-property schema failed in Azure Foundry. **Decision:** JSON only, as a flat facts list. The S0 spike confirmed it: the per-property schema is rejected (union-type limit), the facts list is accepted and valid. TOON is not used. **Rejected:** Building on an untested schema; TOON; the per-property schema.
 
 ### ADR-046: SME approval gate
 
@@ -1430,7 +1461,7 @@ CONTEXT
 Every KML work point is processed, grouped into work zones, and each
 zone runs through the existing pipeline as a child run. A single
 point is a one-zone project. There is no legacy TA-1 path: the POC
-is backed up and the MVP (branch TCP-MVP) has one pipeline for every
+is backed up and the MVP (branch tcp-mvp/base) has one pipeline for every
 TA, so the engine input may change freely. A deterministic router chooses the TA from
 site facts; AI only observes (call 1 common facts, call 2 TA fields
 with crops). Conflicts follow a ladder: move within a sourced band,
@@ -1471,8 +1502,8 @@ STEP 1 - VERIFY THESE ASSUMPTIONS
     how much new code?
  6. Imagery extent for a long zone, mosaic behavior and
     MAP_EXTENT_INSUFFICIENT triggers.
- 7. Every raw file-path read or write in tcp_poc, tcp_ui and
-    tcp_assistant. Estimate the work for ArtifactStore/StateStore.
+ 7. Every raw file-path read or write in src/tcp_planner (run
+    store, evidence, assistant). Estimate the work for ArtifactStore/StateStore.
  8. versions.move_head compare-and-set and locks: can they map to a
     database transaction?
  9. relations._dependency_changes and evidence signatures: what
@@ -1517,7 +1548,7 @@ STEP 1 - VERIFY THESE ASSUMPTIONS
     others) and how their confidence is set.
 25. KML CONTENT: confirm the intake can read coordinates only and
     ignore all ExtendedData; note any code that reads selected_ta.
-26. RULE PACK: how rule_pack.py loads files, where EXPECTED_TA is
+26. RULE PACK: how src/tcp_planner/rules/rule_pack_loader.py loads files, where EXPECTED_TA is
     used, and whether a RulePackStore can wrap the loader.
 27. EXISTING TESTS: which suites still apply to the MVP and which
     depend on TA-1 or the legacy path? Do not run live calls.
@@ -1574,6 +1605,7 @@ for me. Then STOP and wait for my decisions.
 | Tag | Source | Trust level |
 | --- | --- | --- |
 | \[S1\] | Your Multi-TA expansion brief (phases 0 to 15, rule-pack separation, test requirements) | Your instruction |
+| Note | File names in \[S2\] to \[S4\] are POC names (`tcp_poc/...`, `tcp_ui/...`). Their new locations are in `docs/reports/S0a_restructure_plan.md`, section 2 | |
 | \[S2\] | VS Code Claude's multi-work-location architecture plan: facts about `kml_input.py`, `app.py`, `evidence.py`, `relations.py`, the map and OSM fetch, artifact layout and the places that assume one work point | VS Code Claude's reading of the repo. Not independently verified |
 | \[S3\] | VS Code Claude's router analysis: `ta_schema_router.json`, `EXPECTED_TA = "TA-1"` in `rule_pack.py`, the deciding fields, the out-of-scope TAs, real KML point counts and spacings | VS Code Claude's reading. Not independently verified |
 | \[S4\] | VS Code Claude's conflict and exception analysis: obstruction handling in `site_fusion.py` and `validators.py`, `sme_disposition.py`, `exception_tools.py` | VS Code Claude's reading. Not independently verified |

@@ -2,15 +2,18 @@
 
 runs/<run_id>/input/   uploaded KML (as supplied)
 runs/<run_id>/output/  the pipeline's --out directory (file names exactly as the pipeline writes them)
-runs/<run_id>/ui/      UI-only metadata: request.json, process.json, events.jsonl, result.json,
-                       rule_pack.json, usage.json, stdout.log
+runs/<run_id>/ui/      UI-only metadata as state records (run_records.py): request.state.json, process.state.json,
+                       events.events.jsonl, result.state.json, ...; stdout.log stays a plain log. Runs made before S2 keep
+                       ui/*.json and are read-only (run_records.is_legacy).
 
 Everything here is derived from what the pipeline recorded (telemetry spans, written files, its result
 and exit code). Nothing is inferred, defaulted or re-decided.
 """
 import base64, datetime, json, os, re, secrets
 
+from tcp_planner.config import settings
 from tcp_planner.config.settings import PROJECT_ROOT, CONFIG_DIR, VAR_DIR
+from tcp_planner.storage import run_records as records, stores, uploads
 
 PRICING_PATH = os.path.join(CONFIG_DIR, "pricing.json")
 RUN_ID_RE = re.compile(r"^\d{8}-\d{6}-[0-9a-f]{6}$")
@@ -40,13 +43,15 @@ STAGES = (
      ("plan.json", "aerial_image.jpg", "debug_plan.png", "debug_plan.pdf", "sheet_aerial.jpg", "tcp_sheet.png",
       "tcp_sheet.pdf", "plan.dxf", "plan.dwg", "dwt_result.json")),
 )
-# reason codes that mean a service/API failure (not a site-fact discrepancy): shown as ERROR, not REVIEW
+# reason codes that mean a service/API failure (not a site-fact discrepancy). They never change the decision shown
+# (REVIEW_REQUIRED stays REVIEW_REQUIRED, exit 3): a run lists them as `service_error` and the UI shows a badge (S3, Q12-B)
 ERROR_REASON_CODES = {"MAP_CONTEXT_UNAVAILABLE", "OSM_CONTEXT_UNAVAILABLE", "AI_OBSERVATION_UNAVAILABLE",
                       "AI_CALL2_UNAVAILABLE", "CROPS_UNAVAILABLE"}
 
 
-def _is_error(codes):
-    return any(c in ERROR_REASON_CODES for c in codes or ())
+def service_codes(codes):
+    """The service/API failure codes among reason codes (sorted, no duplicates); empty when there are none."""
+    return sorted({c for c in codes or () if c in ERROR_REASON_CODES})
 
 
 EXIT_DECISION = {0: "SUPPORTED_AUTO", 3: "REVIEW_REQUIRED", 4: "UNSUPPORTED_POC",
@@ -59,7 +64,7 @@ class BadRequest(Exception):
 
 
 def runs_dir():
-    return os.environ.get("TCP_UI_RUNS_DIR") or os.path.join(VAR_DIR, "runs")
+    return settings.runs_dir()
 
 
 def run_path(run_id, *parts):
@@ -85,6 +90,20 @@ def _safe_filename(name):
     return base or "input.kml"
 
 
+def reserve_run_id():
+    """A fresh run id. Nothing is created: the project orchestrator records it first and builds the run afterwards, so a
+    crash in between leaves an id that the next attempt completes (S3)."""
+    while True:
+        run_id = datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + secrets.token_hex(3)
+        if not os.path.exists(run_path(run_id)): return run_id
+
+
+def ensure_run_dirs(run_id, subdirs=("input", "output", "ui")):
+    rdir = run_path(run_id)
+    for sub in subdirs: os.makedirs(os.path.join(rdir, sub), exist_ok=True)
+    return rdir
+
+
 def new_run_dirs(subdirs=("input", "output", "ui")):
     """Allocate a new, unique run directory (runs/<id>/...)."""
     while True:
@@ -96,13 +115,41 @@ def new_run_dirs(subdirs=("input", "output", "ui")):
         return run_id, rdir
 
 
+def advanced_args(adv, online):
+    """CLI flags and the request's `advanced` record for the form's advanced settings (shared by plain runs and the
+    zone runs of a project). Validates the shape only; the server checks which AI profiles are available."""
+    argv = []
+    if online:  # the CLI ignores provider flags in offline mode; do not pretend otherwise
+        if adv.get("map_provider"):
+            if adv["map_provider"] not in MAP_PROVIDERS: raise BadRequest("unknown map provider")
+            argv += ["--map-provider", adv["map_provider"]]
+        if adv.get("ai_provider"):
+            if adv["ai_provider"] not in AI_PROVIDERS: raise BadRequest("unknown AI provider")
+            argv += ["--ai-provider", adv["ai_provider"]]
+    if adv.get("ai_profile"):  # Foundry model profile (deployment registry entry), validated by the server
+        if not online: raise BadRequest("AI profile applies to live runs only")
+        argv += ["--ai-provider", "foundry"] if "--ai-provider" not in argv else []
+    if adv.get("evidence_mode") not in (None, "", "single", "multi"):
+        raise BadRequest("evidence_mode must be single or multi")
+    if adv.get("no_dwt") is True: argv += ["--no-dwt"]
+    elif adv.get("dwt_mode"):
+        if adv["dwt_mode"] not in ("PLAN", "AERIAL_BASE"): raise BadRequest("dwt_mode must be PLAN or AERIAL_BASE")
+        argv += ["--dwt-mode", adv["dwt_mode"]]
+    return argv, {"ai_profile": (adv.get("ai_profile") or None) if online else None,
+                  "evidence_mode": adv.get("evidence_mode") or "single",
+                  "map_provider": (adv.get("map_provider") or None) if online else None,
+                  "ai_provider": (adv.get("ai_provider") or None) if online else None,
+                  "dwt_mode": None if adv.get("no_dwt") is True else (adv.get("dwt_mode") or None),
+                  "no_dwt": adv.get("no_dwt") is True}
+
+
 def create_run(payload, offline_scenarios):
     """Validate the form payload (shape only), store inputs and build the CLI argv. Returns (run_id, run_dir)."""
     if not isinstance(payload, dict): raise BadRequest("JSON object expected")
     itype = payload.get("input_type")
     if itype not in ("kml", "coordinates", "offline"): raise BadRequest("input_type must be kml, coordinates or offline")
     run_id, rdir = new_run_dirs()
-    out_dir = os.path.join(rdir, "output")
+    out_dir = f"{run_id}/output"  # run-relative key (D-77)
     argv, request = [], {"input_type": itype}
 
     if itype == "kml":
@@ -112,10 +159,9 @@ def create_run(payload, offline_scenarios):
         if not raw: raise BadRequest("KML file is empty")
         if len(raw) > MAX_KML_UPLOAD_BYTES: raise BadRequest("KML upload too large")
         name = _safe_filename(f.get("filename"))
-        path = os.path.join(rdir, "input", name)
-        with open(path, "wb") as fh: fh.write(raw)
-        argv += ["--kml", path]
-        request.update(kml_filename=name, kml_size_bytes=len(raw), kml_saved_path=path)
+        ref = uploads.store_upload(stores.artifacts(), run_id, name, raw)  # key <run_id>/input/<slug>.kml
+        argv += ["--kml", ref.uri]  # a run-relative key; the worker resolves it under the runs folder (D-77)
+        request.update(kml_filename=name, kml_size_bytes=len(raw), kml_key=ref.uri)
     elif itype == "coordinates":
         lat, lon = str(payload.get("lat", "")).strip(), str(payload.get("lon", "")).strip()
         if not lat or not lon: raise BadRequest("latitude and longitude are required")
@@ -143,37 +189,16 @@ def create_run(payload, offline_scenarios):
 
     adv = payload.get("advanced") or {}
     online = itype != "offline"
-    if itype != "offline":  # the CLI ignores provider flags in offline mode; do not pretend otherwise
-        if adv.get("map_provider"):
-            if adv["map_provider"] not in MAP_PROVIDERS: raise BadRequest("unknown map provider")
-            argv += ["--map-provider", adv["map_provider"]]
-        if adv.get("ai_provider"):
-            if adv["ai_provider"] not in AI_PROVIDERS: raise BadRequest("unknown AI provider")
-            argv += ["--ai-provider", adv["ai_provider"]]
-    if adv.get("ai_profile"):  # Foundry model profile (deployment registry entry), validated by the server
-        if not online: raise BadRequest("AI profile applies to live runs only")
-        argv += ["--ai-provider", "foundry"] if "--ai-provider" not in argv else []
-    if adv.get("evidence_mode") not in (None, "", "single", "multi"):
-        raise BadRequest("evidence_mode must be single or multi")
-    if adv.get("no_dwt") is True: argv += ["--no-dwt"]
-    elif adv.get("dwt_mode"):
-        if adv["dwt_mode"] not in ("PLAN", "AERIAL_BASE"): raise BadRequest("dwt_mode must be PLAN or AERIAL_BASE")
-        argv += ["--dwt-mode", adv["dwt_mode"]]
+    flags, adv_request = advanced_args(adv, online)
+    argv += flags
     argv += ["--out", out_dir]
 
-    online = itype != "offline"
     request.update(operator={"road_type": op.get("road_type") or None,
                              "speed": int(op["speed"]) if op.get("speed") not in (None, "") else None,
                              "requires_lane_closure": op.get("requires_lane_closure") is True,
                              "options": options},
-                   advanced={"ai_profile": (adv.get("ai_profile") or None) if online else None,
-                             "evidence_mode": adv.get("evidence_mode") or "single",
-                             "map_provider": (adv.get("map_provider") or None) if online else None,
-                             "ai_provider": (adv.get("ai_provider") or None) if online else None,
-                             "dwt_mode": None if adv.get("no_dwt") is True else (adv.get("dwt_mode") or None),
-                             "no_dwt": adv.get("no_dwt") is True})
-    _write_json(os.path.join(rdir, "ui", "request.json"),
-                {"run_id": run_id, "created_at": _now(), "argv": argv, "request": request})
+                   advanced=adv_request)
+    records.create(run_id, "request", {"run_id": run_id, "created_at": _now(), "argv": argv, "request": request})
     return run_id, rdir
 
 
@@ -182,16 +207,8 @@ def _now():
 
 
 # ------------------------------------------------------------------ state
-def _events(ui):
-    out = []
-    try:
-        with open(os.path.join(ui, "events.jsonl"), encoding="utf-8") as f:
-            for line in f:
-                try: out.append(json.loads(line))
-                except ValueError: pass  # a line being written right now
-    except OSError:
-        pass
-    return out
+def _events(run_id):
+    return records.events(run_id)
 
 
 def _spans(events):
@@ -243,9 +260,10 @@ def _stage_outcome(key, attrs):
     if key == "fusion" and (a.get("conflicts") or a.get("inputs_complete") is False):
         return "WARNING", [f"conflicts={a.get('conflicts')}", f"inputs_complete={a.get('inputs_complete')}"]
     if key == "eligibility" and a.get("decision") in ("REVIEW_REQUIRED", "UNSUPPORTED_POC"):
-        codes = str(a.get("reason_codes") or "").split(",")
-        return ("ERROR" if _is_error(codes) else "REVIEW" if a["decision"] == "REVIEW_REQUIRED" else "UNSUPPORTED"), \
-            [f"decision={a['decision']}", f"reason_codes={a.get('reason_codes')}"]
+        svc = service_codes(str(a.get("reason_codes") or "").split(","))
+        problems = [f"decision={a['decision']}", f"reason_codes={a.get('reason_codes')}"]
+        if svc: problems.append(f"service_error={','.join(svc)}")
+        return ("REVIEW" if a["decision"] == "REVIEW_REQUIRED" else "UNSUPPORTED"), problems
     if key == "rules" and a.get("issues"):
         return "WARNING", [f"placement issues={a['issues']}"]
     if key == "validation" and (a.get("rule") != "PASS" or a.get("geometry") != "PASS"):
@@ -268,23 +286,25 @@ def _outputs(out_dir):
 
 def build_state(run_id, live_ids=(), with_lineage=True):
     rdir = run_path(run_id); ui = os.path.join(rdir, "ui")
-    req = _read_json(os.path.join(ui, "request.json"))
+    req = records.read(run_id, "request")
     if req is None: return None
-    proc = _read_json(os.path.join(ui, "process.json")) or {}
-    result = _read_json(os.path.join(ui, "result.json"))
-    pack = _read_json(os.path.join(ui, "rule_pack.json"))
+    proc = records.read(run_id, "process") or {}
+    result = records.read(run_id, "result")
+    pack = records.read(run_id, "rule_pack")
     finished = proc.get("state") == "FINISHED"
     state = "FINISHED" if finished else "RUNNING" if run_id in live_ids else "INTERRUPTED"
     done = state != "RUNNING"
 
-    events = _events(ui); spans = _spans(events)
+    events = _events(run_id); spans = _spans(events)
     ev_events = [e for e in events if e.get("event") == "evidence"]
-    calls = _read_json(os.path.join(ui, "calls.json"))
-    if calls is None and os.path.isfile(os.path.join(ui, "deps.json")):
+    calls = records.read(run_id, "calls")
+    if calls is None and records.read(run_id, "deps") is not None:
         calls = []  # call tracking was active and no provider call was made (e.g. everything reused)
     lines = _log_lines(ui); msgs = _stage_messages(lines)
-    diags = _read_json(os.path.join(ui, "diagnostics.json"), []) or []
-    outputs = _outputs(os.path.join(rdir, "output")); have = {o["name"] for o in outputs}
+    diags = records.read(run_id, "diagnostics", []) or []
+    index = {x["name"]: x for x in (result or {}).get("output_index") or []}  # SHA-256 of each output file (S3)
+    outputs = [dict(o, sha256=(index.get(o["name"]) or {}).get("sha256")) for o in _outputs(os.path.join(rdir, "output"))]
+    have = {o["name"] for o in outputs}
 
     stages, claimed, last_started = [], set(), None
     for i, (key, title, span_names, files) in enumerate(STAGES, start=1):
@@ -344,8 +364,8 @@ def build_state(run_id, live_ids=(), with_lineage=True):
     else:
         decision = None
     elig = (result or {}).get("eligibility") or _read_json(os.path.join(rdir, "output", "eligibility_result.json"))
-    if decision == "REVIEW_REQUIRED" and _is_error((result or {}).get("reason_codes") or (elig or {}).get("reason_codes")):
-        decision = "ERROR"  # API / service failure, not a site-understanding discrepancy
+    reason_codes = (result or {}).get("reason_codes") or (elig or {}).get("reason_codes") or []
+    service_error = service_codes(reason_codes) or None  # a badge, never a different decision (Q12-B)
     draft = decision == "SUPPORTED_AUTO" and exit_code == 0 and "plan.json" in have
     plan_status = (result or {}).get("plan_status")  # SME revision runs only
     if plan_status == "DRAFT_WITH_ENGINEERING_EXCEPTION" and exit_code == 5 and "plan.json" in have and not error:
@@ -357,25 +377,25 @@ def build_state(run_id, live_ids=(), with_lineage=True):
         "state": state, "started_at": proc.get("started_at"), "ended_at": proc.get("ended_at"),
         "runtime_ms": proc.get("runtime_ms"), "exit_code": exit_code,
         "decision": decision,
-        "reason_codes": (result or {}).get("reason_codes") or (elig or {}).get("reason_codes") or [],
+        "reason_codes": reason_codes, "service_error": service_error,
         "message": (elig or {}).get("message"), "error": error,
         "stages": stages, "span_total_ms": span_total,
         "rule_pack": pack, "plan": {"plan_id": (result or {}).get("plan_id"), "plan_hash": (result or {}).get("plan_hash")},
         "selected_ta": (elig or {}).get("selected_typical_application"),
         "dwt": (result or {}).get("dwt"),
         "draft_generated": draft, "outputs": outputs, "log": lines,
-        "tls": _read_json(os.path.join(ui, "tls.json")),
-        "cost": cost_summary(req, spans, _read_json(os.path.join(ui, "usage.json"), []), have, calls, ev_events),
-        "evidence": _evidence_list(rdir),
+        "tls": records.read(run_id, "tls"),
+        "cost": cost_summary(req, spans, records.read(run_id, "usage", []), have, calls, ev_events),
+        "evidence": _evidence_list(run_id),
         "evidence_compat": _compat(run_id, {"stages": stages}),
-        "lineage": _lineage(run_id, ui, ev_events, done) if with_lineage else None,
-        "sme_revision": _sme_revision(ui, rdir, plan_status),
+        "lineage": _lineage(run_id, ev_events, done) if with_lineage else None,
+        "sme_revision": _sme_revision(run_id, rdir, plan_status),
     }
 
 
-def _sme_revision(ui, rdir, plan_status):
+def _sme_revision(run_id, rdir, plan_status):
     """SME revision lineage (revision runs only; None otherwise)."""
-    resume = _read_json(os.path.join(ui, "resume.json")) or {}
+    resume = records.read(run_id, "resume") or {}
     if not resume.get("sme_revision"): return None
     return {**resume["sme_revision"], "strict_replay": resume.get("strict_replay"), "plan_status": plan_status,
             "machine_site_model": os.path.isfile(os.path.join(rdir, "output", "machine_site_model.json"))}
@@ -388,15 +408,15 @@ def _compat(run_id, partial_state):
     except Exception: return None
 
 
-def _evidence_list(rdir):
+def _evidence_list(run_id):
     from tcp_planner.storage.evidence_store import load_manifest
     return [{k: e.get(k) for k in ("artifact_id", "kind", "mode", "file", "sha256", "size_bytes", "producer_span",
                                    "produced_by_run", "source_run", "source_artifact_id", "created_at")}
-            for e in load_manifest(rdir)]
+            for e in load_manifest(run_id)]
 
 
-def _lineage(run_id, ui, ev_events, done):
-    resume = _read_json(os.path.join(ui, "resume.json"))
+def _lineage(run_id, ev_events, done):
+    resume = records.read(run_id, "resume")
     if not resume: return None
     from tcp_planner.orchestration.run_relations import actual_stage
     parent = build_state(resume["parent_run_id"], with_lineage=False) if os.path.isdir(run_path(resume["parent_run_id"])) else None
@@ -505,10 +525,14 @@ def list_runs(live_ids=()):
         st = build_state(rid, live_ids)
         if not st: continue
         r = st["request"] or {}
+        proj = r.get("project") or {}
         label = {"kml": f"KML: {r.get('kml_filename')}", "coordinates": "Coordinates",
-                 "offline": f"Offline: {r.get('offline_scenario')}"}.get(r.get("input_type"), "?")
+                 "offline": f"Offline: {r.get('offline_scenario')}",
+                 "zone": f"Zone {proj.get('zone_id')}"}.get(r.get("input_type"), "?")
         out.append({"run_id": rid, "created_at": st["created_at"], "input": label, "state": st["state"],
-                    "decision": st["decision"], "runtime_ms": st["runtime_ms"],
+                    "decision": st["decision"], "service_error": bool(st["service_error"]), "runtime_ms": st["runtime_ms"],
+                    "project_id": proj.get("project_id"), "zone_id": proj.get("zone_id"),
+                    "zone_version": proj.get("zone_version"),
                     "rule_pack": f"{st['rule_pack']['id']} v{st['rule_pack']['version']}" if st["rule_pack"] else None,
                     "estimated_cost_usd": st["cost"]["ai"]["estimated_cost_usd"],
                     "parent_run_id": (st["lineage"] or {}).get("parent_run_id"),

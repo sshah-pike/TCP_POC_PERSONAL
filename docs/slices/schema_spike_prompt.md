@@ -3,7 +3,11 @@
 Paste the block below into Claude Code in VS Code. It changes no pipeline code. It writes only to `spikes/schema_spike/`.
 
 ```
-You are working in the TCP repository. Create branch tcp-mvp/s00-schema-spike.
+You are working in the TCP repository. Create branch tcp-mvp/s00-schema-spike
+from tcp-mvp/base (after S0a is merged). The current call 1 schema is in
+src/tcp_planner/ai/vision_provider.py; the Foundry request code is in
+src/tcp_planner/ai/foundry_provider.py; the three KMLs are in
+docs/references/kml/.
 Do NOT change any pipeline code. Write only under spikes/schema_spike/.
 
 GOAL

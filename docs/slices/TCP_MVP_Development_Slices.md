@@ -1,6 +1,6 @@
 # TCP MVP: Development Slices for Claude Code
 
-*Companion to TCP_MVP_Architecture_Plan_v4.md. Version 2 (adds S15), October 26, 2026. Branch: `TCP-MVP`.*
+*Companion to TCP_MVP_Architecture_Plan_v4.md. Version 3 (paths after S0a), October 28, 2026. Base branch: `tcp-mvp/base`.*
 
 Each slice below is written so a Claude Code prompt can be generated from it directly: goal, dependencies, scope, contracts, tasks, acceptance criteria, tests and a prompt seed. Module and file names are proposals. Statements about the existing repo come from VS Code Claude's earlier analysis and are unverified until slice S0's report confirms or corrects them. Where S0 finds a different name or structure, S0's finding wins.
 
@@ -8,7 +8,10 @@ Each slice below is written so a Claude Code prompt can be generated from it dir
 
 1. Run S0 first. Its report fixes file names and any wrong assumption.
 2. For each later slice, build the Claude Code prompt as: the common preamble below, then the slice's prompt seed, then its acceptance criteria and tests copied verbatim.
-3. One branch per slice off `TCP-MVP`, named `tcp-mvp/sNN-short-name`. Merge only when the gate passes.
+3. One branch per slice off the previous slice (`tcp-mvp/base` for the first), named `tcp-mvp/sNN-short-name`. Merge only when the gate passes.
+4. Setup once per environment: `pip install -e . --no-build-isolation` inside `.venv`.
+
+*Future scope that no slice builds, such as suggesting police detail instead of a flagger from the work location, is kept in the plan, Section 16.*
 
 ## Common preamble for every Claude Code prompt
 
@@ -34,6 +37,20 @@ Rules:
   trade-offs and a recommendation. Do not silently pick.
 - Finish with: files changed, tests added, test results, open questions.
 ```
+
+## Where code lives after S0a
+
+| Area | Folder |
+| --- | --- |
+| Pipeline package | `src/tcp_planner/` with `intake/`, `geometry/`, `imagery/`, `data_sources/`, `ai/`, `site_model/`, `routing/`, `rules/`, `layout/`, `validation/`, `conflicts/`, `review/` (assistant in `review/assistant/`), `sheets/`, `orchestration/`, `storage/`, `audit/`, `evaluation/`, `web_api/`, `config/settings.py`, `contracts.py`, `cli.py` |
+| UI | `apps/web/` |
+| Data and config | `config/`, `rule_pack/`, `assets/` (symbols, sheet, DWT) |
+| Tests | `tests/unit/`, `tests/integration/pipeline/`, `tests/integration/web_api/`, `tests/integration/review_assistant/`, `tests/golden/` |
+| Run data | `var/` (old POC runs tracked in `var/runs/`, new runs ignored) |
+| Backups | `backup/orphans/<date>/` with `MANIFEST.json`; restore with `scripts/restore_backup.py` |
+| Reports | `docs/reports/` |
+
+Module names in the slices below are targets inside these folders. The S0 report confirms or corrects them.
 
 ## Shared contracts
 
@@ -62,32 +79,46 @@ Question { question_id, kind, reason, options[], default_if_skipped,
 
 ---
 
-## S0. Setup, repo verification and fixtures
+## S0a. Production layout (done)
 
-**Goal.** Start the MVP branch, verify the plan against the real repo, and set up the fixture harness and the golden set so every later slice can be tested without live calls.
+Done on `tcp-mvp/s00a-restructure` (9 commits). The POC packages `tcp_poc`, `tcp_ui` and `tcp_assistant` became one package `src/tcp_planner/`; the UI moved to `apps/web/`. Every test suite, all 13 offline scenarios and all 36 saved-run replays are identical to the baseline. Report: `docs/reports/S0a_restructure_report.md`.
 
-**Depends on.** Nothing.
+Follow-ups carried into later slices:
+- S0: fix `test_protected_run_dir_untouched` (D-79) and make Foundry the default AI provider (D-78).
+- S2: store run paths relative to the runs folder, so runs can be resumed after a move (D-77).
+- S15: the symbol-level backups left out of S0a (USGS and Esri provider classes, the direct Anthropic provider and its usage wrapper, `test_diagnostics.py`).
+- Later, as one commit with a replay diff: rename output codes and strings that still say POC (`UNSUPPORTED_POC`, `SELF_CONFIRMED_POC`, "TCP POC Pipeline"). The rule pack file name changes in S4.
 
-**In scope.** Create `TCP-MVP` from the backed-up POC. Run the Section 18 verification prompt and save its report as `docs/S0_repo_report.md`. Add a fixture harness that records Azure Maps, OSM and AI responses once and replays them. Copy the golden set v0.1 into `tests/golden/` and the symbol library v0.1 into `assets/symbols/`. List which existing suites still apply to the MVP.
+---
 
-**Out of scope.** Any behavior change.
+## S0. Repo verification, fixtures and schema spike
+
+**Goal.** Verify the plan against the real repo, set up the fixture harness, close the two S0a follow-ups, and run the schema spike, so every later slice can be tested without live calls.
+
+**Depends on.** S0a merged into `tcp-mvp/base`.
+
+**In scope.** Run the Section 18 verification prompt and save its report as `docs/reports/S0_repo_report.md`. Add a fixture harness that records Azure Maps, OSM and AI responses once and replays them. List which existing suites still apply to the MVP. Fix the protected-run test and the default AI provider. Run the schema spike.
+
+**Out of scope.** Any other behavior change.
 
 **Tasks.**
-1. Branch and folder layout: `docs/`, `tests/fixtures/`, `tests/golden/`, `assets/symbols/`.
-2. Fixture recorder and replayer. Key fixtures by a request fingerprint. Replay mode is the default in tests and fails if a fixture is missing.
-3. Record fixtures for the three real KMLs once, with live calls run by you, not by CI.
-4. Verification report: answer items 1 to 34 of the Section 18 prompt with file and line evidence.
-5. Schema spike: run `schema_spike_prompt.md` (the only live calls allowed in S0, behind `TCP_LIVE=1`, at most 18 AI calls, JSON only). Its report decides the call 1 and call 2 output format (D-61). Nothing in S6 is built before it.
+1. Fixture recorder and replayer. Key fixtures by a request fingerprint. Replay mode is the default in tests and fails if a fixture is missing. Fixtures go in `tests/fixtures/`.
+2. Seed fixtures from saved evidence (Granite single point P30, Alton Bradford and Exeter demos) with `python -m tests.support.record seed`. Recording the three real KMLs needs live calls and the pipeline cannot take them yet (it rejects more than one Point), so it moves to the post-S6 recording task in S6.
+3. Verification report: answer items 1 to 34 of the Section 18 prompt with file and line evidence.
+4. Fix `test_protected_run_dir_untouched` so it checks that `var/runs/20261020-214203-7f7232` is tracked and unchanged (D-79). After this, every suite is green.
+5. Make Foundry the default when `TCP_AI_PROVIDER` is unset, and fail with a clear message when Foundry is not configured (D-78). This is a deliberate behavior change in its own commit.
+6. Once fixtures exist, replace the git-HEAD oracle in `test_global_identity.py` with fixture replay.
+7. Schema spike: run `docs/slices/schema_spike_prompt.md` (the only live calls allowed in S0, behind `TCP_LIVE=1`, at most 18 AI calls, JSON only). Its report decides the call 1 and call 2 output format (D-61). Nothing in S6 is built before it.
 
 **Acceptance criteria.**
-- `pytest` runs with no network access and no live calls.
-- A replayed run of each real KML gives the same request fingerprints twice.
+- `pytest` runs with no network access and no live calls, and every suite is green.
+- A replayed saved run gives the same request fingerprints twice.
 - The report lists every confirmed, refuted or unknown assumption, with file paths.
 - `spikes/schema_spike/REPORT.md` exists with results for the current schema and the facts list, and a recommendation.
 
-**Tests.** Fixture replay determinism; a missing fixture raises a clear error; the network is blocked in the test environment.
+**Tests.** Fixture replay determinism; a missing fixture raises a clear error; the network is blocked in the test environment; unset `TCP_AI_PROVIDER` selects Foundry.
 
-**Prompt seed.** "Create branch TCP-MVP and slice branch tcp-mvp/s00-setup. Do not change behavior. Build a fixture recorder and replayer for Azure Maps, OSM and AI calls, keyed by request fingerprint, with replay as the test default. Copy the golden set and symbol library into the folders listed. Then run the verification prompt in Section 18 of the plan and write docs/S0_repo_report.md. Stop and report."
+**Prompt seed.** "Create branch tcp-mvp/s00-setup from tcp-mvp/base. Build a fixture recorder and replayer for Azure Maps, OSM and AI calls, keyed by request fingerprint, with replay as the test default. Fix the protected-run test (D-79) and make Foundry the default provider (D-78), each in its own commit. Then run the verification prompt in Section 18 of the plan and write docs/reports/S0_repo_report.md. Stop and report. The schema spike is a separate session."
 
 ---
 
@@ -114,13 +145,13 @@ Question { question_id, kind, reason, options[], default_if_skipped,
 
 ## S2. Storage interfaces
 
-**Goal.** All reads and writes go through thin interfaces with local adapters, so data is content-addressed and replayable.
+**Goal.** All reads and writes go through thin interfaces with local adapters, so data is content-addressed and replayable. Includes the S0a follow-up: run records store paths relative to the runs folder (D-77).
 
 **Depends on.** S0.
 
-**In scope.** `ArtifactStore` (blobs), `StateStore` (index, events, heads, compare-and-set) and `RulePackStore` (interface only, implemented in S4). Local filesystem and SQLite adapters. Artifact references, schema versions and migrations. A project store.
+**In scope.** `ArtifactStore` (blobs), `StateStore` (index, events, heads, compare-and-set) and `RulePackStore` (interface only, implemented in S4). Local filesystem adapters only, files only (D-84): artifacts as files, state as one `.state.json` file per record and one `.events.jsonl` file per stream, each run's state inside its own run folder. Artifact references, schema versions and migrations. A project store.
 
-**Out of scope.** Cloud adapters and the migration tool (deferred, D-40).
+**Out of scope.** Cloud adapters and the migration tool (deferred, D-40). A database adapter (future scope, D-84).
 
 **Acceptance criteria.**
 - No raw path in any persisted JSON (checked by a test that scans outputs).
@@ -157,6 +188,8 @@ Question { question_id, kind, reason, options[], default_if_skipped,
 ## S4. Rule pack v1
 
 **Goal.** A composed, table-shaped rule pack for TA-1, TA-6, TA-10 and TA-33, built from the supplied MUTCD 11th Edition Chapter 6 (December 2023 revision), behind `RulePackStore`. Field names must match the general and per-TA input schema in plan Section 4B.
+
+**Replaces the POC pack (D-81).** Rule pack v1 replaces `rule_pack/APPROVED_TWO_LANE_POC_RULE_PACK.json`, which is the only pack in `rule_pack/` until then. The six KMLs in `docs/references/kml/` (the three real sites and the TA-6, TA-10 and TA-33 examples) are its test inputs.
 
 **Depends on.** S0. Can run in parallel with S1 to S3.
 
@@ -223,6 +256,7 @@ Question { question_id, kind, reason, options[], default_if_skipped,
 - Data sources (D-53, D-62, D-63): Azure Maps, OSM via Overpass (the tag list in plan Section 5), MassGIS, RIGIS, HPMS, Census urban areas, USGS 3DEP, MBTA and RIPTA GTFS, FRA crossings. All fused values are low confidence, imagery decides, disagreements are recorded (D-37).
 - Width with uncertainty (D-38).
 - Every image resized in code to the model limit (from S0's report).
+- Spike requirements (D-80): `lanes_per_direction` is cross-checked against OSM lanes and state data, and a disagreement makes it UNKNOWN with an SME question; width comes from `cross_section.py` first and AI marks second, and an invalid or missing mark makes the width UNKNOWN; each evidence string is capped at 15 words and UNKNOWN facts carry a short fixed reason, per `docs/reports/S0_prompt_tuning_proposal.md` once approved.
 - Hybrid crops: code crop first, a higher-zoom fetch only when pixels are insufficient.
 - Pre-calculation per plan Section 4C: vehicle width and footprint (measured, else cited default flagged `DEFAULT_ASSUMED`), the remaining-width table, shadow vehicle, TMA suggestion and arrow board.
 
@@ -232,6 +266,8 @@ Question { question_id, kind, reason, options[], default_if_skipped,
 - A higher-zoom fetch happens only when the pixel threshold fails, and it is recorded as evidence with a signature.
 
 **Tests.** Mandatory fields are never written by code; a computed remaining width that contradicts `lane_closure` creates a conflict, not a change; no length comes from the AI (a test fails if a length field appears in AI output); length computations against fixtures with known pixel scale; every observed field resolves to RESOLVED or UNKNOWN; fusion disagreement recorded; only the approved sources are called (a mock fails the test otherwise); the remaining-width table as a parametrized test; crop decision with mocked pixel counts.
+
+**Post-S6 recording task (run by the user, `TCP_LIVE=1`).** Record the three real KMLs (Granite, E Second St, Colorado) with `python -m tests.support.record live`, which calls `use_os_trust_store()` first. This is the third live-call exception in CLAUDE.md. Then add replay tests for them: the same request fingerprints twice.
 
 **Prompt seed.** "Extend call 1 and fusion per slice S6. Use only recorded fixtures in tests. Keep the two-AI-call budget per zone."
 
@@ -249,6 +285,7 @@ Question { question_id, kind, reason, options[], default_if_skipped,
 - The routing tree and explicit eligibility (D-60): TA-6 requires `shoulder_present` and a low-speed minor road (note 2; cutoff `SOURCE_REVIEW_REQUIRED` until set) with width to the device face; TA-33 is one OR'd rule citing 6P-33 and 6N.11, so undivided four-lane roads such as Granite qualify.
 - `traffic_control_method` set by code to Flagger when TA-10 is chosen (D-68). Police details are not applied by the router.
 - Call 2 with crops for unresolved TA fields. It never overwrites a resolved fact, and safety-critical facts go through the cross-view check.
+- Spike requirements (D-80): call 2 re-asks `lanes_per_direction` with a lane-marking crop; it requests lane lines, shoulder edge and curb marks from crops; and it resolves `sidewalk_present` and `sidewalk_side` with a crop plus OSM sidewalk tags.
 
 **Acceptance criteria.**
 - On golden fixtures the router returns TA-10 for Colorado, TA-6 for E Second St and TA-33 for Granite, or a question when a deciding fact is unknown. It never returns a wrong TA silently.
@@ -444,7 +481,7 @@ S0, then S1 and S2 in parallel, then S3. S4 and S5 can run beside S1 to S3. Then
 
 **Goal.** Find files and code the MVP no longer uses and move them to `backup/`, with a manifest, so the codebase stays clean and nothing is lost. Nothing is ever deleted.
 
-**Depends on.** S0 for the repo report. The first run comes after S3, when the new flow has replaced the old entry points. The final run comes after S14.
+**Depends on.** S0 for the repo report. S0a already moved 16 whole files to `backup/orphans/2026-10-28/`. The first S15 run comes after S3 and starts with the symbol-level items S0a left behind (USGS and Esri provider classes, the direct Anthropic provider and its usage wrapper, `test_diagnostics.py`). The final run comes after S14.
 
 **Two kinds of orphan.**
 1. **Orphaned files:** modules, scripts, configs, assets, data files and tests that nothing reaches.
@@ -455,7 +492,7 @@ The known candidates from earlier work are the USGS imagery code and the direct-
 **How candidates are found.** Use several methods. A file is an orphan only when every method agrees.
 - **Static reachability:**
   - Python: build an import graph from every entry point (CLI, app server, workers, tests of live code) using an AST walk.
-  - TypeScript in `tcp_ui`: use `knip` or `ts-prune` and `unimported`.
+  - TypeScript in `apps/web`: use `knip` or `ts-prune` and `unimported`.
   - Unused dependencies: `depcheck` for npm, and an import scan for `requirements` and `pyproject`.
 - **Dead-code scan:** `vulture` for Python at 80 % confidence or more, and the TypeScript tools above for unused exports.
 - **Runtime evidence:** coverage from the full test suite plus one replayed full-pipeline run of each real KML. Code never executed is a suspect, not a proof.

@@ -6,7 +6,7 @@ CONFIRMED; with a DRAFT label every row is shown but marked "not scored". A mode
 """
 import json
 
-from tcp_planner.storage import run_store as store
+from tcp_planner.storage import run_records as records, run_store as store
 from tcp_planner.evaluation import ground_truth_labels as labels
 from tcp_planner.orchestration import run_relations as relations
 
@@ -47,8 +47,8 @@ def _match(field, value, label):
 def evaluate_comparison(cid):
     rep = relations.comparison_state(cid)
     if rep is None: return None
-    pg = store._read_json(store.run_path(rep["source_run_id"], "output", "project_geometry.json"))
-    label = labels.get(labels.site_id_for(pg)) if pg else None
+    sid = labels.site_id_for((records.read(rep["source_run_id"], "request") or {}).get("request"))
+    label = labels.get(sid) if sid else None  # a source run outside a project has no lineage and no label
     confirmed = bool(label and label["status"] == "CONFIRMED")
     cols = []
     for c in rep["columns"]:

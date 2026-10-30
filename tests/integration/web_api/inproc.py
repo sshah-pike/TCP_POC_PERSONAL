@@ -34,7 +34,7 @@ def isolated():
 def run(rdir):
     from tcp_planner.orchestration import run_worker as runner
     with isolated():
-        return runner.main([rdir])
+        return runner.main([os.path.basename(rdir)])
 
 
 def tree_hashes(path):

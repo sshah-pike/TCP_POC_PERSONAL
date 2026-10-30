@@ -36,7 +36,7 @@ def inproc(tmp_path, monkeypatch):
         rid, rdir = store.create_run({"input_type": "coordinates", "lat": "41.415", "lon": "-71.742",
                                       "operator": {"road_type": "RURAL"},
                                       "advanced": {"map_provider": "azure_maps", "no_dwt": True}}, set())
-        code = runner.main([rdir])
+        code = runner.main([os.path.basename(rdir)])
         return code, store.build_state(rid), rdir
 
     yield run
@@ -60,7 +60,7 @@ def raising(exc):
 
 
 def assert_fail_closed(code, st, rdir, expected=EXPECTED):
-    assert code == 3 and st["decision"] == "ERROR" and st["reason_codes"] == expected
+    assert code == 3 and st["decision"] == "REVIEW_REQUIRED" and st["service_error"]  # exit 3 stays REVIEW_REQUIRED (S3 Q12-B) and st["reason_codes"] == expected
     assert not st["draft_generated"] and not ({o["name"] for o in st["outputs"]} & DRAFT)
     stages = {s["key"]: s for s in st["stages"]}
     assert stages["imagery"]["status"] == "ERROR"
