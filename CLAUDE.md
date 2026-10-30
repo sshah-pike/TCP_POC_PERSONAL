@@ -54,7 +54,7 @@ If code and plan disagree, **stop and report**. Do not silently follow either on
    - A computed check that contradicts one raises a conflict question. It never changes the value.
 5. **Traffic control method (D-68):**
    - It is not a UI start field. When the router picks TA-10, code sets it to Flagger.
-   - Police details are a post-draft SME review action: W20-7 becomes POLICE OFFICER AHEAD and the checks re-run.
+   - Flagger is the default. Police detail instead of flagger is future scope (D-68).
 6. **KML (D-66):** read coordinates only (points, lines, polygons).
    - Ignore all `ExtendedData`, including `tcp:*` and `selected_ta`.
    - Placemark names are display labels only.
@@ -129,7 +129,7 @@ If code and plan disagree, **stop and report**. Do not silently follow either on
 - **Retry is idempotent, not transactional.** Run reserves run ids in the project record, builds each run, then starts it. A
   crash in between leaves a reserved id or a built run that the next Run completes; nothing is created twice.
 - **The live UI path is untried.** Projects ran only on offline scenarios, recorded fixtures and fakes. The Azure Maps and AI
-  path through the project UI waits for the real-KML recording after S6 (`TCP_LIVE=1`, run by the owner).
+  path through the project UI waits for the real-KML recordings (Colorado after S7, the rest after S9; `TCP_LIVE=1`, run by the owner).
 - **Cap approval is not an identity.** `approved_by` is typed text or "UI click", stored with `verified: false` (S10's
   approver role replaces it). An approval covers the zone count it was given for, not a bigger set.
 - **A REVIEW_REQUIRED zone has no draft.** The pipeline drafts only SUPPORTED_AUTO; the project status REVIEW_REQUIRED
@@ -148,7 +148,7 @@ If code and plan disagree, **stop and report**. Do not silently follow either on
 - **Live Azure Maps and AI calls** are allowed only in:
   - the S13 full-pipeline test;
   - the S0 schema spike;
-  - recording real-KML fixtures with `python -m tests.support.record live`, once, after S6.
+  - recording real-KML fixtures with `python -m tests.support.record live`: Colorado once after S7 merges (calls 1 and 2 together), the rest after S9. Granite is compared at pole P32 (Phase I) only. The owner runs recordings with `TCP_LIVE=1`.
   All run only when `TCP_LIVE=1` and only when the user runs them.
 - **Every script that can make live calls** (the recorder, the spike, the S13 test) calls `use_os_trust_store()` first, as the pipeline CLI does. Certificate verification is never turned off.
 - **Gate for every slice:** applicable suites green, new slice tests green, replay deterministic. From S13 on, the golden comparator report must not get worse.

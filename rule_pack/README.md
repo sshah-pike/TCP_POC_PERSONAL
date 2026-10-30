@@ -4,7 +4,7 @@
 | --- | --- |
 | `APPROVED_TWO_LANE_POC_RULE_PACK.json` | The POC pack. Still used by the pipeline through `rules/rule_pack_loader.py`. Protected: never edited. Switching the pipeline to pack v1 is a separate step that needs the owner's approval |
 | `pack.json` | Rule pack v1 manifest: id, version, status `DRAFT`, `ta_scope`, the parts with their sha256, and the pack hash |
-| `base/*.json` | Federal layer, shared by every TA: sources, registry fields, Tables 6B-1 to 6B-3, formulas (6B-4, 6B-3, 6K.01), shared rules, devices |
+| `base/*.json` | Federal layer, shared by every TA: sources, registry fields, Tables 6B-1 to 6B-3, formulas (6B-4, 6B-3, 6K.01), shared rules, devices; sign sizes from Tables 6G-1, 6H-1 and 6I-1 (`sign_sizes.json`, S4b); the optional sidewalk-closed and detour add-ons, Sect. 6G.10 and 6I.02 (`sidewalk_detour.json`, S4b) |
 | `ta/TA-1.json`, `TA-6`, `TA-10`, `TA-33` | Federal layer, one file per TA: figure notes, eligibility conditions, device sequences |
 | `jurisdiction/`, `client/` | Not created. Layers stay in the schema but are empty in v1 (S4 scope change: rules come from the MUTCD only) |
 

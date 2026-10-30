@@ -103,7 +103,7 @@ Follow-ups carried into later slices:
 
 **Tasks.**
 1. Fixture recorder and replayer. Key fixtures by a request fingerprint. Replay mode is the default in tests and fails if a fixture is missing. Fixtures go in `tests/fixtures/`.
-2. Seed fixtures from saved evidence (Granite single point P30, Alton Bradford and Exeter demos) with `python -m tests.support.record seed`. Recording the three real KMLs needs live calls and the pipeline cannot take them yet (it rejects more than one Point), so it moves to the post-S6 recording task in S6.
+2. Seed fixtures from saved evidence (Granite single point P30, Alton Bradford and Exeter demos) with `python -m tests.support.record seed`. Recording the three real KMLs needs live calls and the pipeline cannot take them yet (it rejects more than one Point), so it moves to the recording task in S6 (Colorado after S7, the rest after S9, D-98).
 3. Verification report: answer items 1 to 34 of the Section 18 prompt with file and line evidence.
 4. Fix `test_protected_run_dir_untouched` so it checks that `var/runs/20261020-214203-7f7232` is tracked and unchanged (D-79). After this, every suite is green.
 5. Make Foundry the default when `TCP_AI_PROVIDER` is unset, and fail with a clear message when Foundry is not configured (D-78). This is a deliberate behavior change in its own commit.
@@ -217,6 +217,27 @@ Follow-ups carried into later slices:
 
 **Prompt seed.** "Build rule pack v1 per slice S4 from the supplied Chapter 6 PDF in docs/sources. Use AI-assisted extraction only to draft records. Every record must quote its table, section and page. Mark client-layer rules PROPOSED. Produce a review report listing every value and its source for SME sign-off."
 
+**Amendment 2026-10-30.** The S4 scope lines above are kept as merged. The client layer (`rule_pack/client/*.json`, the client 100 ft buffer, the police variant of TA-10, the add-on modules and the 11 ft note) is withdrawn by D-51 and was not built; the buffer is a per-zone choice (D-94) and add-ons come from sourced sections (D-90). The line on 6N.11 ("TA-33 on undivided four-lane roads") is narrowed to a Granite-type case by D-91.
+
+---
+
+## S4b. Pack extension round
+
+**Goal.** Close the pack gaps that S5 commits 3 and 4 and S8 depend on, as quoted, sourced pack rows (owner decisions D-91 and D-99, added 2026-10-30).
+
+**Depends on.** S4.
+
+**In scope.**
+- Sign sizes as quoted pack rows (the work S5 commit 3 was to do).
+- Device rows for note-only signs (the work S5 commit 4 was to do).
+- Placement anchors: what A, B and C are measured from (consecutive gaps ending at the taper start for TA-6 and TA-33, or at the flagger station for TA-10; SME confirms).
+- Add-on sections: sidewalk closed (R9-9, R9-11 family) and detour (M4-9 family). No-parking (R8-3) and RI double fines wait for sources.
+- The 6N.11 split: Granite-type case sourced, broader cases an engineer question.
+
+**Acceptance criteria.** To be set when S4b is planned. Every value is quoted with page and rule id; a value with no source stays `SOURCE_REVIEW_REQUIRED`. The manifest stays DRAFT. The pack hash change is recorded.
+
+**Runs.** Before S5 commit 3 and before S8. S5 resumes after S4b is merged.
+
 ---
 
 ## S5. Device catalog and symbol library
@@ -224,6 +245,8 @@ Follow-ups carried into later slices:
 **Goal.** Every device a plan can place exists in the catalog, with a symbol, and the renderer can draw it.
 
 **Depends on.** S4.
+
+**Changed 2026-10-30 (D-99):** commits 3 and 4 of the S5 plan (sign sizes as quoted pack rows; device rows for note-only signs) move to slice S4b. S5 resumes after S4b is merged.
 
 **In scope.**
 - Import `assets/symbols/device_catalog.json` (v0.1, 51 entries) into the pack's `device` table.
@@ -247,6 +270,8 @@ Follow-ups carried into later slices:
 
 **Goal.** Call 1 returns the common and deciding facts with confidence and evidence, and geometry, width and crops follow the plan.
 
+**Changed 2026-10-30 (D-96, S6 plan Q1 B):** S6 runs in two sessions (session 1: call 1, measurement, crops, OSM, wiring; session 2: data sources). Cutover chain: S6 builds beside the old path, S7 adds a non-gating route stage, S8 cuts over once with regenerated oracles the owner reviews.
+
 **Depends on.** S3.
 
 **In scope.**
@@ -267,7 +292,7 @@ Follow-ups carried into later slices:
 
 **Tests.** Mandatory fields are never written by code; a computed remaining width that contradicts `lane_closure` creates a conflict, not a change; no length comes from the AI (a test fails if a length field appears in AI output); length computations against fixtures with known pixel scale; every observed field resolves to RESOLVED or UNKNOWN; fusion disagreement recorded; only the approved sources are called (a mock fails the test otherwise); the remaining-width table as a parametrized test; crop decision with mocked pixel counts.
 
-**Post-S6 recording task (run by the user, `TCP_LIVE=1`).** Record the three real KMLs (Granite, E Second St, Colorado) with `python -m tests.support.record live`, which calls `use_os_trust_store()` first. This is the third live-call exception in CLAUDE.md. Then add replay tests for them: the same request fingerprints twice.
+**Recording task (run by the owner, `TCP_LIVE=1`; changed 2026-10-30, D-97, D-98).** The 9-call check on gpt-5.6-sol and on claude-opus-5-5 comes before any recording. Colorado is recorded once after S7 merges (calls 1 and 2 together); E Second St and Granite after S9. Granite is compared at pole P32 (Phase I) only. Record with `python -m tests.support.record live`, which calls `use_os_trust_store()` first. This is the third live-call exception in CLAUDE.md. Then add replay tests for them: the same request fingerprints twice.
 
 **Prompt seed.** "Extend call 1 and fusion per slice S6. Use only recorded fixtures in tests. Keep the two-AI-call budget per zone."
 
@@ -282,7 +307,7 @@ Follow-ups carried into later slices:
 **In scope.**
 - Router over pack TAs only, with the five outcomes, near match ("did you mean", at most 1 failed condition, at most 2 suggestions) and thresholds (D-33).
 - `TA_SELECTION_CONFLICT` against a TA hypothesis entered in the UI.
-- The routing tree and explicit eligibility (D-60): TA-6 requires `shoulder_present` and a low-speed minor road (note 2; cutoff `SOURCE_REVIEW_REQUIRED` until set) with width to the device face; TA-33 is one OR'd rule citing 6P-33 and 6N.11, so undivided four-lane roads such as Granite qualify.
+- The routing tree and explicit eligibility (D-60): TA-6 requires `shoulder_present` and a low-speed minor road (note 2; cutoff `SOURCE_REVIEW_REQUIRED` until set) with width to the device face; TA-33 is one OR'd rule citing 6P-33 and 6N.11, so a Granite-type case (undivided, two lanes each way, right lane closed; D-91) qualifies. Broader undivided cases are an engineer question.
 - `traffic_control_method` set by code to Flagger when TA-10 is chosen (D-68). Police details are not applied by the router.
 - Call 2 with crops for unresolved TA fields. It never overwrites a resolved fact, and safety-critical facts go through the cross-view check.
 - Spike requirements (D-80): call 2 re-asks `lanes_per_direction` with a lane-marking crop; it requests lane lines, shoulder edge and curb marks from crops; and it resolves `sidewalk_present` and `sidewalk_side` with a crop plus OSM sidewalk tags.
@@ -305,8 +330,8 @@ Follow-ups carried into later slices:
 
 **In scope.**
 - Strategies for TA-1, TA-6, TA-10 and TA-33 on one common placement core. Advance signs come from Table 6B-1 A, B and C spacing on both approaches where the figure shows them.
-- Tapers from Tables 6B-3 and 6B-4, buffers from the client layer or Table 6B-2, channelizer spacing from 6K.01, and end signs.
-- Add-on modules: no parking, side streets, pedestrian or sidewalk, RI double fines, police detail, arrow board.
+- Tapers from Tables 6B-3 and 6B-4, buffers from Table 6B-2 when chosen per zone (client layer withdrawn, D-51), channelizer spacing from 6K.01, and end signs.
+- Add-on modules, optional per zone (changed 2026-10-30, D-90, D-51 withdrawn, D-68 deferred): sidewalk closed and detour, built from the S4b sections. No-parking and RI double fines wait for sources. Client modules and police detail are out of scope.
 - Validators with independent recomputation.
 - The layout envelope per zone, used by S9.
 
@@ -386,7 +411,6 @@ Follow-ups carried into later slices:
 - The append-only ledger.
 - The SME approval gate `require_sme_approval_for_all_plans`, default true (D-65): every plan waits for a click and shows whether it would have been SUPPORTED_AUTO.
 - Asked-if-needed fields (duration, night work, heavy vehicles and the rest, plan Section 4B) appear only when a rule needs them. `work_side` always appears as an AI suggestion for the SME to confirm (D-69).
-- Review action "switch to police details" for TA-10 zones (D-68): flagger stations become police details, W20-7 becomes POLICE OFFICER AHEAD, checks re-run, a ledger entry is written. Callable from the review screen and from the SME assistant chat.
 
 **Acceptance criteria.**
 - Answering a question resumes with zero new external calls when signatures match.
@@ -434,7 +458,7 @@ Follow-ups carried into later slices:
   - Exact: TA, sheet count, work points per sheet, scale, advance-sign order and code set.
   - Tolerance: position within 15 ft and spacing within 10 ft, using the labelled value where the draft is schematic.
   - Side of road must match.
-- Report categories: RULE\_GAP, CLIENT\_PRACTICE, FIELD\_JUDGMENT, SCHEMATIC\_DRAFT, EXTRACTION\_ERROR, POST\_DRAFT\_VARIANT (for Colorado, compare after applying the police switch, D-68).
+- Report categories: RULE\_GAP, CLIENT\_PRACTICE, FIELD\_JUDGMENT, SCHEMATIC\_DRAFT, EXTRACTION\_ERROR; no post-draft variant category: police detail is future scope (D-68), so the Colorado difference is reported as a known difference.
 - The live full-pipeline test on the three KMLs behind `TCP_LIVE=1`.
 - Golden v0.2 after your SME's corrections.
 
@@ -473,7 +497,7 @@ Follow-ups carried into later slices:
 
 ## Order and parallel work
 
-S0, then S1 and S2 in parallel, then S3. S4 and S5 can run beside S1 to S3. Then S6, S7, S8, S9, then S10 and S12 in parallel, then S11 and S13. S14 can follow S9 at any time. S15 runs once after S3 and again after S14.
+S0, then S1 and S2 in parallel, then S3. S4 and S5 can run beside S1 to S3 (changed 2026-10-30: S4b runs after S4 and before S5 commit 3 and before S8; S5 resumes after S4b). Cutover chain across S6, S7 and S8: S6 builds beside the old path, S7 adds a non-gating route stage, S8 cuts over once (D-96). Then S6, S7, S8, S9, then S10 and S12 in parallel, then S11 and S13. S14 can follow S9 at any time. S15 runs once after S3 and again after S14. S16 (rule management UI) is last.
 
 ---
 
@@ -539,3 +563,11 @@ The known candidates from earlier work are the USGS imagery code and the direct-
 - A check that every allowlisted path still exists.
 
 **Prompt seed.** "Run the orphan sweep per slice S15. Build the candidate list using import graphs from all entry points, vulture, knip or ts-prune, depcheck, coverage from the test suite plus one replayed run per real KML, and a repo-wide string search including configs and CI. Classify each item as CONFIRMED_ORPHAN, SUSPECT or KEEP with its evidence. Write docs/S15_orphan_report.md and STOP for my approval. After approval, git mv approved files and cut approved symbols into backup/orphans/<date>/ with MANIFEST.json and a restore script. Delete nothing. Then rerun all tests and the replayed pipeline and show that outputs are unchanged."
+
+---
+
+## S16. Rule management UI (last slice)
+
+**Goal.** A read-only browser for the rule pack first, then approval of rule changes as an append-only record (owner decision D-102, added 2026-10-30).
+
+**Depends on.** All earlier slices. Planned last. Scope and acceptance criteria are set when S16 is planned (see docs/plans/S16_plan.md).

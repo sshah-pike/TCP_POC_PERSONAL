@@ -24,6 +24,7 @@
       {"id": "vehicle_detour_required", "group": "ASKED_IF_NEEDED", "source_type": "SME_FORM", "value_type": "boolean", "unit": null, "enum_values": null, "plan_ref": "4B asked-if-needed fields"},
       {"id": "pedestrian_detour_required", "group": "ASKED_IF_NEEDED", "source_type": "SME_FORM", "value_type": "boolean", "unit": null, "enum_values": null, "plan_ref": "4B asked-if-needed fields"},
       {"id": "pedestrian_accessible_route_maintained", "group": "ASKED_IF_NEEDED", "source_type": "SME_FORM", "value_type": "boolean", "unit": null, "enum_values": null, "plan_ref": "4B asked-if-needed fields"},
+      {"id": "addon_sidewalk_closed", "group": "ASKED_IF_NEEDED", "source_type": "SME_FORM", "value_type": "boolean", "unit": null, "enum_values": null, "plan_ref": "D-90; S11 add-on toggle ADDON:sidewalk_closed"},
 
       {"id": "work_location", "group": "OBSERVED_COMPUTED", "source_type": "AI_AND_CODE", "value_type": "enum", "unit": null,
        "enum_values": ["BEYOND_SHOULDER", "ON_SHOULDER_OR_ENCROACHING", "IN_LANE"], "plan_ref": "6 routing decision tree (D-60)"},

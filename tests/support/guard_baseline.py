@@ -8,9 +8,8 @@ empty APPROVED.
 import os, subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-BASELINE_REF = "964948162973f4bfd442b85cec2f3681708af92c"  # merge-base of tcp-mvp/s05-device-catalog with origin/tcp-mvp/base
-APPROVED = {
-}
+BASELINE_REF = "c2c0250575b6bf72b516306f20535d3369267356"  # merge-base of HEAD with origin/tcp-mvp/base (after merging base)
+APPROVED = {}
 
 
 def _git(*args):
