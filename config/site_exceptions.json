@@ -1,0 +1,24 @@
+{
+  "readme": {
+    "purpose": "Reviewed overrides for one known site where the imagery or the data sources are known to mislead the tool (for example a road that OSM draws wrongly). The file ships empty: the tool adds no real entries. Every entry is a deliberate human decision.",
+    "schema": {
+      "entry_id": "unique text id of the entry",
+      "scope": "exactly one of site_id | zone_id | osm_way_id (an integer) naming where the entry applies",
+      "field": "the fact it applies to (a call 1 field or a measured width); never a mandatory start field (road_type, posted_speed_mph, traffic_volume, lane_closure)",
+      "action": "SET_VALUE (needs value) or FORCE_UNKNOWN (takes no value)",
+      "value": "the override value, SET_VALUE only, one scalar",
+      "reason": "why, in one sentence",
+      "added_by": "who added it",
+      "added_on": "date YYYY-MM-DD"
+    },
+    "rules": [
+      "An entry applies only to its named site, zone or OSM way and only to its named field.",
+      "Every use is listed in the run trace (entry id, scope, field, action, original outcome and value).",
+      "The sha256 of this file is recorded in the run trace.",
+      "A malformed file or entry fails closed: nothing is applied and the run stops with SITE_EXCEPTIONS_MALFORMED.",
+      "Two entries for the same field at the same site fail closed."
+    ]
+  },
+  "schema_version": "1",
+  "entries": []
+}

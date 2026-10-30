@@ -89,3 +89,20 @@ def test_summary_prints_saved_rows(script, capsys, monkeypatch):
     script.main(["--profile", "gpt-5.6-sol", "--only", "1"]); capsys.readouterr()
     assert script.main(["--profile", "gpt-5.6-sol", "--summary"]) == 0
     assert "| 1 | granite | 1 | gpt-5.6-sol |" in capsys.readouterr().out
+
+
+def test_without_profile_the_default_gpt_profile_is_used_and_claude_still_works(script, capsys, monkeypatch):
+    monkeypatch.delenv("TCP_LIVE", raising=False); monkeypatch.delenv("TCP_FOUNDRY_PROFILE", raising=False)
+    monkeypatch.setattr("tcp_planner.ai.call1.send_call1", lambda *a, **k: pytest.fail("a call was made"))
+    assert script.main(["--dry-run", "--only", "1"]) == 0
+    out = capsys.readouterr().out
+    assert "gpt-5.6-sol" in out
+    assert script.main(["--profile", "claude-opus-5-5", "--dry-run", "--only", "1"]) == 0
+    out2 = capsys.readouterr().out
+    assert "claude-opus-5-5" in out2 and "output_config" in out2
+
+
+def test_the_default_profile_in_config_is_gpt_5_6_sol():
+    from tcp_planner.ai.foundry_provider import load_profiles
+    doc = load_profiles()
+    assert doc["default_profile"] == "gpt-5.6-sol" and "claude-opus-5-5" in doc["profiles"]

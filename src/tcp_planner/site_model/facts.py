@@ -14,7 +14,7 @@ Scalar = Union[bool, int, float, str]
 
 REASON_CODES = ("not_visible", "occluded", "low_resolution", "ambiguous", "source_disagreement", "threshold_in_interval",
                 "no_source", "malformed", "missing", "duplicate", "low_confidence", "no_registry_value", "ai_conflict",
-                "not_stated", "single_source", "layout_not_allowed", "source_failed", "no_tag", "check_failed", "near_edge", "no_road_near")
+                "not_stated", "single_source", "layout_not_allowed", "source_failed", "no_tag", "check_failed", "near_edge", "no_road_near", "site_exception")
 FLAGS = ("DEFAULT_ASSUMED", "POLICY_SUGGESTED", "CALIBRATION_PENDING", "SOURCE_REVIEW_REQUIRED", "CONTEXT_ONLY",
          "AI_ONLY_UNCONFIRMED", "NEEDS_SECOND_SOURCE", "EVIDENCE_OVER_15_WORDS", "UNIT_MISMATCH", "AI_CONFLICT", "PROPOSED")
 # flags that keep a fact out of every rule input (the value is shown to the SME only)
@@ -119,6 +119,45 @@ class Question(_Rec):
     project_id: Optional[str] = None
     osm_way_id: Optional[int] = None
     context: dict = {}
+
+
+class AnswerRecord(_Rec):
+    """A stored SME answer. There is no question log store in S6 or S7; whatever stores an answer keeps these keys, so a later log
+    can be built from the stored records alone: kind, field, zone id, project id, OSM way id and the time of the answer."""
+    schema_version: str = SCHEMA_VERSION
+    question_id: str
+    kind: Literal[QUESTION_KINDS]
+    field: str
+    zone_id: Optional[str] = None
+    project_id: Optional[str] = None
+    osm_way_id: Optional[int] = None
+    answer: str
+    answered_by: str
+    answered_at: str                        # ISO 8601 with a time zone
+
+    @model_validator(mode="after")
+    def _complete(self):
+        import datetime
+        if not self.field.strip(): raise ValueError("answer record has no field")
+        if not self.answer.strip() or not self.answered_by.strip(): raise ValueError("answer record has no answer or no actor")
+        try: t = datetime.datetime.fromisoformat(self.answered_at)
+        except ValueError: raise ValueError("answered_at is not an ISO 8601 time")
+        if t.tzinfo is None: raise ValueError("answered_at has no time zone")
+        return self
+
+
+def question_scope(q, zone_id=None, project_id=None):
+    """The question with its zone and project ids filled in (a question is built before it is known which zone it belongs to)."""
+    return q.model_copy(update={"zone_id": zone_id or q.zone_id, "project_id": project_id or q.project_id})
+
+
+def answer_record(q, answer, answered_by, answered_at, zone_id=None, project_id=None):
+    """AnswerRecord for a question. The field is the question's own, else its only `reveals` entry; a question with neither cannot
+    be stored (it would be lost to the log)."""
+    field = q.field or (q.reveals[0] if len(q.reveals) == 1 else None)
+    if not field: raise ValueError(f"question {q.question_id} ({q.kind}) names no single field: set Question.field")
+    return AnswerRecord(question_id=q.question_id, kind=q.kind, field=field, zone_id=zone_id or q.zone_id, project_id=project_id or q.project_id,
+                        osm_way_id=q.osm_way_id, answer=str(answer), answered_by=answered_by, answered_at=answered_at)
 
 
 def question_id(kind, *parts):

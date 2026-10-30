@@ -169,7 +169,7 @@ def _print_result(out):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--profile", required=True, help="profile name in config/foundry_profiles.json")
+    ap.add_argument("--profile", default=None, help="profile name in config/foundry_profiles.json (default: its default_profile, gpt-5.6-sol; claude-opus-5-5 keeps working)")
     ap.add_argument("--only", type=int, choices=range(1, 10), metavar="N", help="run call N alone (1-9)")
     ap.add_argument("--from", dest="start", type=int, choices=range(1, 10), default=1, metavar="N", help="start at call N")
     ap.add_argument("--parallel", type=int, default=1, metavar="N", help="run N calls at once on this profile (default 1, one after the other)")
@@ -181,6 +181,10 @@ def main(argv=None):
     if a.parallel < 1: print("--parallel must be at least 1"); return 2
     if a.reps < 1: print("--reps must be at least 1"); return 2
     if a.sites and (a.only or a.start != 1): print("--sites cannot be combined with --only or --from"); return 2
+    if a.profile is None:
+        from tcp_planner.ai.foundry_provider import load_profiles
+        a.profile = load_profiles().get("default_profile")
+        if not a.profile: print("no --profile given and config/foundry_profiles.json has no default_profile"); return 2
     if a.summary: summary(a.profile); return 0
     sites = None
     if a.sites:
