@@ -116,7 +116,7 @@ def test_a_client_asset_is_not_a_placeholder_and_a_mixed_plan_lists_only_placeho
     p = assets / "symbols" / "device_catalog.json"
     doc = json.load(open(p, encoding="utf-8"))
     for e in doc["entries"]:
-        if e["device_id"] == "W20-1": e["asset"]["status"] = "CLIENT_ASSET"
+        if e["device_id"] == "W20-1": e["asset"]["status"] = e["raster"]["status"] = "CLIENT_ASSET"
     json.dump(doc, open(p, "w", encoding="utf-8"))
     dc.seal()
     c = load_catalog()

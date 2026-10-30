@@ -95,12 +95,15 @@ class Entry(_Frozen):
     size_source: SizeSource
     size_text: str          # informational text for TEXT_ONLY devices, empty otherwise
     source: str             # where the device comes from, as text; the size's own source is its pack row
-    asset: Asset
+    asset: Asset            # the symbol file: an SVG or PNG, PLACEHOLDER_ASSET or CLIENT_ASSET
+    raster: Asset           # the PNG the app draws: the SVG pre-rendered by scripts/render_symbols.py, or the asset itself if a PNG
     notes: str
     observed_in_drafts: tuple[str, ...]
 
     @model_validator(mode="after")
     def _consistent(self):
+        if self.raster.media_type != "image/png": raise ValueError(f"{self.device_id}: raster must be a PNG")
+        if self.raster.status != self.asset.status: raise ValueError(f"{self.device_id}: raster and asset status differ")
         is_device = self.code_status == CodeStatus.DEVICE
         if (self.size_source == SizeSource.TEXT_ONLY) != is_device:
             raise ValueError(f"{self.device_id}: TEXT_ONLY is for DEVICE entries only")
@@ -217,9 +220,10 @@ class DeviceCatalog:
         return {"uses_placeholder": bool(used), "device_ids": used, "reason_code": "PLACEHOLDER_ASSET" if used else None,
                 "label": self.catalog.placeholder_label if used else None, "requires_review": bool(used)}
 
-    def asset_path(self, device_id):
-        """Path of the device's symbol file, after checking it against the recorded sha256 and size."""
-        a = self.get(device_id).asset
+    def asset_path(self, device_id, raster=False):
+        """Path of the device's symbol file (or its PNG), after checking it against the recorded sha256 and size."""
+        entry = self.get(device_id)
+        a = entry.raster if raster else entry.asset
         ref = file_ref(a.uri)
         _need(ref == {"sha256": a.sha256, "size": a.size}, "ASSET_HASH_MISMATCH",
               f"asset for {device_id} differs from the catalog", device_id=device_id, uri=a.uri)
@@ -229,10 +233,10 @@ class DeviceCatalog:
         """Every asset exists and matches its recorded sha256 and size. Returns the list of problems."""
         problems = []
         for e in self.catalog.entries:
-            try:
-                if file_ref(e.asset.uri) != {"sha256": e.asset.sha256, "size": e.asset.size}:
-                    problems.append((e.device_id, "ASSET_HASH_MISMATCH"))
-            except DeviceCatalogError as ex: problems.append((e.device_id, ex.code))
+            for a in (e.asset, e.raster):
+                try:
+                    if file_ref(a.uri) != {"sha256": a.sha256, "size": a.size}: problems.append((e.device_id, "ASSET_HASH_MISMATCH"))
+                except DeviceCatalogError as ex: problems.append((e.device_id, ex.code))
         return problems
 
 
@@ -256,7 +260,9 @@ def seal(path=None):
     """Record every asset's sha256 and size and the catalog hash in the catalog file. Returns the hash."""
     path = path or DEVICE_CATALOG_PATH
     doc = _read_doc(path)
-    for e in doc["entries"]: e["asset"].update(file_ref(e["asset"]["uri"]))
+    for e in doc["entries"]:
+        for k in ("asset", "raster"):
+            if k in e: e[k].update(file_ref(e[k]["uri"]))
     doc["catalog_hash"] = compute_catalog_hash(doc)
     with open(path, "w", encoding="utf-8") as f: json.dump(doc, f, indent=1, ensure_ascii=False)
     return doc["catalog_hash"]

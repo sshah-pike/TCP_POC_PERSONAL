@@ -7,7 +7,7 @@
   "Client reference drafts: Colorado, E Second, Granite"
  ],
  "placeholder_label": "PLACEHOLDER SYMBOLS - NOT CLIENT LIBRARY",
- "catalog_hash": "9dccf791cb5de63ef0b3a7a34e6295b4ee2368e2dd1c78b989666c29b408447f",
+ "catalog_hash": "5e9898940a09b7bcf4ba9f318df4a95939b38b247625d6339fc377ddc4a59fc6",
  "entries": [
   {
    "device_id": "W20-1",
@@ -31,7 +31,14 @@
     "Colorado",
     "E Second",
     "Granite"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/W20-1.png",
+    "sha256": "db9173185ed76e08dfa49d316eed4e717ab3aa863ebf2b2ac1be5636e024077b",
+    "size": 10951,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "W20-4",
@@ -54,7 +61,14 @@
    "observed_in_drafts": [
     "Colorado",
     "Granite V"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/W20-4.png",
+    "sha256": "7f687807276f13a44ffe42fd7d152fea03ed4156005f5c53683b99b0ea4fd581",
+    "size": 9135,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "W20-5R",
@@ -76,7 +90,14 @@
    "notes": "",
    "observed_in_drafts": [
     "Granite"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/W20-5R.png",
+    "sha256": "0848cf0857d58542fde9532b9074c4c1f10f81f9b131bcee570071e9412b6fae",
+    "size": 8828,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "W20-5L",
@@ -96,7 +117,14 @@
     "status": "PLACEHOLDER_ASSET"
    },
    "notes": "TA-33 note 1: used when the median-side lane is closed",
-   "observed_in_drafts": []
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/W20-5L.png",
+    "sha256": "1996723c2b26edf36ca9a1497df31a79d4713ed4557e593c60bc20a5b7a250fa",
+    "size": 9150,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "W20-7",
@@ -116,7 +144,14 @@
     "status": "PLACEHOLDER_ASSET"
    },
    "notes": "Glyph simplified",
-   "observed_in_drafts": []
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/W20-7.png",
+    "sha256": "96630ee8349f508519279454ae98b362ea4fd72bc46879f7e01ce9f6a73e3a94",
+    "size": 7465,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "W21-5",
@@ -138,7 +173,14 @@
    "notes": "TA-1 note 2 allows it in place of W20-1. Drafts print SHOULDER WORK AHEAD",
    "observed_in_drafts": [
     "E Second"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/W21-5.png",
+    "sha256": "539a8e9a4115798fd1babbcf119e075ab5aaf0ce2139ef2d17ac95abb10ae051",
+    "size": 10153,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "W21-5a",
@@ -158,7 +200,14 @@
     "status": "PLACEHOLDER_ASSET"
    },
    "notes": "",
-   "observed_in_drafts": []
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/W21-5a.png",
+    "sha256": "3b2948bc2b0193a15b040449e5b9720bcd323f7fca7618006f178df12eb98ae7",
+    "size": 8585,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "W5-1",
@@ -180,7 +229,14 @@
    "notes": "TA-6 note 6 option",
    "observed_in_drafts": [
     "E Second"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/W5-1.png",
+    "sha256": "0ef71948b72961fa5368429f6afb0198d8d91ffcd842fdc792aeddbecde570e9",
+    "size": 8976,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "W4-2R",
@@ -202,7 +258,14 @@
    "notes": "Glyph simplified",
    "observed_in_drafts": [
     "Granite"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/W4-2R.png",
+    "sha256": "7bab8a4b27f14e4b12d7ec888aca9a2db19765129b502d2c582fdb6d17ba8fb2",
+    "size": 6225,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "W4-2L",
@@ -222,7 +285,14 @@
     "status": "PLACEHOLDER_ASSET"
    },
    "notes": "Glyph simplified",
-   "observed_in_drafts": []
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/W4-2L.png",
+    "sha256": "ccaa9e118956a5d23fbe2bc9386a25f4e13bb570969c6a1e813a2af6919b25dd",
+    "size": 6229,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "W9-2L",
@@ -244,7 +314,14 @@
    "notes": "",
    "observed_in_drafts": [
     "Granite II"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/W9-2L.png",
+    "sha256": "9b7b181df5e2f2ba3da6f53c67e2a842d91795552c45c59c278482bcbb5428c5",
+    "size": 7974,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "W3-4",
@@ -264,7 +341,14 @@
     "status": "PLACEHOLDER_ASSET"
    },
    "notes": "TA-10 note 4 option",
-   "observed_in_drafts": []
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/W3-4.png",
+    "sha256": "6379f2b95efbc011c49f830eb52ed99f7dd776210893ca9cc4787b09cde8c351",
+    "size": 8634,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "W16-2P",
@@ -284,7 +368,14 @@
     "status": "PLACEHOLDER_ASSET"
    },
    "notes": "Optional below W20-7",
-   "observed_in_drafts": []
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/W16-2P.png",
+    "sha256": "edfa6380e066e1ed37c3e2069042412aa265db34754945f5f5505329eee73b4e",
+    "size": 4825,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "CLIENT-POLICE-OFFICER-AHEAD",
@@ -306,7 +397,14 @@
    "notes": "In MUTCD 11th Ed. W20-8 is the SLOW face of the STOP/SLOW paddle (Table 6H-1). The client uses W20-8 for this sign. Confirm code with the client/MassDOT",
    "observed_in_drafts": [
     "Colorado"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/CLIENT-POLICE-OFFICER-AHEAD.png",
+    "sha256": "cb2e9590db6be9a5edd39112a125cba057c7d12fd8a85bcbeb504472e065631e",
+    "size": 9099,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "G20-2",
@@ -330,7 +428,14 @@
     "Colorado",
     "E Second",
     "Granite"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/G20-2.png",
+    "sha256": "807283c0cc082c60527f618e7e96869e944d54699f98257a7f0f9ffca5a0adfc",
+    "size": 10678,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "M4-8a",
@@ -357,7 +462,14 @@
    "notes": "Drafts print M4-A8; likely M4-8a. Confirm",
    "observed_in_drafts": [
     "Granite V (printed M4-A8)"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/M4-8a.png",
+    "sha256": "1402839864fdbe8f22ecfecdffc0003121965b0ba1d70f84d6eb4633cda946be",
+    "size": 7746,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "M4-9L",
@@ -379,7 +491,14 @@
    "notes": "",
    "observed_in_drafts": [
     "Granite V"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/M4-9L.png",
+    "sha256": "d4983b5d0de674186e1a31b19cd6e79ad2451a8a75c001223bff27a1c3bbbcc4",
+    "size": 7946,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "M4-9R",
@@ -401,7 +520,14 @@
    "notes": "",
    "observed_in_drafts": [
     "Granite V"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/M4-9R.png",
+    "sha256": "51c7667dd090b51f0230928eedb49f05c97861df3e04597898783fa70f27b86e",
+    "size": 7956,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "M4-9a-L",
@@ -421,7 +547,14 @@
     "status": "PLACEHOLDER_ASSET"
    },
    "notes": "Sect. 6I.02 para 11 (Standard): the sign shall have an arrow; para 12: on the face or on a supplemental plaque. Placeholder shows the legend only.",
-   "observed_in_drafts": []
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/M4-9a-L.png",
+    "sha256": "8a2e382da15e6d5d2529a83768fde2584be9f63d594f91ed8973d9694edfa6ee",
+    "size": 18561,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "M4-9a-R",
@@ -441,7 +574,14 @@
     "status": "PLACEHOLDER_ASSET"
    },
    "notes": "Sect. 6I.02 para 11 (Standard): the sign shall have an arrow; para 12: on the face or on a supplemental plaque. Placeholder shows the legend only.",
-   "observed_in_drafts": []
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/M4-9a-R.png",
+    "sha256": "9f301082884fd5f856fff50d50ab68adcb7c3b030ef91bcc99fd313dc3c2a7e0",
+    "size": 19207,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "M4-9b",
@@ -461,7 +601,14 @@
     "status": "PLACEHOLDER_ASSET"
    },
    "notes": "Sect. 6I.02 para 13 (Option). No arrow is stated for this sign.",
-   "observed_in_drafts": []
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/M4-9b.png",
+    "sha256": "126e2b323386a6c249cdd95ba65a77d9f3cc4a1be962b1f5c5bcc6cf84844380",
+    "size": 15423,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "M4-9c-L",
@@ -481,7 +628,14 @@
     "status": "PLACEHOLDER_ASSET"
    },
    "notes": "Table 6I-1 names this sign \"with arrow\". Placeholder shows the legend only.",
-   "observed_in_drafts": []
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/M4-9c-L.png",
+    "sha256": "c4533e767f4e450e5e8d5471f43d18614cf38b833e390c7a331d2299998e2e53",
+    "size": 14328,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "M4-9c-R",
@@ -501,7 +655,14 @@
     "status": "PLACEHOLDER_ASSET"
    },
    "notes": "Table 6I-1 names this sign \"with arrow\". Placeholder shows the legend only.",
-   "observed_in_drafts": []
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/M4-9c-R.png",
+    "sha256": "bf84a362dfc0069456c8779796c64d2f609a889be382d15da667c42fab921e52",
+    "size": 14977,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "M4-9AL",
@@ -523,7 +684,14 @@
    "notes": "Confirm meaning (angled arrow?)",
    "observed_in_drafts": [
     "Granite V"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/M4-9AL.png",
+    "sha256": "d4983b5d0de674186e1a31b19cd6e79ad2451a8a75c001223bff27a1c3bbbcc4",
+    "size": 7946,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "R8-3",
@@ -546,7 +714,14 @@
    "observed_in_drafts": [
     "Colorado",
     "E Second"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/R8-3.png",
+    "sha256": "3c59c3a485111dd989c11a0f69e9908fba967b7b5d6afadecd221289d23992b6",
+    "size": 18555,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "R9-9",
@@ -569,7 +744,14 @@
    "observed_in_drafts": [
     "E Second II",
     "Granite"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/R9-9.png",
+    "sha256": "623627d9514c69be6f343b8f9e0c50a970c1cd337a2e02105bb79db602265f44",
+    "size": 11423,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "R9-10L",
@@ -591,7 +773,14 @@
    "notes": "Drafts print R9-10L; MUTCD code R9-10",
    "observed_in_drafts": [
     "Granite V"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/R9-10L.png",
+    "sha256": "b7bdc5e4a5c359f83724cc84fb5a926024b25d885098fdcec71a9b02caa742d8",
+    "size": 13248,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "R9-11L",
@@ -614,7 +803,14 @@
    "observed_in_drafts": [
     "E Second II",
     "Granite"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/R9-11L.png",
+    "sha256": "c6a58e3c3df3de892a26dd5954b90fecc01167f55a600fbca6f149b7ee2ffce1",
+    "size": 15304,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "R9-11R",
@@ -637,7 +833,14 @@
    "observed_in_drafts": [
     "E Second II",
     "Granite"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/R9-11R.png",
+    "sha256": "5805dbe5cd5e697006b3a78f25e046d52bbb55760498b976e1095474da9ac196",
+    "size": 15383,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "R9-11a",
@@ -657,7 +860,14 @@
     "status": "PLACEHOLDER_ASSET"
    },
    "notes": "",
-   "observed_in_drafts": []
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/R9-11a.png",
+    "sha256": "d9d2f3fc8e6bdd0c1bfec2db23dafe765cae1b4d8b8ee0b9faadd95d6d30ac39",
+    "size": 12000,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "R9-3BR",
@@ -679,7 +889,14 @@
    "notes": "Likely R9-3bP from MUTCD Part 2. Confirm",
    "observed_in_drafts": [
     "Granite V"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/R9-3BR.png",
+    "sha256": "b71d666535e6ccd6a03c3c085e8563a33cd4f7fc40edade3f6afdd21dc63c4c3",
+    "size": 11655,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "R2-10",
@@ -699,7 +916,14 @@
     "status": "PLACEHOLDER_ASSET"
    },
    "notes": "",
-   "observed_in_drafts": []
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/R2-10.png",
+    "sha256": "8c653722a9b4be691571522e09d8818bf2732d085b32767c973da0457c38f867",
+    "size": 13813,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "R2-11",
@@ -721,7 +945,14 @@
    "notes": "",
    "observed_in_drafts": [
     "Granite (RI)"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/R2-11.png",
+    "sha256": "13b9215bd0df88c3b77ec1dab4337d81ed9bcc884caf144a428081c237ed246c",
+    "size": 13403,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "RI-27.1.1",
@@ -743,7 +974,14 @@
    "notes": "Get RIDOT detail for size and legend",
    "observed_in_drafts": [
     "Granite (RI)"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/RI-27.1.1.png",
+    "sha256": "ef3d4e40e2b5bf3dd2447d66ebc09958935af6a5aa26d50cf99f348c901305c0",
+    "size": 17984,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "R3-7R",
@@ -765,7 +1003,14 @@
    "notes": "",
    "observed_in_drafts": [
     "Granite II"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/R3-7R.png",
+    "sha256": "1a459e9c35e9a80c7896ffc3b64b61737555c5477b7e2190542ce9e9c3644e05",
+    "size": 15370,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "R1-1-PADDLE",
@@ -785,7 +1030,14 @@
     "status": "PLACEHOLDER_ASSET"
    },
    "notes": "",
-   "observed_in_drafts": []
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/R1-1-PADDLE.png",
+    "sha256": "79b7e37b23308223530f694c9f775dcbc6f68e814f97d7d27acf81133b8316bd",
+    "size": 7922,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-CONE",
@@ -807,7 +1059,14 @@
    "notes": "",
    "observed_in_drafts": [
     "legend"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/DEV-CONE.png",
+    "sha256": "3143ce9bf84a01d01c5cd89887cb6892309a1f2ec27344b9dce23d4f1f522830",
+    "size": 2566,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-DRUM",
@@ -829,7 +1088,14 @@
    "notes": "",
    "observed_in_drafts": [
     "legend"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/DEV-DRUM.png",
+    "sha256": "edec44ac5d0b19d8fa041291094f8331a5a09a98728a0a6679fdf2bf0beaec10",
+    "size": 1241,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-TUBULAR",
@@ -849,7 +1115,14 @@
     "status": "PLACEHOLDER_ASSET"
    },
    "notes": "",
-   "observed_in_drafts": []
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/DEV-TUBULAR.png",
+    "sha256": "d4a2613564924c2586eb7bc8bc219a56c540bc78deda964c96ff82efb054f7ca",
+    "size": 1246,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-BARRICADE-T3",
@@ -871,7 +1144,14 @@
    "notes": "",
    "observed_in_drafts": [
     "legend"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/DEV-BARRICADE-T3.png",
+    "sha256": "6d98a1dbb508fa03f91dd47a8586e54dec21172a639643660b1f1bbefb54e0cf",
+    "size": 3945,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-ARROW-BOARD",
@@ -893,7 +1173,14 @@
    "notes": "TA-33 note 7: required when a freeway lane is closed",
    "observed_in_drafts": [
     "Granite II, V"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/DEV-ARROW-BOARD.png",
+    "sha256": "bd228feae5f9f4929adabfdcf7f065b253b9c9a885e9cd0e0450a3a4a2771014",
+    "size": 2490,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-PCMS",
@@ -915,7 +1202,14 @@
    "notes": "",
    "observed_in_drafts": [
     "legend"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/DEV-PCMS.png",
+    "sha256": "4e99d9a2080cbe2949746df23ab45691b075cda5d9018657c920883bd99770fb",
+    "size": 7326,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-FLAG-TREE",
@@ -937,7 +1231,14 @@
    "notes": "",
    "observed_in_drafts": [
     "legend"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/DEV-FLAG-TREE.png",
+    "sha256": "128721279b4e1aed067f63d678f7fda43bdfff087e0e9ee632eb066f4bc06688",
+    "size": 858,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-WORK-VEHICLE",
@@ -959,7 +1260,14 @@
    "notes": "",
    "observed_in_drafts": [
     "all drafts"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/DEV-WORK-VEHICLE.png",
+    "sha256": "268efefa393cfc25f2ad02c4665f8a34485bd6fb5d5bc97c40f9b63d667183b6",
+    "size": 1635,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-TMA",
@@ -981,7 +1289,14 @@
    "notes": "Optional on TA-6 and TA-33",
    "observed_in_drafts": [
     "legend"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/DEV-TMA.png",
+    "sha256": "d569c749f1eaba9f42503d9ef1f58da0fa39129147ab95f8b2b101189d4ed5cd",
+    "size": 1315,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-FLAGGER",
@@ -1001,7 +1316,14 @@
     "status": "PLACEHOLDER_ASSET"
    },
    "notes": "",
-   "observed_in_drafts": []
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/DEV-FLAGGER.png",
+    "sha256": "c047083c87e2b1ba271dfc3b1a84088195dddcf152ee9dace0b0e541923ddaf7",
+    "size": 1473,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-POLICE-DETAIL",
@@ -1023,7 +1345,14 @@
    "notes": "Client replaces flaggers with police details",
    "observed_in_drafts": [
     "Colorado"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/DEV-POLICE-DETAIL.png",
+    "sha256": "d58fd4a4d2335f4a0c378bc1e1777f16e43436e6de2dbbb9fa383d39547d98c8",
+    "size": 3966,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-WORK-SPACE",
@@ -1045,7 +1374,14 @@
    "notes": "",
    "observed_in_drafts": [
     "all drafts"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/DEV-WORK-SPACE.png",
+    "sha256": "b537455b34ed9a0f2e154d936d6d99afd783e8bf87772bd4ddecf949323c9f8e",
+    "size": 464,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-TRENCH",
@@ -1067,7 +1403,14 @@
    "notes": "",
    "observed_in_drafts": [
     "legend"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/DEV-TRENCH.png",
+    "sha256": "4d2d6deaabfec3a7f01fea46a7299d6f77f0ca925718dcf6293ccc3612333c35",
+    "size": 280,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-FLOW-RED",
@@ -1090,7 +1433,14 @@
    "observed_in_drafts": [
     "Colorado",
     "Granite"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/DEV-FLOW-RED.png",
+    "sha256": "545ab7ffa91e619b480f212d247599c8ae88e4771f41bccbf853dea9c0314586",
+    "size": 717,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-FLOW-BLUE",
@@ -1113,7 +1463,14 @@
    "observed_in_drafts": [
     "Colorado",
     "Granite"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/DEV-FLOW-BLUE.png",
+    "sha256": "00b0c633ee92a03e60f767a0541f7332645c6147d18c1e6cc4bd81a2dc6e9acd",
+    "size": 721,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-FLOW-GREEN",
@@ -1136,7 +1493,14 @@
    "observed_in_drafts": [
     "Colorado",
     "Granite"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/DEV-FLOW-GREEN.png",
+    "sha256": "6f393b160bd8632ae99202b08daa7c9b7d69005e02807f506a22ba9dfaac6230",
+    "size": 714,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-SIGN-POST",
@@ -1158,7 +1522,14 @@
    "notes": "",
    "observed_in_drafts": [
     "all drafts"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/DEV-SIGN-POST.png",
+    "sha256": "d9952a49637a8bcce878be6ae86efe3f3a4727850bdff24da14ecfaf419944f0",
+    "size": 374,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-TEMP-BARRIER",
@@ -1178,7 +1549,14 @@
     "status": "PLACEHOLDER_ASSET"
    },
    "notes": "",
-   "observed_in_drafts": []
+   "observed_in_drafts": [],
+   "raster": {
+    "uri": "symbols/png/DEV-TEMP-BARRIER.png",
+    "sha256": "d1441760a49b6871aa20ba50ab7706e623fde276b722e8f6264838babaea35bf",
+    "size": 636,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-BUS-STOP",
@@ -1200,7 +1578,14 @@
    "notes": "",
    "observed_in_drafts": [
     "legend"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/DEV-BUS-STOP.png",
+    "sha256": "4965f0564b28acb0b5fdb0477bc1f32ea15e540325faa39d6a2790b5b14a7f5c",
+    "size": 2823,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   },
   {
    "device_id": "DEV-PARKING-METER",
@@ -1222,7 +1607,14 @@
    "notes": "",
    "observed_in_drafts": [
     "legend"
-   ]
+   ],
+   "raster": {
+    "uri": "symbols/png/DEV-PARKING-METER.png",
+    "sha256": "7608c036e7d121ee0d4b6bf5624459aa1a38deabb9f9b62554e1490bc19f0a2a",
+    "size": 634,
+    "media_type": "image/png",
+    "status": "PLACEHOLDER_ASSET"
+   }
   }
  ]
 }
