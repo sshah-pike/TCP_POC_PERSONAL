@@ -80,10 +80,37 @@ def test_e_second_facts_leave_ta6_undetermined_on_its_unsourced_conditions(pack)
     assert {c["condition_id"]: c["result"] for c in r["conditions"]}["E-TA6-LOW-SPEED"] is None   # cutoff has no source
 
 
-def test_granite_undivided_facts_route_ta33_to_the_6n11_question(pack):
-    assert _results(pack, GRANITE_TA33_UNDIVIDED) == {"TA-1": NOT_ELIGIBLE, "TA-6": NOT_ELIGIBLE, "TA-10": NOT_ELIGIBLE, "TA-33": UNDETERMINED}
+def test_granite_undivided_facts_match_ta33_through_the_6n11_four_lane_reading(pack):
+    """S4b stage E: undivided, two lanes each way, right lane closed is sourced from Sect. 6N.11 paras 02 and 06."""
+    assert _results(pack, GRANITE_TA33_UNDIVIDED) == {"TA-1": NOT_ELIGIBLE, "TA-6": NOT_ELIGIBLE, "TA-10": NOT_ELIGIBLE, "TA-33": ELIGIBLE}
     r = evaluate_eligibility(pack, "TA-33", GRANITE_TA33_UNDIVIDED)
-    assert [q["condition_id"] for q in r["questions"]] == ["E-TA33-FORM-UNDIVIDED-6N11"]
+    rows = {c["condition_id"]: c["result"] for c in r["conditions"]}
+    assert rows["E-TA33-FORM-UNDIVIDED-FOUR-LANE-RIGHT"] is True and rows["E-TA33-FORM-DIVIDED"] is False
+    assert r["questions"] == []
+    assert pack.get("E-TA33-FORM-UNDIVIDED-FOUR-LANE-RIGHT").interpretation.startswith("INTERPRETATION (owner-confirmed")
+
+
+@pytest.mark.parametrize("change", [
+    {"lanes_per_direction": 3},                       # three or more lanes each way
+    {"closed_lane_side": "MEDIAN_SIDE"},              # left-hand lane closed
+    {"lanes_per_direction": 3, "closed_lane_side": "MEDIAN_SIDE"},
+])
+def test_broader_undivided_cases_stay_source_review_required(pack, change):
+    facts = dict(GRANITE_TA33_UNDIVIDED, **change)
+    r = evaluate_eligibility(pack, "TA-33", facts)
+    assert r["result"] == UNDETERMINED
+    assert [q["condition_id"] for q in r["questions"]] == ["E-TA33-FORM-UNDIVIDED-OTHER"]
+
+
+def test_undivided_without_the_closed_lane_side_is_undetermined_not_a_match(pack):
+    facts = {k: v for k, v in GRANITE_TA33_UNDIVIDED.items() if k != "closed_lane_side"}
+    assert evaluate_eligibility(pack, "TA-33", facts)["result"] == UNDETERMINED
+
+
+def test_the_6n11_split_keeps_one_sourced_reading_and_one_open_question(pack):
+    sourced, open_ = pack.get("R-6N11-TA33-UNDIVIDED-FOUR-LANE-RIGHT"), pack.get("R-6N11-TA33-UNDIVIDED-OTHER")
+    assert sourced.status.value == "SOURCED" and set(sourced.source_ref_ids) == {"SR-6N11-P02", "SR-6N11-P06"}
+    assert open_.status.value == "SOURCE_REVIEW_REQUIRED" and open_.sme_question and open_.condition is None
 
 
 def test_divided_highway_matches_ta33_as_encoded(pack):

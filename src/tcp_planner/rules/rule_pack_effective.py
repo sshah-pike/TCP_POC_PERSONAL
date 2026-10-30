@@ -8,6 +8,7 @@ applied. In v1 only the federal layer is populated (S4 scope change), so overrid
 The lookups return values with their trace and never invent one: a key the source table does not print (a speed
 between Table 6B-2 rows, an unknown road type) gives SOURCE_REVIEW_REQUIRED or UNKNOWN, not an interpolation.
 """
+from tcp_planner.contracts import RulePackError
 from tcp_planner.rules.rule_pack_eval import eval_expr
 from tcp_planner.rules.rule_pack_models import Layer, Status
 
@@ -60,6 +61,40 @@ def advance_sign_spacing(pack, road_type, dimension):
         return {"status": Status.UNKNOWN.value, "value": None, "unit": "ft", "record_id": None,
                 "reason": f"Table 6B-1 has no row for road type {road_type!r} and dimension {dimension!r}"}
     return _value(pack, row, dimension, "ft", strength="GUIDANCE")
+
+
+SIGN_SIZE_COLUMNS = ("conventional", "freeway_expressway", "minimum")
+
+
+def sign_size(pack, sign, column):
+    """Width and height in inches of one sign in one column of Tables 6G-1, 6H-1 or 6I-1 (rows keyed by sign code).
+
+    Which column a road type uses is not decided here (S5 Q3). A column the table prints as "—" is a gap with an SME
+    question: it is never read as 0 and never filled from another column. A code with no row (a client code) is UNKNOWN,
+    with the question from its R-SIGN-SIZE-<code> record when the pack has one.
+    """
+    if column not in SIGN_SIZE_COLUMNS: raise ValueError(f"unknown sign-size column {column!r}")
+    size_defs = {d.id: d for d in pack.records("table_def") if set(d.key_fields) == {"sign"}}
+    rows = [r for r in pack.records("table_row") if r.table_def_id in size_defs and r.key == {"sign": sign}]
+    gap = {"width_in": None, "height_in": None, "unit": "in", "sign": sign, "column": column}
+    if not rows:
+        q = pack.by_id.get(f"R-SIGN-SIZE-{sign}")
+        return {"status": Status.UNKNOWN.value, **gap, "record_id": q.id if q else None,
+                "sme_question": q.sme_question if q else f"No sign-size row for {sign}. What size should be drawn?",
+                "reason": f"no size row for sign {sign!r}"}
+    if len(rows) > 1:
+        raise RulePackError("RULE_PACK_SIGN_SIZE_AMBIGUOUS", f"{len(rows)} size rows for sign {sign}", {"sign": sign})
+    row = rows[0]
+    w, h = row.values[f"{column}_width"], row.values[f"{column}_height"]
+    table = size_defs[row.table_def_id].table
+    if row.status != Status.SOURCED or w is None or h is None:
+        return {"status": Status.SOURCE_REVIEW_REQUIRED.value, **gap, "record_id": row.id, "trace": pack.trace(row.id),
+                "sme_question": row.sme_question or f"Table {table} prints no {column.replace('_', ' or ')} size for {sign} ('—'). "
+                                                     f"What size should be drawn, or should this sign not be used here?",
+                "reason": f"Table {table} gives no {column} size for {sign}; no other column is substituted"}
+    return {"status": Status.SOURCED.value, "width_in": w, "height_in": h, "unit": "in", "sign": sign, "column": column,
+            "record_id": row.id, "layer": Layer.FEDERAL.value, "strength": "STANDARD", "trace": pack.trace(row.id),
+            "interpretation": row.interpretation}
 
 
 def buffer_length(pack, posted_speed_mph, ta_id=None):

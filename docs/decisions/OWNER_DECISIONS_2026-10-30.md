@@ -91,3 +91,13 @@ Granite: the KML (WPI 3159540, points P32 to P28, about north) and the drawing (
 ## D-106: Azure
 
 Azure: account TCP-Foundary-RR, East US; deployments claude-opus-5-5 and gpt-5.6-sol (5,000 requests and 5,000,000 tokens per minute each) and claude-opus-5-5-fast (2,000 and 2,000,000).
+
+## D-107: S4b pack round merged
+
+S4b pack round merged. Pack TCP_MUTCD_CH6_RULE_PACK 1.1.0, status DRAFT, hash 80c25240ab584974f40f4f17205a8490127549837a30f7b69e9d11dd95a18b0a; previous 1.0.0, hash 98c18fb207284ae884a28d20e2a5eba56facd74dfbc2aa7aa06797afe9e53d43 (D-87). Contents: sign-size rows, five note-only devices, placement anchors (TA-1 and TA-6 opposite approach marked SME confirmation pending), 6N.11 split (D-91), sidewalk and detour add-on rules (off by default, per zone, registry field addon_sidewalk_closed), 12 interpretations, 19 unsourced records, 53 registry fields. Approved by the owner as the working pack. The store keeps one version, so 1.0.0 is recoverable from git commit 9649481 only.
+
+Reports: docs/reports/S4b_pack_round_report.md and the "S4b changes" section of docs/reports/S4_rule_pack_review.md.
+
+## D-108: Y1, police text
+
+Owner answered Y1 (police text removed from CLAUDE.md, plan and slices) in the docs merge a498adc. The post-draft police switch now reads "police detail is future scope (D-68, D-86)".

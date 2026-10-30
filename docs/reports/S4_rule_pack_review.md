@@ -6,21 +6,21 @@ Source edition: MUTCD Chapter 6, December 2023 revision (file sha256 recorded). 
 
 ## Pack
 
-- Pack `TCP_MUTCD_CH6_RULE_PACK` version `1.0.0`, status `DRAFT`, hash `98c18fb207284ae884a28d20e2a5eba56facd74dfbc2aa7aa06797afe9e53d43`.
+- Pack `TCP_MUTCD_CH6_RULE_PACK` version `1.1.0`, status `DRAFT`, hash `80c25240ab584974f40f4f17205a8490127549837a30f7b69e9d11dd95a18b0a`.
 - Source: Manual on Uniform Traffic Control Devices, Part 6, Chapter 6 (Temporary Traffic Control), 11th Edition, December 2023. File `docs/sources/CHAPTER 6 - DEC 2023 MUTCD REVISION.pdf`, sha256 `16e03bf4c1a731c5e13a8c8c60a49231a12918f151655564859e341755c0dbf0`, 5029342 bytes.
 - The POC pack (`rule_pack/APPROVED_TWO_LANE_POC_RULE_PACK.json`, unchanged) cites a different edition text: "MUTCD 11th Edition with Revision 1", December 2025. Pack v1 cites only the December 2023 file in the repo.
 - TAs: TA-1, TA-6, TA-10, TA-33. Any other TA is NO_TA_MATCH. Only the federal layer has records.
 
 | Table | Records |
 | --- | --- |
-| source_ref | 112 |
-| registry_field | 52 |
-| table_def | 3 |
-| table_row | 18 |
+| source_ref | 169 |
+| registry_field | 53 |
+| table_def | 6 |
+| table_row | 39 |
 | formula | 9 |
-| rule | 73 |
-| eligibility_condition | 18 |
-| device | 11 |
+| rule | 102 |
+| eligibility_condition | 19 |
+| device | 16 |
 | ta_device_use | 18 |
 | deviation | 0 |
 
@@ -30,7 +30,8 @@ Source edition: MUTCD Chapter 6, December 2023 revision (file sha256 recorded). 
 | --- | --- | --- |
 | Commit 3, base tables | e6ad7d5 | 48 |
 | Commit 4, TA files (+4 Sect. 6B.04 paras 03-06, +1 Sect. 6P.01 para 07, +59 TA files) | e36225b | 112 |
-| Commits 5 to 8 (no pack records added) | this report | 112 |
+| Commits 5 to 8 (no pack records added) | 43f5f46 | 112 |
+| S4b pack round (sign sizes, note-only devices, anchors, 6G.10 and 6I.02, 6N.11 split) | tcp-mvp/s04b-pack-round | 169 |
 
 ## How to read this report
 
@@ -62,7 +63,7 @@ Source edition: MUTCD Chapter 6, December 2023 revision (file sha256 recorded). 
 
 ## Every value, with quote and page
 
-### Tables 6B-1, 6B-2 and 6B-3
+### Tables 6B-1, 6B-2, 6B-3 and sign sizes (Tables 6G-1, 6H-1, 6I-1)
 
 | Record | Value | Quote | Section, page (strength) |
 | --- | --- | --- | --- |
@@ -84,6 +85,27 @@ Source edition: MUTCD Chapter 6, December 2023 revision (file sha256 recorded). 
 | T-6B2-75 | speed_mph = 75 -> distance_ft = 820 | "75 mph 820 feet" | Sect. 6B.06, Table 6B-2, p. 775 (Option) |
 | T-6B3-ONE_LANE_TWO_WAY | taper_type = ONE_LANE_TWO_WAY -> min_ft = 50, max_ft = 100 | "One-Lane, Two-Way Traffic Taper 50 feet minimum, 100 feet maximum" | Sect. 6B.08, Table 6B-3, p. 775 (Guidance) |
 | T-6B3-DOWNSTREAM | taper_type = DOWNSTREAM -> min_ft = 50, max_ft = 100 | "Downstream Taper 50 feet minimum, 100 feet maximum" | Sect. 6B.08, Table 6B-3, p. 775 (Guidance) |
+| SZ-W20-1 | sign = W20-1 -> conventional_width = 36, conventional_height = 36, freeway_expressway_width = 48, freeway_expressway_height = 48, minimum_width = 30, minimum_height = 30 | "Road Work (with distance) W20-1 6H.03 36 x 36 48 x 48 30 x 30" | Sect. 6H.01, Table 6H-1, p. 804 (Standard) |
+| SZ-W20-4 | sign = W20-4 -> conventional_width = 36, conventional_height = 36, freeway_expressway_width = 48, freeway_expressway_height = 48, minimum_width = 30, minimum_height = 30 | "One Lane Road (with distance) W20-4 6H.06 36 x 36 48 x 48 30 x 30" | Sect. 6H.01, Table 6H-1, p. 804 (Standard) |
+| SZ-W20-7 | sign = W20-7 -> conventional_width = 36, conventional_height = 36, freeway_expressway_width = 48, freeway_expressway_height = 48, minimum_width = 30, minimum_height = 30 | "Flagger (symbol) W20-7 6H.15 36 x 36 48 x 48 30 x 30" | Sect. 6H.01, Table 6H-1, p. 804 (Standard) |
+| SZ-W16-2P | sign = W16-2P -> conventional_width = 24, conventional_height = 18, freeway_expressway_width = 30, freeway_expressway_height = 24, minimum_width = None, minimum_height = None | "XX Feet (2-line plaque) W16-2P 6H.01 24 x 18 30 x 24 —" | Sect. 6H.01, Table 6H-1, p. 804 (Standard) |
+| SZ-W20-5R | sign = W20-5R -> conventional_width = 36, conventional_height = 36, freeway_expressway_width = 48, freeway_expressway_height = 48, minimum_width = 30, minimum_height = 30 | "Lane(s) Closed (with distance) W20-5,5a 6H.07 36 x 36 48 x 48 30 x 30"<br>"For a single lane closure, the Lane Closed (W20-5) sign (see Figure 6H-1) shall use the legend RIGHT (LEFT) LANE CLOSED." | Sect. 6H.01, Table 6H-1, p. 804 (Standard)<br>Sect. 6H.07, para 02, p. 805 (Standard) |
+| SZ-W20-5L | sign = W20-5L -> conventional_width = 36, conventional_height = 36, freeway_expressway_width = 48, freeway_expressway_height = 48, minimum_width = 30, minimum_height = 30 | "Lane(s) Closed (with distance) W20-5,5a 6H.07 36 x 36 48 x 48 30 x 30"<br>"For a single lane closure, the Lane Closed (W20-5) sign (see Figure 6H-1) shall use the legend RIGHT (LEFT) LANE CLOSED." | Sect. 6H.01, Table 6H-1, p. 804 (Standard)<br>Sect. 6H.07, para 02, p. 805 (Standard) |
+| SZ-W4-2R | sign = W4-2R -> conventional_width = 36, conventional_height = 36, freeway_expressway_width = 48, freeway_expressway_height = 48, minimum_width = 30, minimum_height = 30 | "Lane Ends W4-2 6H.08 36 x 36 48 x 48 30 x 30"<br>[figure transcription] Figure 6P-33 has panel A (long-term and intermediate) and panel B (short-term), each showing the approach with the right lane closed. From the work outward: a W4-2R Lane Ends sign at dimension A from the upstream end of the merging taper (the start of dimension L; the 'Shoulder taper (see Note 3)' begins inside A and ends where the merging taper begins), a W20-5R RIGHT LANE CLOSED XX MILE sign at B, and a W20-1 ROAD WORK XX MILE sign at C. Each sign is posted on both the right-hand and the left-hand side of the roadway. An arrow board stands in the closed lane at the start of the merging taper, which is dimensioned L; a 'Shoulder taper (see Note 3)' is upstream of it; 'Buffer space (optional)' lies between the merging taper and the work space. Panel A adds a 'Temporary white edge line'; panel B shows a 'Work vehicle' and a 'Truck-mounted attenuator (optional)'. A G20-2 END ROAD WORK sign labelled '(optional)' is downstream on both sides of the roadway. | Sect. 6H.01, Table 6H-1, p. 803 (Standard)<br>Sect. 6P.01, Fig. 6P-33, p. 925 (Guidance) |
+| SZ-W4-2L | sign = W4-2L -> conventional_width = 36, conventional_height = 36, freeway_expressway_width = 48, freeway_expressway_height = 48, minimum_width = 30, minimum_height = 30 | "Lane Ends W4-2 6H.08 36 x 36 48 x 48 30 x 30"<br>"This information also shall be used when work is being performed in the lane adjacent to the median on a divided highway. In this case, the LEFT LANE CLOSED signs and the corresponding Lane Ends signs shall be substituted." | Sect. 6H.01, Table 6H-1, p. 803 (Standard)<br>Sect. 6P.01, Fig. 6P-33, note 1, p. 924 (Standard) |
+| SZ-G20-2 | sign = G20-2 -> conventional_width = 36, conventional_height = 18, freeway_expressway_width = 48, freeway_expressway_height = 24, minimum_width = None, minimum_height = None | "End Road Work G20-2 6H.36 36 x 18 48 x 24 —" | Sect. 6H.01, Table 6H-1, p. 804 (Standard) |
+| SZ-W21-5 | sign = W21-5 -> conventional_width = 36, conventional_height = 36, freeway_expressway_width = 48, freeway_expressway_height = 48, minimum_width = 30, minimum_height = 30 | "Shoulder Work W21-5 6H.22 36 x 36 48 x 48 30 x 30" | Sect. 6H.01, Table 6H-1, p. 804 (Standard) |
+| SZ-W5-1 | sign = W5-1 -> conventional_width = 36, conventional_height = 36, freeway_expressway_width = 48, freeway_expressway_height = 48, minimum_width = 30, minimum_height = 30 | "Road Narrows W5-1 6H.01 36 x 36 48 x 48 30 x 30" | Sect. 6H.01, Table 6H-1, p. 803 (Standard) |
+| SZ-W3-4 | sign = W3-4 -> conventional_width = 36, conventional_height = 36, freeway_expressway_width = 48, freeway_expressway_height = 48, minimum_width = 30, minimum_height = 30 | "Be Prepared to Stop W3-4 6H.01 36 x 36 48 x 48 30 x 30" | Sect. 6H.01, Table 6H-1, p. 803 (Standard) |
+| SZ-R9-9 | sign = R9-9 -> conventional_width = 24, conventional_height = 12, freeway_expressway_width = None, freeway_expressway_height = None, minimum_width = None, minimum_height = None | "Sidewalk Closed R9-9 6G.10 24 x 12 — —" | Sect. 6G.02, Table 6G-1, p. 796 (Standard) |
+| SZ-R9-10 | sign = R9-10 -> conventional_width = 24, conventional_height = 12, freeway_expressway_width = None, freeway_expressway_height = None, minimum_width = None, minimum_height = None | "Sidewalk Closed, Use Other Side R9-10 6G.10 24 x 12 — —" | Sect. 6G.02, Table 6G-1, p. 796 (Standard) |
+| SZ-R9-11 | sign = R9-11 -> conventional_width = 24, conventional_height = 18, freeway_expressway_width = None, freeway_expressway_height = None, minimum_width = None, minimum_height = None | "Sidewalk Closed Ahead, Cross Here R9-11 6G.10 24 x 18 — —" | Sect. 6G.02, Table 6G-1, p. 796 (Standard) |
+| SZ-R9-11a | sign = R9-11a -> conventional_width = 24, conventional_height = 12, freeway_expressway_width = None, freeway_expressway_height = None, minimum_width = None, minimum_height = None | "Sidewalk Closed, Cross Here R9-11a 6G.10 24 x 12 — —" | Sect. 6G.02, Table 6G-1, p. 796 (Standard) |
+| SZ-M4-8a | sign = M4-8a -> conventional_width = 24, conventional_height = 18, freeway_expressway_width = 24, freeway_expressway_height = 18, minimum_width = None, minimum_height = None | "End Detour M4-8a 6I.02 24 x 18 24 x 18 —" | Sect. 6I.01, Table 6I-1, p. 811 (Standard) |
+| SZ-M4-9 | sign = M4-9 -> conventional_width = 30, conventional_height = 24, freeway_expressway_width = 48, freeway_expressway_height = 36, minimum_width = None, minimum_height = None | "Detour M4-9 6I.02 30 x 24 48 x 36 —" | Sect. 6I.01, Table 6I-1, p. 811 (Standard) |
+| SZ-M4-9a | sign = M4-9a -> conventional_width = 30, conventional_height = 24, freeway_expressway_width = None, freeway_expressway_height = None, minimum_width = None, minimum_height = None | "Bike/Pedestrian Detour M4-9a 6I.02 30 x 24 — —" | Sect. 6I.01, Table 6I-1, p. 811 (Standard) |
+| SZ-M4-9b | sign = M4-9b -> conventional_width = 30, conventional_height = 24, freeway_expressway_width = None, freeway_expressway_height = None, minimum_width = None, minimum_height = None | "Pedestrian Detour M4-9b 6I.02 30 x 24 — —" | Sect. 6I.01, Table 6I-1, p. 811 (Standard) |
+| SZ-M4-9c | sign = M4-9c -> conventional_width = 30, conventional_height = 24, freeway_expressway_width = None, freeway_expressway_height = None, minimum_width = None, minimum_height = None | "Bike Detour (with arrow) M4-9c 6I.02 30 x 24 — —" | Sect. 6I.01, Table 6I-1, p. 811 (Standard) |
 
 ### Formulas (Tables 6B-3, 6B-4; Sect. 6B.08, 6K.01)
 
@@ -117,9 +139,27 @@ Source edition: MUTCD Chapter 6, December 2023 revision (file sha256 recorded). 
 | R-6N07-NINE-FT-OPTION | 9 ft AT_LEAST; when (duration EQ SHORT_TERM AND traffic_volume EQ LOW AND low_speed_road EQ True AND heavy_vehicles EQ False); -> NINE_FT_LANE_ALLOWED | "A lane width of 9 feet may be used for short-term stationary work on low-volume, low-speed roadways when vehicular traffic does not include longer and wider heavy commercial vehicles." | Sect. 6N.07, para 04, p. 846 (Option) |
 | R-6N08-MEDIAN-15FT | 15 ft AT_MOST; when (median_work EQ True AND distance_from_edge_ft LE 15); -> ADVANCE_WARNING_AND_CHANNELIZING_DEVICES | "If work in the median of a divided highway is within 15 feet from the edge of the traveled way for either direction of travel, TTC should be used through the use of advance warning signs and channelizing devices." | Sect. 6N.08, para 02, p. 846 (Guidance) |
 | R-6N11-MERGING-TAPER | when (lane_closure EQ True AND lanes_per_direction GE 2 AND duration NE MOBILE); -> MERGING_TAPER_REQUIRED | "When a lane is closed on a multi-lane road for other than a mobile operation, a transition area containing a merging taper shall be used."<br>"Work on multi-lane (two or more lanes of moving motor vehicle traffic in one direction) highways is divided into right-lane closures, left-lane closures, interior-lane closures, multiple-lane closures, and closures on five-lane roadways." | Sect. 6N.11, para 03, p. 847 (Standard)<br>Sect. 6N.11, para 02, p. 847 (Support) |
+| R-6N11-TA33-UNDIVIDED-FOUR-LANE-RIGHT | when (divided_highway EQ False AND lanes_per_direction EQ 2 AND closed_lane_side EQ RIGHT); -> TA33_MAY_BE_USED_ON_UNDIVIDED | "When the right-hand lane is closed, TTC similar to that shown in Figure 6P-33 may be used for undivided or divided four-lane roads."<br>"Work on multi-lane (two or more lanes of moving motor vehicle traffic in one direction) highways is divided into right-lane closures, left-lane closures, interior-lane closures, multiple-lane closures, and closures on five-lane roadways." | Sect. 6N.11, para 06, Fig. 6P-33, p. 847 (Option)<br>Sect. 6N.11, para 02, p. 847 (Support) |
 | R-6P01-FIGURES-ARE-GUIDANCE | (text rule) | "In general, the procedures illustrated represent minimum solutions for the situations depicted. Except for the notes (which are clearly classified using headings as being Standard, Guidance, Option, or Support), the information presented in the typical applications can generally be regarded as Guidance." | Sect. 6P.01, para 02, p. 857 (Support) |
 | R-6P01-MAY-DEVIATE | (text rule) | "TTC plans may deviate from the typical applications described in this Chapter to allow for conditions and requirements of a particular site or jurisdiction." | Sect. 6P.01, para 03, p. 857 (Option) |
 | R-6P01-DEVICES-ADJUSTABLE | (text rule) | "Other devices may be added to supplement the devices and device spacing may be adjusted to provide additional reaction time or delineation. Fewer devices may be used based on field conditions." | Sect. 6P.01, para 04, p. 857 (Option) |
+| R-6B1-ABC-CONSECUTIVE | -> ABC_CONSECUTIVE_UPSTREAM | "The A dimension is the distance from the transition or point of restriction to the first sign. The B dimension is the distance between the first and second signs. The C dimension is the distance between the second and third signs."<br>[figure transcription] Figure 6P-10, both approaches: C runs from the W20-1 sign support to the W20-4 support, B from the W20-4 support to the W20-7 support, and A from the W20-7 support to a line level with the flagger. The one-lane, two-way taper ('50 to 100 ft') starts at that line and runs toward the work space. C, B and A are consecutive and do not overlap.<br>[figure transcription] Figure 6P-33, panels A and B: C runs from the W20-1 sign support to the W20-5R support, B from the W20-5R support to the W4-2R support, and A from the W4-2R support to the upstream end of the merging taper (where dimension L starts), where the arrow board stands. The 'Shoulder taper (see Note 3)' begins inside dimension A and ends where the merging taper begins. C, B and A are consecutive and do not overlap. | Sect. 6B.04, Table 6B-1, note **, p. 773 (Guidance)<br>Sect. 6P.01, Fig. 6P-10, p. 879 (Guidance)<br>Sect. 6P.01, Fig. 6P-33, p. 925 (Guidance) |
+| R-6G10-P01-SIDEWALK-CLOSED-SIGNS | when addon_sidewalk_closed EQ True; -> SIDEWALK_CLOSED_SIGNS | "SIDEWALK CLOSED signs (see Figure 6G-1) should be used where pedestrian flow is restricted." | Sect. 6G.10, para 01, p. 797 (Guidance) |
+| R-6G10-P01-PEDESTRIAN-DETOUR-SIGNS | when pedestrian_detour_required EQ True; -> M4-9A_OR_M4-9B_FOR_PEDESTRIAN_REROUTE | "Bicyclist/ Pedestrian Detour (M4-9a) signs or Pedestrian Detour (M4-9b) signs should be used where pedestrian flow is rerouted (see Section 6I.02)." | Sect. 6G.10, para 01, p. 797 (Guidance) |
+| R-6G10-P02-R9-9 | when addon_sidewalk_closed EQ True; -> R9-9_AT_START_AND_PRECEDING_INTERSECTIONS | "The SIDEWALK CLOSED (R9-9) sign should be installed at the beginning of the closed sidewalk, at the intersections preceding the closed sidewalk, and elsewhere along the closed sidewalk as needed." | Sect. 6G.10, para 02, p. 797 (Guidance) |
+| R-6G10-P03-R9-10 | when addon_sidewalk_closed EQ True; -> R9-10_AT_START_WHEN_PARALLEL_SIDEWALK | "The SIDEWALK CLOSED, (ARROW) USE OTHER SIDE (R9-10) sign should be installed at the beginning of the restricted sidewalk when a parallel sidewalk exists on the other side of the roadway." | Sect. 6G.10, para 03, p. 797 (Guidance) |
+| R-6G10-P04-R9-11 | when addon_sidewalk_closed EQ True; -> R9-11_DIRECT_TO_OPEN_ROUTE | "The SIDEWALK CLOSED AHEAD, (ARROW) CROSS HERE (R9-11) sign should be used to indicate to pedestrians that sidewalks beyond the sign are closed and to direct them to open crosswalks, sidewalks, or other travel paths." | Sect. 6G.10, para 04, p. 797 (Guidance) |
+| R-6G10-P05-R9-11A | when addon_sidewalk_closed EQ True; -> R9-11A_BEYOND_REDIRECT_POINT | "The SIDEWALK CLOSED, (ARROW) CROSS HERE (R9-11a) sign should be installed just beyond the point to which pedestrians are being redirected." | Sect. 6G.10, para 05, p. 797 (Guidance) |
+| R-6G10-P06-DETECTABLE-BARRICADE | when addon_sidewalk_closed EQ True | "These signs are typically mounted on a detectable barricade to encourage compliance and to communicate with pedestrians that the sidewalk is closed." | Sect. 6G.10, para 06, p. 797 (Support) |
+| R-6I02-P01-DETOUR-MARKED | when vehicle_detour_required EQ True; -> DETOUR_ROUTE_SIGNS_REQUIRED | "Each detour shall be adequately marked with standard temporary route signs and destination signs." | Sect. 6I.02, para 01, p. 811 (Standard) |
+| R-6I02-P06-M4-9 | when vehicle_detour_required EQ True; -> M4-9_DETOUR_SIGN | "The DETOUR (M4-9) sign (see Figure 6I-1) should be used for unnumbered highways, for emergency situations, for periods of short durations, or where, over relatively short distances, road users are guided along the detour and back to the desired highway without route signs." | Sect. 6I.02, para 06, p. 812 (Guidance) |
+| R-6I02-P07-M4-9-STREET-NAME | when vehicle_detour_required EQ True; -> M4-9_WITH_STREET_NAME | "A Street Name sign should be placed above, or the street name should be incorporated into, a DETOUR (M4-9) sign to indicate the name of the street being detoured." | Sect. 6I.02, para 07, p. 812 (Guidance) |
+| R-6I02-P08-M4-8A | when vehicle_detour_required EQ True; -> M4-8A_AT_DETOUR_END_OPTIONAL | "The END DETOUR (M4-8a) sign or the END (M4-8bP) plaque (see Figure 6I-1) may be used to indicate that the detour has ended." | Sect. 6I.02, para 08, p. 812 (Option) |
+| R-6I02-P09-M4-8A-NUMBERED | when vehicle_detour_required EQ True; -> M4-8A_ABOVE_ROUTE_SIGN_ON_NUMBERED_HIGHWAY | "When the END DETOUR sign is used on a numbered highway, the sign should be mounted above a route sign after the downstream end of the detour." | Sect. 6I.02, para 09, p. 812 (Guidance) |
+| R-6I02-P10-M4-9A | when pedestrian_detour_required EQ True; -> M4-9A_PED_BIKE_DETOUR | "The Pedestrian/Bicyclist Detour (M4-9a) sign (see Figure 6I-1) should be used where a pedestrian/bicyclist detour route has been established because of the closing of a pedestrian/bicycle facility to through traffic." | Sect. 6I.02, para 10, p. 812 (Guidance) |
+| R-6I02-P11-M4-9A-ARROW | when pedestrian_detour_required EQ True; -> M4-9A_ARROW_REQUIRED | "If used, the Pedestrian/Bicyclist Detour sign shall have an arrow pointing in the appropriate direction." | Sect. 6I.02, para 11, p. 812 (Standard) |
+| R-6I02-P12-M4-9A-ARROW-PLAQUE | when pedestrian_detour_required EQ True | "The arrow on a Pedestrian/Bicyclist Detour sign may be on the sign face or on a supplemental plaque." | Sect. 6I.02, para 12, p. 812 (Option) |
+| R-6I02-P13-M4-9B-M4-9C | when pedestrian_detour_required EQ True; -> M4-9B_OR_M4-9C_SINGLE_MODE_DETOUR | "The Pedestrian Detour (M4-9b) sign or Bicyclist Detour (M4-9c) sign (see Figure 6I-1) may be used where a pedestrian or a bicyclist detour route (not both) has been established because of the closing of the pedestrian or bicycle facility to through traffic." | Sect. 6I.02, para 13, p. 812 (Option) |
 
 ### TA-1: Work Beyond the Shoulder (Figure 6P-1)
 
@@ -140,6 +180,7 @@ Rules (figure notes and figure-derived rules):
 | R-TA1-N4 | when duration IN [SHORT_TERM, SHORT_DURATION, MOBILE]; -> SIGNS_AND_DEVICES_MAY_BE_ELIMINATED_WITH_LIT_VEHICLE | "For short-term, short-duration or mobile operation, all signs and channelizing devices may be eliminated if a vehicle with activated high-intensity rotating, flashing, oscillating, or strobe lights is used." | Sect. 6P.01, Fig. 6P-1, note 4, p. 860 (Option) |
 | R-TA1-N5 | (text rule) | "Vehicle hazard warning signals may be used to supplement high-intensity rotating, flashing, oscillating, or strobe lights." | Sect. 6P.01, Fig. 6P-1, note 5, p. 860 (Option) |
 | R-TA1-N6 | (text rule) | "Vehicle hazard warning signals shall not be used instead of the vehicle’s high-intensity rotating, flashing, oscillating, or strobe lights." | Sect. 6P.01, Fig. 6P-1, note 6, p. 860 (Standard) |
+| R-TA1-ANCHOR-A | -> A_ENDS_AT_WORK_SPACE_START | [figure transcription] Figure 6P-1: the only dimension drawn is A, from the W20-1 sign support to a line level with the upstream end of the hatched work space beyond the shoulder. There is one advance sign, no B or C, and no taper or channelizing devices.<br>"The A dimension is the distance from the transition or point of restriction to the first sign. The B dimension is the distance between the first and second signs. The C dimension is the distance between the second and third signs." | Sect. 6P.01, Fig. 6P-1, p. 861 (Guidance)<br>Sect. 6B.04, Table 6B-1, note **, p. 773 (Guidance) |
 
 Device sequence (from the figure):
 
@@ -181,6 +222,8 @@ Rules (figure notes and figure-derived rules):
 | R-TA6-FIG-SHOULDER-TAPER | CITED ONLY (overlaps F-6B3-SHOULDER, F-6B08-SHOULDER-THIRD) | [figure transcription] Figure 6P-6, northbound: a shoulder taper of channelizing devices dimensioned '1/3 L', then a dimension labelled 'Buffer space (optional)', then the work vehicle and work space. A dimension labelled '10 ft MIN.' runs from the near face of the channelizing devices across the open northbound lane. | Sect. 6P.01, Fig. 6P-6, p. 871 (Guidance) |
 | R-TA6-FIG-10FT-MIN | 10 ft AT_LEAST; CITED ONLY (overlaps R-TA6-N1) | [figure transcription] Figure 6P-6, northbound: a shoulder taper of channelizing devices dimensioned '1/3 L', then a dimension labelled 'Buffer space (optional)', then the work vehicle and work space. A dimension labelled '10 ft MIN.' runs from the near face of the channelizing devices across the open northbound lane. | Sect. 6P.01, Fig. 6P-6, p. 871 (Guidance) |
 | R-TA6-FIG-BUFFER | -> BUFFER_OPTIONAL | [figure transcription] Figure 6P-6, northbound: a shoulder taper of channelizing devices dimensioned '1/3 L', then a dimension labelled 'Buffer space (optional)', then the work vehicle and work space. A dimension labelled '10 ft MIN.' runs from the near face of the channelizing devices across the open northbound lane. | Sect. 6P.01, Fig. 6P-6, p. 871 (Guidance) |
+| R-TA6-ANCHOR-A-WORK-SIDE | -> A_ENDS_AT_SHOULDER_TAPER_START | [figure transcription] Figure 6P-6, northbound (the approach on the work side): A runs from the W20-1 sign support to the upstream end of the shoulder taper; downstream of it come the shoulder taper ('1/3 L'), the optional buffer space and the work vehicle. Southbound (the opposite approach): A runs from the W20-1 sign support to a line level with the near end of the work space; no taper is drawn on that side. Only A is drawn on each approach.<br>"The A dimension is the distance from the transition or point of restriction to the first sign. The B dimension is the distance between the first and second signs. The C dimension is the distance between the second and third signs." | Sect. 6P.01, Fig. 6P-6, p. 871 (Guidance)<br>Sect. 6B.04, Table 6B-1, note **, p. 773 (Guidance) |
+| R-TA6-ANCHOR-A-OPPOSITE | -> A_ENDS_AT_WORK_SPACE_START | [figure transcription] Figure 6P-6, northbound (the approach on the work side): A runs from the W20-1 sign support to the upstream end of the shoulder taper; downstream of it come the shoulder taper ('1/3 L'), the optional buffer space and the work vehicle. Southbound (the opposite approach): A runs from the W20-1 sign support to a line level with the near end of the work space; no taper is drawn on that side. Only A is drawn on each approach.<br>"The A dimension is the distance from the transition or point of restriction to the first sign. The B dimension is the distance between the first and second signs. The C dimension is the distance between the second and third signs." | Sect. 6P.01, Fig. 6P-6, p. 871 (Guidance)<br>Sect. 6B.04, Table 6B-1, note **, p. 773 (Guidance) |
 
 Device sequence (from the figure):
 
@@ -222,6 +265,7 @@ Rules (figure notes and figure-derived rules):
 | R-TA10-N12 | when grade_crossing_present EQ True | "Early coordination with the railroad company or transit agency should occur before work starts." | Sect. 6P.01, Fig. 6P-10, note 12, p. 878 (Guidance) |
 | R-TA10-N13 | 15 ft; when grade_crossing_present EQ True | "A flagger or a uniformed law enforcement officer may be used at the grade crossing to minimize the probability that vehicles are stopped within 15 feet of the grade crossing, measured from both sides of the outside rails." | Sect. 6P.01, Fig. 6P-10, note 13, p. 878 (Option) |
 | R-TA10-FIG-TAPER | 50 to 100 ft; CITED ONLY (overlaps T-6B3-ONE_LANE_TWO_WAY) | [figure transcription] Figure 6P-10: the one-lane, two-way taper of channelizing devices at each end of the work space is dimensioned '50 to 100 ft'. | Sect. 6P.01, Fig. 6P-10, p. 879 (Guidance) |
+| R-TA10-ANCHOR-A | -> A_ENDS_AT_FLAGGER_STATION | [figure transcription] Figure 6P-10, both approaches: C runs from the W20-1 sign support to the W20-4 support, B from the W20-4 support to the W20-7 support, and A from the W20-7 support to a line level with the flagger. The one-lane, two-way taper ('50 to 100 ft') starts at that line and runs toward the work space. C, B and A are consecutive and do not overlap.<br>"The A dimension is the distance from the transition or point of restriction to the first sign. The B dimension is the distance between the first and second signs. The C dimension is the distance between the second and third signs." | Sect. 6P.01, Fig. 6P-10, p. 879 (Guidance)<br>Sect. 6B.04, Table 6B-1, note **, p. 773 (Guidance) |
 
 Device sequence (from the figure):
 
@@ -244,7 +288,8 @@ Eligibility conditions:
 | E-TA33-IN-LANE | work_location EQ IN_LANE | "Notes for Figure 6P-33—Typical Application 33 Stationary Lane Closure on a Divided Highway" | Sect. 6P.01, Fig. 6P-33, p. 924 (Support) |
 | E-TA33-MULTI-LANE | lanes_per_direction GE 2 | "Work on multi-lane (two or more lanes of moving motor vehicle traffic in one direction) highways is divided into right-lane closures, left-lane closures, interior-lane closures, multiple-lane closures, and closures on five-lane roadways."<br>"When a lane is closed on a multi-lane road for other than a mobile operation, a transition area containing a merging taper shall be used." | Sect. 6N.11, para 02, p. 847 (Support)<br>Sect. 6N.11, para 03, p. 847 (Standard) |
 | E-TA33-FORM-DIVIDED | divided_highway EQ True [OR group ROAD_FORM] | "Notes for Figure 6P-33—Typical Application 33 Stationary Lane Closure on a Divided Highway"<br>"Figure 6P-33. Stationary Lane Closure on a Divided Highway (TA-33)" | Sect. 6P.01, Fig. 6P-33, p. 924 (Support)<br>Sect. 6P.01, Fig. 6P-33, p. 925 (Support) |
-| E-TA33-FORM-UNDIVIDED-6N11 | (no expression) [OR group ROAD_FORM] | "When the right-hand lane is closed, TTC similar to that shown in Figure 6P-33 may be used for undivided or divided four-lane roads."<br>"Work on multi-lane (two or more lanes of moving motor vehicle traffic in one direction) highways is divided into right-lane closures, left-lane closures, interior-lane closures, multiple-lane closures, and closures on five-lane roadways." | Sect. 6N.11, para 06, Fig. 6P-33, p. 847 (Option)<br>Sect. 6N.11, para 02, p. 847 (Support) |
+| E-TA33-FORM-UNDIVIDED-FOUR-LANE-RIGHT | (divided_highway EQ False AND lanes_per_direction EQ 2 AND closed_lane_side EQ RIGHT) [OR group ROAD_FORM] | "When the right-hand lane is closed, TTC similar to that shown in Figure 6P-33 may be used for undivided or divided four-lane roads."<br>"Work on multi-lane (two or more lanes of moving motor vehicle traffic in one direction) highways is divided into right-lane closures, left-lane closures, interior-lane closures, multiple-lane closures, and closures on five-lane roadways." | Sect. 6N.11, para 06, Fig. 6P-33, p. 847 (Option)<br>Sect. 6N.11, para 02, p. 847 (Support) |
+| E-TA33-FORM-UNDIVIDED-OTHER | (no expression) [OR group ROAD_FORM] | "When the right-hand lane is closed, TTC similar to that shown in Figure 6P-33 may be used for undivided or divided four-lane roads."<br>"Work on multi-lane (two or more lanes of moving motor vehicle traffic in one direction) highways is divided into right-lane closures, left-lane closures, interior-lane closures, multiple-lane closures, and closures on five-lane roadways." | Sect. 6N.11, para 06, Fig. 6P-33, p. 847 (Option)<br>Sect. 6N.11, para 02, p. 847 (Support) |
 
 Rules (figure notes and figure-derived rules):
 
@@ -257,6 +302,7 @@ Rules (figure notes and figure-derived rules):
 | R-TA33-N5 | (text rule) | "Positive protection devices may be used per Section 6M.02." | Sect. 6P.01, Fig. 6P-33, note 5, p. 924 (Option) |
 | R-TA33-N6 | (text rule) | "Where conditions permit, restricting all vehicles, equipment, workers, and their activities to one side of the roadway might be advantageous." | Sect. 6P.01, Fig. 6P-33, note 6, p. 924 (Support) |
 | R-TA33-N7 | when (freeway EQ True AND lane_closure EQ True); -> ARROW_BOARD_PER_CLOSED_LANE | "An arrow board shall be used when a freeway lane is closed. When more than one freeway lane is closed, a separate arrow board shall be used for each closed lane." | Sect. 6P.01, Fig. 6P-33, note 7, p. 924 (Standard) |
+| R-TA33-ANCHOR-A | -> A_ENDS_AT_MERGING_TAPER_START | [figure transcription] Figure 6P-33, panels A and B: C runs from the W20-1 sign support to the W20-5R support, B from the W20-5R support to the W4-2R support, and A from the W4-2R support to the upstream end of the merging taper (where dimension L starts), where the arrow board stands. The 'Shoulder taper (see Note 3)' begins inside dimension A and ends where the merging taper begins. C, B and A are consecutive and do not overlap.<br>"The A dimension is the distance from the transition or point of restriction to the first sign. The B dimension is the distance between the first and second signs. The C dimension is the distance between the second and third signs." | Sect. 6P.01, Fig. 6P-33, p. 925 (Guidance)<br>Sect. 6B.04, Table 6B-1, note **, p. 773 (Guidance) |
 
 Device sequence (from the figure):
 
@@ -277,29 +323,39 @@ Read from the figure drawings, which have no text layer for their labels. Each r
 | Source ref | Figure, page | Render file | Reading | Used by |
 | --- | --- | --- | --- | --- |
 | SR-6P1-FIG-SIGNS | 6P-1, p. 861 | `tests/fixtures/rule_pack_sources/figures/figure_6P-1_p861.png` | Figure 6P-1 shows one direction (northbound). A W20-1 ROAD WORK AHEAD sign stands on the right-hand roadside of that approach, at dimension A upstream of the work space, which is drawn as a hatched area beyond the shoulder. No channelizing devices, taper or buffer are drawn. | TDU-TA1-W20-1 |
+| SR-6P1-FIG-ANCHOR | 6P-1, p. 861 | `tests/fixtures/rule_pack_sources/figures/figure_6P-1_p861.png` | Figure 6P-1: the only dimension drawn is A, from the W20-1 sign support to a line level with the upstream end of the hatched work space beyond the shoulder. There is one advance sign, no B or C, and no taper or channelizing devices. | R-TA1-ANCHOR-A |
 | SR-6P6-FIG-SIGNS | 6P-6, p. 871 | `tests/fixtures/rule_pack_sources/figures/figure_6P-6_p871.png` | Figure 6P-6 shows both directions. Each approach has a W20-1 ROAD WORK AHEAD sign on its right-hand roadside at dimension A upstream (southbound: A from the start of the work area; northbound: A from the start of the shoulder taper). Each direction has a G20-2 END ROAD WORK sign labelled '(optional)' past the work area. The work space is on the right shoulder with a 'Work vehicle' and a 'Truck-mounted attenuator (optional)' upstream of it. | TDU-TA6-W20-1, TDU-TA6-G20-2, TDU-TA6-WORK-VEHICLE, TDU-TA6-TMA |
 | SR-6P6-FIG-TAPER | 6P-6, p. 871 | `tests/fixtures/rule_pack_sources/figures/figure_6P-6_p871.png` | Figure 6P-6, northbound: a shoulder taper of channelizing devices dimensioned '1/3 L', then a dimension labelled 'Buffer space (optional)', then the work vehicle and work space. A dimension labelled '10 ft MIN.' runs from the near face of the channelizing devices across the open northbound lane. | R-TA6-FIG-SHOULDER-TAPER, R-TA6-FIG-10FT-MIN, R-TA6-FIG-BUFFER |
+| SR-6P6-FIG-ANCHOR | 6P-6, p. 871 | `tests/fixtures/rule_pack_sources/figures/figure_6P-6_p871.png` | Figure 6P-6, northbound (the approach on the work side): A runs from the W20-1 sign support to the upstream end of the shoulder taper; downstream of it come the shoulder taper ('1/3 L'), the optional buffer space and the work vehicle. Southbound (the opposite approach): A runs from the W20-1 sign support to a line level with the near end of the work space; no taper is drawn on that side. Only A is drawn on each approach. | R-TA6-ANCHOR-A-WORK-SIDE, R-TA6-ANCHOR-A-OPPOSITE |
 | SR-6P10-FIG-SIGNS | 6P-10, p. 879 | `tests/fixtures/rule_pack_sources/figures/figure_6P-10_p879.png` | Figure 6P-10 shows both directions. On each approach, from the work outward: a W20-7 Flagger sign at dimension A from the flagger station, a W20-4 ONE LANE ROAD XX FT sign at B, and a W20-1 ROAD WORK XX FT sign at C, each on the right-hand roadside. A W16-2P XX FEET plaque is drawn below W20-7 on both approaches; it is labelled '(optional)' on the upper approach and carries no label on the lower approach. A G20-2 END ROAD WORK sign labelled '(optional)' stands at the end of each direction. A flagger stands at each end of the one-lane section. | TDU-TA10-W20-7, TDU-TA10-W16-2P, TDU-TA10-W20-4, TDU-TA10-W20-1, TDU-TA10-G20-2, TDU-TA10-FLAGGER |
 | SR-6P10-FIG-TAPER | 6P-10, p. 879 | `tests/fixtures/rule_pack_sources/figures/figure_6P-10_p879.png` | Figure 6P-10: the one-lane, two-way taper of channelizing devices at each end of the work space is dimensioned '50 to 100 ft'. | R-TA10-FIG-TAPER |
-| SR-6P33-FIG-SIGNS | 6P-33, p. 925 | `tests/fixtures/rule_pack_sources/figures/figure_6P-33_p925.png` | Figure 6P-33 has panel A (long-term and intermediate) and panel B (short-term), each showing the approach with the right lane closed. From the work outward: a W4-2R Lane Ends sign at dimension A from the upstream end of the shoulder taper, a W20-5R RIGHT LANE CLOSED XX MILE sign at B, and a W20-1 ROAD WORK XX MILE sign at C. Each sign is posted on both the right-hand and the left-hand side of the roadway. An arrow board stands in the closed lane at the start of the merging taper, which is dimensioned L; a 'Shoulder taper (see Note 3)' is upstream of it; 'Buffer space (optional)' lies between the merging taper and the work space. Panel A adds a 'Temporary white edge line'; panel B shows a 'Work vehicle' and a 'Truck-mounted attenuator (optional)'. A G20-2 END ROAD WORK sign labelled '(optional)' is downstream on both sides of the roadway. | TDU-TA33-W4-2R, TDU-TA33-W20-5R, TDU-TA33-W20-1, TDU-TA33-ARROW-BOARD, TDU-TA33-G20-2, TDU-TA33-WORK-VEHICLE, TDU-TA33-TMA |
+| SR-6P10-FIG-ANCHOR | 6P-10, p. 879 | `tests/fixtures/rule_pack_sources/figures/figure_6P-10_p879.png` | Figure 6P-10, both approaches: C runs from the W20-1 sign support to the W20-4 support, B from the W20-4 support to the W20-7 support, and A from the W20-7 support to a line level with the flagger. The one-lane, two-way taper ('50 to 100 ft') starts at that line and runs toward the work space. C, B and A are consecutive and do not overlap. | R-6B1-ABC-CONSECUTIVE, R-TA10-ANCHOR-A |
+| SR-6P33-FIG-SIGNS | 6P-33, p. 925 | `tests/fixtures/rule_pack_sources/figures/figure_6P-33_p925.png` | Figure 6P-33 has panel A (long-term and intermediate) and panel B (short-term), each showing the approach with the right lane closed. From the work outward: a W4-2R Lane Ends sign at dimension A from the upstream end of the merging taper (the start of dimension L; the 'Shoulder taper (see Note 3)' begins inside A and ends where the merging taper begins), a W20-5R RIGHT LANE CLOSED XX MILE sign at B, and a W20-1 ROAD WORK XX MILE sign at C. Each sign is posted on both the right-hand and the left-hand side of the roadway. An arrow board stands in the closed lane at the start of the merging taper, which is dimensioned L; a 'Shoulder taper (see Note 3)' is upstream of it; 'Buffer space (optional)' lies between the merging taper and the work space. Panel A adds a 'Temporary white edge line'; panel B shows a 'Work vehicle' and a 'Truck-mounted attenuator (optional)'. A G20-2 END ROAD WORK sign labelled '(optional)' is downstream on both sides of the roadway. | R-SIGN-NAMING-W4-2-SIDE, TDU-TA33-W4-2R, TDU-TA33-W20-5R, TDU-TA33-W20-1, TDU-TA33-ARROW-BOARD, TDU-TA33-G20-2, TDU-TA33-WORK-VEHICLE, TDU-TA33-TMA |
 | SR-6P33-FIG-500FT | 6P-33, p. 925 | `tests/fixtures/rule_pack_sources/figures/figure_6P-33_p925.png` | Figure 6P-33, panels A and B: a dimension labelled '500 ft' runs from the downstream end of the closure to the G20-2 END ROAD WORK sign. | R-TA33-FIG-G20-2-500FT |
 | SR-6P33-FIG-100FT | 6P-33, p. 925 | `tests/fixtures/rule_pack_sources/figures/figure_6P-33_p925.png` | Figure 6P-33, panel A only: a dimension labelled '100 ft (optional)' runs along the downstream taper, from the downstream end of the work space to the end of the taper. | R-TA33-FIG-DOWNSTREAM-100FT |
+| SR-6P33-FIG-ANCHOR | 6P-33, p. 925 | `tests/fixtures/rule_pack_sources/figures/figure_6P-33_p925.png` | Figure 6P-33, panels A and B: C runs from the W20-1 sign support to the W20-5R support, B from the W20-5R support to the W4-2R support, and A from the W4-2R support to the upstream end of the merging taper (where dimension L starts), where the arrow board stands. The 'Shoulder taper (see Note 3)' begins inside dimension A and ends where the merging taper begins. C, B and A are consecutive and do not overlap. | R-6B1-ABC-CONSECUTIVE, R-TA33-ANCHOR-A |
 
 ## Unsourced items and their SME questions
 
 | Record | Status | SME question |
 | --- | --- | --- |
 | R-LOW-SPEED-CUTOFF | SOURCE_REVIEW_REQUIRED | The MUTCD says 'low-speed roadways' (Sect. 6N.07 para 04) and 'a minor road having low speeds' (TA-6 note 2) without a number. What posted speed, in mph, is the upper limit for 'low speed'? |
-| R-6N11-TA33-UNDIVIDED-FOUR-LANE | SOURCE_REVIEW_REQUIRED | Sect. 6N.11 para 06 allows Figure 6P-33 on 'undivided or divided four-lane roads' when the right-hand lane is closed. Is an undivided road with two lanes each way and the right lane closed the right reading of 'four-lane'? |
+| R-6N11-TA33-UNDIVIDED-OTHER | SOURCE_REVIEW_REQUIRED | Sect. 6N.11 para 06 allows Figure 6P-33 on undivided roads only for four-lane roads with the right-hand lane closed. This undivided site has three or more lanes each way, or a left-lane or interior-lane closure. Should TA-33 be used here, and with what changes? |
 | R-TMA-SPEED-THRESHOLD | UNKNOWN | Should the system ever suggest a truck-mounted attenuator by speed? If so, at what posted speed (mph)? |
 | R-DEFAULT-WORK-VEHICLE-WIDTH | UNKNOWN | What work-vehicle width (ft) should be assumed when no vehicle is visible? |
 | R-DEFAULT-WORK-LENGTH-POLE | UNKNOWN | What work-space length (ft) should be assumed for pole work when the footprint is not visible? |
 | R-DEFAULT-WORK-LENGTH-MANHOLE | UNKNOWN | What work-space length (ft) should be assumed for manhole work when the footprint is not visible? |
 | R-DEFAULT-WORK-LENGTH-EXCAVATION | UNKNOWN | What work-space length (ft) should be assumed for an excavation when the footprint is not visible? |
 | R-DEFAULT-WORK-LENGTH-TRENCH | UNKNOWN | What work-space length (ft) should be assumed for a trench when the footprint is not visible? |
+| R-6B4-W-MERGING | SOURCE_REVIEW_REQUIRED | Table 6B-4 defines W only as 'width of offset in feet'. For a merging taper (TA-33), which measured width should be W: the closed lane's width (lane_width_ft), the lane width plus a closed shoulder, or something else? |
+| R-6B4-W-SHIFTING | SOURCE_REVIEW_REQUIRED | Table 6B-4 defines W only as 'width of offset in feet'. For a shifting taper (for example the TA-6 note 5 lane shift), which measured width should be W: the lateral distance the lane moves, or something else? |
+| R-6B4-W-SHOULDER | SOURCE_REVIEW_REQUIRED | Table 6B-4 defines W only as 'width of offset in feet'. For a shoulder taper (TA-6, TA-33 note 3), which measured width should be W: the closed shoulder's width (shoulder_width_ft), or something else? |
+| R-SIGN-NAMING-W4-2-SIDE | SOURCE_REVIEW_REQUIRED | The MUTCD has one Lane Ends sign, W4-2, with no side suffix. The pack calls the right-lane version W4-2R and the left-lane version W4-2L (the mirror image, per TA-33 note 1 'the corresponding Lane Ends signs'). Are W4-2R and W4-2L the codes your drafts and sign supplier use, and is W4-2L the mirror image of W4-2R? |
+| R-SIGN-SIZE-M4-9AL | UNKNOWN | The client drafts use sign code M4-9AL, which is not in MUTCD Table 6I-1. Which MUTCD sign is it (for example an M4-9a with a left arrow), and what size (inches, width x height) should be drawn? |
+| R-SIGN-SIZE-R9-3BR | UNKNOWN | The client drafts use sign code R9-3BR, which is not in MUTCD Table 6G-1. Which sign is it, and what size (inches, width x height) should be drawn? |
 | E-TA6-MINOR-ROAD | SOURCE_REVIEW_REQUIRED | TA-6 note 2 limits TA-6 to 'a minor road having low speeds'. The MUTCD does not define 'minor road' and the road types are urban low/high speed, rural and expressway/freeway. How should 'minor road' be decided? |
 | R-TA10-SHORT-ZONE | SOURCE_REVIEW_REQUIRED | TA-10 note 2 allows a single flagger for 'short TTC zones' but gives no length. What is the longest zone (ft) that counts as short, or should the single-flagger option always be an SME choice? |
-| E-TA33-FORM-UNDIVIDED-6N11 | SOURCE_REVIEW_REQUIRED | Sect. 6N.11 para 06 allows Figure 6P-33 on 'undivided or divided four-lane roads' when the right-hand lane is closed. Does this undivided site qualify (two lanes each way, right lane closed)? |
+| E-TA33-FORM-UNDIVIDED-OTHER | SOURCE_REVIEW_REQUIRED | Sect. 6N.11 para 06 allows Figure 6P-33 on undivided roads only for four-lane roads with the right-hand lane closed. This undivided site has three or more lanes each way, or a left-lane or interior-lane closure. Should TA-33 be used here, and with what changes? |
 | R-TA33-FIG-G20-2-500FT | SOURCE_REVIEW_REQUIRED | Figure 6P-33 shows '500 ft' from the end of the closure to the END ROAD WORK sign (render, page 925). Confirm the reading and whether the draft should use it. |
 | R-TA33-FIG-DOWNSTREAM-100FT | SOURCE_REVIEW_REQUIRED | Figure 6P-33 panel A shows a downstream taper labelled '100 ft (optional)' (render, page 925). Confirm the reading and whether the draft should use it. |
 
@@ -310,7 +366,10 @@ Read from the figure drawings, which have no text layer for their labels. Each r
 | R-LOW-SPEED-CUTOFF | Upper speed for 'low speed' (Sect. 6N.07 para 04; TA-6 notes 2 and 4). Blocks TA-6 and the 9 ft option. |
 | E-TA6-MINOR-ROAD | Definition of 'minor road' (TA-6 note 2). Blocks TA-6. |
 | R-TA10-SHORT-ZONE | Length of a 'short TTC zone' for the single-flagger option (TA-10 note 2). |
-| R-6N11-TA33-UNDIVIDED-FOUR-LANE / E-TA33-FORM-UNDIVIDED-6N11 | Whether an undivided road with two lanes each way and the right lane closed may use TA-33 (Sect. 6N.11 para 06). |
+| R-6N11-TA33-UNDIVIDED-OTHER / E-TA33-FORM-UNDIVIDED-OTHER | Whether TA-33 may be used on an undivided road with three or more lanes each way, or with a left-lane or interior-lane closure (Sect. 6N.11 para 06 covers only the four-lane, right-lane case; S4b stage E). |
+| R-6B4-W-MERGING, R-6B4-W-SHIFTING, R-6B4-W-SHOULDER | Which measured width is W (Table 6B-4) for each taper type (S4b stage C). |
+| R-SIGN-NAMING-W4-2-SIDE | Whether W4-2R and W4-2L are the codes the drafts and the sign supplier use, and W4-2L is the mirror image (S4b stage A). |
+| R-SIGN-SIZE-M4-9AL, R-SIGN-SIZE-R9-3BR | Which sign each client code is, and its size (not in the MUTCD tables; S4b stage A). |
 | R-TA33-FIG-G20-2-500FT, R-TA33-FIG-DOWNSTREAM-100FT | Confirmation of the two numbers read only from Figure 6P-33. |
 | R-TMA-SPEED-THRESHOLD | Whether a TMA is ever suggested by speed, and at what speed (open question 6). |
 | R-DEFAULT-WORK-VEHICLE-WIDTH | Assumed work-vehicle width when none is visible (open question 7). |
@@ -321,8 +380,18 @@ Read from the figure drawings, which have no text layer for their labels. Each r
 
 | Record | Status | Reading |
 | --- | --- | --- |
-| R-6N11-TA33-UNDIVIDED-FOUR-LANE | SOURCE_REVIEW_REQUIRED | PROPOSED, not owner-approved: 'undivided or divided four-lane roads' read as divided_highway = false with lanes_per_direction = 2 (two lanes each way) and closed_lane_side = RIGHT. Para 02 defines multi-lane as 'two or more lanes of moving motor vehicle traffic in one direction'. |
-| E-TA33-FORM-UNDIVIDED-6N11 | SOURCE_REVIEW_REQUIRED | PROPOSED, not owner-approved: divided_highway = false, lanes_per_direction = 2 and closed_lane_side = RIGHT (see R-6N11-TA33-UNDIVIDED-FOUR-LANE). |
+| R-6N11-TA33-UNDIVIDED-FOUR-LANE-RIGHT | SOURCED | INTERPRETATION (owner-confirmed reading, S4b stage E): 'undivided ... four-lane roads' (para 06) is read as divided_highway = false with lanes_per_direction = 2, i.e. two lanes in each direction, multi-lane as para 02 defines it ('two or more lanes of moving motor vehicle traffic in one direction'); 'the right-hand lane is closed' is read as closed_lane_side = RIGHT. |
+| R-6B1-ABC-CONSECUTIVE | SOURCED | INTERPRETATION (owner-accepted reading of the figure render, S4b stage C): the Table 6B-1 note defines A, B and C as successive sign-to-sign distances; Figures 6P-10 and 6P-33 draw them end to end with no overlap. |
+| SZ-W20-5R | SOURCED | INTERPRETATION: sign code W20-5R is read as the Lane Closed (W20-5) sign with the legend RIGHT LANE CLOSED: Table 6H-1 lists W20-5 without a side and Sect. 6H.07 para 02 gives the RIGHT (LEFT) legend. Owner-approved 2026-10-30 (S4b stage A, decision 1). |
+| SZ-W20-5L | SOURCED | INTERPRETATION: sign code W20-5L is read as the Lane Closed (W20-5) sign with the legend LEFT LANE CLOSED: Table 6H-1 lists W20-5 without a side and Sect. 6H.07 para 02 gives the RIGHT (LEFT) legend. Owner-approved 2026-10-30 (S4b stage A, decision 1). |
+| SZ-W4-2R | SOURCED | INTERPRETATION: sign code W4-2R is read as the Lane Ends (W4-2) sign for a right lane closure: Table 6H-1 lists W4-2 without a side; TA-33 note 1 substitutes 'the corresponding Lane Ends signs' for a left-lane closure. Owner-approved 2026-10-30 (S4b stage A, decision 1). |
+| SZ-W4-2L | SOURCED | INTERPRETATION: sign code W4-2L is read as the Lane Ends (W4-2) sign for a left lane closure: Table 6H-1 lists W4-2 without a side; TA-33 note 1 substitutes 'the corresponding Lane Ends signs' for a left-lane closure. Owner-approved 2026-10-30 (S4b stage A, decision 1). |
+| R-TA1-ANCHOR-A | SOURCED | INTERPRETATION (owner-accepted reading of the figure render, S4b stage C): the 'point of restriction' of Table 6B-1 is the upstream end of the work space; A is the single gap from it to the W20-1 sign. |
+| R-TA6-ANCHOR-A-WORK-SIDE | SOURCED | INTERPRETATION (owner-accepted reading of the figure render, S4b stage C): on the work-side approach the 'transition' of Table 6B-1 is the shoulder taper; A ends at its upstream end. |
+| R-TA6-ANCHOR-A-OPPOSITE | SOURCED | INTERPRETATION (owner-accepted reading of the figure render, S4b stage C): on the opposite approach there is no transition; the 'point of restriction' is the near end of the work space. |
+| R-TA10-ANCHOR-A | SOURCED | INTERPRETATION (owner-accepted reading of the figure render, S4b stage C): A ends at the flagger station (the line level with the flagger), not at the work space; the taper lies downstream of that line. |
+| E-TA33-FORM-UNDIVIDED-FOUR-LANE-RIGHT | SOURCED | INTERPRETATION (owner-confirmed reading, S4b stage E): 'undivided ... four-lane roads' with 'the right-hand lane is closed' (para 06) is read as divided_highway = false, lanes_per_direction = 2 and closed_lane_side = RIGHT; para 02 defines multi-lane as 'two or more lanes of moving motor vehicle traffic in one direction'. |
+| R-TA33-ANCHOR-A | SOURCED | INTERPRETATION (owner-accepted reading of the figure render, S4b stage C): the 'transition' of Table 6B-1 is the merging taper; A ends at its upstream end, not at the shoulder taper. |
 
 **TA-10 'not multi-lane' (E-TA10-NOT-MULTI-LANE).** TA-10 is a two-lane road with one lane each way. The pack encodes this as `lanes_per_direction < 2`. The number 2 comes from Sect. 6N.11 para 02, which defines a multi-lane highway as one with "two or more lanes of moving motor vehicle traffic in one direction"; a road that is not multi-lane therefore has fewer than two lanes in each direction. With `oneway = false` (two-way traffic alternating through one lane, figure title) and `divided_highway = false` (Sect. 6N.09, two-lane highway), this matches the figure. It is treated as a literal reading of para 02, not an interpretation. If the SME disagrees, the condition becomes SOURCE_REVIEW_REQUIRED and every TA-10 site goes to an SME question.
 
@@ -335,6 +404,8 @@ Source, Sect. 6N.11 para 06, p. 847 (Option): "When the right-hand lane is close
 Proposed D-60 text: "TA-33 is one OR'd rule: (a) a divided highway with two or more lanes in the closed direction (figure title; 6N.11 paras 02 and 03), or (b) an undivided four-lane road with the right-hand lane closed (6N.11 para 06). Branch (b) is a proposed reading of 'four-lane' (two lanes each way) and stays SOURCE_REVIEW_REQUIRED until the SME confirms it; until then an undivided site goes to an SME question. A left-lane (median-side) closure on an undivided road, or an undivided road with more than two lanes each way, is not covered by 6N.11 para 06."
 
 Not edited in the plan; for the owner to decide.
+
+**Superseded (S4b).** Owner decision D-91 (2026-10-30) and S4b stage E source branch (b) for the four-lane, right-lane case; broader undivided cases stay SOURCE_REVIEW_REQUIRED. See 'S4b changes'.
 
 ## Differences from plan section 4B (proposals)
 
@@ -370,3 +441,95 @@ Not edited in the plan; for the owner to decide.
 | POC pack edition | The POC pack header cites "MUTCD 11th Edition with Revision 1", December 2025; v1 cites the December 2023 file. The POC header is unchanged. |
 | D-60, TA-33 | D-60 allows TA-33 on 'undivided, 2+ lanes each way'. Sect. 6N.11 para 06 says right-hand lane closed on four-lane roads. See the amendment proposal. |
 | Plan section 10, note 11 | Plan section 10 places the drafts' 11 ft lane-width note in a project-reference layer; the S4 spec put it in the client layer. Both are moot after the scope change. |
+
+## S4b changes
+
+Pack version `1.1.0`, status `DRAFT`, hash `80c25240ab584974f40f4f17205a8490127549837a30f7b69e9d11dd95a18b0a`. 19 unsourced records, 12 interpretations, 53 registry fields.
+
+| Stage | What changed |
+| --- | --- |
+| A | Sign sizes: Tables 6G-1 (p. 796), 6H-1 (pp. 803-804) and 6I-1 (p. 811) as quoted rows in base/sign_sizes.json, one row per sign, inches, width x height; '—' is null. The tables are made binding by Sect. 6G.02 para 02, 6H.01 para 03 and 6I.01 para 07 (Standard). Read only through rule_pack_effective.sign_size(): a null column is a gap with an SME question, never 0 and never another column. |
+| B | Device rows for the note-only signs W21-5, W3-4, W5-1, W20-5L and W4-2L (S5 plan Q4 option B). No model, validator or ta_device_use change; the note rules keep their actions (USE_LEFT_LANE_SIGNS, ROAD_NARROWS_SIGN_MAY_BE_ADDED, BE_PREPARED_TO_STOP_MAY_BE_ADDED, W20-1_MAY_BE_REPLACED). No note rule has a field that can name a device, so none was filled or added. |
+| C | Placement anchors as owner-accepted readings of the figure renders (R-TAxx-ANCHOR-A, R-6B1-ABC-CONSECUTIVE). The TA-1 and TA-6 opposite-approach readings are marked 'Owner-accepted, SME confirmation pending'. W per taper type (merging, shifting, shoulder) is SOURCE_REVIEW_REQUIRED; W is not set. |
+| D | Add-ons (D-90): Sect. 6G.10 (sidewalk closed; 6G.08 not loaded) and Sect. 6I.02 (M4-9 family, M4-8a; M4-8P, M4-8bP, M4-10 not loaded) as cited rules in base/sidewalk_detour.json, optional per zone. No layout numbers: the MUTCD gives none. |
+| E | Sect. 6N.11 split (D-91): undivided, two lanes each way, right lane closed is SOURCED from paras 02 and 06 (owner-confirmed reading); broader undivided cases stay SOURCE_REVIEW_REQUIRED. |
+
+### Records removed or replaced
+
+| Record | Part | Replaced by | Cited in |
+| --- | --- | --- | --- |
+| R-6N11-TA33-UNDIVIDED-FOUR-LANE | base/rules.json | Replaced by R-6N11-TA33-UNDIVIDED-FOUR-LANE-RIGHT (SOURCED) and R-6N11-TA33-UNDIVIDED-OTHER (SOURCE_REVIEW_REQUIRED) | docs/plans/S7_plan.md lines 43, 201, 383; docs/plans/S16_plan.md line 234 |
+| E-TA33-FORM-UNDIVIDED-6N11 | ta/TA-33.json | Replaced by E-TA33-FORM-UNDIVIDED-FOUR-LANE-RIGHT (SOURCED) and E-TA33-FORM-UNDIVIDED-OTHER (SOURCE_REVIEW_REQUIRED) | docs/plans/S7_plan.md lines 43, 201, 383; docs/plans/S16_plan.md line 234 |
+
+### Other changed records
+
+| Record | Change |
+| --- | --- |
+| SR-6P33-FIG-SIGNS | Transcription corrected (owner checked the 400 dpi crops). Superseded reading: "a W4-2R Lane Ends sign at dimension A from the upstream end of the shoulder taper". Current: A runs from the upstream end of the merging taper (start of L); the shoulder taper begins inside A and ends where the merging taper begins. SourceRef has no note field, so the old wording is kept here. |
+| R-TA1-ANCHOR-A, R-TA6-ANCHOR-A-OPPOSITE | Rule text ends 'Owner-accepted, SME confirmation pending.' |
+| Manifest | version 1.0.0 -> 1.1.0; status stays DRAFT. Two part files added: base/sign_sizes.json, base/sidewalk_detour.json. |
+| Registry | One field added: addon_sidewalk_closed (boolean, ASKED_IF_NEEDED, SME_FORM). It is the S11 add-on toggle ADDON:sidewalk_closed; S11 must map the toggle onto this fact and not invent a second name. No other registry change (closed_lane_side unchanged). |
+
+### S4 decisions above that S4b supersedes
+
+| S4 item | Now |
+| --- | --- |
+| Q-B, Sect. 6N.11 | Superseded by D-91 and stage E. |
+| Note-only signs | Superseded by stage B: the five signs have device records; the note actions are unchanged. |
+| S8 client modules proposal ('a pedestrian module needs Sect. 6G.10 loaded first') | 6G.10 is loaded (stage D). |
+
+### Flags written into a device `name`
+
+`Device` has no interpretation or note field (no model change in S4b), so these flags are in the name text.
+
+| Device | Name |
+| --- | --- |
+| DV-W5-1 | ROAD NARROWS (code from the Table 6H-1 row only: TA-6 note 6 names a ROAD NARROWS sign but prints no code) |
+| DV-W20-5L | LEFT LANE CLOSED XX MILE (INTERPRETATION: the L suffix comes from the catalog, not the MUTCD text; the MUTCD sign is the Lane Closed (W20-5) sign with the LEFT legend, Sect. 6H.07 para 02; owner-approved 2026-10-30) |
+| DV-W4-2L | Lane Ends (left lane) (INTERPRETATION: the L suffix comes from the catalog, not the MUTCD text; the MUTCD sign is Lane Ends (W4-2) with no side, Sect. 6H.08; TA-33 note 1 substitutes 'the corresponding Lane Ends signs'; owner-approved 2026-10-30; side naming: R-SIGN-NAMING-W4-2-SIDE) |
+
+### Size rows and the device catalog
+
+Every size row whose sign code has no catalog entry with the same id. Where a catalog entry exists, its sizes equal the row (checked when the rows were built).
+
+| Size row | Sign | Catalog |
+| --- | --- | --- |
+| SZ-R9-10 | R9-10 | side variants only: R9-10L |
+| SZ-R9-11 | R9-11 | side variants only: R9-11L, R9-11R |
+| SZ-M4-9 | M4-9 | side variants only: M4-9L, M4-9R |
+| SZ-M4-9a | M4-9a | no entry |
+| SZ-M4-9b | M4-9b | no entry |
+| SZ-M4-9c | M4-9c | no entry |
+
+### Add-on rules: gate and action kind
+
+None fires on its own: each needs its gate fact true; an unset fact evaluates to None (tests/unit/rules/test_rule_pack_addons.py). No add-on sign has a device row or a ta_device_use row, so none is required or placed by a TA.
+
+| Rule | Strength | Gate | Action | Action kind |
+| --- | --- | --- | --- | --- |
+| R-6G10-P01-SIDEWALK-CLOSED-SIGNS | Guidance | addon_sidewalk_closed EQ True | SIDEWALK_CLOSED_SIGNS | sign placement (Guidance) |
+| R-6G10-P01-PEDESTRIAN-DETOUR-SIGNS | Guidance | pedestrian_detour_required EQ True | M4-9A_OR_M4-9B_FOR_PEDESTRIAN_REROUTE | sign placement (Guidance) |
+| R-6G10-P02-R9-9 | Guidance | addon_sidewalk_closed EQ True | R9-9_AT_START_AND_PRECEDING_INTERSECTIONS | sign placement (Guidance) |
+| R-6G10-P03-R9-10 | Guidance | addon_sidewalk_closed EQ True | R9-10_AT_START_WHEN_PARALLEL_SIDEWALK | sign placement (Guidance) |
+| R-6G10-P04-R9-11 | Guidance | addon_sidewalk_closed EQ True | R9-11_DIRECT_TO_OPEN_ROUTE | sign placement (Guidance) |
+| R-6G10-P05-R9-11A | Guidance | addon_sidewalk_closed EQ True | R9-11A_BEYOND_REDIRECT_POINT | sign placement (Guidance) |
+| R-6G10-P06-DETECTABLE-BARRICADE | Support | addon_sidewalk_closed EQ True |  | none (text only) |
+| R-6I02-P01-DETOUR-MARKED | Standard | vehicle_detour_required EQ True | DETOUR_ROUTE_SIGNS_REQUIRED | sign required when the add-on is on (Standard) |
+| R-6I02-P06-M4-9 | Guidance | vehicle_detour_required EQ True | M4-9_DETOUR_SIGN | sign placement (Guidance) |
+| R-6I02-P07-M4-9-STREET-NAME | Guidance | vehicle_detour_required EQ True | M4-9_WITH_STREET_NAME | sign placement (Guidance) |
+| R-6I02-P08-M4-8A | Option | vehicle_detour_required EQ True | M4-8A_AT_DETOUR_END_OPTIONAL | optional sign (Option) |
+| R-6I02-P09-M4-8A-NUMBERED | Guidance | vehicle_detour_required EQ True | M4-8A_ABOVE_ROUTE_SIGN_ON_NUMBERED_HIGHWAY | sign placement (Guidance) |
+| R-6I02-P10-M4-9A | Guidance | pedestrian_detour_required EQ True | M4-9A_PED_BIKE_DETOUR | sign placement (Guidance) |
+| R-6I02-P11-M4-9A-ARROW | Standard | pedestrian_detour_required EQ True | M4-9A_ARROW_REQUIRED | sign required when the add-on is on (Standard) |
+| R-6I02-P12-M4-9A-ARROW-PLAQUE | Option | pedestrian_detour_required EQ True |  | none (text only) |
+| R-6I02-P13-M4-9B-M4-9C | Option | pedestrian_detour_required EQ True | M4-9B_OR_M4-9C_SINGLE_MODE_DETOUR | optional sign (Option) |
+
+### Follow-ups
+
+| | Area | Follow-up |
+| --- | --- | --- |
+| a | Pack store | Keep sealed versions side by side (for example rule_pack/versions/<version>/) so a run replays against its recorded pack version without git. Before the first recording against pack v1. Today the store holds one version: after 1.1.0, load('1.0.0') raises RULE_PACK_VERSION_MISSING; 1.0.0 is in git at 9649481, and no run is recorded against it (the pipeline still reads the POC pack). |
+| b | Add-on signs (S5, S8) | R9-9, R9-10, R9-11, R9-11a, M4-9, M4-9a, M4-9b, M4-9c and M4-8a have size rows but no device rows, and several have no catalog entry or symbol (see 'Size rows and the device catalog'). They need catalog entries, symbols and device rows before S8 places them. |
+| c | closed_lane_side (S7) | An unknown or unstated side must never default to RIGHT. The enum has only RIGHT and MEDIAN_SIDE, so a left or interior closure on an undivided road cannot be stated exactly; it routes to E-TA33-FORM-UNDIVIDED-OTHER only when reported as MEDIAN_SIDE. No registry change in S4b (owner decision). |
+| d | S8 plan | docs/plans/S8_plan.md lines 208, 219 and 221 (lines 199, 210 and 212 in the earlier copy in C:/work/plans-backup) describe the TA-33 anchor as 'A from the upstream end of the shoulder taper' / 'of the last taper' and list 'TA-33 A when there is no shoulder taper' as undefined. Superseded by the corrected reading: A always ends at the upstream end of the merging taper (R-TA33-ANCHOR-A). |
+| e | S7 and S16 plans | They cite the removed ids E-TA33-FORM-UNDIVIDED-6N11 and R-6N11-TA33-UNDIVIDED-FOUR-LANE (docs/plans/S7_plan.md lines 43, 201, 383; docs/plans/S16_plan.md line 234). Use the replacement ids above. |
