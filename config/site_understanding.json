@@ -67,5 +67,31 @@
       "source": "UNKNOWN",
       "note": "Clearance between the work space and the near face of the devices. No source. Asked per job."
     }
+  },
+  "crops": {
+    "note": "Crop engine (S6 commit 5, Q15 A). The crop centre is always the work reference (the image centre), computed by code; the model never chooses a crop. Values for the lane features are READ from config/pipeline_config.json (crops.min_px_per_lane, fusion.lane_width_plausible_m, crops.primary_zoom, crops.image_px, sharpness.uniform_max_std), not copied here.",
+    "lane_group": {
+      "value": [
+        "lane",
+        "road_edge",
+        "lane_line"
+      ],
+      "source": "S6 Q15 A: the existing crops.min_px_per_lane applies to the lane features",
+      "feature_m": "the low end of fusion.lane_width_plausible_m (the narrowest plausible lane: the conservative case)"
+    },
+    "pending_features": {
+      "value": [
+        "shoulder_edge",
+        "curb",
+        "sidewalk",
+        "bicycle_lane"
+      ],
+      "source": "CALIBRATION_PENDING",
+      "note": "No pixels-per-feature value exists for these. Until one is calibrated they are never judged sufficient, so a higher-zoom view (up to the zoom ceiling) is always requested when one of them is needed. May cost extra Azure Maps requests."
+    },
+    "zoom_ceiling": {
+      "value": "crops.primary_zoom",
+      "source": "config/pipeline_config.json crops.primary_zoom (the documented maximum of the microsoft.imagery tileset); no higher zoom is ever requested, so the upsampling sharpness check (sharpness.min_detail_gain_ratio) is not needed here"
+    }
   }
 }
