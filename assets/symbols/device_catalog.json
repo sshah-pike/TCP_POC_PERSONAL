@@ -6,7 +6,8 @@
   "MUTCD 11th Edition Chapter 6, December 2023 revision (supplied file)",
   "Client reference drafts: Colorado, E Second, Granite"
  ],
- "catalog_hash": "ac304fefab8a63684eda587e200ff1ab59d1f50a317df1b238d23d15ff7715fd",
+ "placeholder_label": "PLACEHOLDER SYMBOLS - NOT CLIENT LIBRARY",
+ "catalog_hash": "9dccf791cb5de63ef0b3a7a34e6295b4ee2368e2dd1c78b989666c29b408447f",
  "entries": [
   {
    "device_id": "W20-1",

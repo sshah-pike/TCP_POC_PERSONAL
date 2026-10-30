@@ -8,7 +8,7 @@ Persistence (CLAUDE.md, Storage): the catalog carries `schema_version`; every as
 {uri, sha256, size, media_type} plus a status. `uri` is a key relative to the assets folder ("symbols/svg/W20-1.svg"),
 never a raw path; only this module turns it into a path, through config/settings.py.
 
-Hashing: `catalog_hash` is the SHA-256 of canonical JSON of schema_version and every entry (asset sha256 included), so
+Hashing: `catalog_hash` is the SHA-256 of canonical JSON of schema_version, the placeholder label and every entry (asset sha256 included), so
 key order and line endings do not matter, and swapping one symbol changes that entry's asset sha256 and the hash only.
 """
 import json, os, re
@@ -120,6 +120,7 @@ class Catalog(_Frozen):
     catalog_version: str
     status: str
     sources: tuple[str, ...]
+    placeholder_label: str   # text a sheet shows when any PLACEHOLDER_ASSET symbol is drawn (S12 draws it)
     catalog_hash: str
     entries: tuple[Entry, ...]
 
@@ -131,8 +132,9 @@ class Resolution(_Frozen):
 
 
 def compute_catalog_hash(doc):
-    """Hash over schema_version and the entries of a catalog document (the hash field itself is not covered)."""
-    return sha256_hex(canonical_json({"schema_version": doc.get("schema_version"), "entries": doc.get("entries")}))
+    """Hash over schema_version, the placeholder label and the entries of a catalog document (not the hash field itself)."""
+    return sha256_hex(canonical_json({"schema_version": doc.get("schema_version"),
+                                      "placeholder_label": doc.get("placeholder_label"), "entries": doc.get("entries")}))
 
 
 def asset_file_path(uri):
@@ -206,6 +208,14 @@ class DeviceCatalog:
         hit = self._codes.get(code)
         _need(hit is not None, "DEVICE_UNKNOWN", f"no device or code {code!r} in the catalog", printed_code=code)
         return Resolution(entry=hit[0], via=hit[1], alias_status=hit[2])
+
+    def placeholder_status(self, device_ids):
+        """Whether a plan that uses these devices uses any PLACEHOLDER_ASSET symbol (acceptance A5). A plan that does is
+        REVIEW_REQUIRED and its sheet shows `label`. Lists only the placeholder devices; a CLIENT_ASSET is not listed.
+        S5 provides the flag and the text; S12 draws the label."""
+        used = sorted({d for d in device_ids if self.get(d).asset.status == AssetStatus.PLACEHOLDER_ASSET})
+        return {"uses_placeholder": bool(used), "device_ids": used, "reason_code": "PLACEHOLDER_ASSET" if used else None,
+                "label": self.catalog.placeholder_label if used else None, "requires_review": bool(used)}
 
     def asset_path(self, device_id):
         """Path of the device's symbol file, after checking it against the recorded sha256 and size."""
