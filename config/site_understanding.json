@@ -46,5 +46,26 @@
       "value": true,
       "source": "S6 Q9 A: interval = width +/- (edge error x mpp_sent x edges) plus the section spread"
     }
+  },
+  "defaults": {
+    "work_vehicle_width_in": {
+      "value": 102,
+      "source": "23 CFR 658.15 (maximum vehicle width 102 in); owner decision S6 session 1",
+      "flags": [
+        "DEFAULT_ASSUMED"
+      ],
+      "optional": true,
+      "note": "Used only when no vehicle is measured in the image. Optional: a caller may leave it out of the footprint."
+    },
+    "work_space_depth_ft": {
+      "value": null,
+      "source": "UNKNOWN",
+      "note": "No source. Asked per job (asked-if-needed work_type and size, S11); stays UNKNOWN until the SME supplies it."
+    },
+    "work_space_clearance_ft": {
+      "value": null,
+      "source": "UNKNOWN",
+      "note": "Clearance between the work space and the near face of the devices. No source. Asked per job."
+    }
   }
 }

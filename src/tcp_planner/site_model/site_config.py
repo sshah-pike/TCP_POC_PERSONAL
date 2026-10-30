@@ -26,3 +26,11 @@ def lane_width_plausible_m():
     """[low, high] metres per lane, read (not copied) from config/pipeline_config.json fusion.lane_width_plausible_m."""
     with open(os.path.join(CONFIG_DIR, "pipeline_config.json"), encoding="utf-8") as f:
         return tuple(json.load(f)["fusion"]["lane_width_plausible_m"])
+
+
+def default_setting(name, cfg=None):
+    """(value, flags, optional) of a default in config 'defaults'. A value with source UNKNOWN is returned as None: it stays
+    unknown until the SME supplies it for the job."""
+    e = (cfg or load_site_config())["defaults"][name]
+    if e.get("source") == "UNKNOWN": return None, ("SOURCE_REVIEW_REQUIRED",), bool(e.get("optional"))
+    return e["value"], tuple(e.get("flags", ())), bool(e.get("optional"))
