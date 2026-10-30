@@ -43,6 +43,20 @@ class Candidate(_Rec):
     evidence_ref: Optional[str] = None
 
 
+class MeasuredLength(_Rec):
+    """How a length was computed (D-64): the numbers behind a width or distance fact. Never read from the AI."""
+    schema_version: str = SCHEMA_VERSION
+    name: str
+    value_ft: float
+    interval_ft: Interval
+    method: Literal["CROSS_SECTION", "AI_MARKS", "GEOMETRY", "ELEVATION"]
+    mpp: float                       # metres per pixel of the image the pixels were read from (as sent)
+    pixel_error_px: float
+    inputs: tuple = ()
+    calculation: str = ""
+    flags: tuple = ()
+
+
 class SiteFact(_Rec):
     schema_version: str = SCHEMA_VERSION
     field: str
@@ -56,6 +70,7 @@ class SiteFact(_Rec):
     status: Literal["RESOLVED", "UNKNOWN"]
     reason_code: Optional[str] = None
     interval: Optional[Interval] = None
+    measured: Optional[MeasuredLength] = None
     flags: tuple = ()
     candidates: tuple = ()
 

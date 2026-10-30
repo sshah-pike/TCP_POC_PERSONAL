@@ -34,7 +34,7 @@ def _bearing(vx, vy):
 
 
 def _compass(vx, vy):
-    return COMPASS8[int(round(_bearing(vx, vy) / 45.0)) % 8]
+    return COMPASS8[int(round(_bearing(vx, vy) / (360.0 / len(COMPASS8)))) % len(COMPASS8)]
 
 
 def _axis(points):

@@ -4,12 +4,42 @@
   "regulatory_status": "IMPLEMENTATION_SETTING_NOT_MUTCD_VALUE",
   "note": "Site understanding settings (S6). No MUTCD value lives here. Every entry has a source or is tagged CALIBRATION_PENDING.",
   "call1": {
-    "evidence_max_words": {"value": 15, "source": "S0 prompt tuning proposal P1, approved S6 Q3 B"},
-    "work_location_min_confidence": {"value": 0.85, "source": "owner decision, S6 session 1"},
+    "evidence_max_words": {
+      "value": 15,
+      "source": "S0 prompt tuning proposal P1, approved S6 Q3 B"
+    },
+    "work_location_min_confidence": {
+      "value": 0.85,
+      "source": "owner decision, S6 session 1"
+    },
     "safety_critical_fields": {
-      "value": ["lanes_per_direction", "divided_highway", "shoulder_present", "oneway"],
+      "value": [
+        "lanes_per_direction",
+        "divided_highway",
+        "shoulder_present",
+        "oneway"
+      ],
       "source": "owner decision, S6 session 1 (Q7/Q8): AI plus OSM must agree, otherwise UNKNOWN"
     },
-    "common_fact_min_confidence": {"value": null, "source": "CALIBRATION_PENDING", "note": "no floor applied until calibrated"}
+    "common_fact_min_confidence": {
+      "value": null,
+      "source": "CALIBRATION_PENDING",
+      "note": "no floor applied until calibrated"
+    }
+  },
+  "measurement": {
+    "edge_pixel_error_px": {
+      "value": 1.0,
+      "source": "CALIBRATION_PENDING",
+      "note": "D-38 example: one pixel of error on each edge. Starting value only: the SME reviews it at S6 STOP 2 and calibrates it on the reference drawings (Q20)."
+    },
+    "edges_per_width": {
+      "value": 2,
+      "source": "geometry: a width is bounded by two edges, each with the pixel error"
+    },
+    "interval_includes_section_spread": {
+      "value": true,
+      "source": "S6 Q9 A: interval = width +/- (edge error x mpp_sent x edges) plus the section spread"
+    }
   }
 }

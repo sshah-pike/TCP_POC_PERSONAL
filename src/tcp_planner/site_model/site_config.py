@@ -13,3 +13,16 @@ def call1_setting(name, cfg=None):
     """Value of a call 1 setting; None while the entry is CALIBRATION_PENDING."""
     entry = (cfg or load_site_config())["call1"][name]
     return None if entry.get("source") == "CALIBRATION_PENDING" else entry["value"]
+
+
+def measurement_setting(name, cfg=None):
+    """(value, flags) of a measurement setting. A CALIBRATION_PENDING value is returned with that flag, so every number
+    computed from it can carry the flag (the value is a starting point, not a calibrated one)."""
+    entry = (cfg or load_site_config())["measurement"][name]
+    return entry["value"], (("CALIBRATION_PENDING",) if entry.get("source") == "CALIBRATION_PENDING" else ())
+
+
+def lane_width_plausible_m():
+    """[low, high] metres per lane, read (not copied) from config/pipeline_config.json fusion.lane_width_plausible_m."""
+    with open(os.path.join(CONFIG_DIR, "pipeline_config.json"), encoding="utf-8") as f:
+        return tuple(json.load(f)["fusion"]["lane_width_plausible_m"])
