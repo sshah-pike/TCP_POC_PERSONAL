@@ -67,9 +67,10 @@ def test_openai_send_posts_the_same_body_to_the_same_url(monkeypatch):
 
 def test_golden_file_itself_is_pinned():
     """A change to the golden file is a deliberate act: it needs this hash updated in the same commit."""
-    assert hashlib.sha256(open(GOLDEN, "rb").read().replace(b"
+    raw = open(GOLDEN, "rb").read().replace(b"
 ", b"
-")).hexdigest() == PINNED   # line endings do not count
+")   # line endings do not count
+    assert hashlib.sha256(raw).hexdigest() == PINNED
 
 
 PINNED = "586c9e3c238ee69a9770811d7ce3db1eba4f6629cfab0eedc7a5b2272c91b0e9"
