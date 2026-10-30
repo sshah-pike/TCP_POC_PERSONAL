@@ -44,7 +44,7 @@
     {
       "path": "base/sign_sizes.json",
       "layer": "FEDERAL",
-      "sha256": "38272f8fbbace449220f50f3f10a3c13fbd673e28a026ba67a5e4f23d7f554c9"
+      "sha256": "d8d53bc2fc09a2f2f4a56082ca34cc417be436c9d95b2cd5e989df75e06b9ed8"
     },
     {
       "path": "ta/TA-1.json",
@@ -67,5 +67,5 @@
       "sha256": "42300db5ac40848e0fc60edfa1e5fa5c24e388a4514d2bf80931e066c10f2eec"
     }
   ],
-  "content_sha256": "f175d44c1ef50aaa4a8e40eb57ba9a85fc1a9667e434ede5495ed62c70435ebe"
+  "content_sha256": "bdb53b12fdb1063d59a734676b8c4ffe5b4ea1cbe5fb2a7fd098b22d15e9a984"
 }

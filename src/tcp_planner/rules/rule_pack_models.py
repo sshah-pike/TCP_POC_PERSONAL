@@ -259,7 +259,7 @@ class Device(_Rec):
     id: str
     code: str
     name: str
-    catalog_id: Optional[str]      # id in assets/symbols/device_catalog.json (sizes and assets live there, S5)
+    catalog_id: Optional[str]      # id in assets/symbols/device_catalog.json (symbol assets, S5); sign sizes are pack rows (base/sign_sizes.json, S4b)
     source_ref_ids: list[str] = Field(min_length=1)
 
 
