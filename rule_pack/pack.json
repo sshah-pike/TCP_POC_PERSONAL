@@ -39,7 +39,7 @@
     {
       "path": "base/devices.json",
       "layer": "FEDERAL",
-      "sha256": "f4aa34d0e446968fd08bc3c1a0ed286c9cddca25eff767d734967047b7f5871f"
+      "sha256": "c1063c0e02c4c5c36401408a7145d3987ba110dcfb10b3fafd087ae20fcfc7cf"
     },
     {
       "path": "base/sign_sizes.json",
@@ -67,5 +67,5 @@
       "sha256": "42300db5ac40848e0fc60edfa1e5fa5c24e388a4514d2bf80931e066c10f2eec"
     }
   ],
-  "content_sha256": "bdb53b12fdb1063d59a734676b8c4ffe5b4ea1cbe5fb2a7fd098b22d15e9a984"
+  "content_sha256": "e5a0984c677d3060d56f02fd0130dd194e6a9096e13371bb62929abf487514d5"
 }
