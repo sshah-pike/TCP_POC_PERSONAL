@@ -269,3 +269,24 @@ def test_it_reads_the_real_nine_saved_files_format(R, tmp_path):
     t = tmp_path / "t.csv"; write_csv(t, [{"site_id": "granite", "lanes_per_direction": 2, "road_width_ft": 24, "truth_source": "x"}], R.COLUMNS)
     rep = R.score(R.read_truth(str(t)), {"gpt-x": R.read_results(str(d))})
     assert rep["gpt-x"]["fields"]["lanes_per_direction"]["calls"] == 1 and rep["gpt-x"]["width"]["calls"] == 1
+
+
+# ---------------------------------------------------------------- ta_situation column (owner addendum 2026-10-31)
+def test_the_optional_ta_situation_column_is_read_and_summarised_per_situation(R, world):
+    tmp, _, p1, sec = world
+    rows = [{**r, "ta_situation": "flagging" if r["site_id"] != "B" else "lane closure"} for r in TRUTH]
+    t2 = tmp / "truth2.csv"; write_csv(t2, rows, R.COLUMNS + ("ta_situation",))
+    truth = R.read_truth(str(t2))
+    assert {k: v["ta_situation"] for k, v in truth.items()} == {"A": "flagging", "B": "lane closure", "C": "flagging"}
+    rep = R.score(truth, {"prof1": R.read_results(str(p1))}, R.read_second(str(sec)))
+    by = rep["prof1"]["by_ta_situation"]
+    assert set(by) == {"flagging", "lane closure"} and by["flagging"]["sites"] == ["A", "C"] and by["lane closure"]["sites"] == ["B"]
+    assert by["flagging"]["wrong"] >= 1 and by["lane closure"]["wrong"] >= 1
+    text = R.render(rep, truth, R.read_second(str(sec)))
+    assert "by ta_situation" in text and "| flagging | A, C |" in text
+
+
+def test_a_truth_csv_without_the_column_still_works_and_shows_no_situation_table(R, world):
+    rep, truth, second = run(R, world)
+    assert set(rep["prof1"]["by_ta_situation"]) == {"(none)"}
+    assert "by ta_situation" not in R.render(rep, truth, second)

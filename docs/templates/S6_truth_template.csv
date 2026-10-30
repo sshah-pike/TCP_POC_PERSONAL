@@ -1,1 +1,1 @@
-site_id,lanes_per_direction,divided_highway,shoulder_present,oneway,parking_present,sidewalk_present,work_location,road_width_ft,truth_source
+site_id,lanes_per_direction,divided_highway,shoulder_present,oneway,parking_present,sidewalk_present,work_location,road_width_ft,truth_source,ta_situation

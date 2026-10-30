@@ -4,7 +4,8 @@
          --truth truth.csv [--second-source osm.csv] [--out report.md] [--json numbers.json]
 
 truth.csv columns:   site_id, lanes_per_direction, divided_highway, shoulder_present, oneway, parking_present, sidewalk_present,
-                     work_location, road_width_ft, truth_source        (a blank cell means "no truth for this field at this site")
+                     work_location, road_width_ft, truth_source, ta_situation (optional, free text)
+                     (a blank cell means "no truth for this field at this site")
 second-source csv:   site_id, lanes_per_direction, divided_highway, shoulder_present, oneway   (optional; blank = the source has no value)
 
 Each result folder is one profile (folder name); every *.json in it with a raw_response and a site is one call. For each profile and field:
@@ -57,7 +58,8 @@ def read_truth(path):
             sid = (row["site_id"] or "").strip()
             if not sid: raise TruthError(f"line {i}: empty site_id")
             if sid in out: raise TruthError(f"line {i}: site_id {sid!r} appears twice")
-            out[sid] = {**{k: _parse(k, row[k], f"line {i}") for k in FIELDS + ("road_width_ft",)}, "truth_source": (row["truth_source"] or "").strip()}
+            out[sid] = {**{k: _parse(k, row[k], f"line {i}") for k in FIELDS + ("road_width_ft",)}, "truth_source": (row["truth_source"] or "").strip(),
+                      "ta_situation": (row.get("ta_situation") or "").strip()}
     return out
 
 
@@ -154,7 +156,15 @@ def score(truth, results_by_profile, second=None, cfg=None):
             wrows.append({"site": r["site"], "call": r["_file"], "truth": t, "measured": tw.value_ft, "lo": tw.interval_ft.lo, "hi": tw.interval_ft.hi,
                           "error": tw.value_ft - t, "contains": tw.interval_ft.lo <= t <= tw.interval_ft.hi})
         meas = [x for x in wrows if x["measured"] is not None]
-        report[profile] = {"fields": fields, "width": {
+        by_ta = {}                          # per ta_situation of the truth csv (optional column), over all scored fields
+        for fld in fields.values():
+            for site in fld["sites"]:
+                by_ta.setdefault(truth[site]["ta_situation"] or "(none)", {"sites": set(), "wrong": 0, "wrong_and_used": 0})["sites"].add(site)
+            for x in fld["wrong_rows"]:
+                e = by_ta[truth[x["site"]]["ta_situation"] or "(none)"]
+                e["wrong"] += 1; e["wrong_and_used"] += bool(x["wrong_and_used"])
+        by_ta = {k: {"sites": sorted(v["sites"]), "wrong": v["wrong"], "wrong_and_used": v["wrong_and_used"]} for k, v in sorted(by_ta.items())}
+        report[profile] = {"by_ta_situation": by_ta, "fields": fields, "width": {
             "calls": len(wrows), "measured": len(meas), "rows": wrows,
             "mean_abs_error": (sum(abs(x["error"]) for x in meas) / len(meas)) if meas else None,
             "max_abs_error": max((abs(x["error"]) for x in meas), default=None),
@@ -173,6 +183,9 @@ def render(report, truth, second, cfg=None):
            f"Floors applied (per profile, default entry unless the profile has its own; none = CALIBRATION_PENDING): {floors}. "
            "work_location is read with the marks check missing, so a passed-on value carries AI_ONLY_UNCONFIRMED.", ""]
     for profile, rep in report.items():
+        if any(k != "(none)" for k in rep["by_ta_situation"]):
+            out += [f"## {profile}: by ta_situation (truth csv column)", "", "| ta_situation | sites | wrong answers | wrong and used |", "| --- | --- | --- | --- |"]
+            out += [f"| {k} | {', '.join(v['sites'])} | {v['wrong']} | {v['wrong_and_used']} |" for k, v in rep["by_ta_situation"].items()] + [""]
         out += [f"## {profile}", "", "| field | sites scored | calls | correct | wrong | UNKNOWN | passed on | wrong and used | sites with wrong and used | 95% upper bound on wrong-and-used rate |",
                 "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
         for f, d in rep["fields"].items():

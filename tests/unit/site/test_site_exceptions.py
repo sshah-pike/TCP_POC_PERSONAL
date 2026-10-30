@@ -13,7 +13,7 @@ DROP = object()                                   # marks a key to leave out of 
 
 def entry(**kw):
     e = {"entry_id": "E1", "site_id": "granite_p32", "field": "shoulder_present", "action": "SET_VALUE", "value": False,
-         "reason": "OSM tags a shoulder that is a parking lane", "added_by": "owner", "added_on": "2026-10-31"}
+         "reason": "OSM tags a shoulder that is a parking lane", "proposed_by_role": "SME", "entered_by_role": "ADMIN", "date": "2026-10-31"}
     e.update(kw)
     return {k: v for k, v in e.items() if v is not DROP}
 
@@ -34,7 +34,7 @@ def test_the_shipped_file_is_empty_valid_and_has_a_readme_first():
     doc = json.loads(raw)
     assert list(doc)[0] == "readme" and doc["entries"] == [] and doc["schema_version"] == "1"
     for k in ("purpose", "schema", "rules"): assert k in doc["readme"]
-    assert set(doc["readme"]["schema"]) >= {"entry_id", "scope", "field", "action", "value", "reason", "added_by", "added_on"}
+    assert set(doc["readme"]["schema"]) >= {"entry_id", "scope", "field", "action", "value", "reason", "proposed_by_role", "entered_by_role", "date"}
     l = X.load()
     assert l.entries == () and l.sha256 == hashlib.sha256(raw).hexdigest()
 
@@ -79,7 +79,7 @@ def test_the_trace_lists_every_use_and_the_file_hash():
     l = loaded(entry(), entry(entry_id="E2", field="parking_present", value=False))
     out, uses = X.apply(facts(), l, site_id="granite_p32")
     rec = X.trace_record(l, uses)
-    assert rec["entries"] == 2 and [u["entry_id"] for u in rec["uses"]] == ["E1", "E2"] and rec["sha256"] == l.sha256
+    assert rec["roles"] == "role selected, not verified" and rec["entries"] == 2 and [u["entry_id"] for u in rec["uses"]] == ["E1", "E2"] and rec["sha256"] == l.sha256
     assert json.dumps(rec)                                                         # JSON-serialisable for the trace
 
 
@@ -90,7 +90,9 @@ def test_two_entries_for_one_field_at_one_site_fail_closed():
 
 # ---------------------------------------------------------------- malformed fails closed
 @pytest.mark.parametrize("bad", [
-    entry(entry_id=DROP), entry(field=DROP), entry(action=DROP), entry(reason=""), entry(added_by=DROP), entry(added_on="31/10/2026"),
+    entry(entry_id=DROP), entry(field=DROP), entry(action=DROP), entry(reason=""), entry(proposed_by_role=DROP), entry(entered_by_role=DROP), entry(date="31/10/2026"), entry(date=DROP),
+    entry(proposed_by_role="OWNER"), entry(entered_by_role="sme"), entry(entered_by_role="SME"), entry(entered_by_role="APPROVER"),
+    entry(proposed_by_role="APPROVER"),
     entry(action="DELETE"), entry(value=DROP), entry(value=None), entry(value=[1]),
     entry(action="FORCE_UNKNOWN", value=True), entry(site_id=DROP), entry(zone_id="z"), entry(site_id=""), entry(site_id=DROP, osm_way_id="12"),
     entry(site_id=DROP, osm_way_id=True), entry(extra="x"), entry(field="posted_speed_mph"), entry(field="road_type"),
@@ -118,3 +120,20 @@ def test_a_missing_file_fails_closed(tmp_path):
 
 def test_no_real_entry_ships():
     assert json.load(open(X.PATH, encoding="utf-8"))["entries"] == []
+
+
+# ---------------------------------------------------------------- roles (owner addendum 2026-10-31)
+def test_the_dropdown_roles_and_what_each_may_do():
+    assert X.ROLES == ("SME", "APPROVER", "ADMIN")
+    assert loaded(entry(proposed_by_role="SME", entered_by_role="ADMIN")).entries
+    assert loaded(entry(proposed_by_role="ADMIN", entered_by_role="ADMIN")).entries          # the admin can do everything for now
+    for bad in (entry(proposed_by_role="APPROVER"), entry(entered_by_role="APPROVER"), entry(entered_by_role="SME")):
+        with pytest.raises(X.SiteExceptionError): loaded(bad)                                 # the approver is for rule pack approval only; the SME proposes, the admin enters
+
+
+def test_every_use_names_both_roles_and_the_trace_says_they_are_not_verified():
+    l = loaded(entry())
+    _, uses = X.apply(facts(), l, site_id="granite_p32")
+    assert (uses[0].proposed_by_role, uses[0].entered_by_role) == ("SME", "ADMIN")
+    rec = X.trace_record(l, uses)
+    assert rec["uses"][0]["proposed_by_role"] == "SME" and rec["roles"] == X.ROLE_NOTE == "role selected, not verified"

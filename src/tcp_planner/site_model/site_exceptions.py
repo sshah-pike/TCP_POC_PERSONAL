@@ -4,7 +4,10 @@
 field; every use is listed in the run trace and the file's sha256 is recorded there too. A malformed file or entry fails closed:
 the loader raises `SiteExceptionError` and nothing is applied (the run does not continue on a half-read file).
 
-Entry: {entry_id, one of site_id | zone_id | osm_way_id, field, action, value (SET_VALUE only), reason, added_by, added_on}
+Entry: {entry_id, one of site_id | zone_id | osm_way_id, field, action, value (SET_VALUE only), reason, proposed_by_role,
+entered_by_role, date}. Roles are SME, APPROVER and ADMIN, chosen from a dropdown and recorded as "role selected, not verified":
+the SME proposes and the ADMIN enters (the admin can do everything for now; the APPROVER is for rule pack approval only and can
+neither propose nor enter an exception).
 Actions: SET_VALUE (the fact becomes FOUND with that value, source SITE_EXCEPTION, class HIGH as a human decision) and FORCE_UNKNOWN
 (the fact becomes UNKNOWN, reason `site_exception`). The four mandatory start fields (D-59) can never be named.
 """
@@ -23,7 +26,10 @@ PATH = os.path.join(settings.CONFIG_DIR, "site_exceptions.json")
 SCHEMA_VERSION = "1"
 SCOPES = ("site_id", "zone_id", "osm_way_id")
 ACTIONS = ("SET_VALUE", "FORCE_UNKNOWN")
-REQUIRED = ("entry_id", "field", "action", "reason", "added_by", "added_on")
+ROLES = ("SME", "APPROVER", "ADMIN")                 # the dropdown
+PROPOSERS, ENTERERS = ("SME", "ADMIN"), ("ADMIN",)
+ROLE_NOTE = "role selected, not verified"
+REQUIRED = ("entry_id", "field", "action", "reason", "proposed_by_role", "entered_by_role", "date")
 SOURCE = "SITE_EXCEPTION"
 
 
@@ -47,6 +53,8 @@ class Use(NamedTuple):
     reason: str
     original_outcome: str
     original_value: object
+    proposed_by_role: str = ""
+    entered_by_role: str = ""
 
 
 def _bad(msg):
@@ -73,8 +81,11 @@ def _check_entry(e, i, seen):
     if e["action"] == "SET_VALUE":
         if "value" not in e or e["value"] is None or isinstance(e["value"], (dict, list)): _bad(f"entry {e['entry_id']}: SET_VALUE needs a scalar value")
     elif "value" in e: _bad(f"entry {e['entry_id']}: FORCE_UNKNOWN takes no value")
-    try: datetime.date.fromisoformat(e["added_on"])
-    except ValueError: _bad(f"entry {e['entry_id']}: added_on must be a date YYYY-MM-DD")
+    for k, allowed in (("proposed_by_role", PROPOSERS), ("entered_by_role", ENTERERS)):
+        if e[k] not in ROLES: _bad(f"entry {e['entry_id']}: {k} must be one of {ROLES}")
+        if e[k] not in allowed: _bad(f"entry {e['entry_id']}: {k} {e[k]} may not do this (allowed: {', '.join(allowed)}; the APPROVER is for rule pack approval only)")
+    try: datetime.date.fromisoformat(e["date"])
+    except ValueError: _bad(f"entry {e['entry_id']}: date must be YYYY-MM-DD")
 
 
 def parse(raw: bytes, path=PATH):
@@ -129,11 +140,11 @@ def apply(facts, loaded, *, site_id=None, zone_id=None, osm_way_id=None):
             new = f.model_copy(update={"value": None, "outcome": "UNKNOWN", "source": SOURCE, "reason_code": "site_exception",
                                        "evidence": f"site exception {e['entry_id']}: {e['reason']}", "candidates": cand})
         out.append(new)
-        uses.append(Use(e["entry_id"], k, v, f.field, e["action"], e.get("value"), e["reason"], f.outcome, f.value))
+        uses.append(Use(e["entry_id"], k, v, f.field, e["action"], e.get("value"), e["reason"], f.outcome, f.value, e["proposed_by_role"], e["entered_by_role"]))
     return out, uses
 
 
 def trace_record(loaded, uses):
     """What the run trace stores: the file's hash, the entry count, and every use."""
-    return {"file": "config/site_exceptions.json", "sha256": loaded.sha256, "entries": len(loaded.entries),
+    return {"file": "config/site_exceptions.json", "sha256": loaded.sha256, "entries": len(loaded.entries), "roles": ROLE_NOTE,
             "uses": [u._asdict() for u in uses]}

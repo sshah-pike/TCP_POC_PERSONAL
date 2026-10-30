@@ -183,3 +183,24 @@ def test_the_sites_path_uses_the_trust_store_first_and_never_disables_certificat
     assert src.index("use_os_trust_store()") < src.index("fetch_site(s)")
     import re
     assert not re.search(r"verify\s*=\s*False|CERT_NONE|_create_unverified_context", src)
+
+
+# ---------------------------------------------------------------- ta_situation column (owner addendum 2026-10-31)
+def test_the_templates_carry_a_ta_situation_column():
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+    for name in ("S6_sites_template.csv", "S6_truth_template.csv"):
+        header = open(os.path.join(root, "docs", "templates", name), encoding="utf-8").readline().strip().split(",")
+        assert header[-1] == "ta_situation", name
+
+
+def test_read_sites_carries_ta_situation_and_still_accepts_a_csv_without_it(tmp_path):
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))), "scripts"))
+    import s06_call1_check as S
+    p = tmp_path / "s.csv"
+    p.write_text("site_id,lat,lon,extent_m,ta_situation\nA,41.0,-71.0,212.4,two-lane flagging\nB,41.1,-71.1,212.4,\n", encoding="utf-8")
+    rows = S.read_sites(str(p))
+    assert [r["ta_situation"] for r in rows] == ["two-lane flagging", ""]
+    q = tmp_path / "t.csv"
+    q.write_text("site_id,lat,lon,extent_m\nA,41.0,-71.0,212.4\n", encoding="utf-8")
+    assert S.read_sites(str(q))[0]["ta_situation"] == ""

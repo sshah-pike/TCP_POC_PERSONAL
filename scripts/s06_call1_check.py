@@ -40,6 +40,9 @@ SITE_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$")
 class SitesError(ValueError): pass
 
 
+TA_SITUATION = {}          # site_id -> ta_situation from the optional sites csv column (filled by main; written into each result)
+
+
 def read_sites(path):
     """[{site_id, lat, lon, extent_m}] from the csv; every problem is named with its line. Nothing is fetched."""
     with open(path, encoding="utf-8-sig", newline="") as f:
@@ -56,7 +59,7 @@ def read_sites(path):
             except (TypeError, ValueError): raise SitesError(f"line {i} ({sid}): lat, lon and extent_m must be numbers")
             if not -85 <= lat <= 85 or not -180 <= lon <= 180: raise SitesError(f"line {i} ({sid}): lat/lon out of range")
             if not 20 <= ext <= 5000: raise SitesError(f"line {i} ({sid}): extent_m {ext} must be between 20 and 5000 (half extent in metres)")
-            out.append({"site_id": sid, "lat": lat, "lon": lon, "extent_m": ext})
+            out.append({"site_id": sid, "lat": lat, "lon": lon, "extent_m": ext, "ta_situation": (r.get("ta_situation") or "").strip()})
     if not out: raise SitesError("sites csv has no rows")
     return out
 
@@ -145,7 +148,7 @@ def _call(call1, profile, ProviderError, name, n, site, rep, req):
     res = call1.parse_call1(reply.text, tuple(req["image"]["sent_px"]))
     problems = call1.schema_problems(reply.text, res)
     lanes = res.observations["lanes_per_direction"]
-    out = {"call": n, "site": site, "rep": rep, "profile": name, "seconds": secs, "model": reply.model, "request_id": reply.request_id,
+    out = {"call": n, "site": site, "ta_situation": TA_SITUATION.get(site, ""), "rep": rep, "profile": name, "seconds": secs, "model": reply.model, "request_id": reply.request_id,
            "input_tokens": reply.usage.get("input_tokens"), "output_tokens": reply.usage.get("output_tokens"),
            "reasoning_tokens": reply.usage.get("reasoning_tokens", 0), "schema_valid": not problems, "schema_problems": problems,
            "unknown_facts": sum(o.status == "UNKNOWN" for o in res.observations.values()), "marks": len(res.marks),
@@ -190,6 +193,7 @@ def main(argv=None):
     if a.sites:
         try: sites = read_sites(a.sites)
         except (SitesError, OSError) as e: print(f"sites file problem: {e}"); return 2
+        TA_SITUATION.clear(); TA_SITUATION.update({x["site_id"]: x["ta_situation"] for x in sites})
 
     from tcp_planner.orchestration.pipeline import load_env_file, use_os_trust_store
     load_env_file(); use_os_trust_store()
