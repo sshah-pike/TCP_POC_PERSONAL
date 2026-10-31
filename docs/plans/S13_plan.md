@@ -1,4 +1,13 @@
-Status: PLANNED. Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md; where they differ from this plan, the register wins.
+Status: PLANNED, PAUSED until the accuracy gate between S7 and S8 (D-153, FS-21). Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md and docs/decisions/OWNER_DECISIONS_2026-10-31.md; where they differ from this plan, the registers win.
+
+## Owner decisions applied (2026-10-31)
+
+Register: `docs/decisions/OWNER_DECISIONS_2026-10-31.md`. Where this block differs from older text, this block is the active text; the older wording is kept in the "Amendments 2026-10-31" notes in sections 1 and 2. S13 is paused until the accuracy gate between S7 and S8 (D-153, FS-21).
+
+- **Two separate suites.** The draft comparator of this plan (golden JSON, core and full scores, tolerances) stays as planned. The **site-reading regression suite** (`docs/evaluation/`: `SITE_TRUTH_v0.md`, `site_truth_v0.json`, `site_truth_v0.csv`) is a different suite: a fixed set of labelled sites replayed offline before any change to a prompt, schema, threshold or model (D-125, FS-10). It scores lanes, divided, shoulder, one-way, parking, sidewalk, work location and width against a truth file; the draft comparator scores a finished plan against a draft. They share no baseline, no scope file and no gate.
+- **Truth is not a rule source.** The site truth files are ground truth for scoring site understanding only. Never use OSM as truth for OSM, and never tune on the sites used as proof (`SITE_TRUTH_v0.md`).
+- **Granite routes automatically.** With pack 1.1.0 the Granite-type case is sourced (D-91), so Granite's expected router result is TA-33 when its facts pass the two-source gate (S7 plan, acceptance 1). Colorado's police variant stays future scope (FS-13).
+- **Recordings.** Colorado once after S7 merges, the rest after S9 (D-98); paused slices S9 to S16 stay paused until the accuracy gate.
 
 # S13 plan: golden comparator and full-pipeline test
 
@@ -27,7 +36,7 @@ Legend: **[B]** batchable. **[STOP]** owner review. **A-n** assumption about S5 
 | Draft codes not in the pack | W20-8 (police sign; the pack has W20-7), W21-5 and W5-1 (note-only, no device record), R8-3, R2-11, RI-27.1.1, R9-9, R9-11L/R, R9-10L, R9-3BR, R3-7R, W9-2L, M4-9 series, M4-A8, G20-2 on side streets |
 | Evaluation code | `evaluation/comparison_scoring.py` scores runs against human **site-fact labels** (lanes, divided, widths). It is a different comparison and stays as is |
 | S8 plan | Proposes `tests/support/golden_compare_lite.py` (informational) and a reviewed `tests/golden/known_differences.json` (S8 commit 12, a STOP). S13 replaces the first and takes over the second |
-| S7 plan | Only Colorado can route automatically with the S4 pack: TA-6 is UNDETERMINED (low-speed cutoff and "minor road" unsourced) and Granite's TA-33 is UNDETERMINED (undivided reading unsourced). For those two the correct router result is the TA as the single candidate plus an SME question (S7 acceptance 1) |
+| S7 plan | Colorado and Granite can route automatically with pack 1.1.0 (Granite through the sourced 6N.11 Granite-type branch, D-91). TA-6 is UNDETERMINED (low-speed cutoff and "minor road" unsourced); for E Second St the correct router result is TA-6 as the single candidate plus an SME question (S7 acceptance 1) |
 | Recordings | None of the three real KMLs is recorded yet. S6 plan Q18 and the owner: Colorado after S7, the rest after S9 |
 | LF | S2 decision 2: "No LF normalization now; revisit in S13". Output files keep the OS line ending, so hashes of the same run differ between Windows and Linux |
 | TA-1 | No reference draft (plan open question 9); the plan default is "compared with Figure 6P-1 only" |
@@ -46,7 +55,9 @@ Legend: **[B]** batchable. **[STOP]** owner review. **A-n** assumption about S5 
 
 ### Out of scope
 
-The police switch (future scope; Colorado is compared without it), any change to rules or layout to "fix" a score, TA-1 golden (A-2), pixel comparison of PDFs (ADR-037).
+The police switch (future scope; Colorado is compared without it), any change to rules or layout to "fix" a score, TA-1 golden (A-2), pixel comparison of PDFs (ADR-037), and the site-reading regression suite in `docs/evaluation/` (a separate suite, see the 2026-10-31 block).
+
+**Amendments 2026-10-31 (sections 1 and 2).** The "S7 plan" row of section 1 read: "Only Colorado can route automatically with the S4 pack: TA-6 is UNDETERMINED ... and Granite's TA-33 is UNDETERMINED (undivided reading unsourced)" (D-91, S4b). The out-of-scope paragraph did not name the site-reading regression suite (D-125, FS-10).
 
 ### Acceptance criteria
 

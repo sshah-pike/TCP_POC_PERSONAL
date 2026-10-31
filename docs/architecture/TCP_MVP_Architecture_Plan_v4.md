@@ -466,7 +466,7 @@ Read it top to bottom. The text on the right says what each stage does and what 
 | Purpose | Wide read of the site | Fill the gaps for the chosen TA |
 | Input | Wide image, KML geometry, known facts, project inputs | Targeted crop images, the facts already resolved, the chosen TA's missing fields |
 | Output | Common facts, the facts that separate the TAs, and image positions of edges, lines and objects. Never a length in feet (D-64) | Only the TA fields still unknown, as positions or observations |
-| Rule | Unknown stays unknown, never guessed | Never overwrites a resolved fact. The cross-view check can only un-resolve a fact |
+| Rule | Unknown stays unknown, never guessed | If call 1 and call 2 disagree on a field, the field becomes UNKNOWN and goes to the SME (D-123). Call 2 re-observes blind (D-120) and never silently replaces a resolved value. *Amendment 2026-10-31 (D-121, D-123); was: "Never overwrites a resolved fact. The cross-view check can only un-resolve a fact".* |
 
 Folding the TA fields into call 2 saves one AI call per zone and keeps the two-call budget the repo already has \[S3\]\[S5\]. The trade-off is that a confident mistake in call 1 survives unless the cross-view check catches it. Safety-critical facts therefore always go through that check.
 
@@ -1305,7 +1305,7 @@ Each record states status, context, decision, consequences and what was rejected
 
 ### ADR-009: SME review per zone, regroup, project-scoped history
 
-**Status:** Accepted. **Context:** The SME reviews one drawing, and geometry-only history is shared across projects. **Decision:** One conversation per zone. Regroup, merge and split are deterministic operations that create new zone versions under a stable zone\_id. New history is project-scoped, with an explicit inherit action. **Consequences:** Safe in a shared cloud system. Corrections are not carried over implicitly. **Rejected:** One project-wide conversation; geometry-only history.
+**Status:** Accepted. **Context:** The SME reviews one drawing, and geometry-only history is shared across projects. **Decision:** One conversation per zone. Regroup, merge and split are deterministic operations that create new zone versions under a stable zone\_id. New history is project-scoped, with an explicit inherit action. **Consequences:** Safe in a shared cloud system. Corrections are not carried over implicitly. **Rejected:** One project-wide conversation; geometry-only history. **Amendment 2026-10-31 (D-146):** zone ids stay geometry-derived, and a regroup makes new zones with a `derived_from` link to the old ones; the decision read "new zone versions under a stable zone\_id". "Inherit" carries facts and answers, never exceptions or approvals.
 
 ### ADR-010: Deterministic cross-zone validation; no automatic regulatory merging
 
@@ -1341,7 +1341,7 @@ Each record states status, context, decision, consequences and what was rejected
 
 ### ADR-018: TA-specific fields are folded into call 2
 
-**Status:** Accepted. **Context:** A separate focused call adds cost per zone. **Decision:** Call 2 receives only the unresolved fields of the chosen TA, never overwrites a resolved fact, and safety-critical facts go through the cross-view check. **Consequences:** One fewer call per zone. A confident call-1 error survives unless cross-checked. **Rejected:** A separate focused call by default.
+**Status:** Accepted. **Context:** A separate focused call adds cost per zone. **Decision:** Call 2 receives the deciding facts, the chosen TA's fields and the conflicts, and re-observes them at fine zoom without being shown the OSM, call-1 or code value for lanes, divided, shoulder or one-way (D-119, D-120). Lane count is a field whenever call 2 runs and never forces a call (D-121). If call 1 and call 2 disagree on a field, the field becomes UNKNOWN and goes to the SME (D-123). **Consequences:** One fewer call per zone. A confident call-1 error is caught when call 2 disagrees. **Rejected:** A separate focused call by default. **Amendment 2026-10-31 (D-121, D-123):** the decision read "Call 2 receives only the unresolved fields of the chosen TA, never overwrites a resolved fact, and safety-critical facts go through the cross-view check", and the consequences read "A confident call-1 error survives unless cross-checked".
 
 ### ADR-019: The conflict ladder
 
@@ -1433,7 +1433,7 @@ Each record states status, context, decision, consequences and what was rejected
 
 ### ADR-044: Routing tree and explicit eligibility
 
-**Status:** Accepted (D-60). **Decision:** Route by `work_location`, then by road form. TA-6 requires a shoulder and a low-speed minor road (note 2), with width measured to the device face (note 1). TA-33 is one OR'd rule covering divided roads and undivided roads with two or more lanes each way (6N.11). Anything else is NO\_TA\_MATCH. **Rejected:** Implicit preconditions; two separate TA-33 checks. **Amendment 2026-10-30 (D-91):** the 6N.11 case is limited to a Granite-type case (undivided, two lanes each way, right lane closed; 6N.11 para 02 and para 06). Broader cases are an engineer question. The text above is kept as originally written.
+**Status:** Accepted (D-60). **Decision:** Route by `work_location`, then by road form. TA-6 requires a shoulder and a low-speed minor road (note 2), with width measured to the device face (note 1). TA-33 is one OR'd rule covering divided roads and undivided roads with two or more lanes each way (6N.11). Anything else is NO\_TA\_MATCH. **Rejected:** Implicit preconditions; two separate TA-33 checks. **Amendment 2026-10-30 (D-91):** the 6N.11 case is limited to a Granite-type case (undivided, two lanes each way, right lane closed; 6N.11 para 02 and para 06). Broader cases are an engineer question. The text above is kept as originally written. **Amendment 2026-10-31 (D-91):** the phrase "undivided roads with two or more lanes each way" in the decision means the Granite-type case only. In pack 1.1.0 that case is `E-TA33-FORM-UNDIVIDED-FOUR-LANE-RIGHT` (sourced); the broader cases are `E-TA33-FORM-UNDIVIDED-OTHER` (unsourced, an engineer question).
 
 ### ADR-045: AI output format chosen by a spike
 

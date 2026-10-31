@@ -1,4 +1,15 @@
-Status: PLANNED. Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md; where they differ from this plan, the register wins.
+Status: PLANNED, PAUSED until the accuracy gate between S7 and S8 (D-153, FS-21). Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md and docs/decisions/OWNER_DECISIONS_2026-10-31.md; where they differ from this plan, the registers win.
+
+## Owner decisions applied (2026-10-31)
+
+Register: `docs/decisions/OWNER_DECISIONS_2026-10-31.md`. Where this block differs from older text, this block is the active text; the older wording is kept in the "Amendments 2026-10-31" note after question 17. **S9 is paused until the accuracy gate between S7 and S8** (D-153, FS-21).
+
+- **Question 8, grouping settings (D-145, Y2 A).** `config/grouping.json`, with one path limit, `input.max_work_path_m`, which the owner confirms. Question 10 follows (one value, not per TA).
+- **Question 9, zone ids (D-146, Y3 C).** Geometry-derived zone ids plus a `derived_from` link on the new zone. "Inherit" carries facts and answers, never exceptions or approvals. ADR-009's wording ("new zone versions under a stable zone_id") is amended.
+- **Question 7, project-level OSM fetch (D-147, Y4 A).** One project-level OSM fetch before the cap check, so cases 6, 7 and 9 work in pass 1. The S3 wording "before any external call" becomes "before any paid call".
+- **Question 17, work-path adapter (D-151, Y11 A).** S9 builds the adapter (zone points ordered by station into `work_path`) unless S8 did.
+- **Revisit the "not on road" flag (case 16, question 5; FS-21).** The Colorado point sits in a back yard (`docs/evaluation/SITE_TRUTH_v0.md`), so a point far from any road is not a defect and pass 1 needs the flag to ask. When S9 is planned again, decide whether case 16 reuses the S6 edge distance (5 m, D-113) and the "which road?" question (D-156) instead of a distance of its own.
+- **Recordings (D-98).** E Second St and Granite are recorded after S9; Colorado after S7 merges.
 
 # S9 plan: grouping engine, zone split, duplicate merge
 
@@ -321,7 +332,7 @@ Three groups: **A. Client inputs** (facts or numbers only the client can supply)
 - Suggestion: (a), status PROPOSED, flagged until the SME confirms.
 - Blocks: **yes, commit 4 tests**.
 
-**5. `NOT_ON_ROAD` distance** (case 16; no source).
+**5. `NOT_ON_ROAD` distance** (case 16; no source). To be revisited when S9 is planned again (2026-10-31, FS-21): Colorado's point sits in a yard.
 - Options: (a) no automatic flag: every snap distance is shown, the SME flags; (b) a distance in config, PROPOSED, with the SME confirming; (c) a distance relative to the observed road edge (needs S6 widths, so pass 2 only).
 - Effects: poles (Granite, Colorado) stand beside the road; manholes (E Second St) are in it. Too small a value flags every pole; too large misses a yard.
 - Suggestion: (a) in pass 1, (c) as a pass 2 proposal.
@@ -335,25 +346,25 @@ Three groups: **A. Client inputs** (facts or numbers only the client can supply)
 
 ### C. Owner decisions
 
-**7. Road identity and order in pass 1.** S0 item 5: only a one-road chain exists. Pass 1 runs before the cap check, and S3's acceptance says the cap holds "before any external call".
+**7. Road identity and order in pass 1.** ANSWERED: (a) (D-147, Y4 A). S0 item 5: only a one-road chain exists. Pass 1 runs before the cap check, and S3's acceptance says the cap holds "before any external call".
 - Options: (a) one project-level OSM fetch (free, allowed source, recorded fixtures) before the cap check, so cases 6, 7, 9 work in pass 1; the S3 wording becomes "before any paid call"; (b) geometry only in pass 1 (straight-line gaps, order along the principal axis of the points); cases 6, 7, 9 become pass 2 proposals after each zone's own OSM fetch; (c) as (b) plus an SME "same road?" question for every multi-point group.
 - Effects: (a) changes an S3 acceptance wording and adds a network call before approval. (b) can run one wrong merged zone across two roads (cost of one zone run) before pass 2 catches it, and fails on curved roads where the principal axis misorders points. (c) adds a question to every multi-point project.
 - Suggestion: (a), with the call counted and recorded.
 - Blocks: **yes, commit 3**.
 
-**8. Where the grouping settings live.** The slice spec says "in the registry"; ADR-015 says grouping settings are never rules, and the owner's S4 decision keeps the pack MUTCD-only.
+**8. Where the grouping settings live.** ANSWERED: (a) (D-145, Y2 A). The slice spec says "in the registry"; ADR-015 says grouping settings are never rules, and the owner's S4 decision keeps the pack MUTCD-only.
 - Options: (a) `config/grouping.json` with status and confirmation; (b) a `grouping` section in `config/pipeline_config.json` (guarded, needs an `APPROVED` entry each change); (c) the pack registry (contradicts ADR-015 and MUTCD-only).
 - Effects: (a) keeps the pack clean and the guard untouched. (c) changes the pack hash on every tuning.
 - Suggestion: (a). This is a contradiction with the slice text; the slice doc wording needs the owner's edit.
 - Blocks: **yes, commit 2**.
 
-**9. Zone identity after a regroup.** S3 derives `zone_id` and `lineage_key` from the zone geometry hash, so a different membership is a new zone with a new SME lineage. ADR-009 says regroup creates "new zone versions under a stable zone_id".
+**9. Zone identity after a regroup.** ANSWERED: (c) (D-146, Y3 C). S3 derives `zone_id` and `lineage_key` from the zone geometry hash, so a different membership is a new zone with a new SME lineage. ADR-009 says regroup creates "new zone versions under a stable zone_id".
 - Options: (a) keep geometry-derived ids; a regroup makes new zones and S11's "inherit" (D-10) carries history explicitly; (b) stable ids (for example the lowest-station member's location id) with versions; (c) (a) plus a `derived_from` link on the new zone.
 - Effects: (a) contradicts ADR-009's wording but keeps D-82 and S3 intact. (b) changes D-82 and the S3 lineage tests; SME history would follow a zone whose geometry changed.
 - Suggestion: (c), and amend ADR-009's wording.
 - Blocks: commit 2 (record shape); S11 depends on it.
 
-**10. Single `max_zone_path_m` or per TA.** The slice lists it per TA; the plan calls 150 m the engine limit (`input.max_work_path_m`, D-19).
+**10. Single `max_zone_path_m` or per TA.** ANSWERED: (a), one `input.max_work_path_m` (D-145). The slice lists it per TA; the plan calls 150 m the engine limit (`input.max_work_path_m`, D-19).
 - Options: (a) one value, the existing `input.max_work_path_m`; (b) per TA in `grouping.json`.
 - Effects: (b) creates a second copy of the engine limit that can disagree with it.
 - Suggestion: (a).
@@ -391,10 +402,12 @@ Three groups: **A. Client inputs** (facts or numbers only the client can supply)
 - Suggestion: (a), added in commit 0 if missing.
 - Blocks: no.
 
-**17. Multi-point zone runs** (A-5). If S6 to S8 still give the engine one Point per zone, S9 zones of several points cannot run.
+**17. Multi-point zone runs** (A-5). ANSWERED: (a), S9 builds the adapter unless S8 did (D-151, Y11 A). If S6 to S8 still give the engine one Point per zone, S9 zones of several points cannot run.
 - Options: (a) S9 adds the work-path adapter (zone points ordered by station into `work_path`); (b) stop S9 until S8 provides it; (c) S9 groups but runs each point's layout inside one zone (not one closure).
 - Suggestion: (a) if S8 has not done it; check at S9 start and stop if the repo differs.
 - Blocks: commit 5 end to end.
+
+**Amendments 2026-10-31 (section 10).** Questions 7, 8, 9, 10 and 17 are annotated "ANSWERED" with their D-numbers; their option texts and suggestions are unchanged. The S3 acceptance wording "before any external call" read as quoted in question 7 (D-147). ADR-009's wording is amended by D-146; the ADR file itself is not edited here.
 
 ### Summary
 

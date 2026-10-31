@@ -1,4 +1,17 @@
-Status: PLANNED. Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md; where they differ from this plan, the register wins.
+Status: PLANNED, PAUSED until the accuracy gate between S7 and S8 (D-153, FS-21). Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md and docs/decisions/OWNER_DECISIONS_2026-10-31.md; where they differ from this plan, the registers win.
+
+## Owner decisions applied (2026-10-31)
+
+Register: `docs/decisions/OWNER_DECISIONS_2026-10-31.md`. Where this block differs from older text, this block is the active text; the older wording is kept in the "Amendments 2026-10-31" notes in sections 1 and 4. S11 is paused until the accuracy gate between S7 and S8 (D-153, FS-21).
+
+- **New question kinds on the form.** WHICH_ROAD ("which road?", from the S6 bearing check, D-156), WORK_LOCATION_NEAR_EDGE (work location within 5 m of an edge or no road near, D-113), LAYOUT_NOT_ALLOWED (a layout the pack or the facts do not allow), SINGLE_SOURCE_CANDIDATE (a safety field with one source and the AI value pre-filled, D-156), and LANE_WIDTH (a lane-width question with a hint). The kind names are proposals; the five cases come from the owner's list of 2026-10-31 and the S6 branch.
+- **Blocking and informational questions.** A candidate question is informational and does not block the plan; it blocks only when the S7 what-if test shows the fact decides the TA (D-156 recommendation 1, owner confirmation open). The form shows the two groups apart.
+- **One-click confirm with a crop (from owner conversation 2026-10-31).** A candidate question shows the crop that the AI read with its pre-filled value; one click confirms it. This is the form side of FS-03 (the verified site facts store, after S11).
+- **Batch per project.** One batched form per project, as before (D-18, ADR-023); answers are saved per project in one submit.
+- **Answer records (D-130).** No question log store. Every saved answer record keeps kind, field, zone, project, OSM way and answer time, so repeats can be mined later (FS-04).
+- **The deep-mode toggle is removed (D-122, D-139, FS-01).** The plan text had no toggle by that name (a search for "deep" finds none); this block states that S11 builds none. It returns only if an FS-01 trigger fires.
+- **Roles (D-141 to D-143).** SME reviewer, approver and admin. The approver is for rule pack approval only (S16); the zone cap, deviations and the plan approval click are the SME's. The admin can do everything.
+- **Exceptions file (D-155).** The SME proposes an entry and the admin enters it; the form gives the SME a way to propose.
 
 # S11 plan: question form, SME review, approval gate (no police switch)
 
@@ -13,7 +26,7 @@ Owner constraints applied here:
   - taper unset: no taper is placed;
   - optional devices: omitted and listed.
 - **Add-ons.** Sidewalk closed and detours are optional per zone and built in S8. No-parking and RI double fines wait for sources.
-- **Roles.** Roles are a dropdown with no login: SME reviewer, with the full chat assistant, and Approver, who approves changes and the zone cap. Every action is audited "role selected, not verified". Real login before client use is **planned in S11**. Pages and components are role-specific.
+- **Roles.** Roles are a dropdown with no login: SME reviewer (with the full chat assistant), approver (rule pack approval only) and admin (D-141 to D-143). Every action is audited "role selected, not verified". Real login before client use is **planned in S11** (FS-16). Pages and components are role-specific.
 - **Two-source rule.** Safety-critical fields need two agreeing sources or become UNKNOWN. The 6N.11 Granite-type case is sourced, and broader cases go to the engineer.
 - **S3 follow-ups.** A REVIEW_REQUIRED zone gets a draft in S7. Projects get an archive flag later and are never deleted. The cap approval is "approved (not verified)".
 - **Test gate.** Fast tier per commit plus impacted suites. The full suite once.
@@ -30,7 +43,7 @@ Legend: **[B]** can be batched with the next commit. **[STOP]** stop for owner r
 | C-2 | "Editing one placemark reruns only its zone" | S3: `project_id` = hash of the usable geometry, so a re-upload with one moved point is a **new project**, and every zone runs again | Question 4: an "edit a placemark" or "replace input" action that keeps the project id |
 | C-3 | Sheet reorder, merge and split | The S11 spec lists them, but sheets are S12. The S11 spec's "Depends on" omits S12. The slice order ("S10 and S12 in parallel, then S11") already puts S11 after S12 | S11 branches off S10 + S12 (question 16) |
 | C-4 | AI-call budget on a TA change | CLAUDE.md: "at most two AI calls per zone". A TA change after a run that already made call 1 and call 2 makes one more call 2 | Question 7: count per zone run (replayed calls not counted) or per zone lifetime |
-| C-5 | Who clicks the approval gate | D-65: "every plan waits for an SME click". The owner's roles: the Approver "approves changes and the zone cap" | Question 5 |
+| C-5 | Who clicks the approval gate | D-65: "every plan waits for an SME click". Resolved by D-143: the approver is for rule pack approval only, so the click is the SME's | Question 5 (answered) |
 
 ---
 
@@ -89,7 +102,7 @@ Legend: **[B]** can be batched with the next commit. **[STOP]** stop for owner r
 10. **The approval gate** `require_sme_approval_for_all_plans`, default `true` (D-65). Every plan version waits for a click and shows whether it would have been SUPPORTED_AUTO. With `false`, only a genuine SUPPORTED_AUTO plan finishes without a click. An approved version is immutable, and any change makes a new version that needs a new approval.
 11. **Role-specific pages.**
     - **The SME reviewer page** has the project form, zone review, TA change, regroup, sheets, and the full chat assistant (its tools call the same deterministic functions).
-    - **The Approver page** has the zone-cap approval, deviation proposals (S10) and grouping settings (S9 question 11, if chosen).
+    - **The approver page** has rule pack approval only (S16; D-143). The zone-cap approval, deviation proposals (S10) and plan approvals are on the SME reviewer page; grouping settings follow S9 question 11 (the SME or the owner, not the approver).
 
     The role dropdown has no login, and every action is audited "role selected, not verified".
 12. **The real-login plan**, written in this slice (`docs/plans/S11_real_login_plan.md`). It covers the identity provider (the existing `EntraIdentityProvider` placeholder), role mapping, how unverified records stay marked, and a gate that blocks client use while the provider is local. Building it is question 9.
@@ -168,8 +181,9 @@ Actor { subject_id, display_name, role SME_REVIEWER|APPROVER|ENGINE, identity_pr
 ```
 FormQuestion {                                            # extends the shared Question contract
   question_id,                                            # sha256(kind, scope, subject, inputs_hash)[:16]: same question, same id
-  scope {project_id, zone_id|null, plan_version_id|null}, kind, source_stage S6|S7|S8|S9|S10|S11,
+  scope {project_id, zone_id|null, plan_version_id|null}, kind, field, osm_way_id|null, source_stage S6|S7|S8|S9|S10|S11,
   reason, answer_type CHOICE|NUMBER|BOOLEAN|TEXT|POINT_SET|TA, options [ {value, label, effect} ],
+  candidate bool, suggested|null, crop_ref|null,          # one-click confirm with the crop (candidate questions)
   default_if_skipped {value|null, label, consequence},    # never a value for an unsourced item
   blocking bool, safety_critical bool, parent_id|null, show_if {question_id, equals}|null, reveals [question_id],
   earliest_affected_stage, evidence_refs [], status OPEN|ANSWERED|SKIPPED|SUPERSEDED }
@@ -177,7 +191,7 @@ FormQuestion {                                            # extends the shared Q
 PerJobDecision { decision_id, zone_id, plan_version_id, item BUFFER|TAPER_LENGTH|OPTIONAL_DEVICE:<device_id>|ADDON:<id>,
   default {value, label}, answer {value, actor Actor, at, reason}|null, rule_ids [], status DEFAULT_PENDING|ANSWERED }
 
-Answer { answer_id, question_id, value, reason|null, actor Actor, at, form_spec_hash, ledger_entry_id }
+Answer { answer_id, question_id, kind, field, zone_id|null, project_id, osm_way_id|null, value, reason|null, actor Actor, at, form_spec_hash, ledger_entry_id }   # D-130
 
 ResumePlan { zone_id, from_stage, reused [stage + artifact ref], rerun [stage], predicted_calls {map, osm, ai_call1, ai_call2},
   new_zone_version, reasons [] }
@@ -225,6 +239,14 @@ Question ids are stable across reruns while their inputs are unchanged, so an an
 | Low-confidence obstruction | S10 | Left flagged |
 | Does the work move into the lane? | S10 | Unchanged; REVIEW_REQUIRED |
 | `NOT_ON_ROAD`, which road | S9 | Kept and flagged |
+| Which road? (bearing check failed; every road-specific fact is UNKNOWN) | S6 | Facts stay UNKNOWN; REVIEW_REQUIRED |
+| Work location near an edge (within 5 m) or no road near | S6 | `work_location` UNKNOWN; REVIEW_REQUIRED |
+| Single-source candidate on lanes, divided, shoulder or one-way (AI value pre-filled; one-click confirm with the crop) | S6, S7 | Informational unless the what-if test shows the fact decides the TA; the value stays UNKNOWN until confirmed |
+| Layout not allowed (the pack or the facts do not allow the layout) | S6, S8 | No layout; REVIEW_REQUIRED |
+| Lane width (hint only) | S6 | Lane width UNKNOWN; REVIEW_REQUIRED |
+| Propose an entry for `config/site_exceptions.json` (the admin enters it) | S6 | Nothing entered |
+
+**Amendments 2026-10-31 (section 4.2).** The table had no row for which road, work location near an edge, layout not allowed, single-source candidate, lane width or an exceptions-file proposal, and the single `NOT_ON_ROAD, which road` row came from S9 only (D-113, D-138, D-155, D-156).
 
 ### 4.3 Earliest affected stage (plan Section 9)
 
@@ -257,7 +279,7 @@ Regroup calls S9's functions with the SME's constraint (method `SME`, case 18). 
 1. The SME picks a TA. `ta_change.preview` runs the router on the current facts with the new TA as the hypothesis.
 2. It returns the preview in section 3. An `ANALYSIS_EXTENT_INSUFFICIENT` result is shown before any fetch.
 3. If the new TA is NOT_ELIGIBLE, confirming it is S10's `TA_SELECTION_KEPT` exception with a reason. For broader 6N.11 cases, it is the engineer handover (S10 question 9).
-4. On confirmation, a new zone version is written. It resumes from the router: call 2 runs once if the new TA has AI-observable missing fields, and is skipped otherwise.
+4. On confirmation, a new zone version is written. It resumes from the router: call 2 runs once if the field list (the deciding facts, the new TA's fields and the conflicts, not counting the lane count) is not empty, and no call is made otherwise (S7, D-121; was: "if the new TA has AI-observable missing fields, and is skipped otherwise", amended 2026-10-31).
 
 ### 4.6 Approval gate (D-65)
 
@@ -273,7 +295,10 @@ Regroup calls S9's functions with the SME's constraint (method `SME`, case 18). 
 
 - **Login.** A role dropdown on first load replaces the assistant's separate identity screen. It uses the existing `LocalIdentityProvider` and session token, with no credentials. Each page shows a banner: "Role selected, not verified".
 - **SME reviewer page.** Project list, project form, zone review with the drawing (S12 output), TA change, regroup, sheets, add-ons, per-job decisions, the ledger view and the chat assistant.
-- **Approver page.** Pending cap approvals, deviation proposals with their exception history, grouping settings (if S9 question 11 says so), and plan approvals (if question 5 says so).
+- **Approver page.** Rule pack approval only (D-143; the page is built with S16). Pending cap approvals, deviation proposals with their exception history and plan approvals are on the SME reviewer page.
+- **Admin.** Can do everything for now (D-141) and enters the exceptions-file entries the SME proposes (D-155).
+
+**Amendments 2026-10-31 (section 4.7).** The Approver page read: "Pending cap approvals, deviation proposals with their exception history, grouping settings (if S9 question 11 says so), and plan approvals (if question 5 says so)" (D-142, D-143).
 - **Enforcement.** The backend refuses any action outside the role (`authz.require`). The UI hides the controls only as a convenience.
 
 ---
@@ -308,7 +333,7 @@ All offline. Network blocked. Fixture projects built from fakes and recorded fix
 | ID | Test | Notes |
 | --- | --- | --- |
 | T-1 | Zero-call resume per row of table 4.3 (strict replay, call counter 0) | Acceptance 1 |
-| T-2 | TA change: preview predicts and the run makes at most one call 2; skipped when nothing is AI-observable; extent check before any fetch | Acceptance 2 |
+| T-2 | TA change: preview predicts and the run makes at most one call 2; no call when the call 2 field list, not counting the lane count, is empty (S7, D-121; was "skipped when nothing is AI-observable"); extent check before any fetch | Acceptance 2 |
 | T-3 | Placemark edit reruns only its zone (after question 4) | Acceptance 3 |
 | T-4 | Regroup: only changed zones rerun; unchanged zones keep version and run; pass 2 re-runs; inherit copies only applicable items and never exceptions | Acceptance 4 |
 | T-5 | Ledger: append-only, hash chain, tamper and truncation detected, reader refuses; three-process append does not fork (S2 pattern) | Acceptance 4 |
@@ -399,7 +424,7 @@ Three groups: **A. Client inputs**, **B. SME questions**, **C. Owner decisions**
 **5. Who clicks the approval gate (C-5)?**
 - Options: (a) the SME reviewer (D-65 as written); (b) the Approver; (c) both, in order.
 - Effects: (b) and (c) contradict D-65's "SME click". (c) adds a second unverified click.
-- Suggestion: (a); the Approver covers deviations, the cap and grouping settings.
+- Suggestion: (a); ANSWERED by D-143 (the click is the SME's; the approver covers rule pack approval only).
 - Blocks: commit 7.
 
 **6. Project approval statuses.**

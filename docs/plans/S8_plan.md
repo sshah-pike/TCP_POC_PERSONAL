@@ -1,4 +1,4 @@
-Status: PLANNED. Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md; where they differ from this plan, the register wins.
+Status: PLANNED. Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md and docs/decisions/OWNER_DECISIONS_2026-10-31.md; where they differ from this plan, the registers win.
 
 ## Owner decisions applied (2026-10-30)
 
@@ -6,6 +6,16 @@ Status: PLANNED. Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-3
 - B-3: buffer is a per-zone choice, default none. B-4: taper length in the 50 to 100 ft range is a per-zone choice; unset places no taper and reports a gap. B-5 A (optional devices omitted and listed). B-6: unknown work-space length gives a provisional POINT_ONLY layout marked REVIEW_REQUIRED. B-7 B (both TA-1 approaches, flagged as a reading of 6P.01 para 07). B-8 A (TA-33 downstream gap and a question). B-9 A (POC values in config, labelled). B-10 B (upper end of the width interval). B-11 A. B-15 A.
 - B-12: sidewalk-closed and detour add-ons are built here from the S4b sections, optional per zone. No-parking and RI double fines wait for sources. Client modules and police are out of scope. B-13: spacing satisfies both limits (the smaller). B-14: cutover with reviewed oracles; the POC output renames happen in the same commit.
 - The vehicle width default is 102 in, flagged; depth and clearance are asked per job. The 10 ft next to the work vehicle on the drafts is an SME question; make no assumption.
+
+## Owner decisions applied (2026-10-31)
+
+Register: `docs/decisions/OWNER_DECISIONS_2026-10-31.md`. Where this block differs from older text, this block is the active text; the older wording is kept in the "Amendments 2026-10-31" notes in section 4 and section 5. Future items are in `docs/FUTURE_SCOPE.md`.
+
+- **TA-33 anchor (S4b, pack 1.1.0; D-107).** The TA-33 anchor text of sections 4.2 and 4.3 is superseded by the corrected reading in pack 1.1.0 (record `SR-6P33-FIG-SIGNS`): dimension A is measured from the upstream end of the merging taper (the start of L), and the shoulder taper lies inside A and ends where the merging taper begins. The owner's note reads "A ends where the merging taper begins"; both place the anchor at the start of the merging taper. The old reading (A from the upstream end of the shoulder taper) was wrong against the figure render.
+- **Add-on device rows and real symbols come before the add-on commit (D-110, D-117).** Sidewalk and detour signs have catalog entries, sizes and placeholder symbols but no device rows yet. Device rows are added just before the add-on commit (commit 9 below), and the symbols are drawn for real before that commit; M4-9a must show its arrow (FS-15; Sect. 6I.02 para 11 requires it). The device-row addition is a pack change, so it is a new sealed pack version approved by the owner (D-144) and run through `scripts/seal_rule_pack_version.py`.
+- **No layout for an UNDETERMINED zone.** If the final router pass leaves the zone UNDETERMINED or in `TA_SELECTION_CONFLICT`, S8 places nothing and returns the open questions. Layout runs only for a zone with a chosen TA (from owner conversation 2026-10-31; D-119 puts the SME after fusion and call 2).
+- **Accuracy gate.** S8 starts after the accuracy gate between S7 and S8 (D-125, D-153). The pack store is merged (commit `69ab4c0`), so a layout recorded against a pack hash replays without a git checkout.
+- Every trace also carries the device catalog hash next to the pack hash (S5 report, open question 5).
 
 # S8 plan: layout engine per TA and add-on modules
 
@@ -26,10 +36,11 @@ Legend: **[B]** can be batched. **[STOP]** stop for owner review. **ASSUMPTION A
 1. **One common placement core** and **four TA strategies** (TA-1, TA-6, TA-10, TA-33). A strategy emits station-relative placement requests from the pack; the core turns them into road coordinates. This keeps the existing two-stage pattern (`rule_engine` emits requests, `local_frame.place_objects` places them) and removes the TA-1 literals (`ta1_template`, `rule_engine.execute`, `validators.py:61`, `eligibility.py:140-156`, `findings.py:218`) after the cutover (question B-14).
 2. **Advance signs** from Table 6B-1 A, B and C, on each approach the figure shows (section 4.3).
 3. **Tapers** (Tables 6B-3 and 6B-4), **buffers** (Table 6B-2, Option), **channelizer spacing** (Sect. 6K.01 para 04 and Sect. 6B.08 paras 12 and 14), end signs, arrow board.
-4. **Add-on modules**, reduced to what the MUTCD sources (section 4.7, question B-12).
+4. **Add-on modules**, reduced to what the MUTCD sources (section 4.7, question B-12). Their device rows and real symbols exist before the add-on commit (D-110, D-117).
 5. **Validators with independent recomputation**.
 6. **The layout envelope** per zone, for S9. Two forms: an exact envelope from placed objects, and a conservative estimate from the pack alone (S9 pass 1 runs before any paid call).
 7. **The handoff of an unplaceable device** to the S10 ladder as a `PlacementFailure`. Nothing is dropped silently.
+8. **No layout for an UNDETERMINED zone**: a zone whose final router pass is UNDETERMINED or in `TA_SELECTION_CONFLICT` gets no layout, only its open questions.
 
 ### Out of scope
 
@@ -56,6 +67,8 @@ Plus two criteria S4 makes necessary:
 | --- | --- | --- |
 | 5 | **No unsourced value is used.** Every input that is `SOURCE_REVIEW_REQUIRED` or UNKNOWN produces a `LayoutGap` (an open item with its SME question), never a number | Section 4.9 |
 | 6 | **No regulatory number in `layout/`.** Changing a pack value changes the placement; a test re-seals a pack copy with A changed from 100 to 120 and checks the stations | Section 7, T-12 |
+| 7 | **No layout for an UNDETERMINED zone.** A zone whose final routing decision is not `MATCH_ONE` (or an SME-chosen TA) produces no `PlanObject` and returns its open questions (2026-10-31) | A test feeds each non-matching outcome and checks zero objects |
+| 8 | **Add-on devices have device rows and real symbols before any add-on is placed**; M4-9a shows its arrow (D-110, D-117) | Catalog and pack tests; a test fails if an add-on sign resolves to a placeholder symbol when the add-on commit runs |
 
 ---
 
@@ -205,9 +218,9 @@ work space near end (x = 0)
   C  ->  sign 3
 ```
 
-A, B and C are **consecutive** gaps, not cumulative distances. Figure 6P-10 shows A from the flagger station to the first sign, B between the first and second sign, C between the second and third. Figure 6P-33 shows A from the upstream end of the shoulder taper to W4-2R, B between W4-2R and W20-5R, C between W20-5R and W20-1. The pack stores `spacing_dimension` per sign, `sequence` (1 = nearest the work) and the Table 6B-1 values; it does **not** store what A is measured **from**. That anchor is read from the figure renders (FIGURE_TRANSCRIPTION evidence) and must be in the pack, not in code (B-1).
+A, B and C are **consecutive** gaps, not cumulative distances. Figure 6P-10 shows A from the flagger station to the first sign, B between the first and second sign, C between the second and third. Figure 6P-33 shows A from the upstream end of the merging taper (the start of L) to W4-2R, B between W4-2R and W20-5R, C between W20-5R and W20-1; the shoulder taper lies inside A and ends where the merging taper begins (pack 1.1.0, `SR-6P33-FIG-SIGNS`). The pack stores `spacing_dimension` per sign, `sequence` (1 = nearest the work) and the Table 6B-1 values; it does **not** store what A is measured **from**. That anchor is read from the figure renders (FIGURE_TRANSCRIPTION evidence) and must be in the pack, not in code (B-1).
 
-Formula for sign `k` of the sequence: `x_k = x_start + sum(spacing of signs 1..k)`, where `x_start` is the upstream end of the last non-sign element (taper or shoulder taper or buffer). Rule ids: `TDU-<TA>-<device>` (sequence and dimension), `T-6B1-<road_type>` (the values).
+Formula for sign `k` of the sequence: `x_k = x_start + sum(spacing of signs 1..k)`, where `x_start` is the upstream end of the last non-sign element (taper or buffer; for TA-33, the upstream end of the merging taper, with the shoulder taper inside A). Rule ids: `TDU-<TA>-<device>` (sequence and dimension), `T-6B1-<road_type>` (the values).
 
 ### 4.3 Per-TA stacks
 
@@ -216,9 +229,11 @@ Formula for sign `k` of the sequence: `x_k = x_start + sum(spacing of signs 1..k
 | **TA-1** (Fig. 6P-1) | W20-1 at `x = A` from the work space. No taper, buffer or channelizers (figure draws none). Sign on the work-side approach; **opposite approach and median left-hand sign see B-7** | `TDU-TA1-W20-1`, `T-6B1-<road_type>` (A); `R-TA1-N1` (median: a left-hand sign), `R-TA1-N3` (sign may be omitted: behind a barrier, more than 24 in behind the curb, or 15 ft or more from the edge), `R-TA1-N4` (all signs and devices may be eliminated for short-term, short-duration or mobile work with a lit vehicle) |
 | **TA-6** (Fig. 6P-6) | Approach with the shoulder taper: `[Bf] + shoulder taper Ts = 0.33*L` then W20-1 at A upstream of the taper's upstream end. Opposite approach: W20-1 at A from the start of the work area (figure: "southbound: A from the start of the work area"). Work vehicle in the work space (required); TMA optional. Channelizers along the work space edge at the tangent spacing. Minimum 10 ft remaining width to the near face of the devices | `F-6B3-SHOULDER` (0.33*L, COMPUTE), `F-6B4-L`; `TDU-TA6-*`; `R-TA6-N1`, `R-TA6-FIG-BUFFER` (optional). `F-6B08-SHOULDER-THIRD` (1/3 L) is CITED_ONLY and never applied |
 | **TA-10** (Fig. 6P-10) | Both ends of the one-lane section: one-lane two-way taper `T` (50 to 100 ft, Table 6B-3), a flagger at the taper's upstream end (`FLAGGER`), then W20-7 at A, W20-4 at B, W20-1 at C, on each approach. Optional W16-2P plaque below W20-7. Channelizers along the centerline between the tapers. Buffer: see B-3 and note 6 | `T-6B3-ONE_LANE_TWO_WAY`, `TDU-TA10-*`, `R-TA10-METHOD-FLAGGER`; `R-TA10-N6` (extend the buffer before a curve: **no number**, section 4.8); `R-TA10-FIG-TAPER` is CITED_ONLY |
-| **TA-33** (Fig. 6P-33) | Approach with the right lane closed: `[Bf] + merging taper L`, with the arrow board at the taper's upstream end; **upstream of that, a shoulder taper only when `shoulder_closed_ft >= 8`** (note 3); then W4-2R at A from the upstream end of the last taper, W20-5R at B, W20-1 at C, **each on both sides of the roadway**. Work vehicle and TMA optional | `F-6B3-MERGING` (L, AT_LEAST), `F-6B4-L`; `F-6B3-SHOULDER`; `R-6N11-MERGING-TAPER` (merging taper required for a closed lane on a multi-lane road); `R-TA33-N3` (shoulder 8 ft or more); `R-TA33-N7` (arrow board, freeway); `TDU-TA33-*` |
+| **TA-33** (Fig. 6P-33) | Approach with the right lane closed: `[Bf] + merging taper L`, with the arrow board at the taper's upstream end; **upstream of that, a shoulder taper only when `shoulder_closed_ft >= 8`** (note 3); then W4-2R at A from the upstream end of the merging taper (the shoulder taper, when present, lies inside A), W20-5R at B, W20-1 at C, **each on both sides of the roadway**. Work vehicle and TMA optional | `F-6B3-MERGING` (L, AT_LEAST), `F-6B4-L`; `F-6B3-SHOULDER`; `R-6N11-MERGING-TAPER` (merging taper required for a closed lane on a multi-lane road); `R-TA33-N3` (shoulder 8 ft or more); `R-TA33-N7` (arrow board, freeway); `TDU-TA33-*` |
 
-**Where the figures leave the anchor undefined** (all in B-1): TA-33 A when there is **no** shoulder taper (the plan says Granite is "used where there is no shoulder"); TA-6 for the opposite approach; whether A starts at the taper's upstream end or at the flagger station for TA-10 (the figure shows the flagger at the taper start, so these coincide).
+**Where the figures leave the anchor undefined** (all in B-1): TA-6 for the opposite approach (marked "SME confirmation pending" in pack 1.1.0); whether A starts at the taper's upstream end or at the flagger station for TA-10 (the figure shows the flagger at the taper start, so these coincide). The TA-33 case is no longer open: A is measured from the upstream end of the merging taper whether or not a shoulder taper is present.
+
+**Amendments 2026-10-31 (sections 4.2, 4.3).** Section 4.2 read "Figure 6P-33 shows A from the upstream end of the shoulder taper to W4-2R" and defined `x_start` as the upstream end of the last non-sign element "(taper or shoulder taper or buffer)". The TA-33 row of 4.3 read "W4-2R at A from the upstream end of the last taper". The paragraph above read "TA-33 A when there is no shoulder taper (the plan says Granite is 'used where there is no shoulder')" as an open anchor. All three are superseded by the pack 1.1.0 reading (S4b report, "Contradictions with the plan" and follow-up d).
 
 ### 4.4 Taper length
 
@@ -307,7 +322,10 @@ Branch `tcp-mvp/s08-layout`, off `tcp-mvp/s07-router`. S8 starts only after the 
 | 6 | `layout/strategies/ta33.py` (merging taper, shoulder taper, arrow board, both-side signs) and tests | **[STOP]** | Layout geometry. Needs B-2, B-1 |
 | 7 | `layout/strategies/ta6.py` and tests | **[STOP]** | Layout geometry. Needs B-2 |
 | 8 | Channelizer spacing and counts (4.5) | **[STOP]** | Safety-critical number (B-13) |
-| 9 | `layout/modules/`: registry, arrow board, side-road and median requirements, optional-device policy | [B] with the review of 8 | The module scope (B-12) |
+| 8a | **Before the add-on commit (D-110, D-117):** device rows for the sidewalk and detour signs (a new sealed pack version, owner-approved) and real symbols for them, M4-9a with its arrow; catalog hash resealed | **[STOP]** | A pack change and new artwork; the owner reviews the rows and the symbols |
+| 9 | `layout/modules/`: registry, arrow board, side-road and median requirements, optional-device policy, and the sidewalk and detour add-ons (after 8a) | [B] with the review of 8 | The module scope (B-12) |
+
+**Amendments 2026-10-31 (section 5).** The table had no step for add-on device rows or real symbols, and the add-on modules of commit 9 were planned on placeholder symbols with the "device rows only" outcome of S4b Stage B (D-110, D-117). Commit 0a (the pack amendment for placement anchors) was done by S4b (stage C) and the corrected TA-33 reading by the owner's check of the 400 dpi crops (S4b report).
 | 10 | `validation/layout_validators.py`: independent recomputation, ordering, clearance, device existence, PlacementFailure creation, obstruction check for every TA | **[STOP]** | The independence of the recomputation is what makes it a check; the owner reviews that it does not call the engine's code |
 | 11 | `layout/envelope.py` (exact and conservative) | [B] | Feeds S9; reviewed with S9 |
 | 12 | `tests/golden/known_differences.json` and `golden_compare_lite.py`; the three-job comparison report | **[STOP]** | The list of "accepted" differences is a decision about what counts as correct |
