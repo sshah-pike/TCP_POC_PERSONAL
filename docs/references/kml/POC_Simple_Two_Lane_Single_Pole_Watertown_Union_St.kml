@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>POC Simple Two-Lane Single-Pole Input</name>
+    <description>Synthetic POC input containing one pole/work-location point only. Roadway conditions must be derived and confirmed by map, OSM, and vision analysis.</description>
+
+    <Style id="poleStyle">
+      <IconStyle>
+        <scale>1.2</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle><scale>1.0</scale></LabelStyle>
+    </Style>
+
+    <Placemark>
+      <name>POC-POLE-001</name>
+      <description>Single roadside pole/work reference for the simple two-lane POC.</description>
+      <styleUrl>#poleStyle</styleUrl>
+      <ExtendedData>
+        <Data name="feature_role"><value>WORK_LOCATION_OR_ASSET</value></Data>
+        <Data name="asset_type"><value>POLE</value></Data>
+        <Data name="scenario_id"><value>POC-SCN-001</value></Data>
+        <Data name="requested_work_pattern"><value>SIMPLE_ROADSIDE_WORK</value></Data>
+        <Data name="work_area_count"><value>1</value></Data>
+        <Data name="expected_lane_closure"><value>false</value></Data>
+        <Data name="expected_pedestrian_impact"><value>false</value></Data>
+        <Data name="input_semantics_only"><value>true</value></Data>
+        <Data name="eligibility_must_be_verified"><value>true</value></Data>
+      </ExtendedData>
+      <Point>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>-71.18645500000000,42.36274500000000,0</coordinates>
+      </Point>
+    </Placemark>
+  </Document>
+</kml>

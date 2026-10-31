@@ -272,13 +272,15 @@ Follow-ups carried into later slices:
 
 **Changed 2026-10-30 (D-96, S6 plan Q1 B):** S6 runs in two sessions (session 1: call 1, measurement, crops, OSM, wiring; session 2: data sources). Cutover chain: S6 builds beside the old path, S7 adds a non-gating route stage, S8 cuts over once with regenerated oracles the owner reviews.
 
+**Changed 2026-10-31 (D-111 to D-138; plan `docs/plans/S6_plan.md`):** call 1 runs first and **blind** (it never sees OSM or code values), then the code and OSM checks, then fusion with the two-source rule (D-119). Results have three outcomes: FOUND, NOT_PRESENT and UNKNOWN (D-111). The OSM rules (lanes from `lanes:forward` and `lanes:backward`, else half an even two-way total; a missing `oneway` tag counts as not one-way at lower confidence and the AI must also say false; a missing `lanes` or `shoulder` tag gives no information; divided from geometry), the bearing check (30 degrees modulo 180) with a "which road?" question, the 5 m edge rule, per-profile confidence floors, the enhanced call-1 prompt with code snapping of marks, code checks (lane-line detection, shadow and tree-cover share, image-to-OSM offset) and consistency checks that only lower confidence or give UNKNOWN and never count as a second source, per-stage off switches, the prompt registry (`prompts/`, id, version, hash, pinned by tests), `config/site_exceptions.json`, question and answer records with kind, field, zone, project, OSM way and time, the accuracy scripts, the zoom-19 probe and OSM recorder scripts, and the 8-site early check (`docs/evaluation/`) are in S6. Session 2 (state and federal data sources) moves to after the first scored test (FS-06). No recordings in S6. The agent loop is future scope (FS-01). Stops: STOP 5 (fusion rule table) and STOP 6 (enhanced prompt text).
+
 **Depends on.** S3.
 
 **In scope.**
 - Call 1 output in the format chosen by the S0 spike (D-61; the expected result is the flat facts list). Fields from plan Section 4B observed and computed groups. The AI returns positions; it never reports a length in feet (D-64).
 - Code computes every length: lane, shoulder and median width, distance from edge, encroachment to the device face, remaining width, gaps, path length, side-road distance, curves and crests (USGS 3DEP).
 - Mandatory start fields (D-59) are read from the project and never calculated, pre-filled or overwritten. A computed check that contradicts one creates a conflict question.
-- Data sources (D-53, D-62, D-63): Azure Maps, OSM via Overpass (the tag list in plan Section 5), MassGIS, RIGIS, HPMS, Census urban areas, USGS 3DEP, MBTA and RIPTA GTFS, FRA crossings. All fused values are low confidence, imagery decides, disagreements are recorded (D-37).
+- Data sources (D-53, D-62, D-63): Azure Maps and OSM via Overpass (the tag list in plan Section 5). MassGIS, RIGIS, HPMS, Census urban areas, USGS 3DEP, MBTA and RIPTA GTFS and FRA crossings move to after the first scored test (FS-06; from owner conversation 2026-10-31). All fused values are low confidence, imagery decides, disagreements are recorded (D-37).
 - Width with uncertainty (D-38).
 - Every image resized in code to the model limit (from S0's report).
 - Spike requirements (D-80): `lanes_per_direction` is cross-checked against OSM lanes and state data, and a disagreement makes it UNKNOWN with an SME question; width comes from `cross_section.py` first and AI marks second, and an invalid or missing mark makes the width UNKNOWN; each evidence string is capped at 15 words and UNKNOWN facts carry a short fixed reason, per `docs/reports/S0_prompt_tuning_proposal.md` once approved.
@@ -286,13 +288,15 @@ Follow-ups carried into later slices:
 - Pre-calculation per plan Section 4C: vehicle width and footprint (measured, else cited default flagged `DEFAULT_ASSUMED`), the remaining-width table, shadow vehicle, TMA suggestion and arrow board.
 
 **Acceptance criteria.**
+- Call 1 is blind: its request holds no OSM or code value (D-119).
+- Every fact has one of three outcomes, FOUND, NOT_PRESENT or UNKNOWN; a source that was not checked is never NOT_PRESENT (D-111).
 - On replayed fixtures, every deciding fact is RESOLVED with evidence or UNKNOWN. None is guessed.
 - A width interval that contains a TA threshold makes the fact UNKNOWN and raises a question.
 - A higher-zoom fetch happens only when the pixel threshold fails, and it is recorded as evidence with a signature.
 
 **Tests.** Mandatory fields are never written by code; a computed remaining width that contradicts `lane_closure` creates a conflict, not a change; no length comes from the AI (a test fails if a length field appears in AI output); length computations against fixtures with known pixel scale; every observed field resolves to RESOLVED or UNKNOWN; fusion disagreement recorded; only the approved sources are called (a mock fails the test otherwise); the remaining-width table as a parametrized test; crop decision with mocked pixel counts.
 
-**Recording task (run by the owner, `TCP_LIVE=1`; changed 2026-10-30, D-97, D-98).** The 9-call check on gpt-5.6-sol and on claude-opus-5-5 comes before any recording. Colorado is recorded once after S7 merges (calls 1 and 2 together); E Second St and Granite after S9. Granite is compared at pole P32 (Phase I) only. Record with `python -m tests.support.record live`, which calls `use_os_trust_store()` first. This is the third live-call exception in CLAUDE.md. Then add replay tests for them: the same request fingerprints twice.
+**Recording task (run by the owner after S7 and S9, not part of S6; changed 2026-10-30, D-97, D-98; confirmed 2026-10-31, D-128).** The 9-call check on gpt-5.6-sol and on claude-opus-5-5 comes before any recording. Colorado is recorded once after S7 merges (calls 1 and 2 together); E Second St and Granite after S9. Granite is compared at pole P32 (Phase I) only. Record with `python -m tests.support.record live`, which calls `use_os_trust_store()` first. This is the third live-call exception in CLAUDE.md. Then add replay tests for them: the same request fingerprints twice.
 
 **Prompt seed.** "Extend call 1 and fusion per slice S6. Use only recorded fixtures in tests. Keep the two-AI-call budget per zone."
 
@@ -300,7 +304,9 @@ Follow-ups carried into later slices:
 
 ## S7. Router and call 2
 
-**Goal.** Code chooses the TA from facts and the pack. Call 2 fills only the chosen TA's missing fields.
+**Goal.** Code chooses the TA from facts and the pack, in two passes. Call 2 re-observes the deciding facts, the chosen TA's fields and the conflicts, blind, at fine zoom.
+
+**Changed 2026-10-31 (D-119 to D-123, D-128; plan `docs/plans/S7_plan.md`):** the router runs twice, provisional before call 2 and final after the second fusion, with a what-if test that marks each unresolved fact as deciding or not deciding. Call 2 is rewritten: a blind re-observation (never shown OSM, call-1 or code values for lanes, divided, shoulder or one-way), code re-measures at fine zoom before it, lane count is a field whenever call 2 runs and never forces a call, and call 1 and call 2 disagreeing gives UNKNOWN. Generality tests: a made-up TA in a test pack works with no code change, and no TA id appears in the router, fusion or call-2 code. Questions are blocking or informational. The 6N.11 ids are `E-TA33-FORM-UNDIVIDED-FOUR-LANE-RIGHT` (sourced) and `E-TA33-FORM-UNDIVIDED-OTHER`. An unknown `closed_lane_side` never defaults to RIGHT. The D-59 breaches in `site_model/fusion.py` are fixed. Two AI calls per zone at most.
 
 **Depends on.** S4, S6.
 
@@ -309,16 +315,27 @@ Follow-ups carried into later slices:
 - `TA_SELECTION_CONFLICT` against a TA hypothesis entered in the UI.
 - The routing tree and explicit eligibility (D-60): TA-6 requires `shoulder_present` and a low-speed minor road (note 2; cutoff `SOURCE_REVIEW_REQUIRED` until set) with width to the device face; TA-33 is one OR'd rule citing 6P-33 and 6N.11, so a Granite-type case (undivided, two lanes each way, right lane closed; D-91) qualifies. Broader undivided cases are an engineer question.
 - `traffic_control_method` set by code to Flagger when TA-10 is chosen (D-68). Police details are not applied by the router.
-- Call 2 with crops for unresolved TA fields. It never overwrites a resolved fact, and safety-critical facts go through the cross-view check.
-- Spike requirements (D-80): call 2 re-asks `lanes_per_direction` with a lane-marking crop; it requests lane lines, shoulder edge and curb marks from crops; and it resolves `sidewalk_present` and `sidewalk_side` with a crop plus OSM sidewalk tags.
+- Call 2 (rewritten 2026-10-31): a blind re-observation at fine zoom of the deciding facts, the chosen TA's fields and the conflicts. If call 1 and call 2 disagree on a field, the field is UNKNOWN. Two AI reads never count as two sources.
+- Spike requirements (D-80, reworked 2026-10-31): lane count is a field whenever call 2 runs and never forces a call (D-121); call 2 requests lane lines, shoulder edge and curb marks from crops; and it resolves `sidewalk_present` and `sidewalk_side` with a crop plus OSM sidewalk tags.
 
 **Acceptance criteria.**
 - On golden fixtures the router returns TA-10 for Colorado, TA-6 for E Second St and TA-33 for Granite, or a question when a deciding fact is unknown. It never returns a wrong TA silently.
 - With no fitting TA it returns `NO_TA_MATCH` with failed conditions per pack TA and names no TA outside the pack.
 
-**Tests.** All router outcomes; each branch of the routing tree; TA-6 rejected without a shoulder and on a high-speed road; TA-33 never double-matches; TA-10 always drafts with flaggers; near match; conflict with the Select TA choice; call 2 non-overwrite.
+**Tests.** All router outcomes; each branch of the routing tree; TA-6 rejected without a shoulder and on a high-speed road; TA-33 never double-matches; TA-10 always drafts with flaggers; near match; conflict with the Select TA choice; call 1 and call 2 disagreement gives UNKNOWN; the what-if test; the generality tests.
 
 **Prompt seed.** "Implement the deterministic router and call 2 per slice S7. Every decision must carry the rule ids it used."
+
+---
+
+## Accuracy gate (between S7 and S8)
+
+Added 2026-10-31 (D-125, D-133, D-134, D-135, D-140; FS-10). S8 and every later slice wait for it.
+
+- **Early failure-finding check (before S8).** 8 sites, 2 per TA situation: Granite, E Second, Colorado and Exeter Ten Rod (existing) plus 4 new, labelled by the owner. Truth files are in `docs/evaluation/` (`SITE_TRUTH_v0.md`, `site_truth_v0.json`, `site_truth_v0.csv`). Tune on the dev sites, freeze, score once; never tune on the sites used as proof. The check finds failures; it cannot certify an error rate (zero wrong answers in 8 sites still leaves an upper bound of about 37%).
+- **Pass bar for the safety fields (D-134).** Zero wrong-and-used on lanes per direction, divided, shoulder and one-way, reported with its 95% upper bound. A wrong value passed on with AI_ONLY_UNCONFIRMED counts as wrong-and-used (D-118). The pass bar for the UNKNOWN rate is set after the first scored test (D-135).
+- **Certification (later).** A larger test from client jobs and live SME corrections (FS-10). The 8 sites then become the permanent site-reading regression suite.
+- **Experiment arms (D-124).** A original call 1 only; B the plan (call 1, fusion, call 2 at fine zoom); C arm B plus the enhanced call-1 prompt and code measurement of marks; D (lab only, parked) a loop in call 1 (FS-01). Selection rule: first zero wrong-and-used with the 95% upper bound, then the lowest UNKNOWN rate, then width error, then fewest calls and least time; ties go to the simpler arm.
 
 ---
 
@@ -331,7 +348,9 @@ Follow-ups carried into later slices:
 **In scope.**
 - Strategies for TA-1, TA-6, TA-10 and TA-33 on one common placement core. Advance signs come from Table 6B-1 A, B and C spacing on both approaches where the figure shows them.
 - Tapers from Tables 6B-3 and 6B-4, buffers from Table 6B-2 when chosen per zone (client layer withdrawn, D-51), channelizer spacing from 6K.01, and end signs.
-- Add-on modules, optional per zone (changed 2026-10-30, D-90, D-51 withdrawn, D-68 deferred): sidewalk closed and detour, built from the S4b sections. No-parking and RI double fines wait for sources. Client modules and police detail are out of scope.
+- Add-on modules, optional per zone (changed 2026-10-30, D-90, D-51 withdrawn, D-68 deferred): sidewalk closed and detour, built from the S4b sections. No-parking and RI double fines wait for sources. Client modules and police detail are out of scope. Add-on device rows and real symbols come before the add-on commit; M4-9a must show its arrow (D-110, D-117, 2026-10-31).
+- No layout for an UNDETERMINED zone: it gets its open questions only (2026-10-31).
+- The TA-33 anchor is the corrected pack 1.1.0 reading: A is measured from the upstream end of the merging taper and the shoulder taper lies inside A (S4b; `docs/plans/S8_plan.md`).
 - Validators with independent recomputation.
 - The layout envelope per zone, used by S9.
 
@@ -349,6 +368,8 @@ Follow-ups carried into later slices:
 
 ## S9. Grouping engine and zone split
 
+**Paused 2026-10-31 (D-153, FS-21):** this slice waits for the accuracy gate between S7 and S8. Its plan is `docs/plans/S9_plan.md`.
+
 **Goal.** Group points into zones using the case table in plan Section 4A, in two passes.
 
 **Depends on.** S3, S8.
@@ -358,6 +379,7 @@ Follow-ups carried into later slices:
 - First pass on geometry and a conservative envelope. Second pass after routing, which may propose a regroup.
 - Automatic split over 150 m with `ZONE_SPLIT_AUTOMATIC` (D-19).
 - `GROUPING_RULE_REVIEW_REQUIRED` until your SME confirms the settings.
+- Changed 2026-10-31 (D-145 to D-147, D-151): settings in `config/grouping.json` with one path limit `input.max_work_path_m`; geometry-derived zone ids plus a `derived_from` link ("inherit" carries facts and answers, never exceptions or approvals; ADR-009 amended); one project-level OSM fetch before the cap check (S3 wording becomes "before any paid call"); S9 builds the work-path adapter unless S8 did; the "not on road" flag is revisited (Colorado's point sits in a yard).
 
 **Acceptance criteria.**
 - Granite KML: with the start value `max_points_per_zone` = 3, two zones, P32 to P31 and P30 to P28, split at the largest gap (39.2 m).
@@ -373,6 +395,8 @@ Follow-ups carried into later slices:
 
 ## S10. Conflicts and exceptions
 
+**Paused 2026-10-31 (D-153, FS-21):** this slice waits for the accuracy gate between S7 and S8. Its plan is `docs/plans/S10_plan.md`.
+
 **Goal.** Handle obstructions and rule failures through the ladder, with exceptions recorded correctly.
 
 **Depends on.** S8.
@@ -382,7 +406,8 @@ Follow-ups carried into later slices:
 - The ladder: move within a sourced band, work-fact change, SME exception, blocked.
 - Taper and buffer have no pre-approved band. An SME may move them manually as a one-off exception that is never promoted.
 - Exception scoped to one plan version, with one-click reuse only on an exact match (D-29).
-- Pre-approved deviations with a named approver role from a config list (D-28).
+- Deviations: the workflow is built and no approval is possible until a MUTCD or client document is the source (D-148, 2026-10-31; was: pre-approved deviations with a named approver role from a config list, D-28).
+- Three roles: SME reviewer, approver and admin (D-142). The approver is for rule pack approval only; the zone cap and deviations are the SME's (D-143). The admin can do everything (D-141). The S3 cap approval changes accordingly.
 - Status labels as in Section 7.
 
 **Acceptance criteria.**
@@ -390,13 +415,15 @@ Follow-ups carried into later slices:
 - The automatic search never moves taper or buffer.
 - An exception never carries to a new version unless reused on an exact match.
 
-**Tests.** The ladder cases; taper and buffer protection; exact-match reuse and mismatch; approver permissions.
+**Tests.** The ladder cases; taper and buffer protection; exact-match reuse and mismatch; role permissions.
 
 **Prompt seed.** "Implement the conflict ladder and exception records per slice S10. Follow the plan's Section 7 exactly for taper and buffer."
 
 ---
 
 ## S11. Question form and SME review
+
+**Paused 2026-10-31 (D-153, FS-21):** this slice waits for the accuracy gate between S7 and S8. Its plan is `docs/plans/S11_plan.md`.
 
 **Goal.** All blocking questions appear on one form with sub-questions, and every SME action resumes at the earliest affected stage.
 
@@ -411,6 +438,7 @@ Follow-ups carried into later slices:
 - The append-only ledger.
 - The SME approval gate `require_sme_approval_for_all_plans`, default true (D-65): every plan waits for a click and shows whether it would have been SUPPORTED_AUTO.
 - Asked-if-needed fields (duration, night work, heavy vehicles and the rest, plan Section 4B) appear only when a rule needs them. `work_side` always appears as an AI suggestion for the SME to confirm (D-69).
+- Changed 2026-10-31 (D-122, D-130, D-156): new question kinds (which road, work location near an edge, layout not allowed, single-source candidate, lane width); blocking and informational questions; one-click confirm with a crop; one batch per project; answer records keep kind, field, zone, project, OSM way and time; the deep-mode toggle is removed (FS-01).
 
 **Acceptance criteria.**
 - Answering a question resumes with zero new external calls when signatures match.
@@ -425,6 +453,8 @@ Follow-ups carried into later slices:
 
 ## S12. Sheets and PDF
 
+**Paused 2026-10-31 (D-153, FS-21):** this slice waits for the accuracy gate between S7 and S8. Its plan is `docs/plans/S12_plan.md`.
+
 **Goal.** Produce the sheet set exactly in the style of your drafts.
 
 **Depends on.** S8, S9.
@@ -433,7 +463,7 @@ Follow-ups carried into later slices:
 - Sheet packing per plan Section 4A: fit at 1 in = 40 ft, then 50 ft, then a new sheet. No overlap on one sheet. Two TAs share a sheet only if both fit.
 - Titles "PHASE I" and so on, numbered "n OF N", no cover page.
 - The common template: legend, the 12 general notes, Type III barricade detail, drum and cone detail, free-standing sign detail, title block, revisions box, DigSafe box, job notes, scale bar and north arrow.
-- Title-block data: the location line uses the road name the POC already prints (D-71); point labels from placemark names (D-72); no address typed by the SME.
+- Title-block data: street, city or neighbourhood, state and ZIP; the street number only if it is in the input (D-100, D-149, 2026-10-31; was: the location line uses the road name the POC already prints, D-71); point labels from placemark names (D-72); no address typed by the SME. The template is used as currently rebuilt; the client's current template is future scope (D-152, FS-22).
 - Azure Maps imagery as the base and dimension labels on the drawing.
 
 **Acceptance criteria.**
@@ -449,6 +479,8 @@ Follow-ups carried into later slices:
 
 ## S13. Golden comparator and full-pipeline test
 
+**Paused 2026-10-31 (D-153, FS-21):** this slice waits for the accuracy gate between S7 and S8. Its plan is `docs/plans/S13_plan.md`.
+
 **Goal.** Measure how close the output is to your drafts and explain every difference.
 
 **Depends on.** S12.
@@ -458,6 +490,7 @@ Follow-ups carried into later slices:
   - Exact: TA, sheet count, work points per sheet, scale, advance-sign order and code set.
   - Tolerance: position within 15 ft and spacing within 10 ft, using the labelled value where the draft is schematic.
   - Side of road must match.
+- The site-reading regression suite (`docs/evaluation/`, D-125, FS-10) is separate from this comparator: its own truth files, its own gate (2026-10-31).
 - Report categories: RULE\_GAP, CLIENT\_PRACTICE, FIELD\_JUDGMENT, SCHEMATIC\_DRAFT, EXTRACTION\_ERROR; no post-draft variant category: police detail is future scope (D-68), so the Colorado difference is reported as a known difference.
 - The live full-pipeline test on the three KMLs behind `TCP_LIVE=1`.
 - Golden v0.2 after your SME's corrections.
@@ -474,6 +507,8 @@ Follow-ups carried into later slices:
 ---
 
 ## S14. Polygon and line normalization
+
+**Paused 2026-10-31 (D-153, FS-21):** this slice waits for the accuracy gate between S7 and S8. Its plan is `docs/plans/S14_plan.md`.
 
 **Goal.** Work areas drawn as lines or polygons run through the same pipeline.
 
@@ -499,9 +534,13 @@ Follow-ups carried into later slices:
 
 S0, then S1 and S2 in parallel, then S3. S4 and S5 can run beside S1 to S3 (changed 2026-10-30: S4b runs after S4 and before S5 commit 3 and before S8; S5 resumes after S4b). Cutover chain across S6, S7 and S8: S6 builds beside the old path, S7 adds a non-gating route stage, S8 cuts over once (D-96). Then S6, S7, S8, S9, then S10 and S12 in parallel, then S11 and S13. S14 can follow S9 at any time. S15 runs once after S3 and again after S14. S16 (rule management UI) is last.
 
+**Changed 2026-10-31 (D-125, D-153).** The pack store that keeps sealed rule pack versions side by side is **merged** (commit `69ab4c0`, `tcp-mvp/pack-store`; D-110, D-116); it ran after S5 and before S7. After S7 comes the **accuracy gate** (8-site early check; certification later, FS-10), then S8. **S9 to S16 are paused** until the gate passes (D-153, FS-21).
+
 ---
 
 ## S15. Orphan sweep: unused files and code to backup
+
+**Paused 2026-10-31 (D-153, FS-21):** this slice waits for the accuracy gate between S7 and S8. Its plan is `docs/plans/S15_plan.md`.
 
 **Goal.** Find files and code the MVP no longer uses and move them to `backup/`, with a manifest, so the codebase stays clean and nothing is lost. Nothing is ever deleted.
 
@@ -568,6 +607,8 @@ The known candidates from earlier work are the USGS imagery code and the direct-
 
 ## S16. Rule management UI (last slice)
 
-**Goal.** A read-only browser for the rule pack first, then approval of rule changes as an append-only record (owner decision D-102, added 2026-10-30).
+**Paused 2026-10-31 (D-153, FS-21):** this slice waits for the accuracy gate between S7 and S8. Its plan is `docs/plans/S16_plan.md`.
+
+**Goal.** A read-only browser for the rule pack. The approval of rule changes as an append-only record (owner decision D-102, added 2026-10-30) and the formula calculator are future scope (D-154, FS-23; 2026-10-31): S16 only displays values from the JSON, and shows the calibration values read-only.
 
 **Depends on.** All earlier slices. Planned last. Scope and acceptance criteria are set when S16 is planned (see docs/plans/S16_plan.md).

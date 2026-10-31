@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+	<name>1A8G8FM WPI 3159540.kml</name>
+	<open>1</open>
+	<atom:link rel="app" href="https://www.google.com/earth/about/versions/#earth-pro" title="Google Earth Pro 7.3.7.1327"></atom:link>
+	<StyleMap id="m_ylw-pushpin">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#s_ylw-pushpin</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#s_ylw-pushpin_hl</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="m_ylw-pushpin0">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#s_ylw-pushpin0</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#s_ylw-pushpin_hl0</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="s_ylw-pushpin">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="s_ylw-pushpin0">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="s_ylw-pushpin_hl">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Style id="s_ylw-pushpin_hl0">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+	</Style>
+	<Placemark>
+		<name>P32</name>
+		<LookAt>
+			<gx:ViewerOptions>
+				<gx:option enabled="0" name="historicalimagery"></gx:option>
+				<gx:option enabled="0" name="sunlight"></gx:option>
+				<gx:option name="streetview"></gx:option>
+			</gx:ViewerOptions>
+			<longitude>-71.82311171383793</longitude>
+			<latitude>41.37214081011249</latitude>
+			<altitude>0</altitude>
+			<heading>-62.20028393612395</heading>
+			<tilt>81.05901612386931</tilt>
+			<range>273.1723319005453</range>
+			<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+		</LookAt>
+		<styleUrl>#m_ylw-pushpin0</styleUrl>
+		<Point>
+			<gx:drawOrder>1</gx:drawOrder>
+			<coordinates>-71.82035330409971,41.3710265954301,40.11863602723302</coordinates>
+		</Point>
+	</Placemark>
+	<Placemark>
+		<name>P31</name>
+		<LookAt>
+			<longitude>-71.8200832036781</longitude>
+			<latitude>41.37135439450824</latitude>
+			<altitude>0</altitude>
+			<heading>0.000221453580656933</heading>
+			<tilt>0</tilt>
+			<range>138.9560862536852</range>
+			<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+		</LookAt>
+		<styleUrl>#m_ylw-pushpin</styleUrl>
+		<Point>
+			<gx:drawOrder>1</gx:drawOrder>
+			<coordinates>-71.82040144539816,41.3713138859659,0</coordinates>
+		</Point>
+	</Placemark>
+	<Placemark>
+		<name>P30</name>
+		<LookAt>
+			<longitude>-71.8200843757551</longitude>
+			<latitude>41.3716382580713</latitude>
+			<altitude>0</altitude>
+			<heading>0.0002206792585833682</heading>
+			<tilt>0</tilt>
+			<range>139.3117967994821</range>
+			<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+		</LookAt>
+		<styleUrl>#m_ylw-pushpin</styleUrl>
+		<Point>
+			<gx:drawOrder>1</gx:drawOrder>
+			<coordinates>-71.82044609829397,41.37166491922503,0</coordinates>
+		</Point>
+	</Placemark>
+	<Placemark>
+		<name>P29</name>
+		<LookAt>
+			<longitude>-71.82004369648638</longitude>
+			<latitude>41.37190120965909</latitude>
+			<altitude>0</altitude>
+			<heading>0.0002475660639960151</heading>
+			<tilt>0</tilt>
+			<range>139.1109400477798</range>
+			<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+		</LookAt>
+		<styleUrl>#m_ylw-pushpin</styleUrl>
+		<Point>
+			<gx:drawOrder>1</gx:drawOrder>
+			<coordinates>-71.82048311235434,41.37199092243124,0</coordinates>
+		</Point>
+	</Placemark>
+	<Placemark>
+		<name>P28</name>
+		<LookAt>
+			<longitude>-71.82009348549298</longitude>
+			<latitude>41.37225960891892</latitude>
+			<altitude>0</altitude>
+			<heading>0.0002146585831301231</heading>
+			<tilt>0</tilt>
+			<range>140.0143990024739</range>
+			<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+		</LookAt>
+		<styleUrl>#m_ylw-pushpin</styleUrl>
+		<Point>
+			<gx:drawOrder>1</gx:drawOrder>
+			<coordinates>-71.82051679365351,41.37227476613246,0</coordinates>
+		</Point>
+	</Placemark>
+</Document>
+</kml>

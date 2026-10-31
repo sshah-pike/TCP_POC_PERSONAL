@@ -1,4 +1,15 @@
-Status: PLANNED. Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md; where they differ from this plan, the register wins.
+Status: PLANNED, PAUSED until the accuracy gate between S7 and S8 (D-153, FS-21). Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md and docs/decisions/OWNER_DECISIONS_2026-10-31.md; where they differ from this plan, the registers win.
+
+## Owner decisions applied (2026-10-31)
+
+Register: `docs/decisions/OWNER_DECISIONS_2026-10-31.md`. Where this block differs from older text, this block is the active text; the older wording is kept in the "Amendments 2026-10-31" notes in sections 1 and 4. S10 is paused until the accuracy gate between S7 and S8 (D-153, FS-21).
+
+- **Three roles (D-142, Y6).** SME reviewer (with the full chat assistant), approver and admin. The admin can do everything for now (D-141). Roles are a dropdown with no login; every action is audited "role selected, not verified". Real login comes before client use (FS-16).
+- **The approver is for rule pack approval only (D-143, Y7).** Everything else, including the zone cap and deviations, is done by the SME. The S3 code in which the approver approves the zone cap needs a small change in S10 or S11: `approve-cap` takes an SME reviewer session (or admin), still recorded "approved (not verified)".
+- **Deviations workflow built, no approvals yet (D-148, Y5).** S10 builds the proposal, the record and the refusal rules. Nothing can be approved until a MUTCD or client document is the source (question 10, option c). `DRAFT_COMPLIANT_WITH_FIELD_ADJUSTMENT` is therefore not produced in the MVP.
+- **Rule pack changes (D-144, Y8).** No rule pack change happens in the MVP; the owner approves any that does.
+- **Exceptions file (D-138, D-155).** `config/site_exceptions.json`: the SME proposes an entry, the admin enters it, each entry gets a decision-log entry. Per-job answers still travel with the plan.
+- **Two-source rule and outcomes (D-92, D-111, D-119).** Status labels and conflict questions use the three outcomes FOUND, NOT_PRESENT and UNKNOWN from S6.
 
 # S10 plan: conflicts and exceptions, the exception ladder, the approver role
 
@@ -8,7 +19,7 @@ Read for this plan: CLAUDE.md; slice specs S8, S10, S11; plan sections 1, 7, 8, 
 
 Owner constraints applied here:
 - **MUTCD only.** Rules come from the MUTCD Chapter 6 (December 2023) only.
-- **Roles.** Roles are a dropdown with no login: **SME reviewer**, with the full chat assistant, and **Approver**, who approves changes and the zone cap. Every action is audited as "role selected, not verified". Real login comes before client use and is planned in S11.
+- **Roles.** Roles are a dropdown with no login: **SME reviewer** (with the full chat assistant), **approver** and **admin** (D-142). The approver is for rule pack approval only; the zone cap and deviations are the SME's (D-143); the admin can do everything (D-141). Every action is audited as "role selected, not verified". Real login comes before client use (FS-16).
 - **Two-source rule.** Safety-critical fields need two agreeing sources or become UNKNOWN.
 - **6N.11.** The Granite-type case is sourced. Broader cases go to the engineer.
 - **Cap approval.** It is recorded as "approved (not verified)".
@@ -30,10 +41,12 @@ Legend: **[B]** can be batched with the next commit. **[STOP]** stop for owner r
    - **Step 4, blocked or manual.** The site understanding, conflicts and imagery are handed over. This includes **"go to the engineer"** for TA cases outside the sourced 6N.11 reading.
 3. **Taper and buffer protection** (D-24, CLAUDE.md rule 8). The automatic search never moves them, and no band exists for them. An SME may move or resize them by hand. That is a one-off exception for that plan version and is never promotable.
 4. **Exception records** scoped to one immutable plan version, with one-click reuse **only on an exact match**, logged as a new approval (D-29).
-5. **Pre-approved deviations** (D-14, D-28, ADR-021, ADR-033). The SME proposes and a named approver role approves. Approvals are stored outside the pack as `{record id, pack hash, approver, time}` (S4 proposal for open question 15). **The owner's MUTCD-only rule collides with this** (question 10). S10 builds the workflow, and whether any deviation may enter the pack is the owner's call.
-6. **Approver role.** Add `APPROVER` to the existing local identity provider (dropdown, no credentials, `users.local.json`), `authz.py`, the action policy and the API. The zone-cap approval moves from typed text to the Approver role, recorded "approved (not verified)" (S3 follow-up 3). Every action records `authentication_status = "ROLE_SELECTED_NOT_VERIFIED"`.
+5. **Pre-approved deviations** (D-14, D-28, ADR-021, ADR-033). The SME proposes and records the deviation (D-143). S10 builds the workflow, and **no approval is possible until a MUTCD or client document is the source** (D-148, question 10 option c). Records are stored outside the pack as `{record id, pack hash, actor, time}` (S4 proposal for open question 15).
+6. **Roles.** Add `APPROVER` and `ADMIN` to the existing local identity provider (dropdown, no credentials, `users.local.json`), `authz.py`, the action policy and the API. The approver's only permission is rule pack approval (S16). The zone-cap approval moves from typed text to an SME reviewer session, recorded "approved (not verified)" (S3 follow-up 3, D-143). Every action records `authentication_status = "ROLE_SELECTED_NOT_VERIFIED"`.
 7. **Status labels** from plan Section 7, `DRAFT_COMPLIANT`, `DRAFT_COMPLIANT_WITH_FIELD_ADJUSTMENT`, `DRAFT_WITH_ENGINEERING_EXCEPTION` and `BLOCKED`, mapped onto the zone decision. Only `DRAFT_COMPLIANT` can be SUPPORTED_AUTO. A `SOURCE_REVIEW_REQUIRED` input forces REVIEW_REQUIRED (D-39). An unanswered per-job decision forces "needs review".
 8. **D-59 breach 2** (S3 follow-up). The encroachment override of the SME's `lane_closure` in `site_model/fusion.py:395-399` becomes a conflict question. The value never changes.
+
+**Amendments 2026-10-31 (section 1).** Item 5 read: "The SME proposes and a named approver role approves ... S10 builds the workflow, and whether any deviation may enter the pack is the owner's call" (D-148, D-143). Item 6 read: "Add `APPROVER` ... The zone-cap approval moves from typed text to the Approver role" (D-142, D-143). Acceptance 4 and 10 named the Approver for the zone cap and deviation approvals (D-143). The roles bullet read "SME reviewer ... and Approver, who approves changes and the zone cap" (D-142, D-143).
 
 ### Out of scope
 
@@ -51,13 +64,13 @@ The first three rows are the slice spec. The rest are readings this plan adds.
 | 1 | A tree on a sign spot moves the sign within a band, or raises an exception question | Two tests: with a sourced band (a test deviation record) the sign moves and the status is `DRAFT_COMPLIANT_WITH_FIELD_ADJUSTMENT`. With no band (the real pack: 0 deviations) a question appears with the proposed spot and the options "move as exception", "change a work fact" and "blocked" |
 | 2 | The automatic search never moves taper or buffer | `LAY-IMMOVABLE` after the ladder. A forced obstruction on a taper gives a question, never a move. A property test over random obstruction sets |
 | 3 | An exception never carries to a new version unless reused on an exact match | New version with identical match key: reuse is offered, and taking it writes a new approval. Any field of the match key changed: no reuse, the question is asked again |
-| 4 | Approver permissions: only APPROVER approves a deviation or the zone cap. Only SME_REVIEWER records an exception. Every record says "role selected, not verified" | `authz` tests per route and tool. Audit fields checked |
+| 4 | Role permissions: only SME_REVIEWER (or ADMIN) approves the zone cap, proposes a deviation and records an exception; APPROVER holds rule pack approval only; ADMIN may do everything. Every record says "role selected, not verified" (D-141 to D-143) | `authz` tests per route and tool. Audit fields checked |
 | 5 | A manual taper or buffer move is an exception with `promotable = false`. A deviation proposal that cites one is refused | Unit tests |
 | 6 | The router re-runs at most once per ladder pass. A second switch goes to review | Fake router that flips its result |
 | 7 | Low-confidence obstructions are never acted on automatically | An obstruction under the threshold produces a confirm-or-dismiss question and no move |
 | 8 | A computed check that contradicts a start field raises a conflict and leaves the field unchanged (D-59) | The S3 breach case: encroachment with `lane_closure = False` keeps False and adds a `MANDATORY_CONTRADICTION` question |
 | 9 | A failure is never turned into a pass | `validation_results.json` keeps FAIL. The disposition layer adds `ACCEPTED_WITH_SME_OVERRIDE` beside it (as `sme_disposition.py` does today) |
-| 10 | The cap approval is recorded as "approved (not verified)" with the Approver's subject id | S3 cap tests updated (diff reviewed) |
+| 10 | The cap approval is recorded as "approved (not verified)" with the SME reviewer's subject id (D-143) | S3 cap tests updated (diff reviewed) |
 
 ---
 
@@ -82,17 +95,17 @@ Changed:
 
 | File | Change |
 | --- | --- |
-| `review/assistant/core/identity.py` | `ROLES` adds `APPROVER`. `audit_fields` sets `authentication_status = "ROLE_SELECTED_NOT_VERIFIED"` for the local provider |
-| `review/assistant/core/authz.py` | `APPROVER` permissions: `deviation:approve`, `cap:approve`, `grouping:confirm` (if S9 question 11 says so), `review:read`, `audit:read`. Plus whatever question 1 adds |
+| `review/assistant/core/identity.py` | `ROLES` adds `APPROVER` and `ADMIN`. `audit_fields` sets `authentication_status = "ROLE_SELECTED_NOT_VERIFIED"` for the local provider |
+| `review/assistant/core/authz.py` | `SME_REVIEWER` permissions: `cap:approve`, `deviation:propose`, `exception:record`, `review:read`, `audit:read`. `APPROVER`: `pack:approve` (used by S16), `review:read`, `audit:read`. `ADMIN`: every permission (D-141). `deviation:approve` exists but nothing can be approved until a source exists (D-148) |
 | `config/assistant/users.example.json` | An Approver example identity (no credentials) |
 | `config/assistant/SME_ACTION_POLICY.json` (hash-verified) | New actions `move_sign_outside_band`, `move_taper`, `move_buffer`, `accept_ta_selection`, `use_closest_ta` (question 9), each `is_exception: true`, reason required. `move_existing_device` stays non-exception for signs inside a sourced band only. `approval_mode` renamed per question 7. Rehash with `python -m tcp_planner.review.action_policy --rehash` |
 | `review/action_policy.py` | New action names. `NEVER_OVERRIDABLE` unchanged |
 | `conflicts/sme_disposition.py` | Uses `ExceptionRecord` and the match key. Keeps "a FAIL is never turned into PASS" |
 | `review/assistant/services/exception_tools.py` | `record_exception` builds an `ExceptionRecord`. `TA_NOT_APPLICABLE` no longer assumes TA-1 (S0 item 18), and the base TA comes from the router's candidates |
-| `orchestration/project_runner.py`, `web_api/project_routes.py` | `approve-cap` requires an `APPROVER` session. The record is `{approved_by subject_id, role, verified: false, label "approved (not verified)", zone_count, at}` |
+| `orchestration/project_runner.py`, `web_api/project_routes.py` | `approve-cap` requires an `SME_REVIEWER` (or `ADMIN`) session. The record is `{approved_by subject_id, role, verified: false, label "approved (not verified)", zone_count, at}` |
 | `site_model/fusion.py` (only if still on the live path after S6 to S8, A-5) | D-59 breach 2: no override, a conflict question instead |
 | `orchestration/pipeline.py` | Insert the ladder stage |
-| `apps/web/src/...` | Minimum: the cap banner asks for an Approver session. Role pages are S11 |
+| `apps/web/src/...` | Minimum: the cap banner asks for an SME reviewer session. Role pages are S11 |
 
 Not touched: the rule pack (empty deviation layer stays empty unless question 10 says otherwise), the S8 strategies (S10 calls the validators and the layout core, and never edits a strategy).
 
@@ -103,7 +116,7 @@ Not touched: the rule pack (empty deviation layer stays empty unless question 10
 Every record carries `schema_version`. Persisted references are `{uri, sha256, size, media_type}`. Every actor block is the same:
 
 ```
-Actor { subject_id, display_name, role SME_REVIEWER|APPROVER|ENGINE, identity_provider "LOCAL_DROPDOWN",
+Actor { subject_id, display_name, role SME_REVIEWER|APPROVER|ADMIN|ENGINE, identity_provider "LOCAL_DROPDOWN",
         authentication_status "ROLE_SELECTED_NOT_VERIFIED", verified false, session_id }
 ```
 
@@ -207,12 +220,14 @@ It writes a `Handover` with references to the saved site model, routing decision
 ### 4.6 Pre-approved deviations and the approver role
 
 1. **Reporting.** A report groups exceptions by reason, failed check and device class. A recurring pattern may become a `DeviationProposal`. The SME proposes it with conditions, a justification and any source.
-2. **Approval.** An Approver approves or rejects it. The decision is stored as a state record with `{record id, pack hash, approver, time}`, and "not verified" is shown. The SME who proposed cannot approve the same proposal (question 2).
-3. **Effect.** This depends on question 10:
+2. **Approval.** No approval is possible until a MUTCD or client document is the source (D-148). When one exists, the decision is stored as a state record with `{record id, pack hash, actor, time}`, and "not verified" is shown. Who decides is an owner question at that point; the approver role is not it (D-143).
+3. **Effect.** Question 10 is answered: option (c) (D-148). The other options are kept for reference:
    - (a) an approved deviation becomes a record in `rule_pack/deviation/` with `authority PROPOSED_SETTING`, and the pack is resealed;
    - (b) it stays outside the pack as a config band read by `band_search`;
    - (c) the workflow exists and nothing can be approved until a MUTCD or client source is supplied.
 4. **Exclusions.** A taper or buffer exception is never promotable. Nothing is ever promoted into the federal layer (plan Section 7). An approval voids itself if the pack hash changes (S4 proposal).
+
+**Amendments 2026-10-31 (section 4.6).** Item 2 read "An Approver approves or rejects it ... The SME who proposed cannot approve the same proposal (question 2)"; item 3 read "This depends on question 10" with options (a) to (c) open (D-143, D-148).
 
 ### 4.7 Status labels
 
@@ -243,13 +258,13 @@ Branch `tcp-mvp/s10-conflicts` off `tcp-mvp/s09-grouping`. Fast tier plus impact
 | --- | --- | --- | --- |
 | 0 | Move `BASELINE_REF` to the S9 tip, empty `APPROVED` | [B] with 1 | Housekeeping |
 | 1 | `conflicts/models.py`, `Actor`, schema versions, migrations | [B] | Plumbing |
-| 2 | Approver role: `identity.py`, `authz.py`, `users.example.json`, audit fields "ROLE_SELECTED_NOT_VERIFIED"; cap approval needs an APPROVER session and records "approved (not verified)"; S3 cap tests updated | **[STOP 1]** | Authorization changes and S3 test diffs. Needs questions 1, 2 and 12 |
+| 2 | Roles: `identity.py`, `authz.py`, `users.example.json` (SME reviewer, approver, admin), audit fields "ROLE_SELECTED_NOT_VERIFIED"; cap approval needs an SME reviewer (or admin) session and records "approved (not verified)"; S3 cap tests updated | **[STOP 1]** | Authorization changes and S3 test diffs. Needs questions 1, 2 and 12 |
 | 3 | `conflicts/obstruction.py` on S8's detection, confidence gating, low-confidence question; one new offline scenario with a tree on a sign spot | **[STOP 2]** | Adds a scenario and a check id to stored outputs (S0 item 16: new expected files, regenerated with `make_expected` and reviewed) |
 | 4 | `conflicts/band_search.py`: candidates, upstream-first, order and spacing re-check, proposal-only without a sourced band; `LAY-IMMOVABLE` property test | **[STOP 3]** | Safety-critical: where a warning sign may go. Needs questions 3, 4 and 6 |
 | 5 | `conflicts/work_fact.py`: computed, judged, declared; re-run limit; D-59 breach 2 fix (or regression test if the old path is gone) | **[STOP 4]** | Safety-critical facts and the start-field rule |
 | 6 | `conflicts/exceptions.py`, `sme_disposition.py`, `exception_tools.py`, policy file actions and rehash; match key and reuse | **[STOP 5]** | Changes a hash-verified policy file and the exception semantics |
 | 7 | `conflicts/handover.py`: BLOCKED and ENGINEER_REQUIRED; base-TA exception per question 9 | [B] with 6 for review | Small, same review |
-| 8 | `conflicts/deviations.py`: proposal, approval, refusal of non-promotable sources, voiding on pack hash change; effect per question 10 | **[STOP 6]** | Touches the MUTCD-only rule |
+| 8 | `conflicts/deviations.py`: proposal, record, refusal of non-promotable sources, voiding on pack hash change; no approval path until a source exists (D-148) | **[STOP 6]** | Touches the MUTCD-only rule |
 | 9 | `conflicts/status.py`: labels, mapping, review reasons, `would_have_been_supported_auto` | [B] with 10 | Pure mapping |
 | 10 | `conflicts/ladder.py`, `orchestration/ladder_stage.py`, pipeline insertion, validators re-run after each change; regenerated expected outputs if any change | **[STOP 7]** | Changes stored oracles (D-83). Diff review of every changed expected file |
 | 11 | Full suite once, `docs/reports/S10_conflicts_report.md` | [B] | Required finish |
@@ -265,13 +280,13 @@ All offline, with fakes and recorded fixtures.
 | T-1 | Ladder cases: sourced band and clear spot (moved); sourced band and no spot (exception question); no band (proposal and exception question); judged work-fact change (question); computed change crossing a TA-6 width condition (router once); exception declined (BLOCKED); never-overridable (BLOCKED) | Acceptance 1 |
 | T-2 | Taper and buffer protection: random obstruction sets never move a TAPER or BUFFER; a manual move is a `TAPER_MOVE` exception with `promotable = false`; a deviation proposal citing it is refused | Acceptance 2, 5 |
 | T-3 | Exact-match reuse: identical key offers reuse and writes a new record; each key field changed alone gives no offer (one parametrized case per field); a new pack hash gives no offer | Acceptance 3 |
-| T-4 | Approver permissions: every route and tool against SME_REVIEWER, APPROVER, AUDITOR, ADMIN; self-approval refused per question 2 | Acceptance 4 |
+| T-4 | Role permissions: every route and tool against SME_REVIEWER, APPROVER, AUDITOR, ADMIN; a deviation approval attempt is refused while no source exists | Acceptance 4 |
 | T-5 | Audit: every record holds `ROLE_SELECTED_NOT_VERIFIED` and `verified: false`; the audit chain stays intact | |
 | T-6 | Re-run limit: a flipping fake router re-runs once, then review | Acceptance 6 |
 | T-7 | Low-confidence obstruction: no move, a confirm-or-dismiss question; dismiss records the actor | Acceptance 7 |
 | T-8 | D-59: encroachment with `lane_closure = False` keeps False and raises the question; start fields byte-identical after the ladder | Acceptance 8 |
 | T-9 | FAIL never becomes PASS: `validation_results.json` unchanged by any disposition | Acceptance 9 |
-| T-10 | Cap approval: APPROVER session required; record holds subject id, role, "approved (not verified)", zone count; a bigger zone set needs a new approval (S3 rule kept) | Acceptance 10 |
+| T-10 | Cap approval: SME_REVIEWER (or ADMIN) session required, APPROVER refused; record holds subject id, role, "approved (not verified)", zone count; a bigger zone set needs a new approval (S3 rule kept) | Acceptance 10 |
 | T-11 | Status mapping: every row of 4.7; `would_have_been_supported_auto` | |
 | T-12 | Determinism: same inputs give the same conflicts, exceptions and status bytes | |
 | T-13 | No regulatory number in `conflicts/`: grep for pack numbers; a test deviation band changes the result | CLAUDE.md rule 3 |
@@ -297,7 +312,7 @@ Feeds: S11 (questions, exceptions, reuse offers, status, approver role), S12 (st
 
 ## 8. Client inputs and decisions S10 consumes
 
-- **Client inputs:** who holds the Approver role (R21, plan open question 15), and any document that sets a sign-shift band.
+- **Client inputs:** who holds the approver role (R21, plan open question 15; the role now covers rule pack approval only, D-143), and any document that sets a sign-shift band.
 - **SME questions at run time:** low-confidence obstruction (confirm or dismiss), "does the work move into the lane?", the exception question (move, accept, change a fact, blocked), reuse offers, start-field contradictions.
 - **Owner decisions:** section 10, part C.
 
@@ -324,7 +339,7 @@ Three groups: **A. Client inputs**, **B. SME questions**, **C. Owner decisions**
 
 ### A. Client inputs
 
-**1. Who holds the Approver role, and what does "approves changes" cover?** (R21, plan open question 15, owner's role description)
+**1. Who holds the Approver role, and what does "approves changes" cover?** (R21, plan open question 15, owner's role description) ANSWERED for scope by D-142 and D-143: three roles; the approver is for rule pack approval only; the holder's name is still a client input.
 - Options for scope: (a) deviation promotions and the zone cap only; (b) plus grouping settings (S9 question 11); (c) plus every SME exception (a two-person rule); (d) plus the final plan approval (D-65 says an SME click).
 - Effects: (c) and (d) put a second click on every non-compliant plan; with no login the second person is not verified either. (a) keeps D-29 ("only an SME accepts an exception") and D-65 as written.
 - Suggestion: (a) plus (b); names come from the client.
@@ -381,7 +396,7 @@ Three groups: **A. Client inputs**, **B. SME questions**, **C. Owner decisions**
 - Suggestion: (b).
 - Blocks: commit 7.
 
-**10. Pre-approved deviations under "MUTCD only".** D-14, D-28 and ADR-021 put SME-proposed, approver-approved bands into the pack's deviation layer; the S4 owner decision keeps the pack MUTCD-only.
+**10. Pre-approved deviations under "MUTCD only".** ANSWERED: option (c) (D-148, Y5). D-14, D-28 and ADR-021 put SME-proposed, approver-approved bands into the pack's deviation layer; the S4 owner decision keeps the pack MUTCD-only.
 - Options: (a) deviations enter `rule_pack/deviation/` with authority `PROPOSED_SETTING` (amends the MUTCD-only rule for that layer); (b) approved bands live in config outside the pack, read by `band_search`, and the plan status stays `DRAFT_WITH_ENGINEERING_EXCEPTION` (no authority source, D-15); (c) build the workflow, allow no approval until a MUTCD or client document is the source.
 - Effects: (a) makes `DRAFT_COMPLIANT_WITH_FIELD_ADJUSTMENT` reachable; (b) and (c) mean that label is never produced in the MVP.
 - Suggestion: (c), keeping the label for later.
@@ -424,7 +439,7 @@ Three groups: **A. Client inputs**, **B. SME questions**, **C. Owner decisions**
 
 | # | Question | Group | Blocks S10? | Suggestion |
 | --- | --- | --- | --- | --- |
-| 1 | Approver holder and scope of "approves changes" | Client input | **Commit 2** | Deviations, cap and grouping settings |
+| 1 | Approver holder and scope of "approves changes" | Client input | **Commit 2** | Answered (D-142, D-143): rule pack approval only; the holder's name stays open |
 | 2 | Both roles in one person, self-approval | SME | Commit 2 | Allowed, no self-approval |
 | 3 | Size of the sign-shift band | SME | Commit 4 | None until a document; exception question |
 | 4 | What the search may move | SME | Commit 4 | Warning signs only |
@@ -433,7 +448,7 @@ Three groups: **A. Client inputs**, **B. SME questions**, **C. Owner decisions**
 | 7 | Approval mode name | Owner | Commit 6 | `SME_CONFIRMED_ROLE_NOT_VERIFIED` |
 | 8 | S7 confirm pass and the re-run limit | Owner | Commit 5 | Not counted |
 | 9 | Closest TA as an exception | Owner | Commit 7 | Yes, except broader 6N.11 cases |
-| 10 | Deviations under MUTCD only | Owner | **Commit 8** | Workflow only, no approval until a source |
+| 10 | Deviations under MUTCD only | Owner | **Commit 8** | Answered (D-148): workflow only, no approval until a source |
 | 11 | Reuse key exact or rounded | Owner | Commit 6 | Exact decimal strings |
 | 12 | AUDITOR and ADMIN | Owner | No | Keep, read only, hidden |
 | 13 | One obstruction check id | Owner | Commit 3 | Rename to `GEO-SIGN-OBSTRUCTION` |

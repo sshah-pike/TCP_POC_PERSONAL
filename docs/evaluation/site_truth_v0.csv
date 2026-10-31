@@ -1,0 +1,4 @@
+site_id,lanes_per_direction,divided_highway,shoulder_present,oneway,parking_present,sidewalk_present,work_location,road_width_ft,truth_source
+granite,2,false,,false,false,true,,,"drawing WPI 3178233 sheet 1 and the spike image, read 2026-10-31 (provisional, owner cross-check pending)"
+second,1,false,,,true,true,,27.5,"drawing WPI 3171586 sheets 1 and 2 and the spike image, read 2026-10-31 (provisional, owner cross-check pending)"
+colorado,1,false,,false,true,,BEYOND_SHOULDER,,"drawing WPI 3168057, the spike image, and the owner's check of the KML and drawing, 2026-10-31 (provisional)"

@@ -1,4 +1,14 @@
-Status: PLANNED. Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md; where they differ from this plan, the register wins.
+Status: PLANNED, PAUSED until the accuracy gate between S7 and S8 (D-153, FS-21). Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md and docs/decisions/OWNER_DECISIONS_2026-10-31.md; where they differ from this plan, the registers win.
+
+## Owner decisions applied (2026-10-31)
+
+Register: `docs/decisions/OWNER_DECISIONS_2026-10-31.md`. Where this block differs from older text, this block is the active text; the older wording is kept in the "Amendments 2026-10-31" note in section 2. S16 is paused until the accuracy gate between S7 and S8 (D-153, FS-21).
+
+- **Display only (D-154, Y16).** S16 only **displays values from the rule pack JSON**. The approval flow and the formula calculator are future scope (FS-23), started by the first real pack change after the MVP. No rule pack change happens in the MVP; the owner approves any that does (D-144).
+- **Calibration values read-only (D-127, FS-09).** S16 shows the calibration values read-only: the 5 m edge, the 30 degree bearing, the confidence floors per profile and the pixel errors, each with its CALIBRATION_PENDING tag, read from `config/site_understanding.json`. The values stay in config; each run already records the values it used, and each change has a decision-log entry. The approval record and screen for calibration values are FS-09.
+- **Roles (D-142, D-143).** The approver role exists for rule pack approval only, so it is the role the future approval flow (FS-23) will use. Until then S16 has no write route.
+- **6N.11 ids.** `E-TA33-FORM-UNDIVIDED-6N11` no longer exists in pack 1.1.0; the broader undivided case is `E-TA33-FORM-UNDIVIDED-OTHER` (S4b follow-up e).
+- **Sealed versions.** The browser reads the sealed versions side by side (pack store merged, commit `69ab4c0`).
 
 # S16 plan: rule management UI
 
@@ -43,14 +53,17 @@ Legend: **[B]** batchable. **[STOP]** owner review. **A-n** assumption, repeated
 4. "Used by": for each record, the records that refer to it (for example which TAs use W20-1, which rules cite SR-6B04-P03).
 5. A **diff** between two pack versions.
 6. No write route in phase 1.
+7. Show the calibration values read-only (D-127), with their CALIBRATION_PENDING tags and the values each run used.
 
-### Phase 2: approval and pack versions
+### Phase 2: approval and pack versions (future scope: D-154, FS-23)
 
 1. **Role dropdown** (no login). Every action records `{role, display_name, verified: false, note "role selected, not verified"}`.
 2. **Approval record**: append-only, never edited; scope and effect per B-2 and B-3.
 3. Each approval **creates a new pack version** with a new hash; the previous version's files are never changed.
 4. An **active-version pointer** with compare-and-set; runs pin the version and hash they used (they already record the pack ref).
 5. An **audit view** of every approval event.
+
+**Amendments 2026-10-31 (section 2).** Phase 2 (approval and pack versions) was in scope of this slice; it is now future scope (D-154, FS-23), and so is the formula calculator. Phase 1 had six items; item 7 (calibration values, read-only) is new (D-127).
 
 ### Out of scope
 
@@ -231,7 +244,7 @@ Gate per commit: fast tier plus `tests/unit/rules/`, the web API suite and Vites
 - Blocks: commit 8.
 
 **B-3. What an approval may change.**
-- Options: (a) only marks records approved (no record content changes); (b) (a) plus confirming a proposed interpretation (for example E-TA33-FORM-UNDIVIDED-6N11 from SOURCE_REVIEW_REQUIRED to an SME-confirmed status); (c) (b) plus entering a value the MUTCD does not give (low-speed cutoff, short-zone length) with source "SME", in its own layer.
+- Options: (a) only marks records approved (no record content changes); (b) (a) plus confirming a proposed interpretation (for example E-TA33-FORM-UNDIVIDED-OTHER from SOURCE_REVIEW_REQUIRED to an SME-confirmed status); (c) (b) plus entering a value the MUTCD does not give (low-speed cutoff, short-zone length) with source "SME", in its own layer.
 - Effects: (c) brings values that are not from the MUTCD into the pack; the owner's rule is "MUTCD only", and CLAUDE.md rule 2 allows a value only with a source. (b) changes what the router can decide automatically.
 - Suggestion: (a) in S16; (b) and (c) only after a separate decision on where SME-sourced values live.
 - Blocks: commit 8.

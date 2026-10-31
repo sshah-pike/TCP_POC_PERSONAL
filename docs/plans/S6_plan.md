@@ -1,4 +1,4 @@
-Status: PLANNED. Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md; where they differ from this plan, the register wins.
+Status: PLANNED. Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md and docs/decisions/OWNER_DECISIONS_2026-10-31.md; where they differ from this plan, the registers win.
 
 ## Owner decisions applied (2026-10-30)
 
@@ -9,6 +9,34 @@ Status: PLANNED. Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-3
 - Q10: default work vehicle width 102 in (23 CFR 658.15), flagged DEFAULT_ASSUMED, optional, in the same settings file; work space depth and clearance are UNKNOWN and asked per job.
 - Q12: documentation first; discovery spike on MassGIS (first), RIGIS, with OSM first; live calls only with the owner's permission in chat, read-only, limited, three sites named.
 - Q18: Colorado is recorded once after S7 merges (calls 1 and 2 together), the rest after S9; Granite is compared at pole P32 only. The owner runs recordings with TCP_LIVE=1.
+
+## Owner decisions applied (2026-10-31)
+
+Register: `docs/decisions/OWNER_DECISIONS_2026-10-31.md` (D-111 to D-156). Where this block differs from older text in this plan, this block is the active text and the older wording is kept in the "Amendments 2026-10-31" notes of sections 2, 3, 4, 5 and 9. Future items are in `docs/FUTURE_SCOPE.md`.
+
+- **Order inside a zone run (D-119).** Call 1 runs first and **blind**: it never sees OSM or any code value. Then the code and OSM checks, then fusion with the two-source rule. Call 2 is S7. Two AI calls per zone at most. S6 session 1 resumes for the permanent design only: no agent loop, no deep mode, no call 2 (D-128, D-122, D-139).
+- **Three outcomes (D-111).** FOUND (the source gives a value or the thing is there), NOT_PRESENT (the source was checked and the thing or tag is absent; presence fields only) and UNKNOWN (could not be determined: occluded, too blurry, no tag, malformed, or the source failed; a fixed reason code says why). A source that was not checked is never NOT_PRESENT. Per-field meaning: `docs/references/S6_outcomes.md`.
+- **OSM rules (D-111).**
+  - `lanes_per_direction`: from `lanes:forward` and `lanes:backward`; else `lanes` divided by 2 only when the total is even and the road is two-way; an odd total or a forward/backward mismatch gives no information.
+  - `oneway`: a missing tag counts as "not one-way" for the OSM source at lower confidence, and the AI must also say false. A stated tag counts fully.
+  - A missing `lanes` or `shoulder` tag gives no information.
+  - `divided_highway` comes from geometry: a parallel, opposite-direction way (config distance and angle, CALIBRATION_PENDING).
+  - Source of the even-total and forward/backward wording: S6 plan Q8 (odd total cannot be split) and `docs/reports/S6_stop5_fusion_rules.md` (on branch `tcp-mvp/s06-site-understanding`).
+- **Two-source rule (D-92, D-119).** For lanes per direction, divided, shoulder and one-way the AI and OSM must agree. Two AI calls, two crops, or any code check never count as a second source. A single source gives UNKNOWN with the AI value kept as a pre-filled candidate (recommendation in D-156, owner confirmation open).
+- **Bearing check and "which road?" (D-127, D-156).** The road direction of the AI marks (code, modulo 180) is compared with the nearest OSM way within 30 degrees (config, CALIBRATION_PENDING). A failure makes every road-specific fact from that call UNKNOWN with reason `wrong_road_suspected` and raises one "which road?" question. Recommendation in D-156 (2), owner confirmation open.
+- **Edge rule (D-113).** Work point within 5 m of the nearest road edge, or no road near: `work_location` is UNKNOWN plus one SME question. The distance is in config, tagged CALIBRATION_PENDING. Optional exceptions file: `config/site_exceptions.json` (D-138, D-155).
+- **Confidence floors per model profile (D-132).** A default entry plus optional per-profile entries; no profile entry ships until calibrated. Call 1 uses gpt-5.6-sol by default and the claude-opus-5-5 profile stays working (D-131).
+- **Enhanced call-1 prompt and code snapping of marks (D-128, D-124 arm C).** Both are permanent. Code snaps each AI mark to the nearest real edge in the image; a mark with no edge nearby is rejected and gives no width. The enhanced prompt text is read by the owner at STOP 6 before any live use.
+- **Code checks and consistency checks (D-128).** Code checks: lane-line detection, shadow and tree-cover share, image-to-OSM offset. Consistency checks: lane count against width, work location against edge distance, and the others listed in `docs/reports/S6_stop5_fusion_rules.md`. They only lower confidence or give UNKNOWN. None counts as a second source. Values in config, tagged CALIBRATION_PENDING; every run records the values it used and each change gets a decision-log entry (D-127).
+- **Per-stage off switches (D-128).** Every stage (enhanced prompt, snapping, each code check, each consistency check) has a config switch, so the experiment arms of D-124 can be measured.
+- **Prompt registry (D-129).** All prompts live in `prompts/`, one file per prompt, each with an id, version and sha256 in its header, loaded with a hash check and pinned by tests, before any prompt is enhanced. History, changelog, comparison runs and rollback are future scope (FS-05).
+- **Question model and answer records (D-130).** No question log store now. The `Question` record carries kind, field, zone, project, OSM way id and context; every saved answer record keeps kind, field, zone, project, OSM way and answer time. Repeat analysis is future scope (FS-04).
+- **Accuracy and probe scripts (D-114, D-118, D-134, D-136).** `scripts/s06_accuracy_report.py` (truth CSV in; wrong-and-used counted with the AI_ONLY_UNCONFIRMED flag shown beside it; zero wrong-and-used on the four safety fields with its 95% upper bound); a zoom-19 probe for E Second and Colorado (two Azure requests, run by the owner); an OSM recorder that stores Overpass responses as fixtures (public server for development; self-hosting before production, FS-08). Script names other than the accuracy report are proposals. The Overpass User-Agent is descriptive, with no company name and no contact until production (D-115).
+- **8-site early check (D-125, D-133, D-140).** Granite, E Second, Colorado, Exeter Ten Rod and four new sites, 2 per TA situation, labelled by the owner. Truth files are in `docs/evaluation/` (`SITE_TRUTH_v0.md`, `site_truth_v0.json`, `site_truth_v0.csv`). It finds failures; it cannot certify an error rate. Tune on dev sites, freeze, score once; never tune on the sites used as proof. The pass bar for the UNKNOWN rate is set after the first scored test (D-135).
+- **Moved out of S6.** Session 2 (the state and federal data sources) moves to after the first scored test, chosen by how many SME questions each source removes (FS-06, owner conversation 2026-10-31). No real-KML recordings in S6 (D-98: Colorado after S7 merges, the rest after S9; D-128). The agent loop and deep mode are future scope (FS-01).
+- **Stops.** STOP 5 is now the fusion rule table and the list of consistency checks (`docs/reports/S6_stop5_fusion_rules.md`, S6 branch). STOP 6 is the enhanced call-1 prompt text.
+
+Status of the work as of 2026-10-31 (checked with `git log` and `git show` on the branch, not merged into base): the branch `tcp-mvp/s06-site-understanding` (HEAD `8fc89bd`) holds the prompt registry, the three outcomes, the Overpass adapter and OSM rules, the bearing and which-road check, the edge rule, per-profile floors, `config/site_exceptions.json`, the STOP 5 report and the single-source fusion. Not yet built there (from the STOP 5 report): consistency checks 8 to 13, snapping, the enhanced prompt, and the per-stage switches.
 
 # S6 plan: site understanding
 
@@ -50,15 +78,29 @@ Spec text kept; items marked "added" are testable readings this plan makes.
 | A6 | Mandatory start fields are never written by code | Test: zone input before and after is byte-identical; the four facts carry `source UI`; a computed contradiction creates a conflict question and leaves the value unchanged |
 | A7 | A higher-zoom fetch happens only when the pixel threshold fails, and is recorded as evidence with a signature | Mocked pixel counts; the fetch is called zero times above the threshold; the signature is stored |
 | A8 | Only approved sources are called | A guard that fails any request to a host outside the allow list; mock fails the test otherwise |
-| A9 | `lanes_per_direction` disagreement between AI and OSM or state data gives UNKNOWN plus an SME question (D-80) | Synthetic disagreement cases, including odd OSM lane totals (Q8) |
+| A9 | For `lanes_per_direction`, `divided_highway`, `shoulder_present` and `oneway`, a disagreement between AI and OSM gives UNKNOWN (`source_disagreement`) with both values kept as candidates; a single source gives UNKNOWN (`single_source`) with the AI value kept as a pre-filled candidate; each raises a question candidate (D-80, D-92, D-111, D-119; single-source treatment per D-156, open) | Synthetic disagreement and single-source cases, including odd OSM lane totals, a missing `oneway` tag with AI true and with AI false, and a missing `lanes` or `shoulder` tag (Q8) |
 | A10 | Marks missing or invalid make the width UNKNOWN; width comes from `cross_section` first, AI marks second (D-80) | Cases: section OK and marks bad; section failed and marks good; both bad |
 | A11 | Each evidence string is at most 15 words and UNKNOWN facts carry a short fixed reason (D-80) | The cap is an instruction, not a constraint: a longer string is stored whole and flagged in the trace, never cut (tuning proposal section 3, point 4) |
 | A12 | Every image sent is resized in code to the limit, and the bytes hashed are the bytes sent | Test on hash equality, no upscale, the scale factor recorded (Q5) |
 | A13 | Pre-calculation: footprint, remaining-width table, shadow vehicle, TMA suggestion, arrow board, with default values flagged `DEFAULT_ASSUMED` or `POLICY_SUGGESTED` | Parametrized remaining-width table; defaults stay UNKNOWN while the pack has no source (Q10, Q11, Q22) |
 | A14 | At most two AI calls per zone | S6 makes call 1 only; the budget test keeps the cap |
-| A15 | Replay: the same request fingerprints twice | For the fixture sites now, and for the three real KMLs after the user records them |
+| A15 | Replay: the same request fingerprints twice | For the fixture sites. Real-KML recordings are not part of S6 (D-98, D-128) |
+| A16 | Call 1 is blind: its request holds no OSM value and no code-derived value (D-119) | Request-content test: the request builder has no parameter that accepts one |
+| A17 | Every fact has one of three outcomes, FOUND, NOT_PRESENT or UNKNOWN, with a reason code on UNKNOWN; a source that was not checked is never NOT_PRESENT (D-111) | Parser and fusion tests per field against `docs/references/S6_outcomes.md`; the generated file stays in step with the field table |
+| A18 | The OSM rules of D-111 hold: lanes from forward and backward, else half of an even two-way total; missing `oneway` is "not one-way" at lower confidence and the AI must also say false; missing `lanes` or `shoulder` gives no information; divided from geometry | Table-driven OSM tests on recorded Overpass fixtures |
+| A19 | A bearing failure (30 degrees modulo 180) makes every road-specific fact UNKNOWN (`wrong_road_suspected`) and raises one "which road?" question (D-127, D-156) | Tests with the E Second and Colorado marks |
+| A20 | A work point within 5 m of the nearest road edge, or with no road near, gives `work_location` UNKNOWN plus one question; the distance is read from config (D-113) | Boundary tests at 4.9, 5.0 and 5.1 m; no road near |
+| A21 | Confidence floors are read per model profile: the profile entry if present, else the default; no profile entry ships uncalibrated (D-132) | Floor lookup tests for both shipped profiles |
+| A22 | Code checks and consistency checks only lower confidence or give UNKNOWN, never raise it, and never count as a second source; each has an off switch (D-128) | Property test over every check; switch tests |
+| A23 | Code snaps each mark to the nearest real edge; a mark with no edge nearby is rejected and gives no width (D-128) | Synthetic image tests with and without an edge |
+| A24 | Every prompt is loaded from `prompts/` with a hash check; a changed prompt file fails the pin test (D-129) | Registry tests: id, version, sha256 header, pinned hash |
+| A25 | Every run records the calibration values it used (D-127), and every saved answer record keeps kind, field, zone, project, OSM way and answer time (D-130) | Run-record and answer-record schema tests |
+| A26 | `config/site_exceptions.json` exists, is empty and documented, and a loaded entry appears in the trace of the fact it changed (D-138, D-155) | Loader, schema and trace tests |
+| A27 | The accuracy report counts a wrong value passed on with AI_ONLY_UNCONFIRMED as wrong-and-used, with the flag shown beside it, and reports the 95% upper bound for zero wrong-and-used on the four safety fields (D-118, D-134) | Report tests on a synthetic truth CSV; the exit code 2 on a bad cell |
 
-Out of scope: the router and call 2 (S7), placement (S8), grouping (S9), the question form (S11), polygon and line geometry (S14). Anything the pack cannot source stays empty and marked.
+Out of scope: the router and call 2 (S7), placement (S8), grouping (S9), the question form (S11), polygon and line geometry (S14), the agent loop and deep mode (FS-01), the state and federal data sources (FS-06) and real-KML recordings. Anything the pack cannot source stays empty and marked.
+
+**Amendments 2026-10-31 (section 2).** A9 read: "`lanes_per_direction` disagreement between AI and OSM or state data gives UNKNOWN plus an SME question (D-80)"; now it covers the four safety fields, the single-source case and the candidate (D-92, D-111, D-119). A15 read: "For the fixture sites now, and for the three real KMLs after the user records them"; recordings left S6 (D-98, D-128). A16 to A27 are new (D-111 to D-138).
 
 ## 3. Files and modules (proposals)
 
@@ -76,10 +118,22 @@ New:
 Changed: `config/settings.py` (paths), `ai/foundry_provider.py` (structured-output request for the facts list; fallback "retry once without strict on a 'too complex' 400", plan section 5), `tests/support/record.py` (project and zone aware live mode), the pack registry if Q7 = registry (hash changes), `CLAUDE.md` only if you approve a note.
 Protected, not to be edited: the POC rule pack and `config/pipeline_config.json` (guards against `BASELINE_REF`; an edit needs an `APPROVED` entry).
 
+Added 2026-10-31 (names are proposals except those the owner's files already use):
+- `prompts/`: one file per prompt with id, version and sha256 in the header; a loader with a hash check (D-129). Tests pin the hashes.
+- `config/site_understanding.json`: the confidence floors per profile, the 5 m edge distance, the 30 degree bearing, the divided-geometry distance and angle, the check switches and thresholds, each tagged `source` or `CALIBRATION_PENDING` (D-113, D-127, D-128, D-132).
+- `config/site_exceptions.json`: empty and documented, with a README and a loader; an entry is proposed by the SME, entered by the admin, and gets a decision-log entry; roles are recorded as "role selected, not verified" (D-138, D-155).
+- `site_model/` modules for the outcomes, the fusion with the two-source rule, the bearing and which-road check, the edge rule, mark snapping and the code and consistency checks.
+- `scripts/s06_accuracy_report.py` (truth CSV in), a zoom-19 probe script and an OSM recorder script, run by the owner; a call-1 check script that defaults to the gpt-5.6-sol profile (D-114, D-131).
+- `docs/evaluation/`: the site truth files for the 8-site early check (D-125). `docs/templates/`: the truth, sites and second-source CSV templates the scripts check against.
+- Dropped from this slice: the adapters for MassGIS, RIGIS, HPMS, Census, 3DEP, GTFS and FRA (FS-06) and `tests.support.record live` made project and zone aware (recordings are not in S6).
+
+**Amendments 2026-10-31 (section 3).** The list under "New" above named adapter modules `massgis.py`, `rigis.py`, `hpms.py`, `census_urban.py`, `usgs_3dep.py`, `gtfs.py`, `fra_crossings.py`, and changed `tests/support/record.py` to be project and zone aware. Both moved out of S6 (FS-06; D-98, D-128). `config/site_understanding.json` was already the answer to Q7 B.
+
 ## 4. Data shapes (proposed; each new field bumps a `schema_version` and needs a migration)
 
 ```
 Fact (AI wire, one list item)   {field (enum from registry), value (string), status RESOLVED|UNKNOWN|CONFLICT, confidence, evidence}
+                                 # after parsing, the stored fact has outcome FOUND|NOT_PRESENT|UNKNOWN (D-111); the wire status is mapped by code
                                  # unit is removed if the tuning proposal P5 is approved (Q3); code fills unit from the registry
 Mark (AI wire)                  {feature: road_edge_left|road_edge_right|lane_line|shoulder_edge|work_point|curb, points "x1,y1;x2,y2", status, evidence}
 ImageEvidence                   {artifact_ref{uri,sha256,size,media_type}, source_px, sent_px, resize_scale, mpp_sent, center, signature, parent_crop_spec, purpose}
@@ -87,17 +141,22 @@ SiteFact (shared contract)      {field, value, unit, confidence, uncertainty?, s
    + proposed                   interval{lo, hi, unit}, reason_code (not_visible|occluded|low_resolution|ambiguous|source_disagreement|threshold_in_interval|no_source),
                                 flags[] (DEFAULT_ASSUMED, POLICY_SUGGESTED, CALIBRATION_PENDING, SOURCE_REVIEW_REQUIRED), candidates[{source, value, confidence_class, evidence_ref}]
 MeasuredLength                  {name, value_ft, interval_ft, method CROSS_SECTION|AI_MARKS|GEOMETRY|ELEVATION, mpp, pixel_error_px, inputs[], calculation, flags[]}
-Question (shared contract)      {question_id, kind WIDTH_NEAR_THRESHOLD|LANES_DISAGREE|START_FIELD_CONFLICT|FACT_UNKNOWN|WORK_SIDE_CONFIRM, reason, options[], default_if_skipped, reveals[]}
+Question (shared contract)      {question_id, kind WIDTH_NEAR_THRESHOLD|LANES_DISAGREE|LANES_UNSPLIT|START_FIELD_CONFLICT|FACT_UNKNOWN|WORK_SIDE_CONFIRM|WHICH_ROAD|WORK_LOCATION_NEAR_EDGE|WORK_LOCATION_CONFLICT,
+                                 field, zone, project, osm_way_id|null, context, reason, options[], default_if_skipped, reveals[], candidate bool, suggested|null}
+                                 # candidate = a non-blocking question prefilled with the AI value; S7 makes it blocking only when the what-if test shows the fact decides the TA (D-156, open)
+                                 # the saved answer keeps kind, field, zone, project, OSM way and answer time (D-130)
 SourceCall                      {source_id, host, request_fingerprint, retrieved_at, license_note, attribute_names[], artifact_ref}
 ```
 Mandatory start fields enter S6 as a read-only mapping and come out as facts with `source UI`, equal to the input. All persisted artifacts use refs and carry `schema_version`; nothing holds a raw path (the S2 raw-path scan covers the new JSON).
+
+**Amendments 2026-10-31 (section 4).** The `Question.kind` list read `WIDTH_NEAR_THRESHOLD|LANES_DISAGREE|START_FIELD_CONFLICT|FACT_UNKNOWN|WORK_SIDE_CONFIRM` and had no `field`, `zone`, `project`, `osm_way_id`, `context`, `candidate` or `suggested` (D-130, D-111, D-113, D-156). The wire `status` is unchanged; the stored three-valued outcome is new (D-111).
 
 Pixel coordinates from the AI refer to the image as sent. A resize changes the ground scale, so every conversion uses `mpp_sent`, not the scale of the source image.
 
 ## 5. Commit sequence
 
-Branch off S3's last commit once S3 is merged or declared stable. S6 as specified is large: this plan splits it into two sessions (Q1). Session 1 is commits 0 to 9, offline. Session 2 is commits 10 to 15, sources and recording.
-Live calls: only the optional prompt check (commit 9, run by you) and the post-S6 recording (commit 14, run by you). Everything else runs on fakes.
+Branch off S3's last commit once S3 is merged or declared stable. Session 1 is commits 0 to 12, offline. Session 2 (the state and federal data sources) is not part of this sequence: it moves to after the first scored test (FS-06). There is no recording in S6.
+Live calls: only the checks the owner runs: the nine-call check on both profiles (D-97), the zoom-19 probe (D-114), and the 8-site early check (D-125). Everything else runs on fakes.
 
 | # | Commit | Batch | Stop |
 | --- | --- | --- | --- |
@@ -108,17 +167,16 @@ Live calls: only the optional prompt check (commit 9, run by you) and the post-S
 | 4 | S6 4: start-field protection, conflict questions, pre-calculation functions, remaining-width table | B | **STOP 3, safety-critical**: the remaining-width table and what stays UNKNOWN for lack of a source (Q10, Q11) |
 | 5 | S6 5: crop engine: code crop, pixel sufficiency, higher-zoom decision with signature evidence | C | no (decisions are on pixel counts; no model reads an image in a test) |
 | 6 | S6 6: source framework: allow list, fingerprinted client, fixture hook, `SourceCall`, fusion record, confidence classes (Q14) | C | no |
-| 7 | S6 7: OSM adapter (Overpass or the map API, Q12), lane cross-check and sidewalk tags | C | no |
-| 8 | S6 8: wire into the pipeline as decided in Q2; D-80 checks; replay determinism | D | **STOP 4** if Q2 = replace the old call 1: stored expected outputs of the 13 offline scenarios change and need your approval to regenerate |
-| 9 | S6 9: session-1 report | D | end of session 1. **You may run the optional live prompt check here** (9 + 3 calls, `TCP_LIVE=1`; Q3) |
-| 10 | S6 10: source discovery (docs, and any live read you allow, Q12) and `docs/reports/S6_sources.md` | E | **STOP 5**: endpoints, keys, attribute names, licence per source for your review. Nothing in commits 11 and 12 starts before it |
-| 11 | S6 11: state and federal adapters: MassGIS, RIGIS, HPMS, Census | E | no |
-| 12 | S6 12: USGS 3DEP (curves and crests), MBTA and RIPTA GTFS, FRA crossings, jurisdiction | E | no |
-| 13 | S6 13: `tests.support.record live` made project and zone aware; replay tests | F | no |
-| 14 | S6 14: **you run** `TCP_LIVE=1 python -m tests.support.record live ...` for Granite, E Second St, Colorado (`use_os_trust_store()` first); then I add replay tests | F | **STOP 6, live calls by you** |
-| 15 | S6 15: slice report, full suite | F | end |
+| 7 | S6 7: OSM adapter (Overpass, D-136), the OSM rules of D-111 for lanes, one-way, shoulder, sidewalk and divided, the OSM recorder script | C | no |
+| 8 | S6 8: fusion with the three outcomes and the two-source rule; the bearing check and "which road?" question; the 5 m edge rule; per-profile floors; the fusion rule table for all 18 call 1 fields and the list of consistency checks | C | **STOP 5**: the fusion rule table and the consistency checks (`docs/reports/S6_stop5_fusion_rules.md`), including the three D-156 questions |
+| 9 | S6 9: wire into the pipeline as decided in Q2; D-80 checks; replay determinism | D | **STOP 4** if Q2 = replace the old call 1: stored expected outputs of the 13 offline scenarios change and need your approval to regenerate |
+| 10 | S6 10: code checks and consistency checks 8 to 13 (lane count against width, lane lines, shadow and tree-cover share, image-to-OSM offset, approaching lanes, sidewalk pair), code snapping of marks; each with a config switch, values tagged CALIBRATION_PENDING | D | no |
+| 11 | S6 11: the enhanced call-1 prompt in `prompts/` as a new version (the first version stays and stays pinned); arm switches for D-124 | D | **STOP 6**: you read the enhanced prompt text before any live use |
+| 12 | S6 12: accuracy tooling (truth CSV check, report with the 95% upper bound, wrong-and-used with the flag shown), zoom-19 probe script, `docs/evaluation/` truth files, the early-check procedure; slice report and full suite | D | end. **You run** the nine-call check, the probe and the 8-site check (`TCP_LIVE=1`) |
 
-Batches: A (0 to 2), B (3 to 4), C (5 to 7), D (8 to 9), E (10 to 12), F (13 to 15). One run per batch, stopping where marked. Anything that reads an image with a model happens only in commit 9 and commit 14, both yours.
+Batches: A (0 to 2), B (3 to 4), C (5 to 8), D (9 to 12). One run per batch, stopping where marked. Anything that reads an image with a model happens only in the checks you run (commit 12).
+
+**Amendments 2026-10-31 (section 5).** The table ran to commit 15 with two sessions. Old commits 10 to 12 (source discovery with its STOP 5, then the MassGIS, RIGIS, HPMS, Census, USGS 3DEP, GTFS and FRA adapters) moved out of S6 (FS-06, owner conversation 2026-10-31). Old commits 13 and 14 (the project-aware recorder and the owner's recording of Granite, E Second St and Colorado, with STOP 6) left S6; recording stays as D-98 says: Colorado after S7 merges, the rest after S9 (D-128). The old STOP 5 (source endpoints) and STOP 6 (live recording) are replaced by the fusion rule table and the enhanced prompt text. Old commit 9 allowed an optional live prompt check; the checks are now listed under "Live calls". Old commit 7 allowed "Overpass or the map API"; D-136 chose Overpass.
 
 ## 6. Tests
 
@@ -290,6 +348,13 @@ Spec: after S6. S3 gives one zone per Point (Granite = 5 zones, E Second St = 2,
 - which fields are safety-critical for the confidence floor (Q7).
 - Blocks: no commit; each affects only its own fact.
 
+**Amendments 2026-10-31 (section 9).** The answers recorded as "see decisions section" stand, with these changes from the 2026-10-31 register:
+- Q4: call 1 uses gpt-5.6-sol by default and the claude-opus-5-5 profile stays working; revisit after measurement (D-131, FS-12). Q7 floors are keyed per profile (D-132).
+- Q8: the single-source rule on the four safety fields becomes UNKNOWN with the AI value kept as a candidate (D-156 recommendation 1, owner confirmation open); the missing `oneway` tag rule is D-111.
+- Q12: the discovery spike for MassGIS and RIGIS moves with session 2 to after the first scored test (FS-06); Overpass is the OSM source, public server for development, self-hosted before production (D-136, FS-08); the User-Agent has no company name or contact until production (D-115).
+- Q17 and Q19: the hybrid zoom (wide image in call 1, fine zoom-19 view in call 2) is D-112; the zoom-19 probe for E Second and Colorado is D-114.
+- Q18: no recording in S6 (D-98, D-128). The three-recordings-after-S6 wording of the original question is superseded.
+
 ## 10. Summary of questions
 
 | # | Question | Type | Blocks | Suggestion |
@@ -305,14 +370,14 @@ Spec: after S6. S3 gives one zone per Point (Granite = 5 zones, E Second St = 2,
 | 9 | Width uncertainty and straddle test | Decision | Commit 3 | A, SME checks numbers |
 | 10 | Footprint and encroachment without source | Decision | Commit 4 | A now, C when values arrive |
 | 11 | Where TA-dependent pre-calc runs | Decision | No | A: pure functions, called later |
-| 12 | Source access mode, discovery permission, Overpass | Decision | Commits 7, 10 to 12 | Live REST, docs first, discovery spike by you |
-| 13 | Start-field checks in scope | Decision | Commit 11 scope | A: remaining width only |
+| 12 | Source access mode, discovery permission, Overpass | Decision | Commit 7; the rest moved to FS-06 (2026-10-31) | Overpass now; MassGIS and RIGIS discovery after the first scored test |
+| 13 | Start-field checks in scope | Decision | Scope of the data-source adapters (FS-06) | A: remaining width only |
 | 14 | Confidence classes | Decision | Commit 6 | A: classes for fused values |
 | 15 | Crop thresholds and zoom ceiling | Decision | Commit 5 | A: two known values, rest pending |
 | 16 | Call 1 test fixtures | Decision | Commit 1 | A: cherry-pick spike data |
 | 17 | Image extent and evaluation radius | Decision | Commits 3, 12 | A: fixed extent, close views for width |
-| 18 | Recording timing | Decision | Commit 14 | C: Colorado now, rest after S9 |
+| 18 | Recording timing | Decision | None in S6 (D-98, D-128) | Colorado after S7 merges, the rest after S9 |
 | 19 | Deployment facts (image limit, quota) | Client input | Commit 2 value | Default 1280 px |
 | 20 | Calibration widths from the drafts | Client input | Acceptance of Q9 | Stay `CALIBRATION_PENDING` |
-| 21 | Source endpoints, keys, attributes, order | Client input | Commits 10 to 12 | Docs research, stubs |
+| 21 | Source endpoints, keys, attributes, order | Client input | FS-06 (after the first scored test) | Docs research, stubs |
 | 22 | Values and definitions with no source | Client input | No | Stay UNKNOWN |

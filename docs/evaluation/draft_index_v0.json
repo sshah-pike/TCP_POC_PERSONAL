@@ -1,0 +1,900 @@
+{
+ "version": "v0",
+ "created": "2026-10-31",
+ "note": "TA labels are one reader's reading of each drawing and need SME confirmation. Sign codes and dimension labels are extracted from the PDF text, not verified against the images.",
+ "drafts": [
+  {
+   "key": "colorado",
+   "wpi": "3168057",
+   "place": "130 Colorado St, Mattapan",
+   "state": "MA",
+   "file": "1793362000158_WPI_3168057_-_130_COLORADO_ST_-_MATTAPAN_-_TMP.pdf",
+   "kml_status": "P13 (spike input)",
+   "ta_by_phase": {
+    "I": "TA-10 (police detail instead of flaggers)"
+   },
+   "sheets": [
+    {
+     "sheet": 1,
+     "phase": "I",
+     "scale_ft_per_in": 40,
+     "speed_note": null,
+     "sheet_notes": [
+      "TS",
+      "SPEED LIMIT IN THE CITY OF BOSTON IS 25 MPH, UNLESS OTHERWISE POSTED.",
+      "SIDEWALKS NOT PRESENT ON THE SOUTH SIDE OF COLORADO ST, ADJACENT TO THE WORK ZONE. TRAFFIC MANAGEMENT PLAN - PHASE I"
+     ],
+     "poles_or_manholes": [
+      "P.13"
+     ],
+     "sign_codes": {
+      "G20-2": 8,
+      "R8-3": 15,
+      "W20-1": 8,
+      "W20-4": 4,
+      "W20-8": 4
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "2": 2,
+      "4": 1,
+      "10": 1,
+      "11": 1,
+      "100": 11
+     }
+    }
+   ]
+  },
+  {
+   "key": "esecond",
+   "wpi": "3171586",
+   "place": "E Second St, South Boston",
+   "state": "MA",
+   "file": "1793362000158_1A8J1KB_WPI_3171586__E_Second_St__South_Boston__MA_-_TMP.pdf",
+   "kml_status": "MH 223, MH FA",
+   "ta_by_phase": {
+    "I": "TA-6",
+    "II": "TA-6 plus sidewalk-closed add-on"
+   },
+   "sheets": [
+    {
+     "sheet": 1,
+     "phase": "I",
+     "scale_ft_per_in": 40,
+     "speed_note": null,
+     "sheet_notes": [
+      "SPEED LIMIT IN THE CITY OF BOSTON IS 25 MPH.",
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE I"
+     ],
+     "poles_or_manholes": [
+      "T MH 223"
+     ],
+     "sign_codes": {
+      "G20-2": 7,
+      "R8-3": 7,
+      "W20-1": 7,
+      "W21-5": 2,
+      "W5-1": 2
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "10": 2,
+      "20": 1,
+      "26": 1,
+      "40": 1,
+      "50": 1,
+      "100": 5,
+      "160": 1
+     }
+    },
+    {
+     "sheet": 2,
+     "phase": "II",
+     "scale_ft_per_in": 40,
+     "speed_note": null,
+     "sheet_notes": [
+      "SPEED LIMIT IN THE CITY OF BOSTON IS 25 MPH.",
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE II"
+     ],
+     "poles_or_manholes": [
+      "T MH FA"
+     ],
+     "sign_codes": {
+      "G20-2": 6,
+      "R8-3": 8,
+      "R9-11L": 2,
+      "R9-11R": 2,
+      "R9-9": 3,
+      "W20-1": 6,
+      "W21-5": 2,
+      "W5-1": 2
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "4": 1,
+      "10": 2,
+      "20": 1,
+      "25": 1,
+      "40": 1,
+      "100": 5,
+      "160": 1
+     }
+    }
+   ]
+  },
+  {
+   "key": "granite_3178233",
+   "wpi": "3178233",
+   "place": "125-165 Granite St (US-1), Westerly",
+   "state": "RI",
+   "file": "1793362000159_1A8L6XS_WPI_3178233_-_125-165_GRANITE_ST__US-1___WESTERLY__RI_-_TMP.pdf",
+   "kml_status": "P32 only; P33-P39 derived",
+   "ta_by_phase": {
+    "I": "TA-33",
+    "II": "TA-33 (W9-2L lane-ends variant)",
+    "III": "TA-33",
+    "IV": "TA-33",
+    "V": "TA-33 plus detour and one-lane signs (mixed, SME question)",
+    "VI": "TA-33"
+   },
+   "sheets": [
+    {
+     "sheet": 1,
+     "phase": "I",
+     "scale_ft_per_in": 40,
+     "speed_note": "SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+     "sheet_notes": [
+      "IR",
+      "3328713",
+      "SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE I"
+     ],
+     "poles_or_manholes": [
+      "P. 32"
+     ],
+     "sign_codes": {
+      "R2-11": 9,
+      "R9-11L": 2,
+      "R9-11R": 4,
+      "R9-9": 2,
+      "W20-1": 8,
+      "W20-5R": 2,
+      "W4-2R": 2
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "4": 1,
+      "10": 1,
+      "11": 1,
+      "50": 1,
+      "100": 6,
+      "115": 1
+     }
+    },
+    {
+     "sheet": 2,
+     "phase": "II",
+     "scale_ft_per_in": 40,
+     "speed_note": "SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+     "sheet_notes": [
+      "3328713",
+      "SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE II"
+     ],
+     "poles_or_manholes": [
+      "P. 33",
+      "P. 34",
+      "P. 36"
+     ],
+     "sign_codes": {
+      "R2-11": 8,
+      "R3-7R": 2,
+      "R9-11L": 2,
+      "R9-11R": 2,
+      "W20-1": 8,
+      "W9-2L": 2
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "4": 1,
+      "10": 1,
+      "100": 5
+     }
+    },
+    {
+     "sheet": 3,
+     "phase": "III",
+     "scale_ft_per_in": 50,
+     "speed_note": "SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+     "sheet_notes": [
+      "AA\\PMT",
+      "SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE III"
+     ],
+     "poles_or_manholes": [
+      "P. 37",
+      "P. 38",
+      "P. 38-50"
+     ],
+     "sign_codes": {
+      "R2-11": 8,
+      "R9-11L": 2,
+      "R9-11R": 2,
+      "R9-9": 7,
+      "W20-1": 8,
+      "W20-5R": 2,
+      "W4-2R": 2
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "4": 1,
+      "10": 1,
+      "50": 1,
+      "100": 5,
+      "115": 1,
+      "135": 1
+     }
+    },
+    {
+     "sheet": 4,
+     "phase": "IV",
+     "scale_ft_per_in": 40,
+     "speed_note": "SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+     "sheet_notes": [
+      "SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE IV"
+     ],
+     "poles_or_manholes": [
+      "P. 39"
+     ],
+     "sign_codes": {
+      "R2-11": 4,
+      "R9-11R": 2,
+      "R9-9": 3,
+      "W20-1": 4,
+      "W20-5R": 2,
+      "W4-2R": 2
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "4": 1,
+      "10": 1,
+      "90": 2,
+      "100": 2,
+      "110": 1,
+      "115": 1
+     }
+    },
+    {
+     "sheet": 5,
+     "phase": "V",
+     "scale_ft_per_in": 50,
+     "speed_note": "SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+     "sheet_notes": [
+      "IR",
+      "SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE V"
+     ],
+     "poles_or_manholes": [
+      "P. 40",
+      "P. 41",
+      "P. 42"
+     ],
+     "sign_codes": {
+      "M4-9AL": 2,
+      "M4-9L": 4,
+      "M4-9R": 2,
+      "R2-11": 11,
+      "R9-10L": 2,
+      "R9-11L": 5,
+      "R9-3BR": 2,
+      "W20-1": 11,
+      "W20-4": 2,
+      "W20-5R": 2,
+      "W4-2R": 2
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "4": 1,
+      "10": 1,
+      "40": 2,
+      "55": 1,
+      "90": 1,
+      "95": 1,
+      "100": 6,
+      "105": 1
+     }
+    },
+    {
+     "sheet": 6,
+     "phase": "VI",
+     "scale_ft_per_in": 40,
+     "speed_note": "SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+     "sheet_notes": [
+      "IR",
+      "IR",
+      "SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE VI"
+     ],
+     "poles_or_manholes": [],
+     "sign_codes": {
+      "R2-11": 8,
+      "W20-1": 7,
+      "W20-5R": 2,
+      "W4-2R": 2
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "4": 1,
+      "10": 1,
+      "40": 1,
+      "50": 1,
+      "100": 5,
+      "115": 1
+     }
+    }
+   ]
+  },
+  {
+   "key": "granite_3159540_cadd",
+   "wpi": "3159540",
+   "place": "111-125 Granite St, Westerly",
+   "state": "RI",
+   "file": "WPI_3159540_Granite_St_111-125_CADD_final.pdf",
+   "kml_status": "P28-P32 (AI import KML)",
+   "ta_by_phase": {
+    "I": "TA-33"
+   },
+   "sheets": [
+    {
+     "sheet": 1,
+     "phase": "I",
+     "scale_ft_per_in": 60,
+     "speed_note": "SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+     "sheet_notes": [
+      "TS",
+      "0459513",
+      "SPEED LIMIT 25 MPH AS OBSERVED IN THE FIELD.",
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE I"
+     ],
+     "poles_or_manholes": [
+      "P.28",
+      "P.29",
+      "P.30",
+      "P.31",
+      "P.32"
+     ],
+     "sign_codes": {
+      "R2-11": 12,
+      "R9-11L": 2,
+      "R9-11R": 2,
+      "R9-9": 2,
+      "W20-1": 14,
+      "W20-5": 2,
+      "W4-2R": 2
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "4": 1,
+      "10": 1,
+      "20": 1,
+      "100": 9,
+      "125": 1,
+      "210": 1
+     }
+    }
+   ]
+  },
+  {
+   "key": "granite_3159540_ai",
+   "wpi": "3159540",
+   "place": "111-125 Granite St, Westerly (SME guidance schematic)",
+   "state": "RI",
+   "file": "WPI_3159540_Granite_St_111-125_AI_design.pdf",
+   "kml_status": "P28-P32",
+   "ta_by_phase": {
+    "1": "TA-33 (schematic)"
+   },
+   "sheets": [
+    {
+     "sheet": 1,
+     "phase": "1",
+     "scale_ft_per_in": null,
+     "speed_note": null,
+     "sheet_notes": [],
+     "poles_or_manholes": [],
+     "sign_codes": {},
+     "dimension_labels_ft": {}
+    }
+   ]
+  },
+  {
+   "key": "watertown_cadd",
+   "wpi": "3160485",
+   "place": "17 Union St, Watertown",
+   "state": "MA",
+   "file": "WPI_3160485_Watertown_17_Union_St_CADD_final.pdf",
+   "kml_status": "P2 plus 56 m path",
+   "ta_by_phase": {
+    "I": "TA-10 (police both ends)"
+   },
+   "sheets": [
+    {
+     "sheet": 1,
+     "phase": "I",
+     "scale_ft_per_in": 40,
+     "speed_note": "SPEED LIMIT XX MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY. (OR) SPEED LIMIT IN THE CITY OF BOSTON IS 25 MPH, UNLESS OTHERWISE POSTED.",
+     "sheet_notes": [
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. 1-508-337-7600"
+     ],
+     "poles_or_manholes": [
+      "P. 2"
+     ],
+     "sign_codes": {
+      "G20-2": 12,
+      "MA-W20-7b": 6,
+      "W20-1": 12,
+      "W20-4": 2
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "10": 1,
+      "11": 1,
+      "100": 10,
+      "125": 1
+     }
+    }
+   ]
+  },
+  {
+   "key": "watertown_ai",
+   "wpi": "3160485",
+   "place": "17 Union St, Watertown (SME guidance schematic)",
+   "state": "MA",
+   "file": "WPI_3160485_Watertown_17_Union_St_AI_design.pdf",
+   "kml_status": "P2",
+   "ta_by_phase": {
+    "1": "TA-10 (schematic)"
+   },
+   "sheets": [
+    {
+     "sheet": 1,
+     "phase": "1",
+     "scale_ft_per_in": null,
+     "speed_note": null,
+     "sheet_notes": [],
+     "poles_or_manholes": [],
+     "sign_codes": {},
+     "dimension_labels_ft": {
+      "100": 4
+     }
+    }
+   ]
+  },
+  {
+   "key": "newton",
+   "wpi": "3128174",
+   "place": "88-320 Needham St, Newton",
+   "state": "MA",
+   "file": "WPI_3128174_Newton_Needham_St_TMP.pdf",
+   "kml_status": "none",
+   "ta_by_phase": {
+    "I": "TA-33",
+    "II": "road narrows plus pedestrian crossing (not one of the four; SME)",
+    "III": "TA-33",
+    "IV": "TA-10 (police)"
+   },
+   "sheets": [
+    {
+     "sheet": 1,
+     "phase": "I",
+     "scale_ft_per_in": 40,
+     "speed_note": "SPEED LIMIT 30 MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY.",
+     "sheet_notes": [
+      "SPEED LIMIT 30 MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY.",
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE I"
+     ],
+     "poles_or_manholes": [
+      "P.34"
+     ],
+     "sign_codes": {
+      "G20-2": 8,
+      "R9-11L": 2,
+      "R9-11R": 4,
+      "R9-3BL": 2,
+      "R9-9": 4,
+      "W20-1": 8,
+      "W20-5": 2,
+      "W4-2R": 2
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "4": 1,
+      "10": 1,
+      "11": 2,
+      "12": 1,
+      "50": 1,
+      "100": 8
+     }
+    },
+    {
+     "sheet": 2,
+     "phase": "II",
+     "scale_ft_per_in": null,
+     "speed_note": "SPEED LIMIT 30 MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY.",
+     "sheet_notes": [
+      "AA\\6202\\PMT",
+      "SPEED LIMIT 30 MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY.",
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE II"
+     ],
+     "poles_or_manholes": [
+      "P.25"
+     ],
+     "sign_codes": {
+      "G20-2": 8,
+      "R4-7": 3,
+      "R9-11L": 2,
+      "R9-11R": 4,
+      "R9-9": 4,
+      "W1-4R": 4,
+      "W11-2": 8,
+      "W16-7PL": 2,
+      "W16-7PR": 2,
+      "W16-9P": 4,
+      "W20-1": 8,
+      "W5-1": 8
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "4": 1,
+      "11": 2,
+      "12": 2,
+      "100": 11
+     }
+    },
+    {
+     "sheet": 3,
+     "phase": "III",
+     "scale_ft_per_in": null,
+     "speed_note": "SPEED LIMIT 30 MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY.",
+     "sheet_notes": [
+      "SPEED LIMIT 30 MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY.",
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE III"
+     ],
+     "poles_or_manholes": [
+      "P.11"
+     ],
+     "sign_codes": {
+      "G20-2": 6,
+      "R9-11L": 2,
+      "R9-11R": 2,
+      "R9-9": 2,
+      "W20-1": 6,
+      "W20-5R": 2,
+      "W4-2R": 2
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "4": 1,
+      "10": 1,
+      "12": 2,
+      "13": 2,
+      "80": 1,
+      "100": 8
+     }
+    },
+    {
+     "sheet": 4,
+     "phase": "IV",
+     "scale_ft_per_in": 50,
+     "speed_note": "SPEED LIMIT 30 MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY.",
+     "sheet_notes": [
+      "SPEED LIMIT 30 MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY.",
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE IV"
+     ],
+     "poles_or_manholes": [
+      "P.1"
+     ],
+     "sign_codes": {
+      "R9-11L": 2,
+      "R9-11R": 2,
+      "R9-9": 4,
+      "W20-1": 6,
+      "W20-4": 6,
+      "W20-8": 6
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "4": 1,
+      "10": 1,
+      "15": 2,
+      "50": 1,
+      "100": 10
+     }
+    }
+   ]
+  },
+  {
+   "key": "lowell",
+   "wpi": "3142674",
+   "place": "427-437 Market St, Lowell",
+   "state": "MA",
+   "file": "WPI_3142674_Lowell_Market_St_TMP.pdf",
+   "kml_status": "none",
+   "ta_by_phase": {
+    "I": "TA-6-like (shoulder or parking-lane work)",
+    "II": "TA-6-like plus sidewalk-closed add-on"
+   },
+   "sheets": [
+    {
+     "sheet": 1,
+     "phase": "I",
+     "scale_ft_per_in": 40,
+     "speed_note": "SPEED LIMIT 25 MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY.",
+     "sheet_notes": [
+      "4762413",
+      "SPEED LIMIT 25 MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY.",
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE I"
+     ],
+     "poles_or_manholes": [
+      "T MH 63"
+     ],
+     "sign_codes": {
+      "G20-2": 11,
+      "R8-3": 16,
+      "W1-4L": 2,
+      "W1-4R": 2,
+      "W21-1A": 10
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "4": 1,
+      "10": 1,
+      "21": 1,
+      "95": 1,
+      "100": 7,
+      "105": 1,
+      "115": 1
+     }
+    },
+    {
+     "sheet": 2,
+     "phase": "II",
+     "scale_ft_per_in": 40,
+     "speed_note": "SPEED LIMIT 25 MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY.",
+     "sheet_notes": [
+      "SPEED LIMIT 25 MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY.",
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS. TRAFFIC MANAGEMENT PLAN - PHASE II"
+     ],
+     "poles_or_manholes": [],
+     "sign_codes": {
+      "G20-2": 7,
+      "R8-3": 14,
+      "R9-11L": 2,
+      "R9-11R": 2,
+      "R9-9": 4,
+      "W1-4L": 2,
+      "W1-4R": 2,
+      "W21-1A": 4
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "4": 1,
+      "10": 1,
+      "21": 1,
+      "100": 6,
+      "115": 1
+     }
+    }
+   ]
+  },
+  {
+   "key": "lunenburg",
+   "wpi": "3167248",
+   "place": "410-603 Mass Ave (Rt 2A), Lunenburg",
+   "state": "MA",
+   "file": "WPI_3167248_Lunenburg_Mass_Ave_massDOT_TMP.pdf",
+   "kml_status": "none (address KML and a Hollis Rd reference point only)",
+   "ta_by_phase": {
+    "I": "TA-33 at 40 mph",
+    "II": "TA-1 (work beyond the shoulder, aerial crossing)",
+    "III": "police-controlled stops for an aerial crossing (not one of the four; SME)"
+   },
+   "sheets": [
+    {
+     "sheet": 1,
+     "phase": "I",
+     "scale_ft_per_in": 60,
+     "speed_note": "SPEED LIMIT 40 MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY.",
+     "sheet_notes": [
+      "AA\\PMT"
+     ],
+     "poles_or_manholes": [],
+     "sign_codes": {
+      "MA-R2-10a": 8,
+      "MA-R2-10e": 8,
+      "W20-1": 8,
+      "W20-5R": 2,
+      "W4-2R": 2
+     },
+     "dimension_labels_ft": {
+      "0": 1,
+      "1": 1,
+      "11": 2,
+      "80": 1,
+      "100": 2,
+      "300": 1,
+      "305": 1,
+      "350": 1,
+      "500": 3
+     }
+    },
+    {
+     "sheet": 2,
+     "phase": "II",
+     "scale_ft_per_in": 50,
+     "speed_note": "SPEED LIMIT 40 MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY.",
+     "sheet_notes": [
+      "SPEED LIMIT 40 MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY.",
+      "POLICE DETAIL TO STOP TRAFFIC FOR NO LONGER THAN 5 MINUTES TO FACILITATE AERIAL CROSSING. TRAFFIC MANAGEMENT PLAN - PHASE II",
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS."
+     ],
+     "poles_or_manholes": [
+      "P. 70"
+     ],
+     "sign_codes": {
+      "MA-R2-10a": 3,
+      "MA-R2-10e": 4,
+      "W20-1": 3
+     },
+     "dimension_labels_ft": {
+      "1": 1,
+      "500": 2
+     }
+    },
+    {
+     "sheet": 3,
+     "phase": "III",
+     "scale_ft_per_in": 60,
+     "speed_note": "SPEED LIMIT 40 MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY.",
+     "sheet_notes": [
+      "AA\\PMT",
+      "SPEED LIMIT 40 MPH AS NOTED ON THE massDOT ONLINE ROAD INVENTORY.",
+      "POLICE DETAIL TO STOP TRAFFIC FOR NO LONGER THAN 5 MINUTES TO FACILITATE AERIAL CROSSING. TRAFFIC MANAGEMENT PLAN - PHASE III",
+      "ALLOW BREAKS IN CHANNELIZATION DEVICES TO PERMIT DRIVEWAY ACCESS."
+     ],
+     "poles_or_manholes": [
+      "P. 70"
+     ],
+     "sign_codes": {
+      "MA-R2-10a": 3,
+      "MA-R2-10e": 4,
+      "MA-W20-7b": 4,
+      "W20-1": 1,
+      "W21-7": 7,
+      "W3-4": 4
+     },
+     "dimension_labels_ft": {
+      "0": 4,
+      "1": 1,
+      "100": 1,
+      "500": 5
+     }
+    }
+   ]
+  },
+  {
+   "key": "brooklawn",
+   "wpi": "3086531",
+   "place": "Browning Ln (CR 659), Brooklawn",
+   "state": "NJ",
+   "file": "WPI_3086531_Brooklawn_NJ_Browning_Ln_TMP.pdf",
+   "kml_status": "none",
+   "ta_by_phase": {
+    "I": "NJDOT TCD-3 shoulder and lane closing (TA-6-like; out of MVP scope, NJ)",
+    "II": "same (NJ)",
+    "III": "NJDOT lane narrowing (NJ)"
+   },
+   "sheets": [
+    {
+     "sheet": 1,
+     "phase": "I",
+     "scale_ft_per_in": 50,
+     "speed_note": null,
+     "sheet_notes": [
+      "PLEASE NOTE: DIMENSIONS THAT CONTAIN \"XXX' MIN.\" INDICATES THAT THE SPACING OF THE TEMPORARY TRAFFIC CONTROL NOTE: SIGNS IS NOT TO SCALE, AND THE ACTUAL SIGNS ARE FURTHER APART THAN DEPICTED.",
+      "FLOURESCENT ORANGE",
+      "AA\\PMT",
+      "AA\\6202\\PMT"
+     ],
+     "poles_or_manholes": [
+      " MH 155",
+      "P.60193"
+     ],
+     "sign_codes": {
+      "G20-2": 14,
+      "W20-1": 10,
+      "W20-10G": 2,
+      "W20-1A": 4,
+      "W20-1D": 4
+     },
+     "dimension_labels_ft": {
+      "11": 2,
+      "20": 1,
+      "100": 4,
+      "120": 1,
+      "350": 2,
+      "500": 1,
+      "750": 2
+     }
+    },
+    {
+     "sheet": 2,
+     "phase": "II",
+     "scale_ft_per_in": 50,
+     "speed_note": null,
+     "sheet_notes": [
+      "PLEASE NOTE: DIMENSIONS THAT CONTAIN \"XXX' MIN.\" INDICATES THAT THE SPACING OF THE TEMPORARY TRAFFIC CONTROL NOTE: SIGNS IS NOT TO SCALE, AND THE ACTUAL SIGNS ARE FURTHER APART THAN DEPICTED.",
+      "FLOURESCENT ORANGE",
+      "AA\\PMT",
+      "YTIC",
+      ")956"
+     ],
+     "poles_or_manholes": [
+      " MH 154",
+      "P.60024"
+     ],
+     "sign_codes": {
+      "G20-2": 7,
+      "R9-11L": 2,
+      "R9-11R": 2,
+      "R9-9": 4,
+      "W20-1": 6,
+      "W20-10G": 2,
+      "W20-1A": 2,
+      "W20-1D": 2
+     },
+     "dimension_labels_ft": {
+      "4": 1,
+      "11": 2,
+      "20": 1,
+      "100": 1,
+      "120": 1,
+      "500": 3,
+      "750": 2
+     }
+    },
+    {
+     "sheet": 3,
+     "phase": "III",
+     "scale_ft_per_in": 50,
+     "speed_note": null,
+     "sheet_notes": [
+      "PLEASE NOTE: DIMENSIONS THAT CONTAIN \"XXX' MIN.\" INDICATES THAT THE SPACING OF THE TEMPORARY TRAFFIC CONTROL NOTE: SIGNS IS NOT TO SCALE, AND THE ACTUAL SIGNS ARE FURTHER APART THAN DEPICTED.",
+      "FLOURESCENT ORANGE",
+      "AA\\PMT"
+     ],
+     "poles_or_manholes": [
+      "MH 62"
+     ],
+     "sign_codes": {
+      "G20-2": 12,
+      "W1-4aL": 2,
+      "W20-1": 11,
+      "W20-1A": 4,
+      "W20-1D": 4,
+      "W5-1": 2
+     },
+     "dimension_labels_ft": {
+      "11": 2,
+      "20": 1,
+      "60": 1,
+      "100": 4,
+      "120": 1,
+      "500": 3
+     }
+    }
+   ]
+  }
+ ]
+}
