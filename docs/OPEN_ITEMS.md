@@ -73,4 +73,4 @@ Plan v4 open questions 15 (approver role holder), 17 (MassDOT and RIDOT document
 
 Questions 21 and 24 exist only as items of the plan's verification prompt (Section 18: deployed model image limit; geometry sources), not as open questions. They overlap S6 plan Q19 and Q21 (deployment facts, source access) and stay open there: the deployment facts are partly answered by D-106, and the source access facts moved with FS-06.
 
-Y2 to Y18 (the owner's handover list): D-142 to D-154 record the answers for Y2 to Y18. `docs/FUTURE_SCOPE.md` FS-21 still lists "Y2 to Y18" as decisions needed; treat the register as the later word until FS-21 is corrected.
+Y2 to Y18 (the owner's handover list): D-142 to D-154 record the answers for Y2 to Y18. `docs/FUTURE_SCOPE.md` FS-21 now says the same (corrected 2026-10-31, follow-up edit).

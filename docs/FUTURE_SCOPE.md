@@ -226,12 +226,12 @@ Written 2026-10-31. Place this file at `docs/FUTURE_SCOPE.md`. It lists work tha
 
 ### FS-21 Paused slices S9 to S16
 
-- **What it is:** grouping and zone split (S9), conflicts and the exception ladder (S10), the question form and SME review (S11), sheets and PDF (S12), the golden comparator (S13), polygons and lines (S14), the orphan sweep (S15) and the rule management UI (S16). Open owner decisions Y2 to Y18.
+- **What it is:** grouping and zone split (S9), conflicts and the exception ladder (S10), the question form and SME review (S11), sheets and PDF (S12), the golden comparator (S13), polygons and lines (S14), the orphan sweep (S15) and the rule management UI (S16). Owner decisions Y2 to Y18: answered, D-142 to D-154 (2026-10-31).
 - **Why deferred:** the owner paused them to focus on site-understanding accuracy.
 - **Trigger:** after the accuracy gate between S7 and S8.
 - **Dependencies:** the gate, the S7 call 2 and router.
 - **Source:** owner conversation 2026-10-31.
-- **Decision still needed:** Y2 to Y18. For S9, revisit the "not on road" flag: the Colorado point sits in a yard, so pass 1 needs it.
+- **Decision still needed:** none for Y2 to Y18 (answered, D-142 to D-154); the slices stay paused until the accuracy gate. For S9, revisit the "not on road" flag: the Colorado point sits in a yard, so pass 1 needs it.
 
 ### FS-22 Client's current sheet template
 
