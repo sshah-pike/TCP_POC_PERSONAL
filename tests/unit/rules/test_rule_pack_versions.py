@@ -1,5 +1,5 @@
 """Sealed rule pack versions: rule_pack/versions/<version>/ plus the append-only INDEX.json (pack-store)."""
-import json, os, shutil
+import json, os, shutil, stat
 import pytest
 from tcp_planner.config.settings import RULE_PACK_DIR
 from tcp_planner.contracts import RulePackError
@@ -10,6 +10,28 @@ VERSIONS = os.path.join(RULE_PACK_DIR, "versions")
 # Pinned here so a rewritten INDEX entry fails (an entry is never edited; a new version is appended).
 PINNED = {"1.0.0": "98c18fb207284ae884a28d20e2a5eba56facd74dfbc2aa7aa06797afe9e53d43",
           "1.1.0": "80c25240ab584974f40f4f17205a8490127549837a30f7b69e9d11dd95a18b0a"}
+
+
+def _make_writable(path):
+    os.chmod(path, os.stat(path).st_mode | stat.S_IWRITE)
+
+
+def _rmtree(path):
+    """rmtree that clears the read-only bit and retries (OneDrive and copy2 leave read-only files on Windows)."""
+    def onexc(func, p, exc):
+        if not isinstance(exc, PermissionError): raise exc
+        _make_writable(p); func(p)
+    shutil.rmtree(path, onexc=onexc)
+
+
+def _copy_pack(dst):
+    """Copy rule_pack/ without carrying file attributes, so a read-only source does not give a read-only copy."""
+    shutil.copytree(RULE_PACK_DIR, dst, copy_function=shutil.copyfile)
+
+
+def _set_read_only(root):
+    for d, dirs, files in os.walk(root):
+        for n in files: os.chmod(os.path.join(d, n), stat.S_IREAD)
 
 
 def _index():
@@ -65,7 +87,7 @@ def test_unknown_version_raises_version_missing():
 
 
 def test_tampered_frozen_copy_is_refused(tmp_path):
-    root = tmp_path / "rule_pack"; shutil.copytree(RULE_PACK_DIR, root, ignore=shutil.ignore_patterns("*.pdf"))
+    root = tmp_path / "rule_pack"; _copy_pack(root)
     p = root / "versions" / "1.0.0" / "base" / "rules.json"
     doc = json.loads(p.read_text(encoding="utf-8")); doc["tables"]["rule"][0]["text"] += " x"
     p.write_text(json.dumps(doc), encoding="utf-8")
@@ -74,11 +96,11 @@ def test_tampered_frozen_copy_is_refused(tmp_path):
 
 
 def test_seal_script_refuses_to_overwrite_and_appends_a_new_version(tmp_path):
-    root = str(tmp_path / "rule_pack"); shutil.copytree(RULE_PACK_DIR, root)
+    root = str(tmp_path / "rule_pack"); _copy_pack(root)
     before = open(os.path.join(root, "versions", "INDEX.json"), "rb").read()
     assert seal_version.main(["--source-commit", "abc"], root=root) == 1          # 1.1.0 is already sealed
     assert open(os.path.join(root, "versions", "INDEX.json"), "rb").read() == before
-    shutil.rmtree(os.path.join(root, "versions", "1.1.0"))
+    _rmtree(os.path.join(root, "versions", "1.1.0"))
     idx = json.loads(before); idx["versions"].pop()
     json.dump(idx, open(os.path.join(root, "versions", "INDEX.json"), "w"))
     assert seal_version.main(["--source-commit", "abc", "--expect-hash", "0" * 64], root=root) == 1   # wrong expected hash
@@ -90,7 +112,21 @@ def test_seal_script_refuses_to_overwrite_and_appends_a_new_version(tmp_path):
 
 
 def test_unsealed_current_pack_is_listed_last(tmp_path):
-    root = str(tmp_path / "rule_pack"); shutil.copytree(RULE_PACK_DIR, root)
+    root = str(tmp_path / "rule_pack"); _copy_pack(root)
     idx_path = os.path.join(root, "versions", "INDEX.json")
     idx = json.load(open(idx_path)); idx["versions"].pop(); json.dump(idx, open(idx_path, "w"))
     assert JsonRulePackStore(root).list_versions() == ["1.0.0", "1.1.0"]
+
+
+def test_read_only_tree_copies_and_removes_and_the_script_still_works(tmp_path):
+    src = str(tmp_path / "src"); _copy_pack(src); _set_read_only(src)
+    try:
+        root = str(tmp_path / "rule_pack")
+        shutil.copytree(src, root, copy_function=shutil.copyfile)
+        assert all(os.access(os.path.join(d, n), os.W_OK) for d, _, ns in os.walk(root) for n in ns)   # copy is not read-only
+        assert JsonRulePackStore(root).content_hash("1.1.0") == PINNED["1.1.0"]
+        _set_read_only(root)                                                                          # a read-only tree is removable
+        _rmtree(os.path.join(root, "versions", "1.1.0"))
+        assert not os.path.exists(os.path.join(root, "versions", "1.1.0"))
+    finally:
+        _rmtree(src)
