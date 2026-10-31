@@ -30,6 +30,7 @@ The tool takes a KML of work locations and produces draft traffic control plans 
 | Pipeline package | `src/tcp_planner/` (paths resolved only through `src/tcp_planner/config/settings.py`) |
 | UI | `apps/web/` |
 | Config, rule pack, assets | `config/`, `rule_pack/`, `assets/` |
+| Prompts | `prompts/`: one file per prompt, with an id, a version and a sha256 in its header, loaded with a hash check and pinned by tests (D-129). No prompt text lives in code on the new site-understanding path; legacy POC prompts stay in code until the S8 cutover |
 | Tests | `tests/unit/`, `tests/integration/...`, `tests/golden/` |
 | Run data | `var/` (new runs are not tracked) |
 | Backups | `backup/orphans/<date>/` with `MANIFEST.json`; `scripts/restore_backup.py` restores them |
@@ -64,10 +65,20 @@ If code and plan disagree, **stop and report**. Do not silently follow either on
    - Only the SME may move them, as a one-off exception for that plan version.
 9. **Every plan object carries a trace:** rule\_id, pack version and hash, source, inputs, calculation, validator results, actor.
 10. **Approval gate (D-65):** `require_sme_approval_for_all_plans` defaults to `true`. Every plan waits for an SME click.
+11. **Three outcomes and the two-source rule (D-92, D-111, D-119).**
+    - Every site fact has one outcome: FOUND (the source gives a value, or the thing is there), NOT_PRESENT (the source was checked and the thing or tag is absent) or UNKNOWN (it could not be determined; a reason code says why). A source that was not checked is never NOT_PRESENT.
+    - For lanes per direction, divided, shoulder and one-way, the AI and OSM must agree. Two AI calls, two crops, or any code check never count as a second source. One source gives UNKNOWN, with the AI value kept as a candidate.
+    - Code checks and consistency checks only lower confidence or give UNKNOWN.
+12. **No TA id in the router, the fusion or the call-2 code (D-128).** A made-up TA added to a test pack must work with no code change; a test scans for TA ids.
+13. **Calibration values (D-127).** Every calibration value (the 5 m edge, the 30 degree bearing, the confidence floors per profile, the pixel errors) lives in config, tagged `CALIBRATION_PENDING` until calibrated. Each run records the values it used. Each change gets a decision-log entry.
+14. **Site exceptions (D-138, D-155).** `config/site_exceptions.json` holds site exceptions. The SME proposes an entry, the admin enters it, and each entry gets a decision-log entry. Per-job answers travel with the plan, not in this file.
+15. **Roles (D-141 to D-143).** SME reviewer, approver and admin. The approver is for rule pack approval only. The zone cap and deviations are the SME's. The admin can do everything for now. Roles are a dropdown and every action is recorded as "role selected, not verified".
+16. **Sealed rule pack versions (D-107, D-144).** Frozen copies under `rule_pack/versions/<version>/` and `INDEX.json` are never edited. The current pack must equal the latest INDEX entry. Any pack change needs a new version through `scripts/seal_rule_pack_version.py` and the owner's approval.
 
 ## AI calls
 
-- At most two AI calls per zone. Call 1 is the wide read. Call 2 covers only the chosen TA's missing fields, with crops.
+- At most two AI calls per zone. Call 1 is the wide read and runs first and blind: it never sees OSM values or any value from code (D-119). Call 2 re-observes at fine zoom the deciding facts, the chosen TA's fields and the conflicts, with crops. It is never shown the OSM, call-1 or code value for lanes, divided, shoulder or one-way (D-120). If call 1 and call 2 disagree on a field, the field is UNKNOWN (D-123). Lane count is a field in call 2 whenever call 2 runs; it never forces a call by itself (D-121).
+- Prompts live in `prompts/`, one file per prompt with id, version and hash, loaded with a hash check and pinned by tests (D-129). This applies to the new site-understanding path; legacy POC prompts stay in code until the S8 cutover.
 - Output is **JSON only** (D-61). The format is decided by the S0 spike; the expected result is a flat facts list.
   - Every property is required. Use no nullable unions and no `minimum`/`maximum` in the schema.
   - Validate in code with Pydantic. Compare enum values without regard to case.
@@ -130,8 +141,8 @@ If code and plan disagree, **stop and report**. Do not silently follow either on
   crash in between leaves a reserved id or a built run that the next Run completes; nothing is created twice.
 - **The live UI path is untried.** Projects ran only on offline scenarios, recorded fixtures and fakes. The Azure Maps and AI
   path through the project UI waits for the real-KML recordings (Colorado after S7, the rest after S9; `TCP_LIVE=1`, run by the owner).
-- **Cap approval is not an identity.** `approved_by` is typed text or "UI click", stored with `verified: false` (S10's
-  approver role replaces it). An approval covers the zone count it was given for, not a bigger set.
+- **Cap approval is not an identity.** `approved_by` is typed text or "UI click", stored with `verified: false` (an SME reviewer
+  session replaces it in S10 or S11; the approver role is for rule pack approval only, D-143). An approval covers the zone count it was given for, not a bigger set.
 - **A REVIEW_REQUIRED zone has no draft.** The pipeline drafts only SUPPORTED_AUTO; the project status REVIEW_REQUIRED
   reflects the zone decision. Drafts for review come with S7/S8 and D-65.
 - **No 429 backoff.** Up to `project.max_parallel_zone_runs` zone runs call Foundry, Azure Maps and Overpass at once.
@@ -140,6 +151,17 @@ If code and plan disagree, **stop and report**. Do not silently follow either on
 - **D-59 breaches still in the engine** (fix in S7/S10): the OSM `maxspeed` fallback and the encroachment override of the SME's
   lane closure, both in `site_model/fusion.py`.
 - Only a project starts runs over HTTP: `POST /api/runs` answers 400.
+
+### Known limits of the device catalog (S5)
+
+- **Catalog exception.** `assets/symbols/device_catalog.json` carries `schema_version` once; each entry's `asset` and `raster` are
+  `{uri, sha256, size, media_type, status}` with a `uri` relative to `assets/`. The catalog holds no regulatory number: sizes
+  come from the pack through `size_for()`. Only `rules/device_catalog.py` reads the file. After any change run
+  `scripts/seal_device_catalog.py` (and `scripts/render_symbols.py` after an SVG change).
+- The road-type to size-column mapping is PROPOSED until the SME answers question 38.
+- Device ids and symbol file names must not differ only by case (Windows, OneDrive).
+- PNG bytes can differ between PyMuPDF versions: the committed PNGs and their recorded hashes are authoritative.
+- Every symbol is a placeholder; a plan that uses one is REVIEW_REQUIRED and carries the label text. S12 draws it.
 
 
 ## Tests
