@@ -5,7 +5,7 @@ value that is USED and carries the flag CALIBRATION_PENDING in the trace; none i
 (`tests/unit/site/test_calibration_in_config.py`) keeps this list current, proves every value the code reads exists in config, and
 proves the S6 modules contain no other number than structural ones (0, 1, 2, a half, 180 and 360 degrees, the luminance weights, the earth radius).
 
-## CALIBRATION_PENDING (44)
+## CALIBRATION_PENDING (51)
 
 | config path | value | what it controls |
 | --- | --- | --- |
@@ -53,6 +53,13 @@ proves the S6 modules contain no other number than structural ones (0, 1, 2, a h
 | `consistency/approaching_lanes_vs_lane_count` | true | approaching_lanes_one against lanes_per_direction |
 | `consistency/sidewalk_pair` | true | sidewalk_present against sidewalk_side |
 | `consistency/work_location_vs_edges` | true | work_location against the work point and the edge marks (the marks check) |
+| `osm_diagnose/max_requests` | 14 | most HTTP requests one diagnosis run may make to the server |
+| `osm_diagnose/min_gap_s` | 8 | least seconds between the end of one request and the start of the next |
+| `osm_diagnose/slow_s` | 20 | a variant whose total time is above this, or that fails, counts as slow in the verdict |
+| `osm_diagnose/pass_s` | 60 | stage 1 of the pipeline passes only if the project path answers HTTP 200 with parseable JSON in less than this |
+| `osm_diagnose/connect_timeout_s` | 5 | connect timeout of the diagnosis requests (the project client uses the same 5 s) |
+| `osm_diagnose/read_timeout_s` | 90 | read timeout of every diagnosis request (the same as config/data_sources.json osm_overpass.timeout_s, so a stall is measured and not cut short) |
+| `osm_diagnose/max_ways_listed` | 1 | stage 4 lists the nearest way; this many ways are named in full |
 
 Overpass limits (`config/data_sources.json`, osm_overpass.query_limits, CALIBRATION_PENDING): `max_radius_m` 600, `max_elements` 5000.
 

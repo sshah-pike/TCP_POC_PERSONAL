@@ -406,5 +406,43 @@
       "source": "owner decision, STOP 6",
       "note": "prompt version 2; off until the owner has run the version 2 live calls and decided"
     }
+  },
+  "osm_diagnose": {
+    "note": "Settings of the owner-run OSM diagnosis and pipeline (scripts/s06_osm_diagnose.py, s06_osm_pipeline.py). All CALIBRATION_PENDING starting values.",
+    "max_requests": {
+      "value": 14,
+      "source": "CALIBRATION_PENDING",
+      "note": "most HTTP requests one diagnosis run may make to the server"
+    },
+    "min_gap_s": {
+      "value": 8,
+      "source": "CALIBRATION_PENDING",
+      "note": "least seconds between the end of one request and the start of the next"
+    },
+    "slow_s": {
+      "value": 20,
+      "source": "CALIBRATION_PENDING",
+      "note": "a variant whose total time is above this, or that fails, counts as slow in the verdict"
+    },
+    "pass_s": {
+      "value": 60,
+      "source": "CALIBRATION_PENDING",
+      "note": "stage 1 of the pipeline passes only if the project path answers HTTP 200 with parseable JSON in less than this"
+    },
+    "connect_timeout_s": {
+      "value": 5,
+      "source": "CALIBRATION_PENDING",
+      "note": "connect timeout of the diagnosis requests (the project client uses the same 5 s)"
+    },
+    "read_timeout_s": {
+      "value": 90,
+      "source": "CALIBRATION_PENDING",
+      "note": "read timeout of every diagnosis request (the same as config/data_sources.json osm_overpass.timeout_s, so a stall is measured and not cut short)"
+    },
+    "max_ways_listed": {
+      "value": 1,
+      "source": "CALIBRATION_PENDING",
+      "note": "stage 4 lists the nearest way; this many ways are named in full"
+    }
   }
 }
