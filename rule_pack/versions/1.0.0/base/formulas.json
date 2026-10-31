@@ -1,0 +1,43 @@
+{
+  "schema_version": "1",
+  "layer": "FEDERAL",
+  "tables": {
+    "formula": [
+      {"id": "F-6B4-L", "name": "Taper length L (Table 6B-4)", "strength": "GUIDANCE", "qualifier": "EXACT", "role": "COMPUTE",
+       "variables": {"W": "offset_width_ft", "S": "posted_speed_mph"}, "result_unit": "ft",
+       "cases": [
+         {"when": {"field": "posted_speed_mph", "op": "LE", "value": 40}, "expression": "W*S**2/60"},
+         {"when": {"field": "posted_speed_mph", "op": "GE", "value": 45}, "expression": "W*S"}
+       ],
+       "status": "SOURCED", "sme_question": null, "interpretation": null,
+       "source_ref_ids": ["SR-6B4-FORMULAS", "SR-6B4-DEFS", "SR-6B08-P04"]},
+
+      {"id": "F-6B3-MERGING", "name": "Merging taper length, minimum (Table 6B-3)", "strength": "GUIDANCE", "qualifier": "AT_LEAST", "role": "COMPUTE",
+       "variables": {"L": "F-6B4-L"}, "result_unit": "ft", "cases": [{"when": null, "expression": "L"}],
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B3-MERGING", "SR-6B08-P04"]},
+      {"id": "F-6B3-SHIFTING", "name": "Shifting taper length, minimum (Table 6B-3)", "strength": "GUIDANCE", "qualifier": "AT_LEAST", "role": "COMPUTE",
+       "variables": {"L": "F-6B4-L"}, "result_unit": "ft", "cases": [{"when": null, "expression": "0.5*L"}],
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B3-SHIFTING", "SR-6B08-P04"]},
+      {"id": "F-6B3-SHOULDER", "name": "Shoulder taper length, minimum (Table 6B-3; owner decision Q-C: computed with this value)", "strength": "GUIDANCE", "qualifier": "AT_LEAST", "role": "COMPUTE",
+       "variables": {"L": "F-6B4-L"}, "result_unit": "ft", "cases": [{"when": null, "expression": "0.33*L"}],
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B3-SHOULDER", "SR-6B08-P04"]},
+
+      {"id": "F-6B08-SHIFTING-HALF", "name": "Shifting taper, approximately 1/2 L (Sect. 6B.08 para 08; cited only, owner decision: Table 6B-3 0.5 L computes)", "strength": "GUIDANCE", "qualifier": "APPROXIMATE", "role": "CITED_ONLY",
+       "variables": {"L": "F-6B4-L"}, "result_unit": "ft", "cases": [{"when": null, "expression": "1/2*L"}],
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B08-P08"]},
+      {"id": "F-6B08-SHOULDER-THIRD", "name": "Shoulder taper, approximately 1/3 L (Sect. 6B.08 para 10; cited only, owner decision Q-C)", "strength": "GUIDANCE", "qualifier": "APPROXIMATE", "role": "CITED_ONLY",
+       "variables": {"L": "F-6B4-L"}, "result_unit": "ft", "cases": [{"when": null, "expression": "1/3*L"}],
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6B08-P10"]},
+
+      {"id": "F-6K01-TAPER-SPACING", "name": "Maximum channelizing device spacing in a taper (Sect. 6K.01 para 04)", "strength": "GUIDANCE", "qualifier": "AT_MOST", "role": "COMPUTE",
+       "variables": {"S": "posted_speed_mph"}, "result_unit": "ft", "cases": [{"when": null, "expression": "1*S"}],
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6K01-P04"]},
+      {"id": "F-6K01-TANGENT-SPACING", "name": "Maximum channelizing device spacing in a tangent (Sect. 6K.01 para 04)", "strength": "GUIDANCE", "qualifier": "AT_MOST", "role": "COMPUTE",
+       "variables": {"S": "posted_speed_mph"}, "result_unit": "ft", "cases": [{"when": null, "expression": "2*S"}],
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6K01-P04"]},
+      {"id": "F-6K01-EXTENSION", "name": "Channelizing device extension beyond the downstream end of the transition, where devices could lead traffic out of the intended space as in Figure 6P-39 (Sect. 6K.01 para 05)", "strength": "GUIDANCE", "qualifier": "EXACT", "role": "COMPUTE",
+       "variables": {"S": "posted_speed_mph"}, "result_unit": "ft", "cases": [{"when": null, "expression": "2*S"}],
+       "status": "SOURCED", "sme_question": null, "interpretation": null, "source_ref_ids": ["SR-6K01-P05"]}
+    ]
+  }
+}

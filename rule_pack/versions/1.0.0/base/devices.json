@@ -1,0 +1,21 @@
+{
+  "schema_version": "1",
+  "layer": "FEDERAL",
+  "tables": {
+    "device": [
+      {"id": "DV-W20-1", "code": "W20-1", "name": "ROAD WORK AHEAD (ROAD WORK XX FT / XX MILE)", "catalog_id": "W20-1",
+       "source_ref_ids": ["SR-6P1-FIG-SIGNS", "SR-6P6-FIG-SIGNS", "SR-6P10-FIG-SIGNS", "SR-6P33-FIG-SIGNS"]},
+      {"id": "DV-W20-4", "code": "W20-4", "name": "ONE LANE ROAD XX FT", "catalog_id": "W20-4", "source_ref_ids": ["SR-6P10-FIG-SIGNS"]},
+      {"id": "DV-W20-7", "code": "W20-7", "name": "Flagger (symbol)", "catalog_id": "W20-7", "source_ref_ids": ["SR-6P10-FIG-SIGNS"]},
+      {"id": "DV-W16-2P", "code": "W16-2P", "name": "XX FEET (plaque)", "catalog_id": "W16-2P", "source_ref_ids": ["SR-6P10-FIG-SIGNS"]},
+      {"id": "DV-W20-5R", "code": "W20-5R", "name": "RIGHT LANE CLOSED XX MILE", "catalog_id": "W20-5R", "source_ref_ids": ["SR-6P33-FIG-SIGNS"]},
+      {"id": "DV-W4-2R", "code": "W4-2R", "name": "Lane Ends (right lane)", "catalog_id": "W4-2R", "source_ref_ids": ["SR-6P33-FIG-SIGNS"]},
+      {"id": "DV-G20-2", "code": "G20-2", "name": "END ROAD WORK", "catalog_id": "G20-2",
+       "source_ref_ids": ["SR-6P6-FIG-SIGNS", "SR-6P10-FIG-SIGNS", "SR-6P33-FIG-SIGNS"]},
+      {"id": "DV-ARROW-BOARD", "code": "ARROW_BOARD", "name": "Arrow board", "catalog_id": "DEV-ARROW-BOARD", "source_ref_ids": ["SR-6P33-FIG-SIGNS"]},
+      {"id": "DV-FLAGGER", "code": "FLAGGER", "name": "Flagger station", "catalog_id": "DEV-FLAGGER", "source_ref_ids": ["SR-6P10-FIG-SIGNS"]},
+      {"id": "DV-WORK-VEHICLE", "code": "WORK_VEHICLE", "name": "Work vehicle", "catalog_id": "DEV-WORK-VEHICLE", "source_ref_ids": ["SR-6P6-FIG-SIGNS", "SR-6P33-FIG-SIGNS"]},
+      {"id": "DV-TMA", "code": "TMA", "name": "Truck-mounted attenuator", "catalog_id": "DEV-TMA", "source_ref_ids": ["SR-6P6-FIG-SIGNS", "SR-6P33-FIG-SIGNS"]}
+    ]
+  }
+}

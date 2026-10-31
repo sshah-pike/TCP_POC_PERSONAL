@@ -30,3 +30,24 @@ with `role: CITED_ONLY` are kept for the record and never applied; `overlaps` na
 2. Run `python scripts/seal_rule_pack.py`: it writes every part hash and the pack hash, then validates the pack.
 3. Run `pytest tests/unit/rules`. It checks every quote against the cited-page snapshot in
    `tests/fixtures/rule_pack_sources/` and every number against its quote.
+
+## Sealed versions
+
+`versions/<version>/` holds a frozen copy of each sealed pack (`pack.json` and its part files). `versions/INDEX.json` is
+append-only: one entry per version with `version`, `content_sha256`, `sealed_on`, `source_commit` and `status`. The pack
+in `rule_pack/` is the latest version and equals the last INDEX entry. `JsonRulePackStore` lists every sealed version,
+loads any of them (`load("1.0.0")`) and checks it against INDEX.json, so a recorded run replays without a git checkout.
+
+Adding a version:
+
+1. Edit the current pack as above and set a NEW `version` in `pack.json`.
+2. `python scripts/seal_rule_pack.py` (hashes and validation).
+3. `python scripts/seal_rule_pack_version.py --source-commit <full hash of the commit that holds the pack>`. It copies the
+   pack to `versions/<version>/`, checks the copy's hash and appends the INDEX entry. It refuses to overwrite an existing
+   version directory or entry. `--expect-hash` stops it unless the hash is the one you expect.
+4. `pytest tests/unit/rules`. The tests fail if the current pack differs from the last INDEX entry (a change without a
+   new version), if a frozen directory no longer recomputes to its INDEX hash, or if an old entry was rewritten.
+
+Frozen directories and INDEX entries are never edited. A fix is a new version. `--register-existing <version>` registers
+a version backfilled from git (used once for 1.0.0, from commit 9649481).
+
