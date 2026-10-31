@@ -50,8 +50,8 @@ EW = [(-100.0, 5.0), (100.0, 5.0)]          # an east-west road 5 m north of the
 # ---------------------------------------------------------------- the adapter
 def test_the_query_is_bounded_and_asks_for_tags_and_geometry_only():
     cfg = load_site_config()
-    q = osm.build_query(LAT0, LON0, 150, setting("osm", "highway_classes", cfg)[0])
-    assert q.startswith("[out:json][timeout:25];way(around:150,") and q.endswith("out tags geom;")
+    q = osm.build_query(LAT0, LON0, 150, setting("osm", "highway_classes", cfg)[0], setting("osm", "query_timeout_s", cfg)[0])
+    assert q.startswith("[out:json][timeout:60];way(around:150,") and q.endswith("out tags geom;")
     assert '["highway"~"^(motorway|' in q and "relation" not in q and "node(" not in q
 
 
@@ -295,3 +295,24 @@ def test_no_osm_reading_ever_fills_a_mandatory_start_field():
     assert not (set(R.FIELDS) & set(START_FIELDS))
     r = R.osm_read([way(1, {"oneway": "yes", "lanes": "2", "maxspeed": "35"}, EW)])
     assert "posted_speed_mph" not in r.readings and "road_type" not in r.readings
+
+
+# ---------------------------------------------------------------- timeouts and retries are config (CALIBRATION_PENDING)
+def test_the_query_timeout_is_60_and_the_client_read_timeout_is_90_both_from_config():
+    cfg = load_site_config()
+    assert setting("osm", "query_timeout_s", cfg) == (60, ("CALIBRATION_PENDING",))
+    assert setting("osm", "retry_waits_s", cfg) == ([10, 30], ("CALIBRATION_PENDING",))
+    src = B.load_sources()["sources"]["osm_overpass"]
+    assert src["timeout_s"] == 90 and "CALIBRATION_PENDING" in src["timeout_note"] and src["timeout_s"] > setting("osm", "query_timeout_s", cfg)[0]
+
+
+def test_fetch_ways_sends_the_configured_query_timeout_and_the_client_the_configured_read_timeout(tmp_path):
+    t = Transport(answer(element(1, {"highway": "secondary"}, EW)))
+    cfg = load_site_config(); cfg["osm"]["query_timeout_s"]["value"] = 75
+    osm.fetch_ways(client(tmp_path, t), LAT0, LON0, cfg)
+    assert t.calls[0]["params"]["data"].startswith("[out:json][timeout:75];")
+
+
+def test_the_only_overpass_host_is_still_overpass_api_de():
+    hosts = B.load_sources()["sources"]["osm_overpass"]["hosts"]
+    assert hosts == ["overpass-api.de"] and osm.URL.startswith("https://overpass-api.de/")

@@ -139,6 +139,19 @@
       "value": true,
       "source": "CALIBRATION_PENDING",
       "note": "the opposite way must share the name or the ref of the chosen way"
+    },
+    "query_timeout_s": {
+      "value": 60,
+      "source": "CALIBRATION_PENDING",
+      "note": "the [timeout:N] of the Overpass query: how long the server may work on it. The first recording run timed out at 25 s on a busy public server"
+    },
+    "retry_waits_s": {
+      "value": [
+        10,
+        30
+      ],
+      "source": "CALIBRATION_PENDING",
+      "note": "a failed or timed-out Overpass request is retried once per entry, waiting this many seconds first (so at most 2 retries: after 10 s, then after 30 s)"
     }
   },
   "bearing": {

@@ -5,7 +5,7 @@ value that is USED and carries the flag CALIBRATION_PENDING in the trace; none i
 (`tests/unit/site/test_calibration_in_config.py`) keeps this list current, proves every value the code reads exists in config, and
 proves the S6 modules contain no other number than structural ones (0, 1, 2, a half, 180 and 360 degrees, the luminance weights, the earth radius).
 
-## CALIBRATION_PENDING (42)
+## CALIBRATION_PENDING (44)
 
 | config path | value | what it controls |
 | --- | --- | --- |
@@ -17,6 +17,8 @@ proves the S6 modules contain no other number than structural ones (0, 1, 2, a h
 | `osm/divided_max_separation_m` | 60 | largest distance between the two carriageways of a divided road |
 | `osm/divided_parallel_tolerance_deg` | 20 | largest angle (mod 180) between the two ways for them to count as parallel |
 | `osm/divided_require_same_name_or_ref` | true | the opposite way must share the name or the ref of the chosen way |
+| `osm/query_timeout_s` | 60 | the [timeout:N] of the Overpass query: how long the server may work on it. The first recording run timed out at 25 s on a busy public server |
+| `osm/retry_waits_s` | [10, 30] | a failed or timed-out Overpass request is retried once per entry, waiting this many seconds first (so at most 2 retries: after 10 s, then after 30 s) |
 | `bearing/tolerance_deg` | 30 | largest angle (mod 180) between the mark bearing and an OSM way bearing for them to be the same road |
 | `bearing/which_road_distance_m` | 25 | OSM ways (service ways excluded) within this distance of the work point are the candidates for the reference road; the nearest is used only when it is clearly nearer than the next road that runs a different way (nearest_margin_m) |
 | `bearing/nearest_margin_m` | 8 | the OSM reference way is the one nearest the work point only if it is at least this much nearer than the next road that runs a different way; otherwise the SME is asked which road. The marks never choose the reference way. |

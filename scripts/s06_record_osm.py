@@ -11,7 +11,10 @@ has a fixture for the same query is skipped: fixtures are write-once and a store
 
 Every request goes through the allow-listed SourceClient (host overpass-api.de only, descriptive User-Agent without a company name or
 contact, size bound); an error answer is never recorded. Calls use_os_trust_store() first; certificate verification is never turned off.
-Two seconds pass between requests (Overpass fair use). The script stops at the first error and prints the HTTP status and the body.
+Two seconds pass between requests (Overpass fair use). A timeout, a dropped connection, HTTP 408, 429 or 5xx is retried per site: after the waits
+in config osm.retry_waits_s (10 s, then 30 s: at most 2 retries). Timeouts come from config: osm.query_timeout_s (the query asks the server for 60 s)
+and config/data_sources.json osm_overpass.timeout_s (the client waits up to 90 s); both CALIBRATION_PENDING. A site that still fails prints the HTTP
+status or the timeout and the script goes on with the next site; the exit code is 1 if any site failed. Run it again: recorded sites are skipped.
 """
 import argparse, os, sys, time
 
@@ -19,6 +22,20 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path[:0] = [os.path.join(ROOT, "src"), ROOT, os.path.join(ROOT, "scripts")]
 DEFAULT_OUT = os.path.join(ROOT, "tests", "fixtures", "recorded")
 PAUSE_S = 2.0
+
+
+def retryable(e):
+    """A timeout, a dropped connection, a rate limit (408, 429) or a server error (5xx) is worth another try; anything else is not."""
+    if e.code in ("SOURCE_TIMEOUT", "SOURCE_NETWORK_ERROR"): return True
+    status = (e.details or {}).get("http_status")
+    return e.code == "SOURCE_HTTP_ERROR" and isinstance(status, int) and (status in (408, 429) or status >= 500)
+
+
+def describe(e):
+    """The HTTP status or the timeout, in one phrase."""
+    status = (e.details or {}).get("http_status")
+    if e.code == "SOURCE_TIMEOUT": return f"timeout ({e.message})"
+    return f"HTTP status {status}" if status is not None else f"{e.code}: {e.message}"
 
 
 def main(argv=None, transport=None, sleep=time.sleep):
@@ -33,9 +50,10 @@ def main(argv=None, transport=None, sleep=time.sleep):
     from tcp_planner.site_model.site_config import load_site_config, setting
     from tests.support.source_fixtures import SourceFixtures
     cfg = load_site_config(); radius = setting("osm", "query_radius_m", cfg)[0]; classes = setting("osm", "highway_classes", cfg)[0]
+    timeout_s = setting("osm", "query_timeout_s", cfg)[0]
     if a.dry_run:
         for s in sites:
-            q = osm.build_query(s["lat"], s["lon"], radius, classes)
+            q = osm.build_query(s["lat"], s["lon"], radius, classes, timeout_s)
             print(f"[dry run] {s['site_id']}: {q}")
         print(f"\n{len(sites)} request(s) would be made to {osm.URL}, radius {radius} m; fixtures go to {a.out}")
         return 0
@@ -43,23 +61,35 @@ def main(argv=None, transport=None, sleep=time.sleep):
     if transport is None:
         from tcp_planner.orchestration.pipeline import load_env_file, use_os_trust_store
         load_env_file(); use_os_trust_store(); transport = requests_transport
+    waits = list(setting("osm", "retry_waits_s", cfg)[0])
     done = skipped = 0
+    failed = []
     for i, s in enumerate(sites):
         hook = SourceFixtures(os.path.join(a.out, s["site_id"]))
-        q = osm.build_query(s["lat"], s["lon"], radius, classes)
+        q = osm.build_query(s["lat"], s["lon"], radius, classes, timeout_s)
         fp = request_fingerprint(request_record(osm.SOURCE_ID, "GET", osm.URL, {"data": q}))
         if hook.has(fp):
             print(f"{s['site_id']}: already recorded ({fp[:12]}), skipped"); skipped += 1; continue
         client = SourceClient(hook=hook, transport=transport)
-        try: r = osm.fetch_ways(client, s["lat"], s["lon"], cfg)
-        except SourceError as e:
-            body = (e.details or {}).get("body") if hasattr(e, "details") else None
-            print(f"\nSTOP: {s['site_id']} failed: {e.code}: {e.message}" + (f"\n  HTTP status: {(e.details or {}).get('http_status')}\n  body: {body}" if body is not None else "")); return 1
-        print(f"{s['site_id']}: recorded {len(r.ways)} way(s), fixture {fp[:12]} under {os.path.join(a.out, s['site_id'], 'source')}")
-        done += 1
+        r, err = None, None
+        for attempt in range(len(waits) + 1):
+            try: r = osm.fetch_ways(client, s["lat"], s["lon"], cfg); err = None; break
+            except SourceError as e:
+                err = e
+                if not retryable(e) or attempt == len(waits): break
+                print(f"{s['site_id']}: {describe(e)}; retry {attempt + 1} of {len(waits)} after {waits[attempt]:g} s")
+                sleep(waits[attempt])
+        if err is not None:
+            failed.append(s["site_id"])
+            print(f"\n{s['site_id']}: FAILED after {attempt + 1} attempt(s): {describe(err)}"
+                  + (f"\n  body: {(err.details or {}).get('body')}" if (err.details or {}).get("body") else "") + "\n  continuing with the next site")
+        else:
+            print(f"{s['site_id']}: recorded {len(r.ways)} way(s), fixture {fp[:12]} under {os.path.join(a.out, s['site_id'], 'source')}")
+            done += 1
         if i < len(sites) - 1: sleep(PAUSE_S)
-    print(f"\n{done} recorded, {skipped} already there. Next: python scripts/s06_osm_second_source.py --sites {a.sites} --out second_source.csv")
-    return 0
+    print(f"\n{done} recorded, {skipped} already there, {len(failed)} failed" + (f" ({', '.join(failed)}): run the same command again; recorded sites are skipped" if failed else "")
+          + f". Next: python scripts/s06_osm_second_source.py --sites {a.sites} --out second_source.csv")
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

@@ -77,7 +77,7 @@ def test_the_recorder_dry_run_makes_no_call_and_needs_no_live_flag(rec, tmp_path
     monkeypatch.delenv("TCP_LIVE", raising=False)
     assert rec.main(["--sites", sites_csv(tmp_path), "--out", str(tmp_path / "fx"), "--dry-run"]) == 0
     out = capsys.readouterr().out
-    assert "[out:json]" in out and "around:150" in out and not (tmp_path / "fx").exists()
+    assert "[out:json][timeout:60]" in out and "around:150" in out and not (tmp_path / "fx").exists()
 
 
 def test_the_recorder_needs_tcp_live(rec, tmp_path, capsys, monkeypatch):
@@ -85,11 +85,74 @@ def test_the_recorder_needs_tcp_live(rec, tmp_path, capsys, monkeypatch):
     assert rec.main(["--sites", sites_csv(tmp_path), "--out", str(tmp_path / "fx")]) == 2 and "TCP_LIVE=1" in capsys.readouterr().out
 
 
-def test_the_recorder_stops_at_the_first_error_with_status_and_body_and_records_nothing(rec, tmp_path, capsys):
-    t = Transport(content=b"too many requests", status=429); out = tmp_path / "fx"
+class Scripted:
+    """A transport that answers per call from a list: (status, content) or an exception to raise."""
+    def __init__(self, script, default=None):
+        self.script, self.calls, self.default = list(script), [], default
+
+    def __call__(self, method, url, params, body, headers, timeout):
+        self.calls.append(params["data"])
+        step = self.script.pop(0) if self.script else self.default
+        if isinstance(step, Exception): raise step
+        return step
+
+
+class ReadTimeout(Exception): pass
+
+
+GOOD = (200, answer(element(1, {"highway": "secondary", "lanes": "2"}, EW)))
+
+
+def test_a_failing_site_is_retried_twice_with_the_configured_waits_then_the_next_site_goes_on(rec, tmp_path, capsys):
+    t = Scripted([(429, b"too many requests")] * 3 + [GOOD]); out = tmp_path / "fx"; waits = []
+    assert rec.main(["--sites", sites_csv(tmp_path), "--out", str(out)], transport=t, sleep=waits.append) == 1       # exit 1: one site failed
+    text = capsys.readouterr().out
+    assert len(t.calls) == 4                                                       # site A: 3 attempts (1 + 2 retries), site B: 1
+    assert [w for w in waits if w != rec.PAUSE_S] == [10, 30]                      # the configured waits, in order
+    assert "A: FAILED after 3 attempt(s): HTTP status 429" in text and "too many requests" in text and "continuing with the next site" in text
+    assert "B: recorded 1 way(s)" in text and "1 recorded, 0 already there, 1 failed (A)" in text
+    assert not os.path.isdir(out / "A" / "source") and os.path.isdir(out / "B" / "source")
+
+
+def test_a_timeout_then_success_records_the_site_after_one_retry(rec, tmp_path, capsys):
+    t = Scripted([ReadTimeout("read timed out"), GOOD], default=GOOD); out = tmp_path / "fx"; waits = []
+    p = tmp_path / "one.csv"; p.write_text("site_id,lat,lon,extent_m\nA,%s,%s,212.4\n" % (LAT0, LON0), encoding="utf-8")
+    assert rec.main(["--sites", str(p), "--out", str(out)], transport=t, sleep=waits.append) == 0
+    text = capsys.readouterr().out
+    assert len(t.calls) == 2 and waits == [10] and "timeout" in text and "retry 1 of 2 after 10 s" in text and "A: recorded 1 way(s)" in text
+    assert os.path.isdir(out / "A" / "source")
+
+
+def test_a_final_timeout_prints_the_timeout_and_the_run_continues(rec, tmp_path, capsys):
+    t = Scripted([ReadTimeout("x")] * 3 + [GOOD]); out = tmp_path / "fx"
     assert rec.main(["--sites", sites_csv(tmp_path), "--out", str(out)], transport=t, sleep=lambda s: None) == 1
     text = capsys.readouterr().out
-    assert "HTTP status: 429" in text and "too many requests" in text and len(t.calls) == 1 and not os.path.isdir(out / "A" / "source")
+    assert "A: FAILED after 3 attempt(s): timeout" in text and "90 s read timeout" in text and "B: recorded" in text
+
+
+def test_an_error_that_cannot_improve_is_not_retried(rec, tmp_path, capsys):
+    t = Scripted([(400, b"bad query")] , default=GOOD); waits = []
+    assert rec.main(["--sites", sites_csv(tmp_path), "--out", str(tmp_path / "fx")], transport=t, sleep=waits.append) == 1
+    text = capsys.readouterr().out
+    assert "A: FAILED after 1 attempt(s): HTTP status 400" in text and "bad query" in text and "retry" not in text
+    assert len(t.calls) == 2                                                       # A once, then B
+
+
+def test_rerunning_after_a_failure_skips_what_is_recorded_and_fetches_only_the_rest(rec, tmp_path, capsys):
+    out = tmp_path / "fx"
+    t1 = Scripted([GOOD] + [(504, b"gateway timeout")] * 3)
+    assert rec.main(["--sites", sites_csv(tmp_path), "--out", str(out)], transport=t1, sleep=lambda s: None) == 1
+    capsys.readouterr()
+    t2 = Scripted([], default=GOOD)
+    assert rec.main(["--sites", sites_csv(tmp_path), "--out", str(out)], transport=t2, sleep=lambda s: None) == 0
+    text = capsys.readouterr().out
+    assert len(t2.calls) == 1 and "A: already recorded" in text and "B: recorded" in text
+
+
+def test_the_retry_waits_and_timeouts_come_from_config_not_from_the_script():
+    src = open(os.path.join(ROOT, "scripts", "s06_record_osm.py"), encoding="utf-8").read()
+    assert 'setting("osm", "retry_waits_s"' in src and 'setting("osm", "query_timeout_s"' in src
+    assert "[10, 30]" not in src and "timeout=60" not in src and "90" not in src.split('"""')[2]
 
 
 def test_a_bad_sites_file_is_named(rec, tmp_path, capsys):

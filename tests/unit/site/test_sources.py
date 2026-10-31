@@ -226,3 +226,26 @@ def test_two_ai_readings_are_not_two_sources():
     """The record has exactly one AI candidate whatever the number of AI reads: only a data source can make a second source."""
     rec = F.compare("lanes_per_direction", 2, [])
     assert sum(1 for c in rec.candidates if c.source == "AI") == 1 and rec.agreement == F.SINGLE_SOURCE
+
+
+# ---------------------------------------------------------------- a failed transport is a named SourceError, never recorded
+class Raising:
+    def __init__(self, exc): self.exc = exc
+
+    def __call__(self, *a, **k): raise self.exc
+
+
+class ReadTimeout(Exception): pass
+
+
+def test_a_read_timeout_is_a_source_error_with_the_timeout_and_nothing_is_recorded(tmp_path):
+    c = client(tmp_path, Raising(ReadTimeout("read timed out")))
+    with pytest.raises(B.SourceError) as e: c.request("osm_overpass", URL, {"data": "q"})
+    assert e.value.code == "SOURCE_TIMEOUT" and "90 s" in e.value.message and e.value.details["timeout_s"] == 90
+    assert c.calls == [] and not os.path.isdir(tmp_path / "site" / "source")
+
+
+def test_a_dropped_connection_is_a_network_error(tmp_path):
+    c = client(tmp_path, Raising(ConnectionError("reset")))
+    with pytest.raises(B.SourceError) as e: c.request("osm_overpass", URL, {"data": "q"})
+    assert e.value.code == "SOURCE_NETWORK_ERROR" and "ConnectionError" in e.value.message and c.calls == []

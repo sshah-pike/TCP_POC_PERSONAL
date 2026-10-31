@@ -99,7 +99,12 @@ class SourceClient:
             raise SourceError("SOURCE_NO_TRANSPORT", f"{source_id}: no recorded response and no live transport (replay never calls the network)")
         else:
             h = {"User-Agent": self.cfg["user_agent"], **(headers or {})}
-            status, content = self.transport(method.upper(), url, dict(params or {}), body, h, src.get("timeout_s"))
+            try:
+                status, content = self.transport(method.upper(), url, dict(params or {}), body, h, src.get("timeout_s"))
+            except Exception as e:        # a timeout or a dropped connection: named, never a bare traceback, and never recorded
+                kind = "SOURCE_TIMEOUT" if "timeout" in type(e).__name__.lower() else "SOURCE_NETWORK_ERROR"
+                raise SourceError(kind, f"{source_id}: {type(e).__name__} after the {src.get('timeout_s')} s read timeout" if kind == "SOURCE_TIMEOUT"
+                                  else f"{source_id}: {type(e).__name__}", {"exception": type(e).__name__, "timeout_s": src.get("timeout_s")})
             retrieved = self._now()
             if not 200 <= status < 300:                         # an error answer is never recorded as a fixture
                 raise SourceError("SOURCE_HTTP_ERROR", f"{source_id}: HTTP {status}", {"http_status": status, "body": content[:500].decode("utf-8", "replace")})

@@ -36,10 +36,10 @@ def to_local(lat0, lon0, lat, lon):
     return ((lon - lon0) * k * math.cos(math.radians(lat0)), (lat - lat0) * k)
 
 
-def build_query(lat, lon, radius_m, classes):
-    """Overpass QL: ways of the listed highway classes within radius_m, tags and geometry. The class list comes from config."""
+def build_query(lat, lon, radius_m, classes, timeout_s):
+    """Overpass QL: ways of the listed highway classes within radius_m, tags and geometry. The class list and the server-side timeout come from config."""
     pat = "|".join(classes)
-    return (f'[out:json][timeout:25];way(around:{radius_m:g},{lat:.7f},{lon:.7f})["highway"~"^({pat})$"];out tags geom;')
+    return (f'[out:json][timeout:{timeout_s:g}];way(around:{radius_m:g},{lat:.7f},{lon:.7f})["highway"~"^({pat})$"];out tags geom;')
 
 
 def parse_overpass(content, origin):
@@ -70,7 +70,7 @@ def fetch_ways(client: SourceClient, lat, lon, cfg=None, radius_m=None):
     limits = client.cfg["sources"][SOURCE_ID]["query_limits"]
     if radius > limits["max_radius_m"]:
         raise SourceError("SOURCE_QUERY_TOO_LARGE", f"radius {radius} m is above the limit of {limits['max_radius_m']} m")
-    q = build_query(lat, lon, radius, setting("osm", "highway_classes", cfg)[0])
+    q = build_query(lat, lon, radius, setting("osm", "highway_classes", cfg)[0], setting("osm", "query_timeout_s", cfg)[0])
     resp = client.request(SOURCE_ID, URL, params={"data": q}, attribute_names=("highway", "lanes", "lanes:forward", "lanes:backward",
                                                                                  "oneway", "shoulder", "sidewalk", "name", "ref"))
     try:

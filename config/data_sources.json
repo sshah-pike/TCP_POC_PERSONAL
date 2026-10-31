@@ -19,13 +19,14 @@
       ],
       "enabled": true,
       "license_note": "OpenStreetMap data, ODbL 1.0, (c) OpenStreetMap contributors; Overpass API fair-use policy: small bounded queries, descriptive User-Agent",
-      "timeout_s": 25,
+      "timeout_s": 90,
       "max_bytes": 2000000,
       "query_limits": {
         "max_radius_m": 600,
         "max_elements": 5000,
         "note": "queries are bounded by radius and by element count; CALIBRATION_PENDING until measured"
-      }
+      },
+      "timeout_note": "read timeout of the HTTP client in seconds; CALIBRATION_PENDING (was 25 s, which timed out on the first site of the recording run). Keep it above osm.query_timeout_s in config/site_understanding.json so the server answers or gives up before the client does"
     },
     "massgis": {
       "hosts": [],
