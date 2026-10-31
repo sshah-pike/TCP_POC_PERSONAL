@@ -43,6 +43,11 @@ def setting(section, name, cfg=None):
     return entry["value"], (("CALIBRATION_PENDING",) if entry.get("source") == "CALIBRATION_PENDING" else ())
 
 
+def stage_on(name, cfg=None):
+    """True when the stage is switched on in config `stages` (S6 step 10). An unknown stage name is an error, not a silent True."""
+    return bool((cfg or load_site_config())["stages"][name]["value"])
+
+
 FLOOR_KINDS = ("work_location", "safety_critical", "common")
 
 

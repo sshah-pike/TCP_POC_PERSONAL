@@ -229,5 +229,159 @@
       "source": "CALIBRATION_PENDING",
       "note": "odd number of sample points of the median filter over the offsets along the line"
     }
+  },
+  "code_checks": {
+    "note": "Code checks on the image (S6 step 9). Each returns evidence and can only lower confidence or give UNKNOWN; none is ever a second source. All values CALIBRATION_PENDING.",
+    "stations": {
+      "value": 9,
+      "source": "CALIBRATION_PENDING",
+      "note": "cross-sections taken along the road strip between the two edge marks"
+    },
+    "lane_line_min_contrast": {
+      "value": 25,
+      "source": "CALIBRATION_PENDING",
+      "note": "grey-level excess of a painted line over the local pavement (0 to 255)"
+    },
+    "lane_line_max_width_px": {
+      "value": 7,
+      "source": "CALIBRATION_PENDING",
+      "note": "widest bright run that still counts as a painted line (pixels of the image as sent)"
+    },
+    "lane_line_merge_px": {
+      "value": 6,
+      "source": "CALIBRATION_PENDING",
+      "note": "two lines closer than this (a double yellow) count as one"
+    },
+    "lane_line_edge_margin_px": {
+      "value": 8,
+      "source": "CALIBRATION_PENDING",
+      "note": "lines this close to an edge mark are edge lines, not lane lines"
+    },
+    "lane_line_min_station_fraction": {
+      "value": 0.6,
+      "source": "CALIBRATION_PENDING",
+      "note": "a line must be seen in this share of the stations to count as detected"
+    },
+    "lane_line_position_tolerance_px": {
+      "value": 6,
+      "source": "CALIBRATION_PENDING",
+      "note": "lateral position tolerance when matching a line between stations"
+    },
+    "min_lines_to_judge": {
+      "value": 1,
+      "source": "CALIBRATION_PENDING",
+      "note": "with fewer painted lines than this detected the lane-line check does nothing (owner review R5: it never lowers confidence when no painted lines are detected)"
+    },
+    "green_margin": {
+      "value": 12,
+      "source": "CALIBRATION_PENDING",
+      "note": "a pixel is canopy when its green exceeds both red and blue by this much"
+    },
+    "shadow_luminance_ratio": {
+      "value": 0.6,
+      "source": "CALIBRATION_PENDING",
+      "note": "a non-canopy pixel is shadow when darker than this share of the strip's reference luminance"
+    },
+    "reference_percentile": {
+      "value": 75,
+      "source": "CALIBRATION_PENDING",
+      "note": "percentile of the non-canopy strip luminance used as the sunlit reference"
+    },
+    "occlusion_share_max": {
+      "value": 0.35,
+      "source": "CALIBRATION_PENDING",
+      "note": "code share of the road strip hidden by shadow plus canopy above which edge-based facts become UNKNOWN (occluded)"
+    },
+    "model_share_tolerance": {
+      "value": 0.25,
+      "source": "CALIBRATION_PENDING",
+      "note": "the model's shadow and canopy shares are a cross-check candidate: a difference above this is recorded as evidence; it never changes a fact"
+    },
+    "max_osm_offset_m": {
+      "value": 10,
+      "source": "CALIBRATION_PENDING",
+      "note": "largest distance between the road centre seen in the marks and the OSM reference way; above it OSM cannot confirm an AI value"
+    }
+  },
+  "consistency": {
+    "note": "Consistency checks between facts (S6 step 9). Config driven; each can only lower trust (UNKNOWN or a flag). Values CALIBRATION_PENDING.",
+    "lane_count_vs_width": {
+      "value": true,
+      "source": "CALIBRATION_PENDING",
+      "note": "runs ONLY when parking_present and shoulder_present are both read false (owner review R5); plausible lane width range is read from pipeline_config fusion.lane_width_plausible_m"
+    },
+    "lane_lines_vs_lane_count": {
+      "value": true,
+      "source": "CALIBRATION_PENDING",
+      "note": "painted lane lines against the lane count; nothing happens when no painted line is detected (R5)"
+    },
+    "approaching_lanes_vs_lane_count": {
+      "value": true,
+      "source": "CALIBRATION_PENDING",
+      "note": "approaching_lanes_one against lanes_per_direction"
+    },
+    "sidewalk_pair": {
+      "value": true,
+      "source": "CALIBRATION_PENDING",
+      "note": "sidewalk_present against sidewalk_side"
+    },
+    "work_location_vs_edges": {
+      "value": true,
+      "source": "CALIBRATION_PENDING",
+      "note": "work_location against the work point and the edge marks (the marks check)"
+    }
+  },
+  "stages": {
+    "note": "Per-stage off switches (S6 step 10): turn a stage off to see in a scored test what it adds. enhanced_prompt false means prompt version 1 (the nine recorded calls); true means version 2 (STOP 6). A stage that is off is recorded in the run trace.",
+    "osm": {
+      "value": true,
+      "source": "owner decision, S6 plan item 10",
+      "note": "read OSM and compare it with the AI (two-source rule). Off: every safety field has a single source"
+    },
+    "bearing": {
+      "value": true,
+      "source": "owner decision, S6 plan item 10",
+      "note": "bearing cross-check and which-road question"
+    },
+    "snapping": {
+      "value": true,
+      "source": "owner decision, S6 plan item 10",
+      "note": "code snapping of the AI's marks to the nearest real edge"
+    },
+    "edge_rule": {
+      "value": true,
+      "source": "owner decision, S6 plan item 10",
+      "note": "work location near an edge or with no road near"
+    },
+    "lane_lines": {
+      "value": true,
+      "source": "owner decision, S6 plan item 10",
+      "note": "code check: painted lane lines"
+    },
+    "shadow_canopy": {
+      "value": true,
+      "source": "owner decision, S6 plan item 10",
+      "note": "code check: shadow and canopy share"
+    },
+    "osm_offset": {
+      "value": true,
+      "source": "owner decision, S6 plan item 10",
+      "note": "code check: image to OSM offset"
+    },
+    "consistency": {
+      "value": true,
+      "source": "owner decision, S6 plan item 10",
+      "note": "the config-driven consistency checks"
+    },
+    "site_exceptions": {
+      "value": true,
+      "source": "owner decision, S6 addendum",
+      "note": "apply config/site_exceptions.json (empty today)"
+    },
+    "enhanced_prompt": {
+      "value": false,
+      "source": "owner decision, STOP 6",
+      "note": "prompt version 2; off until the owner has run the version 2 live calls and decided"
+    }
   }
 }

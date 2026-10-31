@@ -72,15 +72,16 @@ def _ai_value(fact):
     return ai[-1].value if ai else None
 
 
-def fuse_fields(facts, osm=None, cfg=None, sources=None):
+def fuse_fields(facts, osm=None, cfg=None, sources=None, osm_trusted=True):
     """FusionResult for all facts. `osm`: an OsmRead (readings per field and its own questions) or None when OSM was not consulted
-    (every safety field then has a single source). Facts of other fields pass unchanged."""
+    (every safety field then has a single source). `osm_trusted` False (the image-to-OSM offset check objects) drops OSM's readings: it
+    cannot confirm an AI value, so the safety fields have a single source. Facts of other fields pass unchanged."""
     cfg = cfg or load_site_config()
     critical = set(call1_setting("safety_critical_fields", cfg))
     allowed = second_sources(sources)
     out, records, questions = [], {}, []
     for f in facts:
-        reading = (osm.readings.get(f.field) if osm is not None else None)
+        reading = (osm.readings.get(f.field) if osm is not None and osm_trusted else None)
         readings = [reading] if reading is not None else []
         _check_sources(readings, allowed)
         if f.field in RECORD_ONLY:
@@ -105,5 +106,5 @@ def fuse_fields(facts, osm=None, cfg=None, sources=None):
         reason = "source_disagreement" if rec.agreement == DISAGREE else "single_source"
         nf = _unknown(f, reason, readings, rec.note)
         out.append(nf)
-        questions.append(_question(nf, rec, osm.questions if osm is not None else ()))
+        questions.append(_question(nf, rec, osm.questions if osm is not None and osm_trusted else ()))
     return FusionResult(tuple(out), records, tuple(questions))
