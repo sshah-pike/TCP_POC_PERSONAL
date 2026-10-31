@@ -107,7 +107,7 @@ def test_a_code_pixel_check_or_the_imagery_is_never_a_second_source(source):
 
 
 def test_the_allowed_second_sources_are_the_enabled_data_sources_without_the_imagery():
-    assert FA.second_sources() == frozenset({"osm_overpass"})
+    assert FA.second_sources() == frozenset({"osm_overpass", "osm_api"})                  # both OSM providers; never the imagery
     assert FA.second_sources({"sources": {"osm_overpass": {"enabled": True, "hosts": ["h"]}, "azure_maps": {"enabled": True, "hosts": ["h"]},
                                           "massgis": {"enabled": False, "hosts": []}}}) == frozenset({"osm_overpass"})
 

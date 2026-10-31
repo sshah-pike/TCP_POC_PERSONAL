@@ -11,6 +11,8 @@ from tests.unit.site.test_osm import EW, answer, element
 from tests.unit.site.test_owner_scripts_osm_probe import at, Scripted, GOOD
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+pytestmark = pytest.mark.usefixtures("overpass_provider")      # these tests are about the Overpass provider; the shipped default is osm_api
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
 
@@ -250,7 +252,7 @@ def test_a_variant_that_is_not_available_is_skipped_and_does_not_count():
 def test_the_report_has_the_table_the_verdict_the_environment_and_the_status_text():
     c = Clock(); o = D.run_diagnose(SITE, runners(c), CFG, c, c.sleep, log=lambda *_: None)
     sources = {"user_agent": "ua", "sources": {"osm_overpass": {"timeout_s": 90}}}
-    text = D.render(SITE, o, D.environment("https://overpass-api.de/api/interpreter", {}), D.effective(SITE, CFG, sources), "t")
+    text = D.render(SITE, o, D.environment("https://overpass-api.de/api/interpreter", {}), D.effective(SITE, load_site_config(), sources), "t")
     for s in ("| variant | what | HTTP status | bytes | connect s | first byte s | total s | error type |", "**VERDICT: not reproduced now**", "## Effective settings of variant a",
               "## Environment", "- python:", "- openssl:", "- requests:", "- urllib3:", "- HTTP_PROXY:", "- NO_PROXY:", "- os_proxies_urllib_getproxies:", "- dns:", "- truststore_injected:",
               "## /api/status (full text)", "2 slots available now", "Stage 1 test"):

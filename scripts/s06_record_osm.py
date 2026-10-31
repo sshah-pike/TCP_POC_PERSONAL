@@ -9,7 +9,8 @@ sites.csv has the columns of the call 1 sites file: site_id, lat, lon, extent_m 
 (the query radius comes from config/site_understanding.json osm.query_radius_m, capped by config/data_sources.json). A site that already
 has a fixture for the same query is skipped: fixtures are write-once and a stored response is never fetched again.
 
-Every request goes through the allow-listed SourceClient (host overpass-api.de only, descriptive User-Agent without a company name or
+The provider is config osm.provider: osm_api (the OSM main API, default) or overpass; fixtures are never shared between them.
+Every request goes through the allow-listed SourceClient (the host of the provider only, descriptive User-Agent without a company name or
 contact, size bound); an error answer is never recorded. Calls use_os_trust_store() first; certificate verification is never turned off.
 Two seconds pass between requests (Overpass fair use). A timeout, a dropped connection, HTTP 408, 429 or 5xx is retried per site: after the waits
 in config osm.retry_waits_s (10 s, then 30 s: at most 2 retries). Timeouts come from config: osm.query_timeout_s (the query asks the server for 60 s)
@@ -38,34 +39,43 @@ def describe(e):
     return f"HTTP status {status}" if status is not None else f"{e.code}: {e.message}"
 
 
-def record_sites(sites, out, transport, sleep=time.sleep, cfg=None, log=print, clock=time.monotonic):
-    """Record one Overpass fixture per site with the config timeouts and retries. Returns one record per site:
-    {site_id, status 'recorded' | 'skipped' | 'failed', attempts, seconds (all attempts), ways, fixture, error}. Never raises for a source failure:
-    a final failure is printed (HTTP status or timeout) and the next site goes on. Recorded sites are skipped; nothing is fetched twice."""
+class Counting:
+    """Counts the live requests a transport makes (a site served entirely from recorded fixtures makes none)."""
+    def __init__(self, inner): self.inner, self.n = inner, 0
+
+    def __call__(self, *a, **k): self.n += 1; return self.inner(*a, **k)
+
+
+def record_sites(sites, out, transport, sleep=time.sleep, cfg=None, log=print, clock=time.monotonic, stop=None):
+    """Record the OSM fixtures of the configured provider (config osm.provider) with the config timeouts and retries. Returns one record per site:
+    {site_id, status 'recorded' | 'skipped' | 'failed' | 'not_attempted', attempts, seconds, ways, fixture, boxes, note, error}. A site whose requests are
+    all in the fixture store is replayed and reported 'skipped' (no live request); a partly recorded site continues where it stopped. Never raises for a
+    source failure: a final failure is printed (HTTP status or timeout) and the next site goes on, unless `stop()` says the run must stop (a 429, a
+    gateway page, the request limit): then the remaining sites are 'not_attempted'. A fixture is never reused across providers (its request names the
+    source and the URL)."""
     from tcp_planner.data_sources import osm
-    from tcp_planner.data_sources.base import SourceClient, SourceError, request_fingerprint, request_record
+    from tcp_planner.data_sources.base import SourceClient, SourceError
     from tcp_planner.site_model.site_config import load_site_config, setting
     from tests.support.source_fixtures import SourceFixtures
     cfg = cfg or load_site_config()
-    radius = setting("osm", "query_radius_m", cfg)[0]; classes = setting("osm", "highway_classes", cfg)[0]; timeout_s = setting("osm", "query_timeout_s", cfg)[0]
     waits = list(setting("osm", "retry_waits_s", cfg)[0])
-    records = []
+    records, halted = [], False
     for i, s in enumerate(sites):
         hook = SourceFixtures(os.path.join(out, s["site_id"]))
-        q = osm.build_query(s["lat"], s["lon"], radius, classes, timeout_s)
-        fp = request_fingerprint(request_record(osm.SOURCE_ID, "GET", osm.URL, {"data": q}))
-        rec = {"site_id": s["site_id"], "status": None, "attempts": 0, "seconds": 0.0, "ways": None, "fixture": fp, "error": None}
+        fp = osm.request_key(s["lat"], s["lon"], cfg)
+        rec = {"site_id": s["site_id"], "status": None, "attempts": 0, "seconds": 0.0, "ways": None, "fixture": fp, "boxes": None, "note": None, "error": None}
         records.append(rec)
-        if hook.has(fp):
-            log(f"{s['site_id']}: already recorded ({fp[:12]}), skipped"); rec["status"] = "skipped"; continue
-        client = SourceClient(hook=hook, transport=transport)
+        if halted:
+            rec["status"] = "not_attempted"; continue
+        counting = Counting(transport)
+        client = SourceClient(hook=hook, transport=counting)
         r, err, t0 = None, None, clock()
         for attempt in range(len(waits) + 1):
             rec["attempts"] = attempt + 1
             try: r = osm.fetch_ways(client, s["lat"], s["lon"], cfg); err = None; break
             except SourceError as e:
                 err = e
-                if not retryable(e) or attempt == len(waits): break
+                if (stop and stop()) or not retryable(e) or attempt == len(waits): break
                 log(f"{s['site_id']}: {describe(e)}; retry {attempt + 1} of {len(waits)} after {waits[attempt]:g} s")
                 sleep(waits[attempt])
         rec["seconds"] = round(clock() - t0, 2)
@@ -73,9 +83,15 @@ def record_sites(sites, out, transport, sleep=time.sleep, cfg=None, log=print, c
             rec.update(status="failed", error=describe(err))
             log(f"\n{s['site_id']}: FAILED after {rec['attempts']} attempt(s): {describe(err)}"
                 + (f"\n  body: {(err.details or {}).get('body')}" if (err.details or {}).get("body") else "") + "\n  continuing with the next site")
-        else:
-            rec.update(status="recorded", ways=len(r.ways))
-            log(f"{s['site_id']}: recorded {len(r.ways)} way(s), fixture {fp[:12]} under {os.path.join(out, s['site_id'], 'source')}")
+            if stop and stop(): halted = True; log(f"STOP: {stop()}: the run stops here; the remaining sites are not attempted")
+            continue
+        info = r.info or {}
+        rec.update(ways=len(r.ways), boxes=[x.get("bbox_half_m") for x in info.get("attempts", [])] or None, note=info.get("note"))
+        if counting.n == 0:
+            rec["status"] = "skipped"; log(f"{s['site_id']}: already recorded ({fp[:12]}), skipped")
+            continue
+        rec["status"] = "recorded"
+        log(f"{s['site_id']}: recorded {len(r.ways)} way(s), fixture {fp[:12]} under {os.path.join(out, s['site_id'], 'source')}" + (f" ({info['note']})" if info.get("note") else ""))
         if i < len(sites) - 1: sleep(PAUSE_S)
     return records
 
@@ -94,9 +110,8 @@ def main(argv=None, transport=None, sleep=time.sleep):
     timeout_s = setting("osm", "query_timeout_s", cfg)[0]
     if a.dry_run:
         for s in sites:
-            q = osm.build_query(s["lat"], s["lon"], radius, classes, timeout_s)
-            print(f"[dry run] {s['site_id']}: {q}")
-        print(f"\n{len(sites)} request(s) would be made to {osm.URL}, radius {radius} m; fixtures go to {a.out}")
+            print(f"[dry run] {s['site_id']}: {osm.request_preview(s['lat'], s['lon'], cfg)}")
+        print(f"\n{len(sites)} request(s) would be made by provider {setting('osm', 'provider', cfg)[0]}, radius {radius} m; fixtures go to {a.out}")
         return 0
     if os.environ.get("TCP_LIVE") != "1" and transport is None: print("live calls need TCP_LIVE=1 (or use --dry-run)"); return 2
     if transport is None:

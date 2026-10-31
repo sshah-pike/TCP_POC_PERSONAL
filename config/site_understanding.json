@@ -152,6 +152,46 @@
       ],
       "source": "CALIBRATION_PENDING",
       "note": "a failed or timed-out Overpass request is retried once per entry, waiting this many seconds first (so at most 2 retries: after 10 s, then after 30 s)"
+    },
+    "provider": {
+      "value": "osm_api",
+      "source": "CALIBRATION_PENDING",
+      "note": "which OSM provider reads the roads: osm_api (the OSM main API, a bounding box map call; default) or overpass (the public Overpass server). Changing it records new fixtures: a fixture is never reused across providers"
+    },
+    "api_url": {
+      "value": "https://api.openstreetmap.org/api/0.6/map",
+      "source": "CALIBRATION_PENDING",
+      "note": "the OSM main API map call; its host must be in the allow list (config/data_sources.json, source osm_api)"
+    },
+    "api_bbox_half_m": {
+      "value": 300,
+      "source": "CALIBRATION_PENDING",
+      "note": "half the side of the box asked of the map call, in metres; larger than query_radius_m because the box is not the query: ways are kept by their true distance from the point"
+    },
+    "api_bbox_retry_half_m": {
+      "value": 600,
+      "source": "CALIBRATION_PENDING",
+      "note": "if no highway way lies within query_radius_m, the call is repeated ONCE with this half-size (recorded in the trace)"
+    },
+    "api_bbox_shrink_half_m": {
+      "value": 150,
+      "source": "CALIBRATION_PENDING",
+      "note": "if the API answers HTTP 400 too many nodes, the call is repeated ONCE with this half-size (recorded in the trace)"
+    },
+    "api_max_bbox_area_deg2": {
+      "value": 0.25,
+      "source": "CALIBRATION_PENDING",
+      "note": "largest box area in square degrees the API accepts (the documented limit); a larger box is refused before any request"
+    },
+    "api_too_many_nodes_text": {
+      "value": "too many nodes",
+      "source": "CALIBRATION_PENDING",
+      "note": "text of the API's HTTP 400 answer that means the box holds too many nodes (compared without case)"
+    },
+    "api_too_many_nodes_status": {
+      "value": 400,
+      "source": "CALIBRATION_PENDING",
+      "note": "HTTP status of the API's answer that means the box holds too many nodes (the text is api_too_many_nodes_text); no other 400 is retried"
     }
   },
   "bearing": {
@@ -443,6 +483,27 @@
       "value": 1,
       "source": "CALIBRATION_PENDING",
       "note": "stage 4 lists the nearest way; this many ways are named in full"
+    },
+    "api_max_requests": {
+      "value": 8,
+      "source": "CALIBRATION_PENDING",
+      "note": "most HTTP requests the osm_api pipeline run may make in total (diagnose stage and recorder together)"
+    },
+    "api_min_gap_s": {
+      "value": 3,
+      "source": "CALIBRATION_PENDING",
+      "note": "least seconds between two requests of the osm_api pipeline run"
+    },
+    "stop_statuses": {
+      "value": [
+        429,
+        502,
+        503,
+        504,
+        509
+      ],
+      "source": "CALIBRATION_PENDING",
+      "note": "HTTP statuses that stop the osm_api pipeline run at once: rate limit, bandwidth limit and gateway pages"
     }
   }
 }

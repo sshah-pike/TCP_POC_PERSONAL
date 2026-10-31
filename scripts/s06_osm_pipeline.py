@@ -27,6 +27,35 @@ PROFILES = ("gpt-5.6-sol", "claude-opus-5-5")
 VERSIONS = (("v1", "s06_call1_check"), ("v2", "s06_call1_check_v2"), ("v3", "s06_call1_check_v3"))
 
 
+class RunStopped(Exception): pass
+
+
+class LimitedTransport:
+    """The transport of an osm_api run: at most `max_requests` requests in all, at least `min_gap_s` seconds between them (counted from the end of the
+    previous one), and the run stops at the first status in `stop_statuses` (429, 509, a gateway page): the answer is returned once so the caller can report
+    it, every later request raises. Clock and sleep are injected for tests."""
+    def __init__(self, inner, max_requests, min_gap_s, stop_statuses, clock=time.monotonic, sleep=time.sleep):
+        self.inner, self.max, self.gap, self.stops, self.clock, self.sleep = inner, max_requests, min_gap_s, tuple(stop_statuses), clock, sleep
+        self.count, self.last_end, self.stop_reason, self.stop_page, self.calls = 0, None, None, None, []
+
+    def __call__(self, method, url, params, body, headers, timeout):
+        if self.stop_reason: raise RunStopped(self.stop_reason)
+        if self.count >= self.max:
+            self.stop_reason = f"request limit of {self.max} reached"; raise RunStopped(self.stop_reason)
+        if self.last_end is not None:
+            wait = self.gap - (self.clock() - self.last_end)
+            if wait > 0: self.sleep(wait)
+        self.count += 1
+        try: status, content = self.inner(method, url, params, body, headers, timeout)
+        finally: self.last_end = self.clock()
+        self.calls.append((url, dict(params or {}), status))
+        if status in self.stops:
+            import re
+            self.stop_reason = f"HTTP {status}"
+            t = re.sub(r"<style.*?</style>", " ", content.decode("utf-8", "replace"), flags=re.S | re.I); self.stop_page = " ".join(re.sub(r"<[^>]+>", " ", t).split())[:400]
+        return status, content
+
+
 def resolve(path):
     """A path as given, else relative to the repository root (so the script works from any folder)."""
     if os.path.isabs(path) or os.path.exists(path): return os.path.abspath(path)
@@ -122,8 +151,8 @@ def report(run, started, env, diag_text, diag, records, table, second_path, seco
     L += ["## 2. Recorder results per site", ""]
     if records is None: L += ["(not run)", ""]
     else:
-        L += ["| site | status | attempts | seconds | ways found | error |", "| --- | --- | --- | --- | --- | --- |"]
-        L += [f"| {r['site_id']} | {r['status']} | {r['attempts']} | {r['seconds']} | {'-' if r['ways'] is None else r['ways']} | {r['error'] or '-'} |" for r in records] + [""]
+        L += ["| site | status | attempts | seconds | ways found | box half-sizes asked (m) | retry or shrink | error |", "| --- | --- | --- | --- | --- | --- | --- | --- |"]
+        L += [f"| {r['site_id']} | {r['status']} | {r['attempts']} | {r['seconds']} | {'-' if r['ways'] is None else r['ways']} | {', '.join(str(x) for x in (r.get('boxes') or [])) or '-'} | {r.get('note') or '-'} | {r['error'] or '-'} |" for r in records] + [""]
     L += ["## 3. second_source.csv", ""]
     if second_path is None: L += ["(not run)", ""]
     else: L += ["```", open(second_path, encoding="utf-8").read().strip(), "```", ""] + [f"- {esc(n)}" for n in second_notes] + [""]
@@ -143,7 +172,7 @@ def report(run, started, env, diag_text, diag, records, table, second_path, seco
     return "\n".join(L) + "\n"
 
 
-def main(argv=None, runners=None, transport=None, accuracy=None, clock=time.monotonic, sleep=time.sleep, now=None, fixtures_root=None, results_root=None):
+def main(argv=None, runners=None, transport=None, accuracy=None, clock=time.monotonic, sleep=time.sleep, now=None, fixtures_root=None, results_root=None, limit_transport=False):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--sites", required=True); ap.add_argument("--truth-sites", required=True); ap.add_argument("--truth", required=True)
     ap.add_argument("--out-dir", default=os.path.join(ROOT, "var", "s06_osm_pipeline")); ap.add_argument("--dry-run", action="store_true")
@@ -168,10 +197,21 @@ def main(argv=None, runners=None, transport=None, accuracy=None, clock=time.mono
         print("nothing was requested")
         return 0
     if os.environ.get("TCP_LIVE") != "1" and runners is None: print("live calls need TCP_LIVE=1 (or use --dry-run)"); return 2
+    provider = D.provider_of(cfg)
+    limited = None
+    if provider == "osm_api" and (transport is None or limit_transport):
+        base = transport or requests_transport
+        limited = LimitedTransport(base, setting("osm_diagnose", "api_max_requests", cfg)[0], setting("osm_diagnose", "api_min_gap_s", cfg)[0],
+                                   setting("osm_diagnose", "stop_statuses", cfg)[0], clock, sleep)
+        transport = limited
     if runners is None:
         from tcp_planner.orchestration.pipeline import load_env_file, use_os_trust_store
-        load_env_file(); use_os_trust_store(); runners = D.real_runners(sites[0], cfg, sources)
+        load_env_file(); use_os_trust_store()
+        transport = transport or requests_transport
+        runners = D.real_runners(sites[0], cfg, sources, transport)
     transport = transport or requests_transport
+    if callable(runners): runners = runners(sites[0], cfg, sources, transport)           # a factory: the runners share this run's (limited) transport
+    stop = (lambda: limited.stop_reason) if limited else None
     if accuracy is None:
         import s06_accuracy_report as ACC; accuracy = ACC.main
     started = (now or datetime.datetime.now()).isoformat(timespec="seconds")
@@ -179,7 +219,7 @@ def main(argv=None, runners=None, transport=None, accuracy=None, clock=time.mono
     state = dict(diag_text=None, diag=None, records=None, table=None, second_path=None, second_rows=None, second_notes=[], accs=None, fixtures=None)
     failed = None
     from tcp_planner.data_sources import osm as osm_mod
-    env = D.environment(osm_mod.URL, sources)
+    env = D.environment(D.provider_url(cfg), sources)
 
     def finish():
         text = report(run, started, env, state["diag_text"], state["diag"], state["records"], state["table"], state["second_path"], state["second_rows"], state["second_notes"],
@@ -192,21 +232,27 @@ def main(argv=None, runners=None, transport=None, accuracy=None, clock=time.mono
     print("== stage 1: diagnose ==")
     outcome = D.run_diagnose(sites[0], runners, cfg, clock, sleep)
     state["diag"] = outcome
-    state["diag_text"] = D.render(sites[0], outcome, D.environment(osm_mod.URL, sources), D.effective(sites[0], cfg, sources), started)
+    state["diag_text"] = D.render(sites[0], outcome, D.environment(D.provider_url(cfg), sources), D.effective(sites[0], cfg, sources), started)
     with open(os.path.join(run, "diagnose.md"), "w", encoding="utf-8", newline="\n") as f: f.write(state["diag_text"])
     if not outcome["passed"]:
         failed = "stage 1 (diagnose)"
         print(f"STAGE 1 FAILED: the project path did not return HTTP 200 with parseable JSON in under {setting('osm_diagnose', 'pass_s', cfg)[0]} s.")
-        print(f"VERDICT: {outcome['verdict']}: {outcome['why']}\nNothing else was requested. Send REPORT.md.")
+        print(f"VERDICT: {outcome['verdict']}: {outcome['why']}")
+        if limited is not None and limited.stop_reason:
+            print(f"The run stopped on {limited.stop_reason}." + (f" Page text: {limited.stop_page}" if limited.stop_page else ""))
+        print("Nothing else was requested. Send REPORT.md.")
         finish(); return 1
     print("stage 1 passed")
     # stage 2
     print("== stage 2: record the OSM fixtures ==")
-    records = REC.record_sites(sites, fixtures_root, transport, sleep, cfg=cfg, clock=clock)
+    records = REC.record_sites(sites, fixtures_root, transport, sleep, cfg=cfg, clock=clock, stop=stop)
     state["records"] = records; state["fixtures"] = fixture_files(fixtures_root, [s["site_id"] for s in sites])
-    bad = [r for r in records if r["status"] == "failed"]
+    bad = [r for r in records if r["status"] in ("failed", "not_attempted")]
     if bad:
-        failed = "stage 2 (record)"; print(f"STAGE 2 FAILED for {', '.join(r['site_id'] for r in bad)}: {bad[0]['error']}. Send REPORT.md."); finish(); return 1
+        failed = "stage 2 (record)"
+        print(f"STAGE 2 FAILED for {', '.join(r['site_id'] for r in bad)}: {bad[0]['error'] or bad[0]['status']}."
+              + (f" The run stopped: {limited.stop_reason}" + (f"; page text: {limited.stop_page}" if limited.stop_page else "") if limited and limited.stop_reason else "") + " Send REPORT.md.")
+        finish(); return 1
     # stage 3
     print("== stage 3: second_source.csv ==")
     state["second_path"] = os.path.join(run, "second_source.csv")

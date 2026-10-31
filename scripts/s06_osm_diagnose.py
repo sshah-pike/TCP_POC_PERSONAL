@@ -96,6 +96,9 @@ def verdict(results, slow_s):
     a, b, c, d, e, f, g, h, i = (R.get(k) for k in "abcdefghi")
     slow = lambda r: is_slow(r, slow_s); fast = lambda r: is_fast(r, slow_s)
     query_variants = [r for r in (a, b, c, d, e, f, g, h) if r is not None]
+    if len(query_variants) == 1 and a is not None:
+        return ("project path fast (no comparison variants run)" if fast(a) else "project path slow or failed (no comparison variants run)"), [], \
+               "only the project path ran (provider osm_api: no other host is called)"
     if query_variants and all(fast(r) for r in query_variants): return "not reproduced now", ["not reproduced now"], "every variant answered fast: the earlier stall did not happen now"
     out = []
     if slow(a) and (fast(b) or fast(c)): out.append(("our client code", "the project path is slow while plain requests with the same query are fast"))
@@ -194,6 +197,27 @@ def timed_powershell(variant, url, read_timeout):
     return result(variant, None, None, None, None, secs, kv.get("ERROR", "PowerShellError"))
 
 
+def provider_of(cfg):
+    from tcp_planner.site_model.site_config import setting
+    return setting("osm", "provider", cfg)[0]
+
+
+def provider_url(cfg):
+    """The URL of the configured provider (for the environment section and the effective settings)."""
+    from tcp_planner.data_sources import osm
+    from tcp_planner.site_model.site_config import setting
+    return setting("osm", "api_url", cfg)[0] if provider_of(cfg) == "osm_api" else osm.URL
+
+
+def parseable(content, provider):
+    """The answer is parseable for the provider: JSON for overpass, OSM XML for osm_api."""
+    if provider == "osm_api":
+        import xml.etree.ElementTree as ET
+        try: return ET.fromstring(content).tag == "osm"
+        except ET.ParseError: return False
+    return _json_ok(content)
+
+
 def queries(site, cfg):
     from tcp_planner.data_sources import osm
     from tcp_planner.site_model.site_config import setting
@@ -203,31 +227,35 @@ def queries(site, cfg):
     return {"full": full, "simple": simple, "no_geom": full.replace("out tags geom;", "out tags;"), "radius": r}
 
 
-def real_runners(site, cfg, sources):
-    """{variant: callable() -> result} for a live run. Each makes exactly one request."""
+def real_runners(site, cfg, sources, transport=None):
+    """{variant: callable() -> result} for a live run. For provider osm_api ONLY variant a (the project path) exists: no other host is called and
+    Overpass is not touched. `transport` is the transport the project path uses (the pipeline passes its limited one)."""
     from tcp_planner.data_sources import osm
     from tcp_planner.data_sources.base import SourceClient, requests_transport
     from tcp_planner.site_model.site_config import setting
+    provider = provider_of(cfg); inner = transport or requests_transport
     q = queries(site, cfg); ua = sources["user_agent"]; url = osm.URL
     ct, rt = setting("osm_diagnose", "connect_timeout_s", cfg)[0], setting("osm_diagnose", "read_timeout_s", cfg)[0]
     get_url = lambda text: url + "?" + urlencode({"data": text})
     status_url = url.replace("/interpreter", "/status")
 
     def a():
-        box = {}; rec = []
+        calls = []; rec = []
 
-        def transport(method, u, params, body, headers, timeout):
-            undo = _patch_connect(rec); t0 = time.perf_counter()
-            try: st, content = requests_transport(method, u, params, body, headers, timeout)
+        def timed(method, u, params, body, headers, timeout):
+            undo = _patch_connect(rec)
+            try: st, content = inner(method, u, params, body, headers, timeout)
             finally: undo()
-            box.update(status=st, bytes=len(content), total=time.perf_counter() - t0, json=_json_ok(content)); return st, content
+            calls.append({"status": st, "bytes": len(content), "ok": parseable(content, provider)}); return st, content
         from tcp_planner.data_sources.base import SourceError
         t0 = time.perf_counter()
-        try: osm.fetch_ways(SourceClient(sources=sources, transport=transport), site["lat"], site["lon"], cfg)
+        try: osm.fetch_ways(SourceClient(sources=sources, transport=timed), site["lat"], site["lon"], cfg)
         except SourceError as e:
-            return result("a", (e.details or {}).get("http_status"), box.get("bytes"), rec[0][0] if rec else None, None, time.perf_counter() - t0, e.code, box.get("json"),
-                          peer=rec[0][1] if rec else None, body_head=head((e.details or {}).get("body")))
-        return result("a", box["status"], box["bytes"], rec[0][0] if rec else None, None, box["total"], None, box["json"], peer=rec[0][1] if rec else None)
+            return result("a", (e.details or {}).get("http_status") or (calls[-1]["status"] if calls else None), sum(c["bytes"] for c in calls) or None, rec[0][0] if rec else None, None,
+                          time.perf_counter() - t0, e.code, False if calls else None, peer=rec[0][1] if rec else None, body_head=head((e.details or {}).get("body")))
+        return result("a", calls[-1]["status"], sum(c["bytes"] for c in calls), rec[0][0] if rec else None, None, time.perf_counter() - t0, None, all(c["ok"] for c in calls),
+                      peer=rec[0][1] if rec else None)
+    if provider == "osm_api": return {"a": a}
     return {
         "a": a,
         "b": lambda: timed_requests("b", "GET", url, params={"data": q["full"]}, read_timeout=rt, connect_timeout=ct),
@@ -260,6 +288,12 @@ def environment(url, sources):
 def effective(site, cfg, sources):
     from tcp_planner.data_sources import osm
     from tcp_planner.site_model.site_config import setting
+    if provider_of(cfg) == "osm_api":
+        from tcp_planner.data_sources import osm_api
+        url, params = osm_api.first_request(site["lat"], site["lon"], cfg)
+        return {"variant a": "project SourceClient path (provider osm_api; no other variant runs)", "url": url, "method": "GET", "sent_as": "query string, parameter bbox=left,bottom,right,top",
+                "bbox": params["bbox"], "headers": {"User-Agent": sources["user_agent"]}, "timeout (connect, read) s": (5, sources["sources"]["osm_api"]["timeout_s"]),
+                "retries": f"a box widened once if no highway way lies within {setting('osm', 'query_radius_m', cfg)[0]} m; shrunk once on HTTP 400 too many nodes"}
     return {"variant a": "project SourceClient path", "url": osm.URL, "method": "GET", "sent_as": "query string, parameter data=<Overpass QL>", "query": queries(site, cfg)["full"],
             "headers": {"User-Agent": sources["user_agent"]}, "timeout (connect, read) s": (5, sources["sources"]["osm_overpass"]["timeout_s"]),
             "query timeout_s (server side)": setting("osm", "query_timeout_s", cfg)[0]}
@@ -328,7 +362,9 @@ def main(argv=None, runners=None, clock=time.monotonic, sleep=time.sleep, run_di
     cfg, sources = load_site_config(), load_sources()
     if a.dry_run:
         print(f"[dry run] site {site['site_id']}: at most {setting('osm_diagnose', 'max_requests', cfg)[0]} requests, at least {setting('osm_diagnose', 'min_gap_s', cfg)[0]} s apart, stop on HTTP 429")
-        for k, label in VARIANTS: print(f"  variant {k}: {label}" + ("  (Windows only)" if k == "h" else ""))
+        if provider_of(cfg) == "osm_api": print("  provider osm_api: only variant a (the project path) runs; Overpass is not called")
+        else:
+            for k, label in VARIANTS: print(f"  variant {k}: {label}" + ("  (Windows only)" if k == "h" else ""))
         for k, v in effective(site, cfg, sources).items(): print(f"  {k}: {v}")
         print("nothing was requested")
         return 0
@@ -339,7 +375,7 @@ def main(argv=None, runners=None, clock=time.monotonic, sleep=time.sleep, run_di
     started = datetime.datetime.now().isoformat(timespec="seconds")
     outcome = run_diagnose(site, runners, cfg, clock, sleep)
     from tcp_planner.data_sources import osm
-    text = render(site, outcome, environment(osm.URL, sources), effective(site, cfg, sources), started)
+    text = render(site, outcome, environment(provider_url(cfg), sources), effective(site, cfg, sources), started)
     d = run_directory or run_dir(a.out_dir)
     with open(os.path.join(d, "diagnose.md"), "w", encoding="utf-8", newline="\n") as f: f.write(text)
     print("\n" + text); print(f"saved {os.path.join(d, 'diagnose.md')}")

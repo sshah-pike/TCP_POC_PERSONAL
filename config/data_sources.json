@@ -28,6 +28,17 @@
       },
       "timeout_note": "read timeout of the HTTP client in seconds; CALIBRATION_PENDING (was 25 s, which timed out on the first site of the recording run). Keep it above osm.query_timeout_s in config/site_understanding.json so the server answers or gives up before the client does"
     },
+    "osm_api": {
+      "hosts": [
+        "api.openstreetmap.org"
+      ],
+      "enabled": true,
+      "license_note": "OpenStreetMap data, ODbL 1.0, (c) OpenStreetMap contributors; OSM API usage policy: descriptive User-Agent, no bulk downloading, small boxes",
+      "timeout_s": 90,
+      "max_bytes": 30000000,
+      "timeout_note": "read timeout in seconds, CALIBRATION_PENDING; a box with up to the API's node limit can be several megabytes",
+      "size_note": "max_bytes is CALIBRATION_PENDING: the API refuses a box with more than 50000 nodes, which is a few tens of megabytes of XML at most"
+    },
     "massgis": {
       "hosts": [],
       "enabled": false,

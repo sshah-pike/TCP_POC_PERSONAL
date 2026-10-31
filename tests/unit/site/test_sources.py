@@ -31,8 +31,9 @@ def client(tmp_path=None, transport=None, hook=True, store=None):
 # ---------------------------------------------------------------- the allow list
 def test_session_1_enables_only_azure_maps_and_overpass():
     cfg = B.load_sources()["sources"]
-    assert {k for k, v in cfg.items() if v["enabled"]} == {"azure_maps", "osm_overpass"}
+    assert {k for k, v in cfg.items() if v["enabled"]} == {"azure_maps", "osm_overpass", "osm_api"}
     assert cfg["osm_overpass"]["hosts"] == ["overpass-api.de"] and cfg["azure_maps"]["hosts"] == ["atlas.microsoft.com"]
+    assert cfg["osm_api"]["hosts"] == ["api.openstreetmap.org"]
 
 
 def test_session_2_sources_are_listed_but_disabled_with_no_host():

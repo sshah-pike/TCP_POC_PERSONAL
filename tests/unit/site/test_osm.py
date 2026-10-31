@@ -12,6 +12,9 @@ from tcp_planner.site_model import osm_rules as R
 from tcp_planner.site_model.site_config import load_site_config, setting
 from tests.support.source_fixtures import SourceFixtures
 
+
+pytestmark = pytest.mark.usefixtures("overpass_provider")      # these tests are about the Overpass provider; the shipped default is osm_api
+
 LAT0, LON0 = 41.5774, -71.6908
 K = math.pi / 180 * osm.EARTH_R_M
 

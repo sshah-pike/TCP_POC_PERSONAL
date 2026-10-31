@@ -111,7 +111,7 @@ class SourceClient:
             if len(content) > src["max_bytes"]:
                 raise SourceError("SOURCE_RESPONSE_TOO_LARGE", f"{source_id}: {len(content)} bytes exceeds the limit of {src['max_bytes']}")
             if self.hook is not None:
-                self.hook.save(rec, {"status": status, "body_b64": base64.b64encode(content).decode(), "retrieved_at": retrieved})
+                self.hook.save(rec, {"status": status, "body_b64": base64.b64encode(content).decode(), "retrieved_at": retrieved, "source": source_id})
         if len(content) > src["max_bytes"]:
             raise SourceError("SOURCE_RESPONSE_TOO_LARGE", f"{source_id}: {len(content)} bytes exceeds the limit of {src['max_bytes']}")
         ref = None

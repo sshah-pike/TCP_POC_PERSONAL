@@ -8,7 +8,7 @@ Geometry is kept in a local frame around the work point: x east, y north, metres
 """
 import json
 import math
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 
 from tcp_planner.data_sources.base import SourceClient, SourceError
 from tcp_planner.site_model.site_config import load_site_config, setting
@@ -28,6 +28,7 @@ class OsmResult(NamedTuple):
     ways: tuple
     call: object           # SourceCall
     origin: tuple          # (lat, lon) of the local frame
+    info: Optional[dict] = None    # provider and what it did (boxes asked, widened, shrunk): for the trace; the OSM rules never read it
 
 
 def to_local(lat0, lon0, lat, lon):
@@ -63,8 +64,49 @@ def parse_overpass(content, origin):
 
 
 def fetch_ways(client: SourceClient, lat, lon, cfg=None, radius_m=None):
-    """OsmResult for the highway ways near (lat, lon). Refuses a radius above the allow list's query limit and an answer with
-    more elements than allowed. A source failure raises SourceError; the caller turns it into UNKNOWN with reason source_failed."""
+    """OsmResult for the highway ways near (lat, lon) from the provider named in config osm.provider: osm_api (the OSM main API, the default)
+    or overpass. Both return the same OsmWay structure; nothing downstream knows which one ran. A source failure raises SourceError; the caller
+    turns it into UNKNOWN with reason source_failed."""
+    cfg = cfg or load_site_config()
+    provider = setting("osm", "provider", cfg)[0]
+    if provider == "overpass": return fetch_ways_overpass(client, lat, lon, cfg, radius_m)
+    if provider == "osm_api":
+        from tcp_planner.data_sources import osm_api
+        return osm_api.fetch_ways_api(client, lat, lon, cfg, radius_m)
+    raise SourceError("SOURCE_UNKNOWN_PROVIDER", f"config osm.provider is {provider!r}; use osm_api or overpass")
+
+
+def request_key(lat, lon, cfg=None):
+    """Fingerprint of the first request the configured provider makes for a point (names the fixture; differs between providers)."""
+    from tcp_planner.data_sources.base import request_fingerprint, request_record
+    cfg = cfg or load_site_config()
+    provider = setting("osm", "provider", cfg)[0]
+    if provider == "osm_api":
+        from tcp_planner.data_sources import osm_api
+        url, params = osm_api.first_request(lat, lon, cfg)
+        return request_fingerprint(request_record(osm_api.API_SOURCE_ID, "GET", url, params))
+    q = build_query(lat, lon, setting("osm", "query_radius_m", cfg)[0], setting("osm", "highway_classes", cfg)[0], setting("osm", "query_timeout_s", cfg)[0])
+    return request_fingerprint(request_record(SOURCE_ID, "GET", URL, {"data": q}))
+
+
+def request_preview(lat, lon, cfg=None):
+    """One line saying what the configured provider would request first for a point (for the dry runs)."""
+    cfg = cfg or load_site_config()
+    if setting("osm", "provider", cfg)[0] == "osm_api":
+        from tcp_planner.data_sources import osm_api
+        url, params = osm_api.first_request(lat, lon, cfg)
+        return f"GET {url}?bbox={params['bbox']}"
+    return build_query(lat, lon, setting("osm", "query_radius_m", cfg)[0], setting("osm", "highway_classes", cfg)[0], setting("osm", "query_timeout_s", cfg)[0])
+
+
+def trace_record(result):
+    """What a caller puts in SiteInput.osm_call: the SourceCall and what the provider did (boxes, widening, shrinking)."""
+    return {"call": result.call.model_dump(mode="json"), "info": result.info or {}}
+
+
+def fetch_ways_overpass(client: SourceClient, lat, lon, cfg=None, radius_m=None):
+    """The Overpass provider. Refuses a radius above the allow list's query limit and an answer with
+    more elements than allowed."""
     cfg = cfg or load_site_config()
     radius = radius_m if radius_m is not None else setting("osm", "query_radius_m", cfg)[0]
     limits = client.cfg["sources"][SOURCE_ID]["query_limits"]
@@ -79,7 +121,7 @@ def fetch_ways(client: SourceClient, lat, lon, cfg=None, radius_m=None):
         n = 0
     if n > limits["max_elements"]:
         raise SourceError("SOURCE_RESPONSE_TOO_LARGE", f"Overpass returned {n} elements; the limit is {limits['max_elements']}")
-    return OsmResult(parse_overpass(resp.content, (lat, lon)), resp.call, (lat, lon))
+    return OsmResult(parse_overpass(resp.content, (lat, lon)), resp.call, (lat, lon), {"provider": "overpass", "url": URL})
 
 
 # ---------------------------------------------------------------- local geometry

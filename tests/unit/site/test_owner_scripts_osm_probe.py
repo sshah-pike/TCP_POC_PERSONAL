@@ -15,6 +15,8 @@ from tests.unit.site.test_osm import K, LAT0, LON0, answer, element, latlon
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+pytestmark = pytest.mark.usefixtures("overpass_provider")      # these tests are about the Overpass provider; the shipped default is osm_api
+
 
 def load(name):
     import sys

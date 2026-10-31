@@ -18,7 +18,7 @@ CFG = json.load(open(os.path.join(ROOT, "config", "site_understanding.json"), en
 SOURCES = json.load(open(os.path.join(ROOT, "config", "data_sources.json"), encoding="utf-8"))
 MODULES = ["site_model/bearing_check.py", "site_model/edge_rule.py", "site_model/osm_rules.py", "site_model/fusion_apply.py", "site_model/consistency.py",
            "site_model/code_checks.py", "site_model/understanding.py", "site_model/site_exceptions.py", "site_model/fusion_v2.py", "site_model/outcomes.py",
-           "data_sources/osm.py", "imagery/snap.py"]
+           "data_sources/osm.py", "data_sources/osm_api.py", "imagery/snap.py"]
 STRUCTURAL = {"0", "1", "2", "0.0", "1.0", "2.0", "0.5", "180", "180.0", "360", "0.299", "0.587", "0.114", "6371008.8"}
 
 
