@@ -76,7 +76,7 @@ def test_to_site_facts_carries_the_flag_into_the_gate():
         obs[r.name] = Observation(field=r.name, value=_norm_value(r, v), status="RESOLVED", confidence=0.95, evidence="e")
     facts, _ = to_site_facts(Call1Result(obs, (), ()), work_location_marks=MARKS_MISSING)
     decision, reasons = rule_inputs(facts).gate(SUPPORTED_AUTO)
-    assert decision == REVIEW_REQUIRED and [r["fact"] for r in reasons] == ["work_location"]
+    assert decision == REVIEW_REQUIRED and sorted(r["fact"] for r in reasons) == ["approaching_lanes_one", "bicycle_lane_present", "median_work", "work_location"]
 
 
 # ---------------------------------------------------------------- TLS (point 4)

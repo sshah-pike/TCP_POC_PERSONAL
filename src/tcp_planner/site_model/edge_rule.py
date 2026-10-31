@@ -5,7 +5,9 @@ The distance is computed in code from the AI's edge and work-point marks (D-64; 
 lowers trust: it can turn a value into UNKNOWN and never creates one. 5 m is CALIBRATION_PENDING in config.
 
   NEAR_EDGE   the work point is within the configured distance of the nearest road edge (on either side, inside or outside)
-  NO_ROAD     no road near: no OSM way within the configured distance and no usable road-edge marks
+  NO_ROAD     no road near: no OSM way within `edge_rule.no_road_near_m` (see `road_near`) and no usable road-edge marks. The question
+              is a question CANDIDATE (informational unless S7's what-if test makes it blocking), pre-filled with the AI value.
+              With a road within that distance and clear of the edge, an answer such as BEYOND_SHOULDER is FOUND.
   CLEAR       far enough from the nearest edge
   NO_DISTANCE a road is known but the marks give no distance (no work point or no edge marks): the rule does not apply, and the
               work_location fact keeps its own marks check
@@ -41,6 +43,14 @@ def edge_distance_m(marks, mpp_sent, cfg=None):
     return abs(m.value_ft) * FT, m.value_ft < 0
 
 
+def road_near(ways, point=(0.0, 0.0), cfg=None):
+    """True when an OSM way (any class, service included: a road is a road) lies within `edge_rule.no_road_near_m` of the work point,
+    False when none does. Pass the result as `osm_road_near`; pass None when OSM was not consulted or failed."""
+    from tcp_planner.data_sources.osm import point_to_polyline
+    limit, _ = setting("edge_rule", "no_road_near_m", cfg or load_site_config())
+    return any(point_to_polyline(point, w.points)[0] <= limit for w in ways)
+
+
 def check_edge(marks, mpp_sent, osm_road_near, cfg=None):
     """EdgeRuleResult. `osm_road_near`: True when an OSM way lies within the configured distance of the work point, False when none does,
     None when OSM was not consulted or failed (then only the edge marks can show a road)."""
@@ -49,14 +59,15 @@ def check_edge(marks, mpp_sent, osm_road_near, cfg=None):
     dist, inside = edge_distance_m(marks, mpp_sent, cfg)
     has_edges = dist is not None
 
-    def ask(kind_reason, status, ctx):
+    def ask(kind_reason, status, ctx, candidate=False):
         q = Question(question_id=question_id("WORK_LOCATION_NEAR_EDGE", "work_location", status), kind="WORK_LOCATION_NEAR_EDGE",
                      reason=kind_reason, options=("IN_LANE", "ON_SHOULDER_OR_ENCROACHING", "BEYOND_SHOULDER"), field="work_location",
-                     reveals=("work_location",), context={**ctx, "threshold_m": limit})
+                     reveals=("work_location",), candidate=candidate,
+                     context={**ctx, "threshold_m": limit, "no_road_near_m": setting("edge_rule", "no_road_near_m", cfg)[0]})
         return q
     if not has_edges and osm_road_near is not True:
         why = "no OSM road near the work point and no road edges marked" if osm_road_near is False else "no road edges marked and OSM gave no road"
-        q = ask("no road is near the work point, so the work location cannot be read from the image: where is the work?", NO_ROAD, {})
+        q = ask("no road is near the work point, so the work location cannot be read from the image: where is the work?", NO_ROAD, {}, candidate=True)
         return EdgeRuleResult(NO_ROAD, None, None, limit, q, flags, why)
     if not has_edges:
         return EdgeRuleResult(NO_DISTANCE, None, None, limit, None, flags, f"road known from OSM; no edge distance from the marks ({inside})")
@@ -75,6 +86,7 @@ def apply_edge_rule(fact, result):
     if fact.outcome == "UNKNOWN": return fact, None
     cand = fact.candidates + (Candidate(source="AI", value=fact.value, outcome=fact.outcome),)
     reason = "near_edge" if result.status == NEAR_EDGE else "no_road_near"
+    q = result.question if result.question is None or not result.question.candidate else result.question.model_copy(update={"suggested": fact.value})
     return fact.model_copy(update={"outcome": "UNKNOWN", "value": None, "reason_code": reason, "candidates": cand,
                                    "flags": tuple(dict.fromkeys(fact.flags + result.flags)),
-                                   "evidence": (fact.evidence + " | " if fact.evidence else "") + f"edge rule: {result.evidence}"}), result.question
+                                   "evidence": (fact.evidence + " | " if fact.evidence else "") + f"edge rule: {result.evidence}"}), q

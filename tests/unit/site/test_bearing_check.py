@@ -170,49 +170,91 @@ def test_no_road_near_gives_no_comparison():
     assert BC.check_bearing(straight_marks(90), []).status == BC.NO_ROAD
 
 
-# ---------------------------------------------------------------- which road?
-def test_roads_that_differ_by_more_than_the_tolerance_raise_a_which_road_question_when_the_marks_do_not_decide():
-    a, b = road(1, 90, "Main St", offset_m=3), road(2, 0, "Side St", offset_m=4)
-    q = BC.check_bearing((), [a, b])
-    assert q.status == BC.WHICH_ROAD and q.questions[0].kind == "WHICH_ROAD" and not q.widths_ok
-    assert {w["id"] for w in q.questions[0].context["ways"]} == {1, 2} and len(q.questions[0].options) == 2
-    assert q.questions[0].field == "road"
+# ---------------------------------------------------------------- the reference way is chosen by the work point, never by the marks (R1)
+def test_roads_that_run_different_ways_and_are_not_clearly_apart_raise_which_road_whatever_the_marks_say():
+    a, b = road(1, 90, "Main St", offset_m=3), road(2, 0, "Side St", offset_m=4)          # 1 m apart: not clearly nearer
+    for marks in ((), straight_marks(85), straight_marks(10), straight_marks(45)):
+        chk = BC.check_bearing(marks, [a, b])
+        assert chk.status == BC.WHICH_ROAD and chk.reference is None and chk.way_id is None and not chk.widths_ok
+        q = chk.questions[0]
+        assert q.kind == "WHICH_ROAD" and q.field == "road" and len(q.options) == 2 and {w["id"] for w in q.context["ways"]} == {1, 2}
 
 
-def test_the_marks_choose_when_exactly_one_candidate_matches():
-    a, b = road(1, 90, "Main St"), road(2, 0, "Side St", offset_m=4)
-    chk = BC.check_bearing(straight_marks(85), [a, b])
-    assert chk.status == BC.AGREE and chk.way_id == 1 and chk.questions == ()
-    chk2 = BC.check_bearing(straight_marks(10), [a, b])
-    assert chk2.status == BC.AGREE and chk2.way_id == 2
+def test_a_clearly_nearer_way_is_the_reference_and_the_marks_only_confirm_or_contradict_it():
+    a, b = road(1, 90, "Main St", offset_m=3), road(2, 0, "Side St", offset_m=20)          # 17 m apart: clear
+    ok = BC.check_bearing(straight_marks(85), [a, b])
+    assert ok.status == BC.AGREE and ok.way_id == 1 and ok.reference.way.id == 1 and ok.questions == ()
+    for bearing in (0, 10, 45, 150):                                                       # the reference never moves with the marks
+        chk = BC.check_bearing(straight_marks(bearing), [a, b])
+        assert chk.way_id in (1, None) and (chk.reference is None or chk.reference.way.id == 1)
+    wrong = BC.check_bearing(straight_marks(10), [a, b])                                   # marks match the OTHER way: a mismatch, not a switch
+    assert wrong.status == BC.MISMATCH and wrong.way_id == 1 and "way 2 instead" in wrong.evidence and not wrong.widths_ok
+    assert wrong.questions[0].kind == "WHICH_ROAD" and len(wrong.questions) == 1
 
 
-def test_marks_that_match_neither_candidate_ask_which_road():
-    a, b = road(1, 90, "Main St"), road(2, 0, "Side St", offset_m=4)
-    chk = BC.check_bearing(straight_marks(45), [a, b])
-    assert chk.status == BC.WHICH_ROAD and chk.questions[0].kind == "WHICH_ROAD" and chk.widths_ok is False
+def test_the_margin_is_read_from_config_and_calibration_pending():
+    cfg = load_site_config()
+    assert setting("bearing", "nearest_margin_m", cfg) == (8, ("CALIBRATION_PENDING",))
+    a, b = road(1, 90, "Main St", offset_m=3), road(2, 0, "Side St", offset_m=10.9)
+    assert BC.check_bearing(straight_marks(88), [a, b]).status == BC.WHICH_ROAD            # 7.9 m
+    b2 = road(2, 0, "Side St", offset_m=11.0)
+    assert BC.check_bearing(straight_marks(88), [a, b2]).status == BC.AGREE                # 8.0 m
+    cfg["bearing"]["nearest_margin_m"]["value"] = 20
+    assert BC.check_bearing(straight_marks(88), [a, b2], cfg=cfg).status == BC.WHICH_ROAD
 
 
-def test_roads_that_differ_by_less_than_the_tolerance_are_one_road():
-    a, b = road(1, 90, "Main St"), road(2, 100, "Main St", offset_m=6)
+def test_a_way_of_the_same_road_is_not_another_road():
+    a, b = road(1, 90, "Main St", offset_m=3), road(2, 100, "Main St", offset_m=4)         # 10 degrees apart: one road
     chk = BC.check_bearing(straight_marks(92), [a, b])
     assert chk.status == BC.AGREE and chk.way_id == 1 and chk.questions == ()
 
 
-def test_a_service_way_is_never_a_candidate_for_which_road():
-    main, drive = road(1, 90, "Main St"), road(2, 0, "Driveway", highway="service", offset_m=1)
+def test_a_service_way_is_never_a_reference_candidate():
+    main, drive = road(1, 90, "Main St", offset_m=5), road(2, 0, "Driveway", highway="service", offset_m=1)
     chk = BC.check_bearing(straight_marks(88), [main, drive])
     assert chk.status == BC.AGREE and chk.way_id == 1
 
 
-def test_which_road_candidates_beyond_the_configured_distance_do_not_count():
+def test_roads_beyond_the_which_road_distance_do_not_count():
     a, b = road(1, 90, "Main St", offset_m=3), road(2, 0, "Far St", offset_m=24)
     cfg = load_site_config(); cfg["bearing"]["which_road_distance_m"]["value"] = 10
     chk = BC.check_bearing(straight_marks(88), [a, b], cfg=cfg)
     assert chk.status == BC.AGREE and chk.way_id == 1
 
 
-def test_the_tolerance_and_distance_are_read_from_config_by_name_not_typed():
+# ---------------------------------------------------------------- Granite P32: US-1 and Cross St at a corner (R1)
+def granite_corner(cross_offset_m):
+    """US-1 runs north-south (bearing 176, as the AI marks read it) 6 m from the work point; Cross St runs east-west."""
+    return [road(10, 176, "US 1", offset_m=6, tags={"lanes": "4"}), road(11, 90, "Cross St", offset_m=cross_offset_m, tags={"lanes": "2"})]
+
+
+def test_a_cross_street_traced_by_the_ai_at_the_corner_fails_and_does_not_pass_on_two_agreeing_sources():
+    from tcp_planner.site_model import fusion_apply as FA
+    from tcp_planner.site_model import osm_rules as OR
+    ways = granite_corner(cross_offset_m=22)                                    # US-1 is clearly nearer (16 m)
+    chk = BC.check_bearing(straight_marks(90), ways)                            # the AI traced Cross St (east-west)
+    assert chk.status == BC.MISMATCH and chk.way_id == 10 and "way 11 instead" in chk.evidence
+    # the AI read lanes_per_direction 2 for the road it traced; OSM's reference (US-1, lanes 4) also gives 2: two sources agree...
+    facts = [SiteFact(field="lanes_per_direction", registry_id="lanes_per_direction", source="AI", outcome="FOUND", value=2, confidence=0.9,
+                      flags=("NEEDS_SECOND_SOURCE",))]
+    fused = FA.fuse_fields(facts, OR.osm_read(ways, choice=chk.reference))
+    assert fused.facts[0].outcome == "FOUND" and fused.records["lanes_per_direction"].agreement == "AGREE"
+    # ...but the bearing check blocks it: it is not allowed to stand
+    blocked = BC.block_road_specific(list(fused.facts), chk)[0]
+    assert blocked.outcome == "UNKNOWN" and blocked.reason_code == "wrong_road_suspected" and any(c.value == 2 for c in blocked.candidates)
+
+
+def test_the_same_corner_passes_when_the_ai_traced_us_1():
+    chk = BC.check_bearing(straight_marks(176), granite_corner(cross_offset_m=22))
+    assert chk.status == BC.AGREE and chk.way_id == 10
+
+
+def test_a_corner_where_neither_road_is_clearly_nearer_asks_which_road():
+    chk = BC.check_bearing(straight_marks(176), granite_corner(cross_offset_m=10))          # 4 m apart
+    assert chk.status == BC.WHICH_ROAD and chk.questions[0].kind == "WHICH_ROAD" and not chk.widths_ok
+
+
+def test_the_tolerance_margin_and_distance_are_read_from_config_by_name_not_typed():
     src = open(BC.__file__, encoding="utf-8").read()
-    assert 'setting("bearing", "tolerance_deg"' in src and 'setting("bearing", "which_road_distance_m"' in src
-    assert "tol = 30" not in src and "> 30" not in src and "<= 30" not in src
+    for name in ("tolerance_deg", "which_road_distance_m", "nearest_margin_m"): assert f'setting("bearing", "{name}"' in src
+    assert "tol = 30" not in src and "> 30" not in src and "<= 30" not in src and "margin = 8" not in src

@@ -16,6 +16,15 @@
         "oneway"
       ],
       "source": "owner decision, S6 session 1 (Q7/Q8): AI plus OSM must agree, otherwise UNKNOWN"
+    },
+    "ai_only_review_fields": {
+      "value": [
+        "median_work",
+        "bicycle_lane_present",
+        "approaching_lanes_one"
+      ],
+      "source": "owner decision, STOP 5 review R2 (2026-10-31)",
+      "note": "AI-only registry facts with no second source: a value that reaches a rule input carries AI_ONLY_UNCONFIRMED (REVIEW_REQUIRED, naming the fact). No new floor number."
     }
   },
   "measurement": {
@@ -142,7 +151,12 @@
     "which_road_distance_m": {
       "value": 25,
       "source": "CALIBRATION_PENDING",
-      "note": "OSM ways (service ways excluded) within this distance of the work point are the candidates for the road of the job; if they differ in bearing by more than the tolerance the SME is asked which road"
+      "note": "OSM ways (service ways excluded) within this distance of the work point are the candidates for the reference road; the nearest is used only when it is clearly nearer than the next road that runs a different way (nearest_margin_m)"
+    },
+    "nearest_margin_m": {
+      "value": 8,
+      "source": "CALIBRATION_PENDING",
+      "note": "the OSM reference way is the one nearest the work point only if it is at least this much nearer than the next road that runs a different way; otherwise the SME is asked which road. The marks never choose the reference way."
     }
   },
   "edge_rule": {
@@ -151,6 +165,11 @@
       "value": 5,
       "source": "CALIBRATION_PENDING",
       "note": "within this distance of the nearest road edge (or with no road near) work_location is UNKNOWN plus one SME question"
+    },
+    "no_road_near_m": {
+      "value": 25,
+      "source": "CALIBRATION_PENDING",
+      "note": "no road near: no OSM way within this distance of the work point and no usable road-edge marks. With a road within the distance a BEYOND_SHOULDER answer stays FOUND; with none the SME gets one question candidate (informational unless S7's what-if test makes it blocking)"
     }
   },
   "confidence_floors": {

@@ -7,6 +7,8 @@ source must agree.
   single source    UNKNOWN (single_source): no second source, or the source gave nothing (no tag, failed, ambiguous). The AI value stays
                    visible and pre-filled as a candidate and ONE question CANDIDATE is emitted (Question.candidate, suggested = the AI
                    value). A candidate is not a blocking question: S7's what-if test makes it blocking only when the fact decides the TA.
+A FOUND value whose OSM side is a stand-in for a missing tag (one-way read as "not one-way") carries OSM_TAG_ASSUMED: any result using
+it is REVIEW_REQUIRED naming the fact (RuleInputs.gate).
 A second source is a DATA source only (an enabled source of config/data_sources.json other than the imagery provider). A code check
 on the image (lane lines, snapping, shadow share, offsets) can lower trust or give UNKNOWN, and is never a second source: a reading
 from any other source id is refused.
@@ -96,8 +98,9 @@ def fuse_fields(facts, osm=None, cfg=None, sources=None):
             out.append(f); continue
         if rec.agreement == AGREE:
             src = readings[0].source
-            out.append(f.model_copy(update={"source": f"AI+{src}", "candidates": _cands(f, readings),
-                                            "flags": tuple(x for x in f.flags if x != "NEEDS_SECOND_SOURCE")}))
+            flags = tuple(x for x in f.flags if x != "NEEDS_SECOND_SOURCE")
+            if readings[0].lower_confidence: flags += ("OSM_TAG_ASSUMED",)      # the OSM side is a stand-in for a missing tag: REVIEW_REQUIRED
+            out.append(f.model_copy(update={"source": f"AI+{src}", "candidates": _cands(f, readings), "flags": flags}))
             continue
         reason = "source_disagreement" if rec.agreement == DISAGREE else "single_source"
         nf = _unknown(f, reason, readings, rec.note)

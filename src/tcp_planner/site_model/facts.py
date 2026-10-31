@@ -16,7 +16,7 @@ REASON_CODES = ("not_visible", "occluded", "low_resolution", "ambiguous", "sourc
                 "no_source", "malformed", "missing", "duplicate", "low_confidence", "no_registry_value", "ai_conflict",
                 "not_stated", "single_source", "layout_not_allowed", "source_failed", "no_tag", "check_failed", "near_edge", "no_road_near", "site_exception", "wrong_road_suspected")
 FLAGS = ("DEFAULT_ASSUMED", "POLICY_SUGGESTED", "CALIBRATION_PENDING", "SOURCE_REVIEW_REQUIRED", "CONTEXT_ONLY",
-         "AI_ONLY_UNCONFIRMED", "NEEDS_SECOND_SOURCE", "EVIDENCE_OVER_15_WORDS", "UNIT_MISMATCH", "AI_CONFLICT", "PROPOSED")
+         "AI_ONLY_UNCONFIRMED", "NEEDS_SECOND_SOURCE", "EVIDENCE_OVER_15_WORDS", "UNIT_MISMATCH", "AI_CONFLICT", "PROPOSED", "OSM_TAG_ASSUMED")
 # flags that keep a fact out of every rule input (the value is shown to the SME only)
 BLOCKING_FLAGS = frozenset({"CONTEXT_ONLY", "NEEDS_SECOND_SOURCE"})
 QUESTION_KINDS = ("WIDTH_NEAR_THRESHOLD", "LANES_DISAGREE", "START_FIELD_CONFLICT", "FACT_UNKNOWN", "WORK_SIDE_CONFIRM",
@@ -171,6 +171,7 @@ def question_id(kind, *parts):
 # flags that make any result using the fact REVIEW_REQUIRED, with the fact named (STOP 1 point 2; D-93 for the default vehicle width)
 REVIEW_FLAGS = {
     "AI_ONLY_UNCONFIRMED": "was read from the image only and is not confirmed (marks missing); the SME must confirm it",
+    "OSM_TAG_ASSUMED": "rests on a missing OSM oneway tag counted as not one-way (a stand-in, not a stated tag); the SME must confirm it",
     "DEFAULT_ASSUMED": "uses a default value (not measured, not entered); the SME must confirm or override it",
     "PROPOSED": "uses the proposed footprint (a geometry with no source in the rule pack); the SME must confirm it or enter the encroachment depth",
 }

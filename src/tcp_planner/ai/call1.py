@@ -247,6 +247,7 @@ def to_site_facts(result, work_location_marks=MARKS_MISSING, cfg=None, profile=N
     confidence floors: its own entry when config has one, else the default; a reading below its floor is UNKNOWN (low_confidence)."""
     cfg = cfg or load_site_config()
     critical = set(call1_setting("safety_critical_fields", cfg))
+    ai_only = set(call1_setting("ai_only_review_fields", cfg))      # no second source exists for these: the value stands, flagged for the SME
     floor = confidence_floor("work_location", profile, cfg)[0]
     facts, questions = [], []
     for row in FIELDS:
@@ -259,7 +260,9 @@ def to_site_facts(result, work_location_marks=MARKS_MISSING, cfg=None, profile=N
             if obs.status == "RESOLVED" and kind_floor is not None and (obs.confidence is None or obs.confidence < kind_floor):
                 f = _fact(row, obs, status="UNKNOWN", reason="low_confidence")
             else:
-                f = _fact(row, obs, flags=("NEEDS_SECOND_SOURCE",) if row.name in critical and obs.status == "RESOLVED" else ())
+                flags = ("NEEDS_SECOND_SOURCE",) if row.name in critical and obs.status == "RESOLVED" else ()
+                if row.name in ai_only and obs.status == "RESOLVED": flags += ("AI_ONLY_UNCONFIRMED",)
+                f = _fact(row, obs, flags=flags)
         facts.append(f)
     return facts, questions
 

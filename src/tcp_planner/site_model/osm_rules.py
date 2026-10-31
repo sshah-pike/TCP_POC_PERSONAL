@@ -157,9 +157,14 @@ def divided_reading(choice, ways, cfg):
     return SourceReading.unknown(SOURCE_ID, "one-way chosen way and no opposite carriageway found: the other side may be unmapped", "ambiguous")
 
 
+def osm_unclear(note="the reference road is not clear (WHICH_ROAD): OSM is not read for any way"):
+    """OsmRead for a zone whose reference road is not clear: every field UNKNOWN (ambiguous). The bearing check's question stands for it."""
+    return OsmRead(None, {}, _unknown_all("ambiguous", note), (), None)
+
+
 def osm_read(ways, point=(0.0, 0.0), cfg=None, choice=None):
-    """OsmRead for the chosen way (the nearest within the configured distance, or `choice`). No way near: every field UNKNOWN with
-    reason no_source and no question here (the road question is raised by the bearing check)."""
+    """OsmRead for the reference way: `choice` (the WayChoice the bearing check settled on, chosen by the work point, never by the marks),
+    else the nearest within the configured distance. No way near: every field UNKNOWN with reason no_source and no question here."""
     cfg = cfg or load_site_config()
     ranked = rank_ways(ways, point, cfg)
     choice = choice or (ranked[0] if ranked else None)
