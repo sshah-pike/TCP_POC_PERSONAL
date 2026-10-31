@@ -191,5 +191,43 @@
       }
     },
     "profiles": {}
+  },
+  "snapping": {
+    "note": "Code snapping of the AI's marks to the nearest real edge in the image (S6 step 8). The AI draws roughly; code decides where the edge is. All values CALIBRATION_PENDING.",
+    "features": {
+      "value": [
+        "road_edge_left",
+        "road_edge_right",
+        "shoulder_edge",
+        "curb"
+      ],
+      "source": "CALIBRATION_PENDING",
+      "note": "marks that follow a step edge; lane lines are painted stripes and are not snapped"
+    },
+    "search_radius_px": {
+      "value": 12,
+      "source": "CALIBRATION_PENDING",
+      "note": "how far from the AI's point, across the line, an edge is searched (pixels of the image as sent)"
+    },
+    "sample_step_px": {
+      "value": 8,
+      "source": "CALIBRATION_PENDING",
+      "note": "spacing of the sample points along the AI's polyline"
+    },
+    "min_edge_contrast": {
+      "value": 14,
+      "source": "CALIBRATION_PENDING",
+      "note": "smallest grey-level step (0 to 255) across a candidate edge for it to count as a real edge"
+    },
+    "min_accepted_fraction": {
+      "value": 0.6,
+      "source": "CALIBRATION_PENDING",
+      "note": "a mark with a smaller share of sample points that found an edge is rejected (no_edge_nearby)"
+    },
+    "smooth_window": {
+      "value": 5,
+      "source": "CALIBRATION_PENDING",
+      "note": "odd number of sample points of the median filter over the offsets along the line"
+    }
   }
 }

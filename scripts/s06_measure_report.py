@@ -39,7 +39,7 @@ def build(profile):
         if not os.path.isfile(p): continue
         r = json.load(open(p, encoding="utf-8")); site = r["site"]
         mpp = r["image"]["mpp_sent"]
-        res = parse_call1(r["raw_response"], tuple(r["image"]["sent_px"])); o = res.observations
+        res = parse_call1(r["raw_response"], tuple(r["image"]["sent_px"]), version=r.get("prompt_version", 1)); o = res.observations
         a, b = L.usable(res.marks, "road_edge_left"), L.usable(res.marks, "road_edge_right")
         row = {"call": n, "site": site, "rep": r["rep"], "mpp": mpp, "scale_source": f"{site}.json mpp_sent, resize_scale {r['image']['resize_scale']}"}
         lanes = o["lanes_per_direction"]; row["lanes"] = (lanes.value, lanes.confidence) if lanes.status == "RESOLVED" else ("UNKNOWN", lanes.confidence)

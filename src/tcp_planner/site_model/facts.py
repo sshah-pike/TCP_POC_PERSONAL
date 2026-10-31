@@ -14,7 +14,7 @@ Scalar = Union[bool, int, float, str]
 
 REASON_CODES = ("not_visible", "occluded", "low_resolution", "ambiguous", "source_disagreement", "threshold_in_interval",
                 "no_source", "malformed", "missing", "duplicate", "low_confidence", "no_registry_value", "ai_conflict",
-                "not_stated", "single_source", "layout_not_allowed", "source_failed", "no_tag", "check_failed", "near_edge", "no_road_near", "site_exception", "wrong_road_suspected")
+                "not_stated", "single_source", "layout_not_allowed", "source_failed", "no_tag", "check_failed", "near_edge", "no_road_near", "site_exception", "wrong_road_suspected", "no_edge_nearby")
 FLAGS = ("DEFAULT_ASSUMED", "POLICY_SUGGESTED", "CALIBRATION_PENDING", "SOURCE_REVIEW_REQUIRED", "CONTEXT_ONLY",
          "AI_ONLY_UNCONFIRMED", "NEEDS_SECOND_SOURCE", "EVIDENCE_OVER_15_WORDS", "UNIT_MISMATCH", "AI_CONFLICT", "PROPOSED", "OSM_TAG_ASSUMED")
 # flags that keep a fact out of every rule input (the value is shown to the SME only)
@@ -102,6 +102,8 @@ class Mark(_Rec):
     status: Literal["RESOLVED", "UNKNOWN"]
     reason_code: Optional[str] = None
     evidence: str = ""
+    original_points: tuple = ()             # the AI's own points, kept when code snapped the mark to the image edge
+    snap: Optional[dict] = None             # how the snapping went (accepted fraction, shifts in pixels); None when not snapped
 
 
 class Question(_Rec):

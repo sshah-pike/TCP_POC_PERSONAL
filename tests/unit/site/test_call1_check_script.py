@@ -106,3 +106,23 @@ def test_the_default_profile_in_config_is_gpt_5_6_sol():
     from tcp_planner.ai.foundry_provider import load_profiles
     doc = load_profiles()
     assert doc["default_profile"] == "gpt-5.6-sol" and "claude-opus-5-5" in doc["profiles"]
+
+
+def test_prompt_version_2_dry_run_prints_the_enhanced_body_and_version_1_stays_the_default(script, capsys, monkeypatch):
+    monkeypatch.delenv("TCP_LIVE", raising=False)
+    monkeypatch.setattr("tcp_planner.ai.call1.send_call1", lambda *a, **k: pytest.fail("a call was made"))
+    assert script.main(["--profile", "gpt-5.6-sol", "--dry-run", "--only", "1", "--prompt-version", "2"]) == 0
+    out = capsys.readouterr().out
+    assert "tcp_site_facts_v2" in out and "OUTER edges" in out and "nearest_edge_point" in out
+    assert script.main(["--profile", "gpt-5.6-sol", "--dry-run", "--only", "1"]) == 0
+    out1 = capsys.readouterr().out
+    assert '"name": "tcp_site_facts"' in out1 and "OUTER edges" not in out1
+
+
+def test_version_2_results_go_to_their_own_folder_and_say_which_version(script, tmp_path, monkeypatch):
+    monkeypatch.setenv("TCP_LIVE", "1")
+    monkeypatch.setattr(script, "OUT", str(tmp_path / "out"))
+    monkeypatch.setattr(script, "VERSION", 2)
+    assert script.out_root() == str(tmp_path / "out") + "_v2"
+    monkeypatch.setattr(script, "VERSION", 1)
+    assert script.out_root() == str(tmp_path / "out")

@@ -118,7 +118,7 @@ def score(truth, results_by_profile, second=None, cfg=None):
         calls = []
         for r in results_by_profile[profile]:
             if r["site"] not in truth: continue
-            res = parse_call1(r["raw_response"], tuple(r["image"]["sent_px"]), cfg)
+            res = parse_call1(r["raw_response"], tuple(r["image"]["sent_px"]), cfg, version=r.get("prompt_version", 1))
             calls.append((r, res))
         fields = {}
         for field in FIELDS:

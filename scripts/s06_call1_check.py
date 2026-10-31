@@ -31,6 +31,11 @@ sys.path[:0] = [os.path.join(ROOT, "src"), ROOT]
 SITES = ("granite", "second", "colorado")
 INPUTS = os.path.join(ROOT, "tests", "fixtures", "site", "spike", "inputs")
 OUT = os.path.join(ROOT, "var", "s06_call1_check")
+VERSION = 1          # prompt version of this run (--prompt-version); version 2 results go to var/s06_call1_check_v2/<profile>/, never over the version 1 files
+
+
+def out_root():
+    return OUT if VERSION == 1 else OUT + "_v2"
 SITES_STORE = os.path.join(ROOT, "var", "s06_sites")
 CALLS = [(i + 1, SITES[i // 3], i % 3 + 1) for i in range(9)]   # (call number, site, repetition)
 SITE_COLUMNS = ("site_id", "lat", "lon", "extent_m")
@@ -105,14 +110,14 @@ def _prepare(profile, site):
     with open(os.path.join(INPUTS, site + ".jpg"), "rb") as f: data = f.read()
     with open(os.path.join(INPUTS, site + ".json"), encoding="utf-8") as f: mpp = json.load(f)["metres_per_pixel"]
     sent, record = resize_for_model(data, call1.profile_max_image_px(profile), mpp)
-    return call1.build_request(sent, record)
+    return call1.build_request(sent, record, version=VERSION)
 
 
 def _prepare_bytes(profile, data, mpp):
     from tcp_planner.ai import call1
     from tcp_planner.imagery.prepare import resize_for_model
     sent, record = resize_for_model(data, call1.profile_max_image_px(profile), mpp)
-    return call1.build_request(sent, record)
+    return call1.build_request(sent, record, version=VERSION)
 
 
 def _row(r):
@@ -122,7 +127,7 @@ def _row(r):
 
 
 def summary(profile):
-    d = os.path.join(OUT, profile); rows = []
+    d = os.path.join(out_root(), profile); rows = []
     for n, _, _ in CALLS:
         p = os.path.join(d, f"call{n}.json")
         if os.path.isfile(p):
@@ -145,17 +150,17 @@ def _call(call1, profile, ProviderError, name, n, site, rep, req):
     if reply.truncated or not reply.text:
         return None, {"call": n, "seconds": secs, "code": "TRUNCATED" if reply.truncated else "EMPTY", "status": None,
                       "body": f"{'response hit the output limit' if reply.truncated else 'empty response'}; usage {reply.usage}"}
-    res = call1.parse_call1(reply.text, tuple(req["image"]["sent_px"]))
+    res = call1.parse_call1(reply.text, tuple(req["image"]["sent_px"]), version=VERSION)
     problems = call1.schema_problems(reply.text, res)
     lanes = res.observations["lanes_per_direction"]
-    out = {"call": n, "site": site, "ta_situation": TA_SITUATION.get(site, ""), "rep": rep, "profile": name, "seconds": secs, "model": reply.model, "request_id": reply.request_id,
+    out = {"call": n, "site": site, "ta_situation": TA_SITUATION.get(site, ""), "prompt_version": VERSION, "rep": rep, "profile": name, "seconds": secs, "model": reply.model, "request_id": reply.request_id,
            "input_tokens": reply.usage.get("input_tokens"), "output_tokens": reply.usage.get("output_tokens"),
            "reasoning_tokens": reply.usage.get("reasoning_tokens", 0), "schema_valid": not problems, "schema_problems": problems,
            "unknown_facts": sum(o.status == "UNKNOWN" for o in res.observations.values()), "marks": len(res.marks),
            "lanes_per_direction": {"value": lanes.value, "status": lanes.status, "confidence": lanes.confidence},
            "fingerprint": call1.request_fingerprint(req, profile), "image": req["image"], "raw_response": reply.text}
     fname = n if isinstance(n, str) else f"call{n}"
-    with open(os.path.join(OUT, name, f"{fname}.json"), "w", encoding="utf-8") as f: json.dump(out, f, indent=2, ensure_ascii=False)
+    with open(os.path.join(out_root(), name, f"{fname}.json"), "w", encoding="utf-8") as f: json.dump(out, f, indent=2, ensure_ascii=False)
     return out, None
 
 
@@ -173,6 +178,7 @@ def _print_result(out):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--profile", default=None, help="profile name in config/foundry_profiles.json (default: its default_profile, gpt-5.6-sol; claude-opus-5-5 keeps working)")
+    ap.add_argument("--prompt-version", type=int, choices=(1, 2), default=1, help="1: the prompt of the nine recorded calls (default); 2: the enhanced prompt (STOP 6)")
     ap.add_argument("--only", type=int, choices=range(1, 10), metavar="N", help="run call N alone (1-9)")
     ap.add_argument("--from", dest="start", type=int, choices=range(1, 10), default=1, metavar="N", help="start at call N")
     ap.add_argument("--parallel", type=int, default=1, metavar="N", help="run N calls at once on this profile (default 1, one after the other)")
@@ -184,6 +190,8 @@ def main(argv=None):
     if a.parallel < 1: print("--parallel must be at least 1"); return 2
     if a.reps < 1: print("--reps must be at least 1"); return 2
     if a.sites and (a.only or a.start != 1): print("--sites cannot be combined with --only or --from"); return 2
+    global VERSION
+    VERSION = a.prompt_version
     if a.profile is None:
         from tcp_planner.ai.foundry_provider import load_profiles
         a.profile = load_profiles().get("default_profile")
@@ -204,7 +212,7 @@ def main(argv=None):
     if profile.profile_cfg is None: print(f"unknown profile {a.profile!r}"); return 2
     if not a.dry_run and os.environ.get("TCP_LIVE") != "1": print("live calls need TCP_LIVE=1 (or use --dry-run)"); return 2
 
-    os.makedirs(os.path.join(OUT, a.profile), exist_ok=True)
+    os.makedirs(os.path.join(out_root(), a.profile), exist_ok=True)
     items = []          # (label, site, rep, request or None)
     if sites is None:
         items = [(n, site, rep, _prepare(profile, site)) for n, site, rep in CALLS if (n == a.only if a.only else n >= a.start)]

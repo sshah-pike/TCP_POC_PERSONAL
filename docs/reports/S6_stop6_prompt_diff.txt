@@ -1,0 +1,15 @@
+--- call1_user.v1.txt
++++ call1_user.v2.txt
+@@ -1,8 +1,9 @@
+ Image {w}x{h} px, north-up, {mpp:.3f} m per pixel. Work location = image centre ({cx},{cy}). Sides are N, S, E, W.
+-For the road nearest the work location give one fact per field (facts) and one mark per visible feature (marks):
++Choose the road nearest the work location. Name it in road_name (the name or number if readable on a sign or label, else UNKNOWN) and list any other roads you see in other_roads_seen (short list or NONE). For the chosen road give one fact per field (facts) and one mark per visible feature (marks):
+ - work_location: ROADWAY|SHOULDER|BEYOND_SHOULDER|SIDEWALK|UNKNOWN. work_side: N|S|E|W.
+ - lanes_per_direction: count of through lanes in one direction. sidewalk_side: N|S|E|W|BOTH|NONE|UNKNOWN. obstructions: short list or NONE.
++- shadow_share and canopy_share: a number from 0 to 1, the share of the road and its edges hidden by cast shadow or by tree canopy.
+ - every other field: true|false|UNKNOWN.
+-- marks: points as 'x1,y1;x2,y2;...' in image pixels; one mark per lane line; road_edge_left and road_edge_right: the two pavement edges, either order.
+-Evidence: at most {words} words. For UNKNOWN, evidence is exactly one of: not_visible, occluded, low_resolution, ambiguous.
++- marks: points as 'x1,y1;x2,y2;...' in image pixels; one mark per lane line; road_edge_left and road_edge_right: the two OUTER edges of the asphalt, where the pavement meets grass, soil, gravel or kerb, not the sidewalk edge and not a gutter or kerb line inside the pavement, either order; nearest_edge_point: one point, on the nearer outer pavement edge, closest to the work location.
++Evidence: at most {words} words. Reason: for every fact exactly one of visible, not_visible, occluded, low_resolution, ambiguous, shadowed, canopy (the main reason for your confidence). For UNKNOWN, evidence is exactly one of: not_visible, occluded, low_resolution, ambiguous.
+ Report no length or distance. Return the JSON object only.

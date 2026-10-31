@@ -49,6 +49,26 @@ FIELDS = (
 )
 BY_NAME = {r.name: r for r in FIELDS}
 
+# Version 2 (the enhanced prompt, S6 STOP 6): four more facts (all CONTEXT_ONLY here), one more mark feature, and a reason next to every
+# confidence. Version 1 (FIELDS, MARK_FEATURES, the schema pinned since the spike) is untouched, so the nine recorded calls still parse.
+FIELDS_V2_EXTRA = (
+    Row("road_name", "text", (), None, None),             # label only: the road the AI chose, as named on a sign; never matched to OSM by text
+    Row("other_roads_seen", "text", (), None, None),      # label only: other roads in view, NONE when there are none
+    Row("shadow_share", "share", (), None, None),         # 0..1 share of the road and its edges hidden by cast shadow (checked in code, not a length)
+    Row("canopy_share", "share", (), None, None),         # 0..1 share hidden by tree canopy
+)
+MARK_FEATURES_V2 = MARK_FEATURES + ("nearest_edge_point",)    # one pixel point; code computes the distance to the edge (D-64: no length from the AI)
+REASONS_V2 = ("visible", "not_visible", "occluded", "low_resolution", "ambiguous", "shadowed", "canopy")
+BY_NAME_V2 = {r.name: r for r in FIELDS + FIELDS_V2_EXTRA}
+
+
+def fields_for(version=1):
+    return FIELDS if version == 1 else FIELDS + FIELDS_V2_EXTRA
+
+
+def mark_features_for(version=1):
+    return MARK_FEATURES if version == 1 else MARK_FEATURES_V2
+
 # Registry fields that list AI as a source and are deliberately NOT asked in call 1 (call 2, S7, or an SME question).
 NOT_IN_CALL1 = {
     "work_side": "registry values LEFT/RIGHT stay an SME question; the compass work_side here is context only",
@@ -72,6 +92,10 @@ class _WireFact(BaseModel):
     evidence: StrictStr
 
 
+class _WireFactV2(_WireFact):
+    reason: StrictStr
+
+
 class _WireMark(BaseModel):
     model_config = ConfigDict(extra="forbid")
     feature: StrictStr
@@ -90,6 +114,7 @@ class Observation(BaseModel):
     confidence: Optional[float] = None
     evidence: str = ""
     flags: tuple = ()
+    ai_reason: Optional[str] = None  # version 2: the reason the model gave next to its confidence (one of REASONS_V2); never used as a value
 
     @property
     def outcome(self):
@@ -125,8 +150,19 @@ def _norm_value(row, text):
     if row.kind == "enum":
         if t.upper() in row.values: return t.upper()
         raise ValueError("not in enum")
+    if row.kind == "share":
+        try: f = float(t)
+        except ValueError: raise ValueError("not a number")
+        if not math.isfinite(f) or not 0.0 <= f <= 1.0: raise ValueError("not a share between 0 and 1")
+        return f
     if not t: raise ValueError("empty text")
     return t
+
+
+def _reason(w):
+    """The version 2 reason (lower case, one of REASONS_V2) or None; a version 1 fact has none."""
+    r = getattr(w, "reason", None)
+    return r.strip().lower() if isinstance(r, str) and r.strip().lower() in REASONS_V2 else None
 
 
 def _observation(row, w, max_words):
@@ -141,11 +177,12 @@ def _observation(row, w, max_words):
     if status not in ("RESOLVED", "UNKNOWN"):
         return _unknown(row.name, "malformed", w.evidence, conf, flags)
     if status == "UNKNOWN" or w.value.strip().upper() == "UNKNOWN":
-        return _unknown(row.name, ev_code if ev_code in EVIDENCE_CODES else "not_stated", w.evidence, conf, flags)
+        return _unknown(row.name, ev_code if ev_code in EVIDENCE_CODES else "not_stated", w.evidence, conf, flags).model_copy(update={"ai_reason": _reason(w)})
     if conf is None: return _unknown(row.name, "malformed", w.evidence, None, flags)
     try: value = _norm_value(row, w.value)
     except ValueError: return _unknown(row.name, "malformed", w.evidence, conf, flags)
-    return Observation(field=row.name, value=value, status="RESOLVED", confidence=conf, evidence=w.evidence, flags=tuple(flags))
+    return Observation(field=row.name, value=value, status="RESOLVED", confidence=conf, evidence=w.evidence, flags=tuple(flags),
+                       ai_reason=_reason(w))
 
 
 def parse_points(text, image_size=None):
@@ -162,42 +199,44 @@ def parse_points(text, image_size=None):
     return tuple(pts) or None
 
 
-def _mark(w, image_size):
+def _mark(w, image_size, version=1):
     feature, status = w.feature.strip().lower(), w.status.strip().upper()
-    if feature not in MARK_FEATURES or status not in ("RESOLVED", "UNKNOWN"): return None
+    if feature not in mark_features_for(version) or status not in ("RESOLVED", "UNKNOWN"): return None
     if status == "UNKNOWN": return Mark(feature=feature, status="UNKNOWN", reason_code="not_stated", evidence=w.evidence)
     pts = parse_points(w.points, image_size)
     if pts is None: return Mark(feature=feature, status="UNKNOWN", reason_code="malformed", evidence=w.evidence)
     return Mark(feature=feature, points=pts, status="RESOLVED", evidence=w.evidence)
 
 
-def parse_call1(response, image_size=None, cfg=None):
-    """Parse the model's JSON (text or already decoded) into observations and marks. Never raises on model content."""
+def parse_call1(response, image_size=None, cfg=None, version=1):
+    """Parse the model's JSON (text or already decoded) into observations and marks. Never raises on model content. `version` is the
+    prompt version the response answers (1: the 18 facts; 2: also the four context facts, nearest_edge_point and a reason per fact)."""
     max_words = call1_setting("evidence_max_words", cfg)
+    rows = fields_for(version); by_name = {r.name: r for r in rows}; wire_fact = _WireFact if version == 1 else _WireFactV2
     notes, found, bad = [], {}, set()
     try: doc = json.loads(response) if isinstance(response, (str, bytes)) else response
     except ValueError: doc = None
     if not isinstance(doc, dict) or not isinstance(doc.get("facts"), list) or not isinstance(doc.get("marks"), list):
         notes.append("response is not an object with a facts list and a marks list")
-        return Call1Result({r.name: _unknown(r.name, "malformed") for r in FIELDS}, (), tuple(notes))
+        return Call1Result({r.name: _unknown(r.name, "malformed") for r in rows}, (), tuple(notes))
     for i, item in enumerate(doc["facts"]):
         raw = item.get("field") if isinstance(item, dict) else None
         name = raw.strip().lower() if isinstance(raw, str) else None
-        row = BY_NAME.get(name)
+        row = by_name.get(name)
         if row is None: notes.append(f"facts[{i}]: unknown or missing field {raw!r} dropped"); continue
-        try: w = _WireFact.model_validate(item)
+        try: w = wire_fact.model_validate(item)
         except ValidationError: notes.append(f"facts[{i}] {name}: malformed"); bad.add(name); continue
         if name in found: bad.add(name); notes.append(f"facts[{i}] {name}: duplicate"); continue
         found[name] = _observation(row, w, max_words)
         if "EVIDENCE_OVER_15_WORDS" in found[name].flags: notes.append(f"{name}: evidence over {max_words} words, stored whole")
     obs = {}
-    for r in FIELDS:
+    for r in rows:
         if r.name in found and not (r.name in bad): obs[r.name] = found[r.name]
         elif r.name in bad: obs[r.name] = _unknown(r.name, "duplicate" if r.name in found else "malformed")
         else: obs[r.name] = _unknown(r.name, "missing")
     marks = []
     for i, item in enumerate(doc["marks"]):
-        try: m = _mark(_WireMark.model_validate(item), image_size)
+        try: m = _mark(_WireMark.model_validate(item), image_size, version)
         except ValidationError: m = None
         if m is None: notes.append(f"marks[{i}]: malformed, dropped")
         else: marks.append(m)
@@ -250,7 +289,7 @@ def to_site_facts(result, work_location_marks=MARKS_MISSING, cfg=None, profile=N
     ai_only = set(call1_setting("ai_only_review_fields", cfg))      # no second source exists for these: the value stands, flagged for the SME
     floor = confidence_floor("work_location", profile, cfg)[0]
     facts, questions = [], []
-    for row in FIELDS:
+    for row in FIELDS + tuple(r for r in FIELDS_V2_EXTRA if r.name in result.observations):
         obs = result.observations[row.name]
         if row.name == "work_location":
             f, q = map_work_location(obs, work_location_marks, floor)
@@ -269,8 +308,10 @@ def to_site_facts(result, work_location_marks=MARKS_MISSING, cfg=None, profile=N
 
 # ---------------------------------------------------------------- request: schema, prompt, builder (provider-neutral)
 SCHEMA_NAME = "tcp_site_facts"      # the name given to a strict Responses API schema; the Messages API ignores it
+SCHEMA_NAME_V2 = "tcp_site_facts_v2"
 MODE = "site_call1"
 WIRE_UNITS = ("bool", "count", "enum", "text", "none")
+WIRE_UNITS_V2 = WIRE_UNITS + ("share",)
 
 # The prompt text lives in prompts/ (registry, hash verified on load). Wording history: spike text, then one change after STOP 2
 # (the edge sentence no longer says "facing north"). Version 1 is the text the nine recorded calls used.
@@ -290,27 +331,33 @@ SYSTEM = load_prompts()[0].text
 INSTRUCTIONS = load_prompts()[1].text
 
 
-def wire_schema():
+def wire_schema(version=1):
     """Structured-output schema for call 1. Every property required, additionalProperties false, no union, no
-    minimum/maximum, no $ref: the plain subset that both API families accept."""
+    minimum/maximum, no $ref: the plain subset that both API families accept. Version 1 is the spike schema (pinned); version 2 adds the
+    four context facts, the `share` unit, the nearest_edge_point mark feature and a required `reason` on every fact."""
     def obj(props): return {"type": "object", "additionalProperties": False, "required": list(props), "properties": props}
-    facts = obj({"field": {"type": "string", "enum": [r.name for r in FIELDS]}, "value": {"type": "string"},
-                 "unit": {"type": "string", "enum": list(WIRE_UNITS)},
-                 "status": {"type": "string", "enum": ["RESOLVED", "UNKNOWN", "CONFLICT"]},
-                 "confidence": {"type": "number"}, "evidence": {"type": "string"}})
-    marks = obj({"feature": {"type": "string", "enum": list(MARK_FEATURES)}, "points": {"type": "string"},
+    fprops = {"field": {"type": "string", "enum": [r.name for r in fields_for(version)]}, "value": {"type": "string"},
+              "unit": {"type": "string", "enum": list(WIRE_UNITS if version == 1 else WIRE_UNITS_V2)},
+              "status": {"type": "string", "enum": ["RESOLVED", "UNKNOWN", "CONFLICT"]},
+              "confidence": {"type": "number"}, "evidence": {"type": "string"}}
+    if version != 1: fprops["reason"] = {"type": "string", "enum": list(REASONS_V2)}
+    facts = obj(fprops)
+    marks = obj({"feature": {"type": "string", "enum": list(mark_features_for(version))}, "points": {"type": "string"},
                  "status": {"type": "string", "enum": ["RESOLVED", "UNKNOWN"]}, "evidence": {"type": "string"}})
     return obj({"facts": {"type": "array", "items": facts}, "marks": {"type": "array", "items": marks}})
 
 
-def build_request(image_bytes, record, cfg=None):
-    """Request in the provider's shape: {"mode", "system", "parts", "schema", "schema_name", "image"}.
-    `image_bytes` and `record` come from imagery.prepare.resize_for_model: the bytes hashed are the bytes sent."""
+def build_request(image_bytes, record, cfg=None, version=PROMPT_VERSION):
+    """Request in the provider's shape: {"mode", "system", "parts", "schema", "schema_name", "image", "prompt_version"}.
+    `image_bytes` and `record` come from imagery.prepare.resize_for_model: the bytes hashed are the bytes sent.
+
+    The request is BLIND: the only inputs are the image, its size and scale, and the evidence word cap. No OSM tag, way name, lane count,
+    bearing, floor or any other value computed by code is ever put in the prompt (a test enforces it)."""
+    system, user = (SYSTEM, INSTRUCTIONS) if version == PROMPT_VERSION else (lambda p: (p[0].text, p[1].text))(load_prompts(version))
     w, h = record["sent_px"]
-    text = INSTRUCTIONS.format(w=w, h=h, mpp=record["mpp_sent"], cx=w // 2, cy=h // 2,
-                               words=call1_setting("evidence_max_words", cfg))
-    return {"mode": MODE, "system": SYSTEM, "parts": [("image", image_bytes), ("text", text)], "schema": wire_schema(),
-            "schema_name": SCHEMA_NAME, "image": record}
+    text = user.format(w=w, h=h, mpp=record["mpp_sent"], cx=w // 2, cy=h // 2, words=call1_setting("evidence_max_words", cfg))
+    return {"mode": MODE, "system": system, "parts": [("image", image_bytes), ("text", text)], "schema": wire_schema(version),
+            "schema_name": SCHEMA_NAME if version == 1 else SCHEMA_NAME_V2, "image": record, "prompt_version": version}
 
 
 def request_fingerprint(request, profile):
@@ -321,7 +368,8 @@ def request_fingerprint(request, profile):
     return {"prompt_sha256": sha256_hex("\x00".join([request["system"]] + [v for k, v in request["parts"] if k == "text"])),
             "schema_sha256": sha256_hex(canonical_json(request["schema"])), "schema_name": request["schema_name"],
             "images_sha256": sha256_hex("".join(hashlib.sha256(v).hexdigest() for k, v in request["parts"] if k == "image")),
-            "model": profile.deployment, "profile": profile.profile, "api": profile.api, "effort": profile.effort}
+            "model": profile.deployment, "profile": profile.profile, "api": profile.api, "effort": profile.effort,
+            "prompt_version": request.get("prompt_version", 1)}
 
 
 def profile_max_image_px(profile):
