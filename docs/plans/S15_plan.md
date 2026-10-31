@@ -1,4 +1,4 @@
-Status: PLANNED. Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md; where they differ from this plan, the register wins.
+Status: PLANNED, PAUSED until the accuracy gate between S7 and S8 (D-153, FS-21). Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md and docs/decisions/OWNER_DECISIONS_2026-10-31.md; where they differ from this plan, the registers win.
 
 # S15 plan: orphan sweep (unused files and code to backup)
 

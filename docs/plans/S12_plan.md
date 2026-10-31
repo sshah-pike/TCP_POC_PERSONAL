@@ -1,4 +1,12 @@
-Status: PLANNED. Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md; where they differ from this plan, the register wins.
+Status: PLANNED, PAUSED until the accuracy gate between S7 and S8 (D-153, FS-21). Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md and docs/decisions/OWNER_DECISIONS_2026-10-31.md; where they differ from this plan, the registers win.
+
+## Owner decisions applied (2026-10-31)
+
+Register: `docs/decisions/OWNER_DECISIONS_2026-10-31.md`. Where this block differs from older text, this block is the active text; the older wording is kept in the "Amendments 2026-10-31" note in section 10 and in the next sentence: scope item 4 and the owner-constraints line of this plan read "street, city, state and ZIP" (now "city or neighbourhood", D-149), and questions A-1, A-4 and B-1 of section 11 are annotated in place with the answer and the D-number. S12 is paused until the accuracy gate between S7 and S8 (D-153, FS-21).
+
+- **Title block (D-149, Y9).** It prints street, city or neighbourhood, state and ZIP. The reference drafts print them this way ("MATTAPAN, MA 02126", "BOSTON, MA 02127"); the street number appears on the Colorado sheet. The street number is printed only when it is in the input (D-100). Which locality name goes on the second line stays an SME question (A-4; FS-22 names it C2).
+- **Template (D-152, Y12).** Use the template as currently rebuilt (B-1 option b: the frame rebuilt from the E Second St drawing, text elements as PDF text). The client's current template (DWT or PDF) is future scope (FS-22), triggered when the client supplies it (client question C1).
+- **Add-on signs.** Real symbols for the add-on signs exist before S8's add-on commit (D-110, D-117), so S12 draws them as built; any remaining placeholder symbol keeps the visible label and REVIEW_REQUIRED (S5).
 
 # S12 plan: sheets and PDF
 
@@ -6,7 +14,7 @@ Planning only. Branch when built: `tcp-mvp/s12-sheets`, off the last merged slic
 
 Read for this plan: CLAUDE.md; slice specs S8, S9, S11, S12, S13; plan sections 3, 4A, 8, 9, 10, 10A, 12, 14, 15 (D-26, D-27, D-45, D-65, D-71, D-72, open question 3) and ADR-035, ADR-046; `S0_repo_report.md` items 6, 22, 30; `S2_storage_report.md`; `S3_orchestrator_report.md`; `S4_rule_pack_review.md`; the plan copies `docs/plans/S5_plan.md` to `S8_plan.md` (not final); `tests/golden/*`; the three reference TMP PDFs (text layer, title block, notes); `src/tcp_planner/sheets/sheet_renderer.py`, `dwt_renderer.py`; `assets/sheet/sheet_layout.json`; `scripts/build_sheet_frame.py`.
 
-Owner constraints applied: rules come from the MUTCD Chapter 6, December 2023, only; the drafts are comparison material and a style reference, never a rule source. A phase is a drawn sheet (D-45). Title block: street, city, state and ZIP; the street number only if it is in the input. Every plan waits for an SME click (D-65).
+Owner constraints applied: rules come from the MUTCD Chapter 6, December 2023, only; the drafts are comparison material and a style reference, never a rule source. A phase is a drawn sheet (D-45). Title block: street, city or neighbourhood, state and ZIP; the street number only if it is in the input. Every plan waits for an SME click (D-65).
 
 Legend: **[B]** can be batched with the next commit. **[STOP]** stop for owner review. **A-n** is an assumption about a shape from S5 to S11 that I could not verify; each is repeated in section 9.
 
@@ -34,7 +42,7 @@ Legend: **[B]** can be batched with the next commit. **[STOP]** stop for owner r
 1. **Sheet packing** per plan section 4A: order the zones, fit at 1" = 40', then 1" = 50', then a new sheet. No overlap on one sheet. Two TAs share a sheet only if both fit, and such a sheet is REVIEW_REQUIRED.
 2. **Titles** "PHASE I", "PHASE II" and so on; "n OF N"; no cover page.
 3. **The common template**: legend, the 12 general notes, Type III barricade detail, drum and cone detail, free-standing sign detail, title block, revisions box, Dig Safe box, job notes, scale bar, north arrow.
-4. **Title-block data**: street, city, state, ZIP; street number only if it is in the input (owner); point labels from placemark names (D-72); no address typed by the SME (D-71, see B-4).
+4. **Title-block data**: street, city or neighbourhood, state, ZIP; street number only if it is in the input (owner; D-100, D-149); point labels from placemark names (D-72); no address typed by the SME (D-71, see B-4).
 5. **Azure Maps imagery** as the base, **dimension labels** on the drawing, the **placeholder-symbols label** (S5 Q8 option B: S5 gives the flag, S12 draws it), draft and approval markings (D-65).
 6. **One multi-page PDF per project sheet set**, 34 x 22 in, plus one PNG preview per sheet, all through `ArtifactStore` with artifact refs, and a versioned `SheetSet` record through `StateStore`.
 7. The hooks S11 needs to reorder, merge and split sheets (a new sheet-set version per change). The S11 actions themselves are S11.
@@ -251,7 +259,9 @@ Not stale: the template, the page size, the scale steps, the title-block format.
 
 ## 10. Where the plan, the spec and the repo differ (stop-and-report items)
 
-1. D-71 says "road name only, the SME types no address"; the owner now wants street, city, state and ZIP, and the number when it is in the input. D-71 and plan open question 3 need new wording (not edited here).
+1. D-71 says "road name only, the SME types no address"; the owner now wants street, city or neighbourhood, state and ZIP, and the number when it is in the input (D-100, D-149). D-71 and plan open question 3 need new wording (not edited here).
+
+**Amendments 2026-10-31 (section 10).** The line read "street, city, state and ZIP"; D-149 says "city or neighbourhood" because the drafts print a Boston neighbourhood for Mattapan.
 2. The spec wants the drafts' style; the current frame comes from a fourth drawing not in the repo (B-1).
 3. Note 11 on every draft (11 ft) contradicts the pack's 10 ft (B-2). The free-standing sign detail cites Sect. 6F.03, which is not loaded in the pack.
 4. Plan section 4A lists the Granite phases differently from the accepted golden (section 1).
@@ -264,7 +274,7 @@ Not stale: the template, the page size, the scale steps, the title-block format.
 
 ### Part A: client inputs and SME questions
 
-**A-1. The client's current sheet template.** The frame in the repo is cut from WPI 3160485, not one of the three references.
+**A-1. The client's current sheet template.** ANSWERED for the MVP by D-152: use the template as currently rebuilt; the client's current template is future scope (FS-22). The frame in the repo is cut from WPI 3160485, not one of the three references.
 - Options: (a) the client sends its current template (DWT or PDF); (b) use one of the three reference PDFs; (c) keep the current frame.
 - Effects: (a) is exact; (b) and (c) may carry stale notes or logos.
 - Suggestion: ask for (a); meanwhile B-1.
@@ -281,7 +291,7 @@ Not stale: the template, the page size, the scale steps, the title-block format.
 - Suggestion: (a), with the 11 ft question answered explicitly.
 - Blocks: commit 2.
 
-**A-4. Locality name.** The drafts print "MATTAPAN, MA 02126" (a Boston neighbourhood) and "BOSTON, MA 02127". Which name goes on the second line: the city, the neighbourhood, or the USPS place name of the ZIP?
+**A-4. Locality name.** Partly answered by D-149 (city or neighbourhood, as the drafts print); which one goes on the line is still the SME's rule. The drafts print "MATTAPAN, MA 02126" (a Boston neighbourhood) and "BOSTON, MA 02127". Which name goes on the second line: the city, the neighbourhood, or the USPS place name of the ZIP?
 - Suggestion: the SME states the rule; until then the source's value as returned, flagged.
 - Blocks: commit 6 sign-off.
 
@@ -294,7 +304,7 @@ Not stale: the template, the page size, the scale steps, the title-block format.
 
 ### Part B: owner decisions
 
-**B-1. Template source and form.**
+**B-1. Template source and form.** ANSWERED by D-152: the template as currently rebuilt (from the E Second St drawing, FS-22).
 - Options: (a) keep the current raster frame; (b) rebuild the frame from one reference PDF (for example E Second St) with `build_sheet_frame.py`, new files beside the old; (c) a vector template: frame lines and details as images, all text (notes, legend words, title fields) drawn as PDF text.
 - Effects: (a) is unverified against the references. (b) matches the drafts. (c) makes the notes searchable and testable on the text layer (T-3), but needs the note text stored as template data. A test-only PDF reader (`pymupdf`, already a `tools` extra and banned from `src/`) is needed for T-3 in any option.
 - Suggestion: (b) for the artwork plus (c) for every text element.
@@ -312,7 +322,7 @@ Not stale: the template, the page size, the scale steps, the title-block format.
 - Suggestion: (a), recorded with the post-S9 recording; Colorado's recording after S7 would then need one extra call later.
 - Blocks: commit 6, and the post-S9 recording plan.
 
-**B-4. "Street number only if it is in the input": which input?**
+**B-4. "Street number only if it is in the input": which input?** (D-149: the street number appears on the Colorado sheet; the choice of input stays open.)
 - Options: (a) an optional typed title field on the project (display only, never used in decisions); (b) the placemark name (D-72 allows display only; extracting a number is parsing); (c) the KML file name (free-text parsing is future scope); (d) the reverse-geocoded house number (not "in the input").
 - Effects: (a) amends D-71 for the number only. (b) and (c) parse free text.
 - Suggestion: (a), with an EWO field next to it (A-2).

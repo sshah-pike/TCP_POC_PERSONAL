@@ -1,0 +1,266 @@
+{
+  "schema_version": "1.0",
+  "name": "site_truth_v0",
+  "created": "2026-10-31",
+  "status": "DRAFT_UNVERIFIED: owner cross-check pending",
+  "purpose": "Ground truth for scoring site understanding (lanes, divided, shoulder, one-way, parking, sidewalk, work location, width). Not a source for rules.",
+  "rules": [
+    "A null value means no truth for that field; it is not scored.",
+    "Only values with confidence high or medium-high go into the CSV used by the accuracy report.",
+    "expected_tool_behavior says what the tool should do on an edge case; the truth value is separate from it.",
+    "Never edit a value silently. Change it by creating a new version and recording why."
+  ],
+  "confidence_levels": {
+    "high": "two independent readings agree, or an explicit symbol or note on the drawing",
+    "medium-high": "one clear reading plus a consistent second hint",
+    "medium": "one reading with a known weakness; excluded from the CSV until verified",
+    "n/a": "no truth"
+  },
+  "sites": [
+    {
+      "site_id": "granite",
+      "job": "WPI 3178233, Granite St (US-1), Westerly RI, phase I, pole P.32",
+      "ta_situation": "TA-33",
+      "point": {
+        "name": "P32",
+        "lat": 41.3710265954301,
+        "lon": -71.82035330409971
+      },
+      "image": {
+        "file": "granite.jpg",
+        "sha256_prefix": "5560a76c",
+        "metres_per_pixel": 0.448139,
+        "zoom": 17,
+        "size_px": [
+          1280,
+          1280
+        ],
+        "half_extent_m": 212.4
+      },
+      "truth_source": "drawing WPI 3178233 sheet 1 and the spike image, read 2026-10-31 (provisional, owner cross-check pending)",
+      "road": "US-1, runs north-south in the image (the drawing sheet is rotated 90 degrees)",
+      "truth": {
+        "lanes_per_direction": {
+          "value": 2,
+          "confidence": "high",
+          "evidence": "Drawing: two arrows each direction at the sheet end, dashed lane lines, yellow centre line. Aerial image shows several lanes."
+        },
+        "divided_highway": {
+          "value": false,
+          "confidence": "high",
+          "evidence": "Yellow centre line, no median on the drawing or the image."
+        },
+        "shoulder_present": {
+          "value": false,
+          "confidence": "medium",
+          "evidence": "Curb with a sidewalk strip; no shoulder visible."
+        },
+        "oneway": {
+          "value": false,
+          "confidence": "high",
+          "evidence": "2 WAY STREET arrows in both directions."
+        },
+        "parking_present": {
+          "value": false,
+          "confidence": "medium-high",
+          "evidence": "No parked cars on the road at the work point; none drawn."
+        },
+        "sidewalk_present": {
+          "value": true,
+          "confidence": "high",
+          "evidence": "Sidewalk strips both sides; SIDEWALK CLOSED signs on the drawing.",
+          "side": "BOTH"
+        },
+        "work_location": {
+          "value": null,
+          "confidence": "n/a",
+          "evidence": "The point sits within about 1 to 2 m of the pavement edge at an intersection corner; the drawing closes the right lane. Edge case.",
+          "expected_tool_behavior": "UNKNOWN plus one SME question (within 5 m of the edge)"
+        },
+        "road_width_ft": {
+          "value": 40,
+          "confidence": "medium",
+          "evidence": "Pavement between the light strips, mid-block about 100 ft along the road from the work vehicle on the sheet; not the intersection approach. Brightness profile on the drawing image gave 39.7 ft. The first hand reading of 49 ft was wrong (it included a sidewalk strip).",
+          "tolerance_ft": 4,
+          "method": "code edge profile on the drawing image"
+        }
+      },
+      "posted_speed_mph": {
+        "value": 25,
+        "confidence": "medium-high",
+        "evidence": "Sheet note: speed limit 25 mph as observed in the field."
+      }
+    },
+    {
+      "site_id": "second",
+      "job": "WPI 3171586, E Second St, South Boston MA, phase I, MH 223",
+      "ta_situation": "TA-6",
+      "point": {
+        "name": "MH 223",
+        "lat": 42.33743803651997,
+        "lon": -71.02685856279096
+      },
+      "image": {
+        "file": "second.jpg",
+        "sha256_prefix": "b87f38dd",
+        "metres_per_pixel": 0.441419,
+        "zoom": 17,
+        "size_px": [
+          1280,
+          1280
+        ],
+        "half_extent_m": 212.4
+      },
+      "truth_source": "drawing WPI 3171586 sheets 1 and 2 and the spike image, read 2026-10-31 (provisional, owner cross-check pending)",
+      "road": "E Second St, runs east-west, about 90 ft east of P St",
+      "truth": {
+        "lanes_per_direction": {
+          "value": 1,
+          "confidence": "medium-high",
+          "evidence": "No lane lines seen; about 27 ft wide with parked cars. Holds if the street is two-way; one-way is not shown on the drawing.",
+          "depends_on": "oneway"
+        },
+        "divided_highway": {
+          "value": false,
+          "confidence": "high",
+          "evidence": "No median."
+        },
+        "shoulder_present": {
+          "value": false,
+          "confidence": "medium",
+          "evidence": "Curb with parking; no shoulder visible."
+        },
+        "oneway": {
+          "value": null,
+          "confidence": "n/a",
+          "evidence": "Not shown on the drawing. Needs the SME (question S41).",
+          "expected_tool_behavior": "UNKNOWN"
+        },
+        "parking_present": {
+          "value": true,
+          "confidence": "high",
+          "evidence": "Parked cars along the north edge; R8-3 no-parking signs on the south side."
+        },
+        "sidewalk_present": {
+          "value": true,
+          "confidence": "medium-high",
+          "evidence": "Sidewalk strips on both sides.",
+          "side": "BOTH"
+        },
+        "work_location": {
+          "value": null,
+          "confidence": "n/a",
+          "evidence": "The manhole sits at the south curb, under building shadow. Edge case.",
+          "expected_tool_behavior": "UNKNOWN plus one SME question (within 5 m of the edge)"
+        },
+        "road_width_ft": {
+          "value": 27.5,
+          "confidence": "medium-high",
+          "evidence": "Three readings: drawing dimension 26 ft, code edge profile on the spike image 27.5 ft, first hand reading 29 ft.",
+          "tolerance_ft": 2.5,
+          "method": "code edge profile on the spike image"
+        }
+      },
+      "posted_speed_mph": {
+        "value": 25,
+        "confidence": "high",
+        "evidence": "Sheet note: speed limit in the city of Boston is 25 mph."
+      }
+    },
+    {
+      "site_id": "colorado",
+      "job": "WPI 3168057, 130 Colorado St, Mattapan MA, P13",
+      "ta_situation": "TA-10 per the drawing; the point itself sits in a yard",
+      "point": {
+        "name": "P13",
+        "lat": 42.27575907259692,
+        "lon": -71.10121450786647
+      },
+      "image": {
+        "file": "colorado.jpg",
+        "sha256_prefix": "d9eb9370",
+        "metres_per_pixel": 0.441851,
+        "zoom": 17,
+        "size_px": [
+          1280,
+          1280
+        ],
+        "half_extent_m": 212.4
+      },
+      "truth_source": "drawing WPI 3168057, the spike image, and the owner's check of the KML and drawing, 2026-10-31 (provisional)",
+      "road": "none close to the point; the nearest streets in the image are diagonal and about 50 m away (estimate, plus or minus 10 m)",
+      "truth": {
+        "lanes_per_direction": {
+          "value": 1,
+          "confidence": "medium-high",
+          "evidence": "Colorado St is two-way with parking. The image's nearest street may be a different street, also a narrow residential street.",
+          "depends_on": "which road is nearest"
+        },
+        "divided_highway": {
+          "value": false,
+          "confidence": "high",
+          "evidence": "No median."
+        },
+        "shoulder_present": {
+          "value": false,
+          "confidence": "medium",
+          "evidence": "Curb with parking; no shoulder visible."
+        },
+        "oneway": {
+          "value": false,
+          "confidence": "high",
+          "evidence": "2 WAY STREET symbols at both ends of Colorado St on the drawing."
+        },
+        "parking_present": {
+          "value": true,
+          "confidence": "high",
+          "evidence": "Parked cars on the street; R8-3 signs on both sides on the drawing."
+        },
+        "sidewalk_present": {
+          "value": null,
+          "confidence": "n/a",
+          "evidence": "South side: none at the work zone (sheet note). North side appears to have one. The point is in a yard.",
+          "side": "north yes, south no"
+        },
+        "work_location": {
+          "value": "BEYOND_SHOULDER",
+          "confidence": "high",
+          "evidence": "The owner checked the drawing and the KML: the point is in a back yard. The image shows a driveway behind houses.",
+          "expected_tool_behavior": "UNKNOWN plus a 'which road?' question (no road within 5 m)"
+        },
+        "road_width_ft": {
+          "value": null,
+          "confidence": "n/a",
+          "evidence": "Colorado St measured 25 to 26 ft by code and 27 ft by hand at the visible east end of the sheet, but which street is nearest in the spike image is not established."
+        }
+      },
+      "posted_speed_mph": {
+        "value": 25,
+        "confidence": "high",
+        "evidence": "Sheet note: speed limit in the city of Boston is 25 mph unless posted."
+      }
+    }
+  ],
+  "sites_still_to_add": [
+    {
+      "slot": "fourth existing site: Exeter Ten Rod (stored demo point)",
+      "ta_situation": "TA-1, to be confirmed"
+    },
+    {
+      "slot": "new",
+      "ta_situation": "TA-33"
+    },
+    {
+      "slot": "new",
+      "ta_situation": "TA-6"
+    },
+    {
+      "slot": "new",
+      "ta_situation": "TA-10"
+    },
+    {
+      "slot": "new",
+      "ta_situation": "TA-1"
+    }
+  ]
+}

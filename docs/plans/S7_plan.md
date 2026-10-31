@@ -1,9 +1,30 @@
-Status: PLANNED. Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md; where they differ from this plan, the register wins.
+Status: PLANNED. Owner decisions are in docs/decisions/OWNER_DECISIONS_2026-10-30.md and docs/decisions/OWNER_DECISIONS_2026-10-31.md; where they differ from this plan, the registers win.
 
 ## Owner decisions applied (2026-10-30)
 
 - B-1: an SME determination record for the plan, plus a proposal to promote it into the pack. B-2 B. B-3: thresholds 0.85 and 0.80; strict cross-check only on lanes per direction, divided, shoulder, one-way; work_location by confidence plus SME confirmation. B-4 A (non-gating route stage; S8 cuts over). B-5 A. B-6 A. B-7 B (wait for 6G.10 in the pack). B-8: record call 2 after S7 with call 1. B-9 C (SME determination).
 - The 6N.11 Granite-type case is sourced, so Granite routes to TA-33 automatically; broader cases go to the engineer. E Second stays UNDETERMINED until the SME answers the low-speed and minor-road questions. Colorado routes to TA-10. TA-6 never auto-selects without an answer.
+
+## Owner decisions applied (2026-10-31)
+
+Register: `docs/decisions/OWNER_DECISIONS_2026-10-31.md`. Where this block differs from older text, this block is the active text; the older wording is kept in the "Amendments 2026-10-31" notes at the end of sections 1, 3, 4, 7 and 10. Future items are in `docs/FUTURE_SCOPE.md`.
+
+- **Two-pass router (D-128).** A provisional pass runs before call 2 and a final pass after the second fusion. A **what-if test** marks each unresolved fact as *deciding* or *not deciding* for routing: the router is re-run with the fact set to each value of its registry domain, and the fact is deciding when the outcome set changes (the owner's wording is "marks each unresolved fact as deciding or not deciding"; this mechanism is proposed here for approval). It reads the pack only.
+- **Call 2 rewritten (D-119, D-120, D-121, D-123).**
+  - Call 2 is a **blind re-observation**: it is never shown the OSM value, the call-1 value or any code value for lanes, divided, shoulder or one-way.
+  - Before the call, code re-measures at fine zoom (the zoom-19 view, D-112).
+  - Call 2 fields are the deciding facts (from the what-if test), the chosen TA's fields and the conflicts.
+  - Lane count is a field whenever call 2 runs; it never forces a call (D-121); a config switch turns it off.
+  - If call 1 and call 2 disagree on a field, the field becomes UNKNOWN and goes to the SME (D-123).
+  - Two AI reads never count as two sources (D-92, D-119; `docs/reports/S6_stop5_fusion_rules.md` on branch `tcp-mvp/s06-site-understanding`): call 2 can lower a resolved safety fact to UNKNOWN; it cannot raise a single-source one.
+  - At most two AI calls per zone.
+- **Generality tests (D-128, FS-11).** A made-up TA added to a test pack works with no code change. No TA id appears in the router, the fusion or the call-2 code (a string-scan test).
+- **Blocking and informational questions (D-156 recommendation 1, owner confirmation open).** A single-source safety field is UNKNOWN with the AI value kept as a pre-filled candidate. The question candidate S6 emits is informational; S7 makes it blocking only when the what-if test shows the fact decides the TA.
+- **New 6N.11 ids (S4b follow-up e).** `E-TA33-FORM-UNDIVIDED-6N11` and `R-6N11-TA33-UNDIVIDED-FOUR-LANE` no longer exist in pack 1.1.0. The sourced Granite-type branch is `E-TA33-FORM-UNDIVIDED-FOUR-LANE-RIGHT` with rule `R-6N11-TA33-UNDIVIDED-FOUR-LANE-RIGHT`; the broader undivided cases are `E-TA33-FORM-UNDIVIDED-OTHER` with rule `R-6N11-TA33-UNDIVIDED-OTHER` (unsourced, an engineer question). The old ids exist only in the sealed version 1.0.0.
+- **Unknown `closed_lane_side` never defaults to RIGHT (S4b follow-up c).** A missing or unstated side keeps TA-33 UNDETERMINED with a question.
+- **D-59 fixes (CLAUDE.md, "D-59 breaches still in the engine").** Remove the OSM `maxspeed` fallback and the encroachment override of the SME's lane closure in `site_model/fusion.py`; a computed disagreement raises a conflict question and never changes the value.
+- **Pack store merged.** Sealed pack versions are stored side by side (commit `69ab4c0`), so a decision recorded against a pack hash replays without a git checkout (D-116).
+- **Gate after S7.** The accuracy gate (8-site early check) sits between S7 and S8 (D-125).
 
 # S7 plan: router and call 2 TA fields
 
@@ -21,13 +42,16 @@ Legend used below: **[B]** commits that can be batched. **[STOP]** stop for owne
 
 ### In scope
 
-1. A **router** that reads only the rule pack (through `RulePackStore`) and the zone's facts, and returns exactly one of five outcomes (section 3.2). It names only TAs in the pack (D-35).
+1. A **router** that reads only the rule pack (through `RulePackStore`) and the zone's facts, and returns exactly one of five outcomes (section 3.2). It names only TAs in the pack (D-35). It runs twice: a provisional pass before call 2 and a final pass after the second fusion (D-128), with a what-if test that marks each unresolved fact as deciding or not deciding.
 2. **Near match** ("did you mean"): at most 1 failed condition, at most 2 suggestions (D-33).
 3. **`TA_SELECTION_CONFLICT`** against the UI "Select TA" hypothesis (D-73), and never trusting the hypothesis alone (CLAUDE.md rule 7).
 4. **Derived facts that depend on the pack or on the start fields**: `low_speed_road`, `freeway`, `traffic_control_method` (code sets FLAGGER when TA-10 is chosen, D-68), `single_flagger_eligible`, and the remaining-width verdict. Each stays UNKNOWN while its pack record is unsourced.
 5. **Consistency checks against the four mandatory start fields.** A contradiction raises a conflict question. It never changes the field (CLAUDE.md rule 4).
-6. **Call 2**: the request builder, the output schema and validation, the merge (never overwrites a resolved fact), and the cross-view check (can only un-resolve). Includes the three D-80 re-asks: `lanes_per_direction` with a lane-marking crop; lane lines, shoulder edge and curb marks from crops; `sidewalk_present` and `sidewalk_side` with a crop plus OSM tags (see question B-7: no rule uses sidewalk in v1).
+6. **Call 2** (rewritten 2026-10-31): the request builder, the output schema and validation, a code re-measurement at fine zoom before the call, the blind re-observation (no OSM, call-1 or code value for lanes, divided, shoulder or one-way), and the disagreement rule (call 1 and call 2 disagreeing gives UNKNOWN). Its fields are the deciding facts, the chosen TA's fields and the conflicts; lane count is a field whenever call 2 runs and never forces a call (D-120, D-121, D-123). The D-80 re-asks that remain: lane lines, shoulder edge and curb marks from crops; the sidewalk pair (see question B-7: no rule uses sidewalk in v1).
 7. A **pipeline stage** that writes the routing decision as a write-once artifact. Whether it gates the pipeline is question B-4.
+8. **Generality**: a made-up TA in a test pack works with no code change, and no TA id appears in the router, the fusion or the call-2 code (D-128).
+9. **Blocking and informational questions**: each `Question` says whether it blocks, using the what-if test (D-156 recommendation 1).
+10. **Fixes**: an unknown `closed_lane_side` never defaults to RIGHT (S4b follow-up c); the D-59 breaches in `site_model/fusion.py` (the OSM `maxspeed` fallback and the encroachment override of the SME's lane closure).
 
 ### Out of scope
 
@@ -40,14 +64,15 @@ Legend used below: **[B]** commits that can be batched. **[STOP]** stop for owne
 
 | # | Criterion | What it means with the S4 pack |
 | --- | --- | --- |
-| 1 | On golden fixtures the router returns TA-10 for Colorado, TA-6 for E Second St and TA-33 for Granite, **or a question when a deciding fact is unknown**. Never a wrong TA silently. | Only **Colorado can auto-route** today. TA-6 stays UNDETERMINED because `E-TA6-LOW-SPEED` (cutoff) and `E-TA6-MINOR-ROAD` are unsourced. Granite is undivided, so TA-33 stays UNDETERMINED on `E-TA33-FORM-UNDIVIDED-6N11`. For those two jobs the passing result is the TA as the single candidate plus the SME question. This is the honest consequence of S4; I recommend the owner reads it before approving. |
+| 1 | On golden fixtures the router returns TA-10 for Colorado, TA-6 for E Second St and TA-33 for Granite, **or a question when a deciding fact is unknown**. Never a wrong TA silently. | **Colorado and Granite can auto-route** with pack 1.1.0 when their facts pass the gates: Granite matches TA-33 through the sourced branch `E-TA33-FORM-UNDIVIDED-FOUR-LANE-RIGHT` (D-91). Broader undivided cases are `E-TA33-FORM-UNDIVIDED-OTHER` (unsourced) and stay UNDETERMINED with an engineer question. TA-6 stays UNDETERMINED because `E-TA6-LOW-SPEED` (cutoff) and `E-TA6-MINOR-ROAD` are unsourced; for E Second St the passing result is TA-6 as the single candidate plus the SME question. This is the honest consequence of S4; I recommend the owner reads it before approving. |
 | 2 | With no fitting TA, `NO_TA_MATCH` with failed conditions per pack TA, and no TA outside the pack named. | Direct. |
 | 3 | TA-6 rejected without a shoulder, and on a high-speed road. | "Without a shoulder" works with the real pack. "High-speed road" **cannot** work with the real pack: the cutoff is unsourced, so a high speed gives UNKNOWN, not rejected. It is tested only with a test-only pack variant (section 7, T-9; question B-9). |
 | 4 | TA-33 never double-matches. | Pack-driven: the divided and undivided branches share one `any_group` (`ROAD_FORM`). Test enumerates every fact combination in the small domain. |
 | 5 | TA-10 always drafts with flaggers. | `traffic_control_method` is set to FLAGGER by code from `R-TA10-METHOD-FLAGGER` when TA-10 is chosen. |
-| 6 | Call 2 never overwrites a resolved fact. Safety-critical facts go through the cross-view check. | Section 5. |
-| 7 | At most two AI calls per zone. | Counted and asserted per zone. Call 2 is skipped when nothing AI-observable is missing. |
+| 6 | Call 2 re-observes blind: its request holds no OSM, call-1 or code value for lanes, divided, shoulder or one-way. A field on which call 1 and call 2 disagree becomes UNKNOWN. Two AI reads never count as two sources. | Section 4 (merge table). |
+| 7 | At most two AI calls per zone. | Counted and asserted per zone. Call 2 runs when the field list, not counting the lane count, holds at least one deciding fact, chosen-TA field or conflict; the lane count is added when call 2 runs and never causes it (D-121). |
 | 8 | Every decision carries the rule ids it used. | Condition ids, rule ids, pack id, version and hash on every `RoutingDecision` (section 3.3). |
+| 9 | A made-up TA in a test pack routes with no code change; no TA id appears in the router, the fusion or the call-2 code. | Generality tests (T-16, T-17). |
 
 ---
 
@@ -64,7 +89,7 @@ New (under `src/tcp_planner/`):
 | `routing/consistency.py` | Contradictions with the mandatory fields. Produces conflict `Question`s only |
 | `routing/call2_plan.py` | Pack-driven list of the chosen TA's fields, classified by registry `source_type`, with crop specs |
 | `ai/call2.py` | Call 2 prompt, flat-facts-list schema (D-61), Pydantic validation, provider call through the existing Foundry provider |
-| `routing/merge.py` | Non-overwrite merge and the cross-view check |
+| `routing/merge.py` | Merge, the call 1 and call 2 disagreement rule (UNKNOWN), and the second fusion (was: "Non-overwrite merge and the cross-view check", amended 2026-10-31, D-123) |
 | `orchestration/route_stage.py` | The pipeline stage, artifact writes, event log, zone `ta` update |
 
 Changed:
@@ -124,7 +149,7 @@ Rule for hypothesis `H` (not AUTO):
 
 ```
 RoutingDecision {
-  schema_version, decision_id, zone_id, zone_version, stage "INITIAL"|"CONFIRM",
+  schema_version, decision_id, zone_id, zone_version, stage "PROVISIONAL"|"FINAL",
   outcome, ta {value|null, source "ROUTER"|"UI_VERIFIED"|"SME", status},
   hypothesis, candidates [ {ta_id, result ELIGIBLE|NOT_ELIGIBLE|UNDETERMINED,
       conditions [ {condition_id, any_group, result true|false|null, status SOURCED|SOURCE_REVIEW_REQUIRED|UNKNOWN,
@@ -137,8 +162,9 @@ RoutingDecision {
   settings_used {...3.4...}, pack_ref, inputs_hash,
   trace {rule_ids [], pack_id, pack_version, pack_hash, source_refs [], inputs [], calculation "per-condition table", validators [], actors ["ENGINE:router@<v>", "UI:<hypothesis source>"]}
 }
-Question { question_id, kind DECIDING_FACT|UNSOURCED_CONDITION|TA_CONFLICT|NEAR_MATCH|FACT_CONFLICT|MANDATORY_CONTRADICTION,
-           reason, options [], default_if_skipped, parent_id?, reveals [] }
+Question { question_id, kind DECIDING_FACT|UNSOURCED_CONDITION|TA_CONFLICT|NEAR_MATCH|FACT_CONFLICT|MANDATORY_CONTRADICTION|WHICH_ROAD|WORK_LOCATION_NEAR_EDGE,
+           field, zone, project, osm_way_id|null, context, reason, options [], default_if_skipped, parent_id?, reveals [],
+           blocking bool (what-if test), candidate bool, suggested|null }
 ```
 
 `default_if_skipped` is never a value for an unsourced item. For an unsourced condition it is "stay UNDETERMINED; plan is REVIEW_REQUIRED". Written write-once through `ArtifactStore` (`routing_decision.<stage>.json`) with an artifact reference, `schema_version`, and the decision id derived from the inputs hash. Same inputs, same file.
@@ -180,9 +206,9 @@ Applies to one plan version only (D-29 spirit). A plan that uses one is REVIEW_R
 
 ```
 Call2Request { zone_id, ta_id, budget {calls_used, calls_max},
-  fields [ {field, class AI_OBSERVE|AI_THEN_SME|CODE_AND_AI, reason MISSING|CROSS_VIEW|MARKS_REQUIRED,
-            crop {purpose, center {lat, lon}|{station_m, offset_m}, extent_m, min_px, kind WIDE_CUT|HIGHER_ZOOM_FETCH}} ],
-  known_facts [ {field, value, status} ] }            # resolved facts the model must not contradict silently
+  fields [ {field, class AI_OBSERVE|AI_THEN_SME|CODE_AND_AI, reason DECIDING_UNKNOWN|DECIDING_CONFLICT|TA_FIELD|LANE_COUNT|MARKS_REQUIRED,
+            crop {purpose, center {lat, lon}|{station_m, offset_m}, extent_m, min_px, kind FINE_ZOOM_FETCH|WIDE_CUT}} ],
+  known_facts [ {field, value, status} ] }            # never holds lanes_per_direction, divided_highway, shoulder_present or oneway (blind re-observation, D-120)
 Call2Result  = flat facts list, same schema as call 1 (D-61): facts [ {field, value, status, confidence, evidence} ] + marks [ {feature, points, status, evidence} ]
 ```
 
@@ -198,7 +224,7 @@ S7 produces no distance. It produces TA decisions and derived facts. Each is tra
 | --- | --- | --- | --- |
 | Per-TA eligibility | `evaluate_eligibility(pack, ta, facts, determinations)`; conditions with the same `any_group` OR'd; any False gives NOT_ELIGIBLE; else any None gives UNDETERMINED | `E-TA1-*`, `E-TA6-*`, `E-TA10-*`, `E-TA33-*` | Unsourced conditions are None and add the pack's `sme_question` |
 | Routing tree (D-60) | **Not coded.** The tree is a picture of what the pack conditions already say (work_location, lane_closure, shoulder, road form) | the same | Tests walk each branch by facts, not by code path |
-| TA-33 road form | One OR group `ROAD_FORM`: divided, or the undivided 6N.11 branch | `E-TA33-FORM-DIVIDED`, `E-TA33-FORM-UNDIVIDED-6N11` | The undivided branch is SOURCE_REVIEW_REQUIRED, so an undivided site is UNDETERMINED with a question, never ELIGIBLE, until B-1 or the pack changes |
+| TA-33 road form | One OR group `ROAD_FORM`: divided, or an undivided branch (the Granite-type case, or the broader cases) | `E-TA33-FORM-DIVIDED`, `E-TA33-FORM-UNDIVIDED-FOUR-LANE-RIGHT` (SOURCED, D-91), `E-TA33-FORM-UNDIVIDED-OTHER` | The Granite-type branch (two lanes each way, right lane closed) is SOURCED in pack 1.1.0 (rule `R-6N11-TA33-UNDIVIDED-FOUR-LANE-RIGHT`). The broader undivided branch is SOURCE_REVIEW_REQUIRED (rule `R-6N11-TA33-UNDIVIDED-OTHER`), so such a site is UNDETERMINED with a question, never ELIGIBLE, until B-1 or the pack changes |
 | `low_speed_road` | `posted_speed_mph` against `R-LOW-SPEED-CUTOFF` | `R-LOW-SPEED-CUTOFF` | The record has no value, so the fact is UNKNOWN. The code has no number |
 | `freeway` | `road_type == EXPRESSWAY_FREEWAY` | registry `freeway` (source_type CODE) | A mapping of the SME's own answer. No new value |
 | `traffic_control_method` | Set to FLAGGER when the decision selects TA-10 | `R-TA10-METHOD-FLAGGER` (Sect. 6N.09 para 07, 6P-10) | Fact source CODE, actor router. POLICE_DETAIL never set here |
@@ -210,7 +236,7 @@ The router does not read `ta_hypothesis` to decide eligibility. It reads it only
 
 ### Call 2 field set (pack-driven)
 
-For the chosen TA `T`: the union of (a) fields in `T`'s eligibility expressions, (b) fields in the conditions of rules with `ta_id == T` or `ta_id is None` that the effective-rules view marks as applying to `T`, (c) fields the sequence devices need (`arrow_board_present`, `shoulder_closed_ft`). Remove fields already RESOLVED. Classify each by registry `source_type`:
+Call 2 is built after the provisional router pass. Its fields are the union of (0) the deciding facts that the what-if test marks as deciding and that are unresolved or in conflict, (a) fields in the eligibility expressions of the chosen TA `T` (when no TA is chosen yet, of the still-UNDETERMINED TAs, at most two), (b) fields in the conditions of rules with `ta_id == T` or `ta_id is None` that the effective-rules view marks as applying to `T`, (c) fields the sequence devices need (`arrow_board_present`, `shoulder_closed_ft`). Remove fields already RESOLVED **unless they are in conflict**. The lane count is added whenever the list is not empty and never makes it non-empty (D-121). Classify each by registry `source_type`:
 
 | source_type | Resolved by |
 | --- | --- |
@@ -230,22 +256,24 @@ Expected content (derived from the pack today, not hardcoded):
 | TA-10 | `approaching_lanes_one` | `curve_or_crest_near_zone`, `grade_crossing_present`, `single_flagger_eligible` are CODE; `night_work`, `duration` from the form |
 | TA-33 | `closed_lane_side`, `lanes_closed_count`, `positive_barrier_present`, `ramp_present` | `side_road_in_zone`, `shoulder_closed_ft`, `median_width_ft` are CODE (marks from crops); `arrow_board_wanted` from the form |
 
-Plus the D-80 re-asks, which apply even when the field is resolved: `lanes_per_direction` with a lane-marking crop (cross-view), the weak marks (`lane_line`, `shoulder_edge`, `curb`) when the width is UNKNOWN, and the sidewalk pair when UNKNOWN (B-7).
+Also asked: the weak marks (`lane_line`, `shoulder_edge`, `curb`) when the width is UNKNOWN, and the sidewalk pair when UNKNOWN (B-7). `lanes_per_direction` is no longer a separate re-ask with a lane-marking crop: it is the lane-count field of D-121, observed blind at fine zoom whenever call 2 runs. A config switch turns it off (FS-02 decides later whether to keep it).
 
-Budget: the request builder refuses to build a second call 2, and the stage asserts `calls_used <= 2`. When the list of AI fields is empty, **no call is made** and the stage records "call 2 not needed".
+**Blind rule (D-120).** The request builder has no parameter that carries the OSM value, the call-1 value or any code value for `lanes_per_direction`, `divided_highway`, `shoulder_present` or `oneway`. Before the call, code re-measures the views at fine zoom (D-112); the measurements are not shown to the model either.
 
-### Merge and cross-view check
+Budget: the request builder refuses to build a second call 2, and the stage asserts `calls_used <= 2`. When the list of AI fields, not counting the lane count, is empty, **no call is made** and the stage records "call 2 not needed" (D-121).
+
+### Merge and disagreement check
 
 | Situation | Result |
 | --- | --- |
-| Field UNKNOWN before, call 2 RESOLVED | Filled. Source IMAGERY_CALL2, evidence kept |
+| Field UNKNOWN before, call 2 RESOLVED | Filled, except for `lanes_per_direction`, `divided_highway`, `shoulder_present` and `oneway`: two AI reads never count as two sources, so a single-source safety fact stays UNKNOWN until OSM agrees (D-92, D-119). Source IMAGERY_CALL2, evidence kept |
 | Field UNKNOWN before, call 2 UNKNOWN | Stays UNKNOWN; reason updated |
 | Field RESOLVED before, call 2 gives the same value | Unchanged. Agreement recorded |
-| Field RESOLVED before, call 2 gives a different RESOLVED value | **Not overwritten.** If the field is a deciding field, it becomes UNKNOWN with reason `CROSS_VIEW_DISAGREEMENT` (or CONFLICT, per S6's vocabulary). Both values and evidence are kept. For other fields, the original stays and the disagreement is a note |
+| Field RESOLVED before, call 2 gives a different value (call 1 and call 2 disagree) | The field becomes UNKNOWN with reason `CROSS_VIEW_DISAGREEMENT` (or CONFLICT, per S6's vocabulary) and goes to the SME (D-123). Both values and evidence are kept as candidates. A resolved value is never silently replaced |
 | Field RESOLVED before, call 2 says UNKNOWN | Unchanged. Silence does not un-resolve |
 | Mandatory start field in the result | Ignored and logged. Never written |
 
-After the merge, `route(stage="CONFIRM")` runs on the merged facts. If its outcome differs from the INITIAL outcome, **the TA does not switch automatically** (ADR-022): the decision becomes `DECIDING_FACT_UNKNOWN` or `TA_SELECTION_CONFLICT` with a question for the SME (B-5). Whether this confirm pass counts toward the "router may re-run at most once" limit in plan section 7 is for S10; S7 stores `inputs_hash` and `stage` so S10 can count.
+After the merge, the second fusion runs and then `route(stage="FINAL")` on the merged facts. If its outcome differs from the PROVISIONAL outcome, **the TA does not switch automatically** (ADR-022): the decision becomes `DECIDING_FACT_UNKNOWN` or `TA_SELECTION_CONFLICT` with a question for the SME (B-5). Whether this confirm pass counts toward the "router may re-run at most once" limit in plan section 7 is for S10; S7 stores `inputs_hash` and `stage` so S10 can count.
 
 ---
 
@@ -260,14 +288,15 @@ Branch `tcp-mvp/s07-router`, off the S6 branch. Commits are small; **[B]** marks
 | 2 | `routing/models.py`: Pydantic models, `schema_version`, JSON schema check, `Question` extension | [B] | Plumbing; no behaviour |
 | 3 | `routing/facts_view.py`: deciding-field derivation from the pack, status, confidence and uncertainty gating, enum normalisation | **[STOP]** | Decides which facts the router may believe. Safety-critical. Also fixes the `work_location` vocabulary (A-1, B-6), which is read from images |
 | 4 | `routing/derived_facts.py` | **[STOP]** | The remaining-width interval test and the `low_speed_road` UNKNOWN behaviour are safety-critical numbers |
-| 5 | `routing/router.py` plus `rule_pack_eval` `determinations` parameter, near match, hypothesis rules, the five outcomes | **[STOP]** | The router is the safety gate. Review the outcome table, the "strict MATCH_ONE" rule and the thresholds |
+| 5 | `routing/router.py` plus `rule_pack_eval` `determinations` parameter, near match, hypothesis rules, the five outcomes, the two passes (PROVISIONAL, FINAL) and the what-if test (`routing/whatif.py`, name proposed) | **[STOP]** | The router is the safety gate. Review the outcome table, the "strict MATCH_ONE" rule and the thresholds |
 | 6 | `routing/consistency.py`: mandatory-field contradictions | [B] with 5 for review | Questions only; no write |
 | 7 | TA-10 sets FLAGGER (code) with trace | [B] with 5 | One rule id |
-| 8 | `routing/call2_plan.py`: pack-driven field set, class split, crop specs, budget guard. **No AI call** | **[STOP]** | Crop specs and which facts are asked of an image |
+| 8 | `routing/call2_plan.py`: pack-driven field set (deciding facts from the what-if test, chosen-TA fields, conflicts, lane count when call 2 runs), class split, fine-zoom crop specs, budget guard, the blind-request rule. **No AI call** | **[STOP]** | Crop specs and which facts are asked of an image |
 | 9 | `ai/call2.py`: prompt, schema, Pydantic validation, fake-provider tests, replay through the fixture harness | **[STOP]** | The prompt and the schema are the contract with the model; the owner reads the exact text |
-| 10 | `routing/merge.py`: non-overwrite merge, cross-view check, confirm pass | **[STOP]** | The un-resolve rules for safety-critical facts |
+| 10 | `routing/merge.py`: merge, the call 1 and call 2 disagreement rule, the second fusion, the FINAL pass | **[STOP]** | The un-resolve rules for safety-critical facts |
 | 11 | `orchestration/route_stage.py` and the `pipeline.py` insertion; artifacts, events, zone `ta` update | **[STOP]** | Any change to the 13 offline scenarios' stored expected outputs (D-83) needs a diff review. See B-4: with option A there is no such change |
-| 12 | Tests not yet added: golden-fixture router tests, property test, replay determinism, no-live-call guard | [B] | Tests follow each commit; this one only completes the set |
+| 12 | Tests not yet added: golden-fixture router tests, property test, replay determinism, no-live-call guard, the generality tests (T-16, T-17) | [B] | Tests follow each commit; this one only completes the set |
+| 12a | `closed_lane_side` never defaults to RIGHT; the D-59 fixes in `site_model/fusion.py` (the OSM `maxspeed` fallback; the encroachment override of the SME's lane closure) | **[STOP]** | The fixes change engine behaviour that CLAUDE.md lists as breaches; diff review |
 | 13 | `docs/reports/S7_router_report.md` (files changed, tests, results, contradictions, open questions) | [B] | Required finish (CLAUDE.md) |
 
 Every commit runs the applicable suites. The gate for the slice: the suites green, the new tests green, replay deterministic. The golden comparator is not part of the gate until S13.
@@ -286,6 +315,7 @@ Every commit runs the applicable suites. The gate for the slice: the suites gree
 
 **Decisions** (design choices that are the owner's): B-1 to B-9 below. I have not decided any of them.
 
+**Amendments 2026-10-31 (sections 1, 3, 4, 7 and 10).** Section 1: scope item 1 read "returns exactly one of five outcomes" with one router pass; item 6 read "the merge (never overwrites a resolved fact), and the cross-view check (can only un-resolve)" and listed the `lanes_per_direction` lane-marking re-ask; acceptance 1 read "Only Colorado can auto-route today ... Granite stays UNDETERMINED on `E-TA33-FORM-UNDIVIDED-6N11`"; acceptance 6 read "Call 2 never overwrites a resolved fact"; acceptance 7 read "Call 2 is skipped when nothing AI-observable is missing" (D-119 to D-123, D-91, D-128). Section 3: the stage names were INITIAL and CONFIRM; `known_facts` read "resolved facts the model must not contradict silently" (D-120, D-128). Section 4: the call 2 field set was the chosen TA's missing fields plus the D-80 re-asks, the budget line read "When the list of AI fields is empty, no call is made", and the merge table kept the original value on a disagreement for non-deciding fields (D-121, D-123). Section 7: T-10 and T-13 are reworded; T-16 to T-19 are new; the Granite row read "`DECIDING_FACT_UNKNOWN`, TA-33 the only candidate, question on 6N.11" (D-91). Section 10: A-4 and B-2 are annotated (D-91, D-119).
 ---
 
 ## 7. Tests
@@ -303,12 +333,16 @@ All with recorded fixtures or fakes. No live call. The network stays blocked.
 | T-7 | **TA-10 sets FLAGGER**; no other TA sets a method; POLICE_DETAIL never produced | D-68 |
 | T-8 | **Hypothesis**: each of the four TAs against facts that fit, fail, or are unknown; the hypothesis never changes eligibility | CLAUDE.md rule 7 |
 | T-9 | **Test-only pack variant** for TA-6 on a high-speed road and the 9 ft option: a copy of the pack under `tests/fixtures/` with a clearly labelled placeholder cutoff, never under `rule_pack/` | Needed because the real pack has no cutoff (B-9). The variant is re-sealed in the test and named `TEST_ONLY` |
-| T-10 | **Call 2 request builder**: for each TA the field list equals the pack-derived set; fields with `SME_*` or `CODE` classes never reach the AI; no mandatory field; empty list means no call | |
+| T-10 | **Call 2 request builder**: for each TA the field list equals the pack-derived set (deciding facts from the what-if test, chosen-TA fields, conflicts); fields with `SME_*` or `CODE` classes never reach the AI; no mandatory field; an empty list, not counting the lane count, means no call; the lane count never causes a call | |
 | T-11 | **Budget**: a second call 2, or a third call in a zone, raises; counted from the zone run record | |
 | T-12 | **Schema**: flat facts list; every property required; no union, no `minimum`/`maximum`; a result with a length-like field fails (D-64); case-insensitive enums; malformed fact becomes UNKNOWN | |
-| T-13 | **Merge and cross-view**: every row of the merge table; mandatory field in the result ignored; confirm pass that changes the outcome never switches the TA | |
+| T-13 | **Merge and disagreement**: every row of the merge table; mandatory field in the result ignored; call 1 and call 2 disagreeing gives UNKNOWN; a FINAL pass that changes the outcome never switches the TA | |
 | T-14 | **Determinism and replay**: same inputs give the same decision hash; fixture replay gives the same call 2 request fingerprints twice | |
 | T-15 | **Store-only access**: the router reads the pack only through `RulePackStore` (extend the S4 isolation test) | |
+| T-16 | **What-if test**: each unresolved fact is marked deciding when changing it over its registry domain changes the outcome set, otherwise not deciding; a not-deciding candidate question is informational, a deciding one is blocking | D-128, D-156 |
+| T-17 | **Generality**: (a) a made-up TA added to a test pack under `tests/fixtures/` routes, plans call 2 fields and runs the what-if test with no code change; (b) a string scan finds no TA id in the router, the fusion or the call-2 code | D-128, FS-11 |
+| T-18 | **Blind call 2**: the built request holds no OSM, call-1 or code value for lanes, divided, shoulder or one-way, on every path that builds it | D-120 |
+| T-19 | **`closed_lane_side` and D-59**: an unknown side keeps TA-33 UNDETERMINED and never becomes RIGHT; with the `maxspeed` fallback and the encroachment override removed, the SME's start fields are byte-identical after a run | S4b follow-up c; CLAUDE.md rule 4 |
 
 ### Comparison with the three reference jobs
 
@@ -318,7 +352,7 @@ The reference jobs are comparison material. The expected TA is a test expectatio
 | --- | --- | --- | --- |
 | Colorado St (TA-10 in the draft) | Start fields `URBAN_LOW_SPEED`, 25 mph, volume and `lane_closure = True` typed as test inputs from the draft's notes; facts: `IN_LANE`, `lanes_per_direction = 1`, `oneway = False`, `divided_highway = False` | `MATCH_ONE`, TA-10, `traffic_control_method = FLAGGER` | TA equals the golden TA. No W20-7 versus W20-8 comparison here (S8/S13) |
 | E Second St (TA-6) | `ON_SHOULDER_OR_ENCROACHING`, `shoulder_present = True`, `lane_closure = False`, remaining width interval | `DECIDING_FACT_UNKNOWN` with TA-6 as the single candidate and two open items: `E-TA6-MINOR-ROAD` (an unsourced condition, with its SME question) and `low_speed_road` (a fact that is UNKNOWN because `R-LOW-SPEED-CUTOFF` has no value) | TA-6 is the only candidate; the open items equal the S4 unsourced list |
-| Granite St (TA-33) | `IN_LANE`, `lanes_per_direction = 2`, `divided_highway = False`, `lane_closure = True` | `DECIDING_FACT_UNKNOWN`, TA-33 the only candidate, question on 6N.11; **TA-10 must be NOT_ELIGIBLE** | The unstable-lane case: feed the three spike responses (Granite 2, 1, 1). With `lanes_per_direction = 1` from the model alone, TA-10 would match. The router must not auto-select unless S6 passes a cross-checked fact (A-1(d), B-3). The test shows both behaviours and fails if a lone `1` auto-routes |
+| Granite St (TA-33) | `IN_LANE`, `lanes_per_direction = 2`, `divided_highway = False`, `lane_closure = True`, `closed_lane_side = RIGHT` (stated, never defaulted) | `MATCH_ONE`, TA-33, through the sourced `E-TA33-FORM-UNDIVIDED-FOUR-LANE-RIGHT` branch, when the lane count is two-source; **TA-10 must be NOT_ELIGIBLE**. With the lane count single-source, `DECIDING_FACT_UNKNOWN` with TA-33 as the only candidate | The unstable-lane case: feed the three spike responses (Granite 2, 1, 1). With `lanes_per_direction = 1` from the model alone, TA-10 would match. The router must not auto-select unless S6 passes a cross-checked fact (A-1(d), B-3). The test shows both behaviours and fails if a lone `1` auto-routes |
 
 Fact sets are hand-written and marked synthetic, or taken from the saved spike responses in `tcp-mvp/s00-schema-spike` (`git show`, copied into `tests/fixtures/` with their sha256). Real-KML recordings come after S6 (CLAUDE.md); call 2 fixtures are question B-8.
 
@@ -380,7 +414,7 @@ Two groups. **A. Client inputs** are facts only the client or its SME can supply
 - Suggestion: (b).
 - Blocks: no.
 
-**A-4. Does an undivided road with two lanes each way and the right lane closed qualify for TA-33 (Sect. 6N.11 para 06)?** `E-TA33-FORM-UNDIVIDED-6N11`, `R-6N11-TA33-UNDIVIDED-FOUR-LANE`; the proposed D-60 amendment in the S4 review.
+**A-4. Does an undivided road with two lanes each way and the right lane closed qualify for TA-33 (Sect. 6N.11 para 06)?** ANSWERED for the Granite-type case by D-91: `E-TA33-FORM-UNDIVIDED-FOUR-LANE-RIGHT`, `R-6N11-TA33-UNDIVIDED-FOUR-LANE-RIGHT`. Broader undivided cases: `E-TA33-FORM-UNDIVIDED-OTHER`, `R-6N11-TA33-UNDIVIDED-OTHER` (unsourced, an engineer question).
 - Options: (a) yes, as read; (b) no; (c) per-plan SME answer.
 - Effects: (a) needs a pack change (hash changes) so Granite can auto-route; (b) Granite is NO_TA_MATCH with TA-33 as a near match; (c) Granite is a question each time.
 - Suggestion: (c) until the SME has answered the question in the review report; then (a) if confirmed.
@@ -400,7 +434,7 @@ Two groups. **A. Client inputs** are facts only the client or its SME can supply
 - Suggestion: (c).
 - Blocks: not S7's router commits. Blocks drafting E Second St and Granite end to end (S8 and S13).
 
-**B-2. Should call 2 run when no TA is chosen yet?** CLAUDE.md says call 2 covers only the chosen TA's missing fields. D-80 says call 2 re-asks `lanes_per_direction`, which is a deciding fact when it is UNKNOWN. ANSWERED (see decisions section)
+**B-2. Should call 2 run when no TA is chosen yet?** CLAUDE.md says call 2 covers only the chosen TA's missing fields. D-80 says call 2 re-asks `lanes_per_direction`, which is a deciding fact when it is UNKNOWN. ANSWERED (see decisions section; reworked by D-119 to D-123 and D-128: call 2 follows the provisional pass and covers the deciding facts, the chosen TA's fields and the conflicts)
 - Options: (a) skip call 2 and ask the SME; (b) run call 2 for the deciding AI-observable unknowns of the still-UNDETERMINED TAs (at most two TAs), then route again; (c) run call 2 for the lane count only.
 - Effects: (a) means a disagreeing lane count always reaches the form; no AI help. (b) uses the one call 2 before the TA is known, so TA-specific fields may stay unresolved and go to the form. (c) is a subset of (b).
 - Suggestion: (b), recorded as an interpretation of CLAUDE.md that the owner approves.
@@ -456,7 +490,7 @@ Two groups. **A. Client inputs** are facts only the client or its SME can supply
 | A-1 | Low-speed cutoff (mph) | Client input | No (blocks auto TA-6) | A number with a source; UNKNOWN until then |
 | A-2 | "Minor road" definition | Client input | No (blocks auto TA-6) | Per-plan SME yes/no |
 | A-3 | Short TTC zone length | Client input | No | Always an SME choice |
-| A-4 | 6N.11 undivided four-lane reading | Client input | No (blocks auto TA-33 undivided) | Per-plan answer, then pack if confirmed |
+| A-4 | 6N.11 undivided four-lane reading | Client input | No (answered for the Granite-type case, D-91; broader cases stay an engineer question) | Per-plan answer for the broader cases |
 | A-5 | MUTCD edition applied | Client input | No | Confirm before S8 |
 | B-1 | How an SME answers an unsourced question | Decision | Not the router; blocks end-to-end drafts of E Second St and Granite | Per-plan determination plus a promotion proposal |
 | B-2 | Run call 2 when no TA is chosen | Decision | Commit 8 | Deciding AI unknowns of the undetermined TAs |
