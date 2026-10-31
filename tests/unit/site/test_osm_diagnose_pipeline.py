@@ -447,3 +447,49 @@ def test_nothing_secret_is_printed_or_written(tmp_path, capsys, monkeypatch):
 def test_the_pipeline_script_uses_the_os_trust_store_and_no_other_host():
     src = open(os.path.join(ROOT, "scripts", "s06_osm_pipeline.py"), encoding="utf-8").read()
     assert "use_os_trust_store()" in src and "verify=False" not in src and "overpass-api.de" not in src.split('"""')[2]
+
+
+# ================================================================= the first live run, as a regression case (2026-10-31)
+GATEWAY_BODY = "failed to connect The destination overpass-api.de is not reachable. Contact your IT administrator with the following error: Connection refused"
+
+
+def live_run_1():
+    """The nine results of the first live diagnosis: the project path answered 200 in 28 s; the default User-Agent got 406; four others got a gateway 502."""
+    rs = [D.result("a", 200, 16482, 0.63, None, 28.09, None, True), D.result("b", 406, 156, 0.22, 1.06, 1.06, None, False, body_head="Not Acceptable"),
+          D.result("c", 502, 534, 0.22, 1.05, 1.05, None, False, body_head=GATEWAY_BODY), D.result("d", 406, 156, 0.22, 1.03, 1.03, None, False, body_head="Not Acceptable"),
+          D.result("e", 406, None, 0.22, None, 1.03, "HTTPError", None, body_head="Not Acceptable"), D.result("f", 502, 856, 0.22, 0.79, 0.79, None, False, body_head=GATEWAY_BODY),
+          D.result("g", 502, 856, 0.24, 0.80, 0.80, None, False, body_head=GATEWAY_BODY), D.result("h", None, None, None, None, 1.0, "WebException"),
+          D.result("i", 502, 856, 0.22, 0.79, 0.79, None, None, text="<html>Bad Gateway</html>", body_head=GATEWAY_BODY)]
+    return rs
+
+
+def test_the_first_live_run_is_not_read_as_everything_slow():
+    rs = live_run_1()
+    p, allv, why = D.verdict(rs, 20)
+    assert p == "gateway or proxy" and "network" not in allv and "server busy" not in allv
+    assert "406" in why and "default User-Agent" in why and "28 s" in why and "variants c, f, g, i" in why
+    assert D.passed(rs, 60) is True                                              # the project path itself answered 200 with JSON in under 60 s
+
+
+def test_an_http_error_is_a_failure_not_slowness():
+    assert D.is_slow(D.result("b", 502, 1, None, None, 0.5), 20) is False and D.is_http_error(D.result("b", 502, 1, None, None, 0.5)) is True
+    assert D.is_slow(D.result("b", 200, 1, None, None, 30.0), 20) is True and D.is_slow(D.result("b", None, None, None, None, 90.0, "ReadTimeout"), 20) is True
+    assert D.is_slow(D.result("b", None, None, None, None, 1.0, "WebException"), 20) is False
+
+
+def test_http_failures_without_a_gateway_page_are_inconclusive_and_say_which():
+    rs2 = [D.result("a", 200, 10, 0.1, None, 5.0, None, True), D.result("b", 500, 1, 0.1, 0.2, 0.2, None, False, body_head="oops")]
+    assert D.verdict(rs2, 20)[0] == "inconclusive" and "b: HTTP 500" in D.verdict(rs2, 20)[2]
+
+
+def test_error_bodies_are_kept_as_plain_text_and_shown_in_the_report():
+    assert D.head(b"<html><head><style>p{color:red}</style></head><body><h1>failed to connect</h1><p>Connection refused</p></body></html>") == "failed to connect Connection refused"
+    assert D.head(None) is None and len(D.head("x" * 1000)) == 240
+    c = Clock(); o = {"results": live_run_1(), "verdict": "gateway or proxy", "all": ["gateway or proxy"], "why": "w", "passed": True, "stopped": None, "status_text": None, "requests_made": 9}
+    text = D.render(SITE, o, {"python": "3"}, {"url": "u"}, "t")
+    assert "Error bodies (first characters, plain text):" in text and "variant c (HTTP 502): failed to connect" in text
+
+
+def test_a_429_anywhere_fails_the_pipeline_stage_even_if_the_project_path_answered():
+    rs = [D.result("a", 200, 10, 0.1, None, 5.0, None, True), D.result("b", 429, 1, 0.1, 0.2, 0.2)]
+    assert D.passed(rs, 60) is False

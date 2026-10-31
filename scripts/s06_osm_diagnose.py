@@ -48,13 +48,30 @@ class Budget:
     def done(self): self.last_end = self.clock()
 
 
-def result(variant, status=None, nbytes=None, connect=None, first=None, total=None, error=None, json_ok=None, text=None, peer=None):
+def result(variant, status=None, nbytes=None, connect=None, first=None, total=None, error=None, json_ok=None, text=None, peer=None, body_head=None):
     return {"variant": variant, "status": status, "bytes": nbytes, "connect_s": connect, "first_byte_s": first, "total_s": total, "error": error,
-            "json_ok": json_ok, "text": text, "peer": peer}
+            "json_ok": json_ok, "text": text, "peer": peer, "body_head": body_head}
+
+
+def head(body, n=240):
+    """The first characters of an error body as plain text (tags and blank runs removed), for the report."""
+    import re
+    t = body.decode("utf-8", "replace") if isinstance(body, (bytes, bytearray)) else str(body or "")
+    t = re.sub(r"<style.*?</style>", " ", t, flags=re.S | re.I); t = re.sub(r"<[^>]+>", " ", t)
+    return " ".join(t.split())[:n] or None
+
+
+def is_timeout(r):
+    return r is not None and r["error"] is not None and "timeout" in str(r["error"]).lower()
+
+
+def is_http_error(r):
+    return r is not None and r["status"] not in (None, 200)
 
 
 def is_slow(r, slow_s):
-    return r is not None and (r["error"] is not None or r["status"] != 200 or (r["total_s"] is not None and r["total_s"] > slow_s))
+    """Slow means it answered 200 but took longer than slow_s, or it timed out. An HTTP error status is a failure, not slowness."""
+    return r is not None and (is_timeout(r) or (r["status"] == 200 and r["total_s"] is not None and r["total_s"] > slow_s))
 
 
 def is_fast(r, slow_s):
@@ -93,12 +110,24 @@ def verdict(results, slow_s):
         free = status_has_free_slot(i["text"] if i else None)
         if free is False: out.append(("server busy", "everything is slow and /api/status shows no free slot"))
         else: out.append(("network", "everything is slow and /api/status does not show a busy server" if free else "everything is slow and /api/status gives no slot information"))
-    if not out: return "inconclusive", [], "the variants disagree in a way the table does not cover; send the report"
-    return out[0][0], [o[0] for o in out], "; ".join(o[1] for o in out)
+    # HTTP failures are not slowness. Name them, so a run in which most variants failed is not read as "everything slow".
+    notes = []
+    refused = [r["variant"] for r in (b, d, e) if r is not None and r["status"] == 406]
+    if refused and any(r is not None and r["status"] == 200 for r in (a, c)):
+        notes.append(f"the server answers HTTP 406 to the library's default User-Agent (variants {', '.join(refused)}); the project User-Agent is accepted")
+    gateway = [r["variant"] for r in results if r["status"] in (502, 503, 504) and any(w in (r.get("body_head") or "").lower() for w in ("not reachable", "bad gateway", "it administrator", "connection refused"))]
+    if gateway: out.insert(0, ("gateway or proxy", f"a web gateway between this computer and the server answered HTTP 5xx with its own error page (variants {', '.join(gateway)}; not an Overpass answer), so those variants cannot be compared"))
+    if a is not None and a["status"] == 200 and slow(a): notes.append(f"the project path itself answered 200 but needed {a['total_s']:.0f} s (limit for 'slow': {slow_s} s)")
+    if not out:
+        failures = [f"{r['variant']}: HTTP {r['status']}" for r in results if is_http_error(r)]
+        why = "the variants disagree in a way the table does not cover; send the report" + (f" (HTTP failures: {', '.join(failures)})" if failures else "")
+        return "inconclusive", [], "; ".join([why] + notes)
+    return out[0][0], [o[0] for o in out], "; ".join([o[1] for o in out] + notes)
 
 
 def passed(results, pass_s):
     """Stage 1 of the pipeline: the project path returned HTTP 200 with parseable JSON in under `pass_s` seconds."""
+    if any(r["status"] == 429 for r in results): return False                      # a 429 anywhere: the server asked us to slow down
     a = next((r for r in results if r["variant"] == "a"), None)
     return bool(a and a["error"] is None and a["status"] == 200 and a["json_ok"] and a["total_s"] is not None and a["total_s"] < pass_s)
 
@@ -132,7 +161,7 @@ def timed_requests(variant, method, url, *, params=None, data=None, headers=None
         first = time.perf_counter() - t0
         body = r.content
         return result(variant, r.status_code, len(body), rec[0][0] if rec else None, first, time.perf_counter() - t0, None, _json_ok(body) if variant != "i" else None,
-                      body.decode("utf-8", "replace") if variant == "i" else None, rec[0][1] if rec else None)
+                      body.decode("utf-8", "replace") if variant == "i" else None, rec[0][1] if rec else None, head(body) if r.status_code != 200 else None)
     except Exception as e:
         return result(variant, None, None, rec[0][0] if rec else None, first, time.perf_counter() - t0, type(e).__name__, peer=rec[0][1] if rec else None)
     finally: undo()
@@ -147,7 +176,9 @@ def timed_urllib(variant, url, read_timeout):
         return result(variant, status, len(body), rec[0][0] if rec else None, first, time.perf_counter() - t0, None, _json_ok(body), peer=rec[0][1] if rec else None)
     except Exception as e:
         status = getattr(e, "code", None)
-        return result(variant, status, None, rec[0][0] if rec else None, first, time.perf_counter() - t0, type(e).__name__, peer=rec[0][1] if rec else None)
+        try: bh = head(e.read(2000)) if hasattr(e, "read") else None
+        except Exception: bh = None
+        return result(variant, status, None, rec[0][0] if rec else None, first, time.perf_counter() - t0, type(e).__name__, peer=rec[0][1] if rec else None, body_head=bh)
     finally: undo()
 
 
@@ -195,7 +226,7 @@ def real_runners(site, cfg, sources):
         try: osm.fetch_ways(SourceClient(sources=sources, transport=transport), site["lat"], site["lon"], cfg)
         except SourceError as e:
             return result("a", (e.details or {}).get("http_status"), box.get("bytes"), rec[0][0] if rec else None, None, time.perf_counter() - t0, e.code, box.get("json"),
-                          peer=rec[0][1] if rec else None)
+                          peer=rec[0][1] if rec else None, body_head=head((e.details or {}).get("body")))
         return result("a", box["status"], box["bytes"], rec[0][0] if rec else None, None, box["total"], None, box["json"], peer=rec[0][1] if rec else None)
     return {
         "a": a,
@@ -265,6 +296,8 @@ def render(site, outcome, env, eff, started):
     labels = dict(VARIANTS)
     for r in outcome["results"]:
         L.append(f"| {r['variant']} | {labels[r['variant']]} | {fmt(r['status'])} | {fmt(r['bytes'])} | {fmt(r['connect_s'])} | {fmt(r['first_byte_s'])} | {fmt(r['total_s'])} | {fmt(r['error'])} |")
+    bodies = [r for r in outcome["results"] if r.get("body_head")]
+    if bodies: L += ["", "Error bodies (first characters, plain text):", ""] + [f"- variant {r['variant']} (HTTP {r['status']}): {r['body_head']}" for r in bodies]
     L += ["", f"**VERDICT: {outcome['verdict']}**", "", outcome["why"] + (f" (all matching: {', '.join(outcome['all'])})" if len(outcome["all"]) > 1 else ""), ""]
     if outcome["stopped"]: L += [f"Stopped: {outcome['stopped']}", ""]
     L += [f"Stage 1 test (project path HTTP 200, parseable JSON, under the pass time): **{'PASS' if outcome['passed'] else 'FAIL'}**", "",
