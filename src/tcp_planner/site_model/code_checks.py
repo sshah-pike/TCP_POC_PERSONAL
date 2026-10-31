@@ -90,7 +90,7 @@ def lane_lines(image_bytes, marks, cfg=None):
     for t, sa, sb in stations:
         lo, hi = (sa, sb) if sa <= sb else (sb, sa)
         samples = [_px(lum, u, v, t, s) for s in np.arange(lo, hi + 0.5, 1.0)]
-        if any(p is None for p in samples) or len(samples) < 8: continue
+        if any(p is None for p in samples) or len(samples) < setting("code_checks", "min_cross_section_px", cfg)[0]: continue
         cross = np.array([lum[y, x] for x, y in samples])
         pos = [p for p in _line_peaks(cross, None, cfg) if margin <= p <= len(cross) - 1 - margin]
         found.append(pos)

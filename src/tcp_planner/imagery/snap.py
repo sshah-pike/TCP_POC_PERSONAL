@@ -59,7 +59,7 @@ def _profile(g, x, y, nx, ny, radius):
     return np.array(vals)
 
 
-def nearest_edge_offset(profile, radius, min_contrast, arm=3):
+def nearest_edge_offset(profile, radius, min_contrast, arm):
     """Offset (pixels, signed along the normal) of the nearest step edge in the profile, or None. A step at offset o has contrast
     |mean of `arm` samples after o - mean of `arm` samples before o|; it counts when the contrast reaches `min_contrast` and the
     gradient there is a local maximum. The nearest to the AI's point wins; a tie goes to the larger step."""
@@ -87,12 +87,12 @@ def snap_mark(g, mark, cfg):
     """Snapped copy of one mark, or the mark rejected (UNKNOWN, no_edge_nearby)."""
     radius = int(setting("snapping", "search_radius_px", cfg)[0]); step = setting("snapping", "sample_step_px", cfg)[0]
     contrast = setting("snapping", "min_edge_contrast", cfg)[0]; need = setting("snapping", "min_accepted_fraction", cfg)[0]
-    window = int(setting("snapping", "smooth_window", cfg)[0])
+    window = int(setting("snapping", "smooth_window", cfg)[0]); arm = int(setting("snapping", "edge_arm_px", cfg)[0])
     samples = _densify(mark.points, step)
     offs = []
     for x, y, ux, uy in samples:
         prof = _profile(g, x, y, -uy, ux, radius)
-        offs.append(None if prof is None else nearest_edge_offset(prof, radius, contrast))
+        offs.append(None if prof is None else nearest_edge_offset(prof, radius, contrast, arm))
     found = [o for o in offs if o is not None]
     frac = len(found) / len(samples) if samples else 0.0
     if not samples or frac < need:

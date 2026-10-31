@@ -228,6 +228,11 @@
       "value": 5,
       "source": "CALIBRATION_PENDING",
       "note": "odd number of sample points of the median filter over the offsets along the line"
+    },
+    "edge_arm_px": {
+      "value": 3,
+      "source": "CALIBRATION_PENDING",
+      "note": "samples on each side of a candidate edge averaged to measure the grey-level step; also the spread of a soft edge"
     }
   },
   "code_checks": {
@@ -301,6 +306,11 @@
       "value": 10,
       "source": "CALIBRATION_PENDING",
       "note": "largest distance between the road centre seen in the marks and the OSM reference way; above it OSM cannot confirm an AI value"
+    },
+    "min_cross_section_px": {
+      "value": 8,
+      "source": "CALIBRATION_PENDING",
+      "note": "a cross-section across the road strip with fewer pixels than this is skipped by the lane-line check"
     }
   },
   "consistency": {
