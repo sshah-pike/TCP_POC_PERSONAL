@@ -61,9 +61,21 @@ MARK_FEATURES_V2 = MARK_FEATURES + ("nearest_edge_point",)    # one pixel point;
 REASONS_V2 = ("visible", "not_visible", "occluded", "low_resolution", "ambiguous", "shadowed", "canopy")
 BY_NAME_V2 = {r.name: r for r in FIELDS + FIELDS_V2_EXTRA}
 
+# Version 3 (S6 STOP 7): road_name and other_roads_seen are dropped (the prompt now makes the model pick the road by the pavement nearest the
+# centre, not by a name); road_axis and centre_at_intersection are added. Both are CONTEXT_ONLY: parsed, kept, shown to the SME and in the trace,
+# read by no decision code. Versions 1 and 2 are untouched.
+ROAD_AXES = ("N-S", "E-W", "NE-SW", "NW-SE", "CURVED", "UNKNOWN")
+FIELDS_V3_EXTRA = (
+    FIELDS_V2_EXTRA[2:] +                                                # shadow_share, canopy_share (kept from version 2)
+    (Row("road_axis", "enum", ROAD_AXES, None, None),                    # label only: the direction of the road the model chose
+     Row("centre_at_intersection", "bool", (), None, None)))             # label only: the model says the centre is at a corner or junction
+EXTRA_ROWS = FIELDS_V2_EXTRA + FIELDS_V3_EXTRA[2:]                       # every context row of any version, in one stable order
+PROMPT_VERSIONS = (1, 2, 3)
+
 
 def fields_for(version=1):
-    return FIELDS if version == 1 else FIELDS + FIELDS_V2_EXTRA
+    if version not in PROMPT_VERSIONS: raise ValueError(f"unknown prompt version {version!r}")
+    return FIELDS if version == 1 else FIELDS + (FIELDS_V2_EXTRA if version == 2 else FIELDS_V3_EXTRA)
 
 
 def mark_features_for(version=1):
@@ -289,7 +301,7 @@ def to_site_facts(result, work_location_marks=MARKS_MISSING, cfg=None, profile=N
     ai_only = set(call1_setting("ai_only_review_fields", cfg))      # no second source exists for these: the value stands, flagged for the SME
     floor = confidence_floor("work_location", profile, cfg)[0]
     facts, questions = [], []
-    for row in FIELDS + tuple(r for r in FIELDS_V2_EXTRA if r.name in result.observations):
+    for row in FIELDS + tuple(r for r in EXTRA_ROWS if r.name in result.observations):
         obs = result.observations[row.name]
         if row.name == "work_location":
             f, q = map_work_location(obs, work_location_marks, floor)
@@ -309,6 +321,8 @@ def to_site_facts(result, work_location_marks=MARKS_MISSING, cfg=None, profile=N
 # ---------------------------------------------------------------- request: schema, prompt, builder (provider-neutral)
 SCHEMA_NAME = "tcp_site_facts"      # the name given to a strict Responses API schema; the Messages API ignores it
 SCHEMA_NAME_V2 = "tcp_site_facts_v2"
+SCHEMA_NAME_V3 = "tcp_site_facts_v3"
+SCHEMA_NAMES = {1: SCHEMA_NAME, 2: SCHEMA_NAME_V2, 3: SCHEMA_NAME_V3}
 MODE = "site_call1"
 WIRE_UNITS = ("bool", "count", "enum", "text", "none")
 WIRE_UNITS_V2 = WIRE_UNITS + ("share",)
@@ -334,7 +348,8 @@ INSTRUCTIONS = load_prompts()[1].text
 def wire_schema(version=1):
     """Structured-output schema for call 1. Every property required, additionalProperties false, no union, no
     minimum/maximum, no $ref: the plain subset that both API families accept. Version 1 is the spike schema (pinned); version 2 adds the
-    four context facts, the `share` unit, the nearest_edge_point mark feature and a required `reason` on every fact."""
+    four context facts, the `share` unit, the nearest_edge_point mark feature and a required `reason` on every fact; version 3 swaps
+    road_name and other_roads_seen for road_axis and centre_at_intersection."""
     def obj(props): return {"type": "object", "additionalProperties": False, "required": list(props), "properties": props}
     fprops = {"field": {"type": "string", "enum": [r.name for r in fields_for(version)]}, "value": {"type": "string"},
               "unit": {"type": "string", "enum": list(WIRE_UNITS if version == 1 else WIRE_UNITS_V2)},
@@ -351,13 +366,23 @@ def build_request(image_bytes, record, cfg=None, version=PROMPT_VERSION):
     """Request in the provider's shape: {"mode", "system", "parts", "schema", "schema_name", "image", "prompt_version"}.
     `image_bytes` and `record` come from imagery.prepare.resize_for_model: the bytes hashed are the bytes sent.
 
-    The request is BLIND: the only inputs are the image, its size and scale, and the evidence word cap. No OSM tag, way name, lane count,
-    bearing, floor or any other value computed by code is ever put in the prompt (a test enforces it)."""
+    The request is BLIND: the only inputs are the image, its size and scale, the evidence word cap and (version 3) the reference lane width
+    from config, turned into pixels at this scale. No OSM tag, way name, lane count, bearing, floor or any other value computed by code
+    from a map source is ever put in the prompt (a test enforces it)."""
     system, user = (SYSTEM, INSTRUCTIONS) if version == PROMPT_VERSION else (lambda p: (p[0].text, p[1].text))(load_prompts(version))
     w, h = record["sent_px"]
-    text = user.format(w=w, h=h, mpp=record["mpp_sent"], cx=w // 2, cy=h // 2, words=call1_setting("evidence_max_words", cfg))
+    fill = dict(w=w, h=h, mpp=record["mpp_sent"], cx=w // 2, cy=h // 2, words=call1_setting("evidence_max_words", cfg))
+    if "{lane_px" in user: fill["lane_px"] = lane_px(record["mpp_sent"], cfg)
+    text = user.format(**fill)
     return {"mode": MODE, "system": system, "parts": [("image", image_bytes), ("text", text)], "schema": wire_schema(version),
-            "schema_name": SCHEMA_NAME if version == 1 else SCHEMA_NAME_V2, "image": record, "prompt_version": version}
+            "schema_name": SCHEMA_NAMES[version], "image": record, "prompt_version": version}
+
+
+def lane_px(mpp_sent, cfg=None):
+    """Width in pixels of a normal traffic lane at this scale: the reference lane width (config call1.reference_lane_width_m, tagged
+    CALIBRATION_PENDING, so it is read by name and not through call1_setting) divided by the metres per pixel. A scale hint only."""
+    entry = (cfg or load_site_config())["call1"]["reference_lane_width_m"]
+    return entry["value"] / mpp_sent
 
 
 def request_fingerprint(request, profile):

@@ -126,3 +126,33 @@ def test_version_2_results_go_to_their_own_folder_and_say_which_version(script, 
     assert script.out_root() == str(tmp_path / "out") + "_v2"
     monkeypatch.setattr(script, "VERSION", 1)
     assert script.out_root() == str(tmp_path / "out")
+
+
+def test_prompt_version_3_dry_run_prints_the_v3_body_and_the_default_stays_version_1(script, capsys, monkeypatch):
+    monkeypatch.delenv("TCP_LIVE", raising=False)
+    monkeypatch.setattr("tcp_planner.ai.call1.send_call1", lambda *a, **k: pytest.fail("a call was made"))
+    assert script.main(["--profile", "gpt-5.6-sol", "--dry-run", "--only", "1", "--prompt-version", "3"]) == 0
+    out = capsys.readouterr().out
+    assert "tcp_site_facts_v3" in out and "centre_at_intersection" in out and "px wide at this scale" in out and "road_name" not in out
+    assert script.main(["--profile", "gpt-5.6-sol", "--dry-run", "--only", "1"]) == 0
+    out1 = capsys.readouterr().out
+    assert '"name": "tcp_site_facts"' in out1 and "road_axis" not in out1
+
+
+def test_version_3_results_go_to_their_own_folder_and_say_which_version(script, tmp_path, monkeypatch):
+    monkeypatch.setattr(script, "OUT", str(tmp_path / "out"))
+    monkeypatch.setattr(script, "VERSION", 3)
+    assert script.out_root() == str(tmp_path / "out") + "_v3"
+    monkeypatch.setattr(script, "VERSION", 2)
+    assert script.out_root() == str(tmp_path / "out") + "_v2"
+
+
+def test_a_version_3_live_run_saves_under_the_v3_folder_with_prompt_version_3(script, tmp_path, monkeypatch):
+    seen = []
+    def fake(p, r, send=None):
+        seen.append(r["prompt_version"]); return _Reply(_spike_text())
+    monkeypatch.setattr("tcp_planner.ai.call1.send_call1", fake)
+    assert script.main(["--profile", "gpt-5.6-sol", "--only", "1", "--prompt-version", "3"]) == 0
+    saved = json.load(open(os.path.join(str(tmp_path / "out") + "_v3", "gpt-5.6-sol", "call1.json"), encoding="utf-8"))
+    assert seen == [3] and saved["prompt_version"] == 3 and saved["fingerprint"]["schema_name"] == "tcp_site_facts_v3"
+    assert not os.path.exists(os.path.join(script.OUT, "gpt-5.6-sol"))                        # nothing written over the version 1 folder

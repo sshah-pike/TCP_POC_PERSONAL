@@ -8,6 +8,11 @@
       "value": 15,
       "source": "S0 prompt tuning proposal P1, approved S6 Q3 B"
     },
+    "reference_lane_width_m": {
+      "value": 3.3,
+      "source": "CALIBRATION_PENDING",
+      "note": "prompt version 3 only: a normal traffic lane width in metres, divided by the image scale to tell the model how many pixels a lane is (a scale hint). Not a MUTCD value and never used to decide anything; read by name, not through call1_setting, because that returns None for a pending value"
+    },
     "safety_critical_fields": {
       "value": [
         "lanes_per_direction",

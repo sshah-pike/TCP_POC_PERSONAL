@@ -5,10 +5,11 @@ value that is USED and carries the flag CALIBRATION_PENDING in the trace; none i
 (`tests/unit/site/test_calibration_in_config.py`) keeps this list current, proves every value the code reads exists in config, and
 proves the S6 modules contain no other number than structural ones (0, 1, 2, a half, 180 and 360 degrees, the luminance weights, the earth radius).
 
-## CALIBRATION_PENDING (62)
+## CALIBRATION_PENDING (63)
 
 | config path | value | what it controls |
 | --- | --- | --- |
+| `call1/reference_lane_width_m` | 3.3 | prompt version 3 only: a normal traffic lane width in metres, divided by the image scale to tell the model how many pixels a lane is (a scale hint). Not a MUTCD value and never used to decide anything; read by name, not through call1_setting, because that returns None for a pending value |
 | `measurement/edge_pixel_error_px_cross_section` | 1.0 | D-38 example: one pixel of error on each edge. Starting value for the deterministic cross-section. S6 STOP 2: accepted as the starting model. |
 | `measurement/edge_pixel_error_px_ai_marks` | 3.0 | Derived from the nine recorded spike widths (claude-opus-5-5, pre-tuning prompt, 3 sites x 3 repetitions): at the spike scale (about 0.44 m per pixel) all nine traveled-way widths fall inside the band (3.0 px x 2 edges) around their site's median, which 1.0 px and 2.0 px do not achieve. NOT calibrated against drawings (Q20). gpt-5.6-sol has not run; its marks may differ. Recorded as a test (test_ai_mark_error_evidence). |
 | `crops/pending_features` | ["shoulder_edge", "curb", "sidewalk", "bicycle_lane"] | No pixels-per-feature value exists for these. Until one is calibrated they are never judged sufficient, so a higher-zoom view (up to the zoom ceiling) is always requested when one of them is needed. May cost extra Azure Maps requests. |

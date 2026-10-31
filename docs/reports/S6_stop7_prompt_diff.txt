@@ -1,0 +1,28 @@
+Prompt call1_user: version 2 -> version 3 (S6 STOP 7). Unified diff of the template text; the system text is identical in v1, v2 and v3.
+v2 sha256 00ac1ea2810962ee8e5a99297489210f46a2090e9ccfcfb407bba7b88dfefe96
+v3 sha256 0b1cc612c1e5631b21f1dd22f5fc82041ae9c7dbf39512e852975eb82a2e3689
+
+--- call1_user.v2
++++ call1_user.v3
+@@ -1,9 +1,16 @@
+-Image {w}x{h} px, north-up, {mpp:.3f} m per pixel. Work location = image centre ({cx},{cy}). Sides are N, S, E, W.
+-Choose the road nearest the work location. Name it in road_name (the name or number if readable on a sign or label, else UNKNOWN) and list any other roads you see in other_roads_seen (short list or NONE). For the chosen road give one fact per field (facts) and one mark per visible feature (marks):
+-- work_location: ROADWAY|SHOULDER|BEYOND_SHOULDER|SIDEWALK|UNKNOWN. work_side: N|S|E|W.
+-- lanes_per_direction: count of through lanes in one direction. sidewalk_side: N|S|E|W|BOTH|NONE|UNKNOWN. obstructions: short list or NONE.
++Image {w}x{h} px, north-up, {mpp:.3f} m per pixel; a normal traffic lane is about {lane_px:.0f} px wide at this scale. Work location = image centre ({cx},{cy}). Sides are N, S, E, W.
++The work location is a point, not a place on a road. First decide which road it belongs to: the road whose pavement is closest to the centre. If the centre is at a corner or junction, choose the road with the wider pavement and set centre_at_intersection to true. Give road_axis for that road (N-S, E-W, NE-SW, NW-SE or CURVED). Report every fact below for that road only.
++For the chosen road give one fact per field (facts) and one mark per visible feature (marks):
++- work_location: ROADWAY (the centre is on a travel lane), SHOULDER (on a paved shoulder or a parking lane), BEYOND_SHOULDER (off the pavement: grass, soil, yard, driveway or behind the curb), SIDEWALK (on a concrete walkway), UNKNOWN. If trees, shadow or parked vehicles hide the pavement at the centre, answer UNKNOWN with reason canopy, shadowed or occluded; never infer it from the surroundings. work_side: N|S|E|W (the side of the road the centre is on).
++- lanes_per_direction: through lanes in ONE direction only. Do not count turn-only lanes, bike lanes, parking lanes or shoulders; on a junction approach count the through lanes, not the turn pockets. UNKNOWN if the lane lines are not visible and the pavement is too narrow or too hidden to judge.
++- divided_highway: true only for a physical median, barrier or two separate pavements. A painted centre line, double yellow line or centre turn lane is false.
++- shoulder_present: true only for a paved strip outside the edge line. A parking lane, a sidewalk or grass is not a shoulder.
++- oneway: true only if one-way arrows or a clear one-way layout are visible; false only if both directions are clearly shown; otherwise UNKNOWN.
++- parking_present: true only for on-street parking: vehicles parked at the curb or painted bays along the road edge. Parking lots, driveways and private lots behind the sidewalk are false. UNKNOWN if the curb is hidden.
++- sidewalk_present: true for a concrete walkway beside the road; driveway aprons and gravel strips are not sidewalks. sidewalk_side: N|S|E|W|BOTH|NONE|UNKNOWN. obstructions: short list or NONE.
+ - shadow_share and canopy_share: a number from 0 to 1, the share of the road and its edges hidden by cast shadow or by tree canopy.
+ - every other field: true|false|UNKNOWN.
+-- marks: points as 'x1,y1;x2,y2;...' in image pixels; one mark per lane line; road_edge_left and road_edge_right: the two OUTER edges of the asphalt, where the pavement meets grass, soil, gravel or kerb, not the sidewalk edge and not a gutter or kerb line inside the pavement, either order; nearest_edge_point: one point, on the nearer outer pavement edge, closest to the work location.
++- marks: points as 'x1,y1;x2,y2;...' in image pixels; one mark per lane line; road_edge_left and road_edge_right: the two OUTER edges of the asphalt of the chosen road, drawn along the road on each side, where the pavement meets grass, soil, gravel or kerb, not the sidewalk edge and not a gutter or kerb line inside the pavement, either order. Draw an edge only where you can see it; if it is hidden mark it UNKNOWN. Do not draw an edge across a junction or along a different road. nearest_edge_point: one point on the nearer outer pavement edge, closest to the work location.
++Confidence: 0.9 or more only for what you can see directly at this scale; 0.6 to 0.8 when you infer it from context; 0.5 or less for a guess. At this scale lane counts and lane lines are rarely above 0.7 unless the paint is clear.
+ Evidence: at most {words} words. Reason: for every fact exactly one of visible, not_visible, occluded, low_resolution, ambiguous, shadowed, canopy (the main reason for your confidence). For UNKNOWN, evidence is exactly one of: not_visible, occluded, low_resolution, ambiguous.
+ Report no length or distance. Return the JSON object only.

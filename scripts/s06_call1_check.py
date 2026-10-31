@@ -31,11 +31,11 @@ sys.path[:0] = [os.path.join(ROOT, "src"), ROOT]
 SITES = ("granite", "second", "colorado")
 INPUTS = os.path.join(ROOT, "tests", "fixtures", "site", "spike", "inputs")
 OUT = os.path.join(ROOT, "var", "s06_call1_check")
-VERSION = 1          # prompt version of this run (--prompt-version); version 2 results go to var/s06_call1_check_v2/<profile>/, never over the version 1 files
+VERSION = 1          # prompt version of this run (--prompt-version); version N results go to var/s06_call1_check_vN/<profile>/, never over the version 1 files
 
 
 def out_root():
-    return OUT if VERSION == 1 else OUT + "_v2"
+    return OUT if VERSION == 1 else f"{OUT}_v{VERSION}"
 SITES_STORE = os.path.join(ROOT, "var", "s06_sites")
 CALLS = [(i + 1, SITES[i // 3], i % 3 + 1) for i in range(9)]   # (call number, site, repetition)
 SITE_COLUMNS = ("site_id", "lat", "lon", "extent_m")
@@ -178,7 +178,7 @@ def _print_result(out):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--profile", default=None, help="profile name in config/foundry_profiles.json (default: its default_profile, gpt-5.6-sol; claude-opus-5-5 keeps working)")
-    ap.add_argument("--prompt-version", type=int, choices=(1, 2), default=1, help="1: the prompt of the nine recorded calls (default); 2: the enhanced prompt (STOP 6)")
+    ap.add_argument("--prompt-version", type=int, choices=(1, 2, 3), default=1, help="1: the prompt of the nine recorded calls (default); 2: the enhanced prompt (STOP 6); 3: prompt v3 (STOP 7)")
     ap.add_argument("--only", type=int, choices=range(1, 10), metavar="N", help="run call N alone (1-9)")
     ap.add_argument("--from", dest="start", type=int, choices=range(1, 10), default=1, metavar="N", help="start at call N")
     ap.add_argument("--parallel", type=int, default=1, metavar="N", help="run N calls at once on this profile (default 1, one after the other)")
